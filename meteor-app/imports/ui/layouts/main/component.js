@@ -2,6 +2,10 @@ import React from "react";
 
 import Navbar from "/imports/ui/components/navbar/component";
 
+import {
+  demo_repository,
+} from "/package.json";
+
 export default class Layout_Main extends React.Component {
   render() {
     const {
@@ -18,7 +22,8 @@ export default class Layout_Main extends React.Component {
           {body}
         </div>
         <div className="page__footer">
-          Some footer
+          <p>Some footer</p>
+          <p><a href={demo_repository} target="_blank">Source code on Github</a></p>
         </div>
       </div>
     );
