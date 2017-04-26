@@ -1,1 +1,146 @@
 @import "{}/imports/ui/stylesheets/not-found.less";
+
+html {
+  background-color: #F7EDBA;
+}
+
+.page {
+  width: 800px;
+  margin: 0 auto;
+}
+
+.page__header {
+  padding: 20px;
+  background-color: white;
+}
+
+.page__footer {
+  padding: 20px;
+  background-color: white;
+}
+
+.page--home {
+  .row_1 {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: stretch;
+
+    .box_body {
+      height: 70px;
+      margin: 5px;
+      padding: 30px;
+      background-color: white;
+    }
+
+    :first-child .box_body {
+      margin-left: 0;
+    }
+
+    :last-child .box_body {
+      margin-right: 0;
+    }
+
+    .box {
+      flex: 1 1 0;
+    }
+  }
+
+  .row_2 {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: stretch;
+  }
+
+  .row_3 {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: stretch;
+
+    .box_body {
+      height: 70px;
+      margin: 5px;
+      padding: 30px;
+      background-color: white;
+    }
+
+    :nth-child(odd) .box_body {
+      margin-left: 0;
+    }
+
+    :nth-child(even) .box_body {
+      margin-right: 0;
+    }
+
+    .box {
+      flex: 1 1 50%;
+    }
+  }
+}
+
+.page--search {
+  .row_1 {
+    margin: 5px 0;
+    padding: 10px;
+    background-color: white;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: center;
+
+    * {
+      flex: 0 0 auto;
+    }
+
+    .flex-fill {
+      flex: 1 1 auto;
+    }
+  }
+  .row_2 {
+    margin: 5px 0;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: stretch;
+
+    .box_body {
+      box-sizing: border-box;
+      height: 100%;
+      margin: 0 5px;
+      padding: 10px;
+      background-color: white;
+    }
+
+    :first-child .box_body {
+      margin-left: 0;
+    }
+
+    :last-child .box_body {
+      margin-right: 0;
+    }
+
+    .search_filters {
+      flex: 0 0 auto;
+
+      width: 300px;
+    }
+
+    .search_results {
+      flex: 1 1 auto;
+    }
+  }
+}
