@@ -11,6 +11,8 @@ export default class Page_Workspace extends React.Component {
   }
 
   _rangeFilterOnChange (event) {
+    console.info('filter changed', Date.now());
+
     const target = event.currentTarget;
     const {
       updateFilterValue,
@@ -21,6 +23,7 @@ export default class Page_Workspace extends React.Component {
 
   render () {
     const {
+      dataReady,
       data,
       filterMin,
       filterMax,
@@ -30,7 +33,7 @@ export default class Page_Workspace extends React.Component {
 
     return (
       <div className="page--workspace">
-        <fieldset className="section_filter">
+        <fieldset className="section_filter" disabled={!dataReady}>
           <legend>Filters</legend>
           <div className="filter-row">
             <label>FilterValue: </label>
@@ -56,19 +59,27 @@ export default class Page_Workspace extends React.Component {
           </map-view>
         </div>
         <div className="section_charts">
-          {channelDistributions.map((distData, index) => (
-            <C3Chart
-              key={index}
-              data={{
-                columns: [
-                  [`channel ${index}`, ...distData],
-                ],
-                types: {
-                  [`channel ${index}`]: 'bar',
-                },
-              }}
-            />
-          ))}
+          {
+            dataReady
+            ? <div>
+                {channelDistributions.map((distData, index) => (
+                  <C3Chart
+                    key={index}
+                    data={{
+                      columns: [
+                        [`channel ${index}`, ...distData],
+                      ],
+                      types: {
+                        [`channel ${index}`]: 'bar',
+                      },
+                    }}
+                  />
+                ))}
+              </div>
+            : <div>
+                <span>Loading...</span>
+              </div>
+          }
         </div>
       </div>
     );
