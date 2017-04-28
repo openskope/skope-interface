@@ -15,12 +15,24 @@ const fakeDataExtent = [
 const fakeDataQuantity = 1000;
 const filterMin = 0,
       filterMax = 10;
+const channelValueMin = 0,
+      channelValueMax = 256;
 const fakeData = {
   "type": "FeatureCollection",
   "features": Array.from({length: fakeDataQuantity}, (value, index) => ({
     "type": "Feature",
     "properties": {
       filterValue: _.random(filterMin, filterMax, false),
+      channels: [
+        // Alpha
+        _.random(channelValueMin, channelValueMax, false),
+        // Red
+        _.random(channelValueMin, channelValueMax, false),
+        // Green
+        _.random(channelValueMin, channelValueMax, false),
+        // Blue
+        _.random(channelValueMin, channelValueMax, false),
+      ],
     },
     "geometry": {
       "type": "Point",
@@ -47,10 +59,23 @@ export default createContainer((props) => {
 
   data.features = data.features.filter((feature) => feature.properties.filterValue < filterValue);
 
+  const channelDistributions = data.features.reduce((acc, feature, index) => {
+    const {
+      channels,
+    } = feature.properties;
+    return acc.map((channel, index) => channel.map((count, value) => (value === channels[index]) ? (count + 1) : count));
+  }, [
+    Array(channelValueMax - channelValueMin).fill(0),
+    Array(channelValueMax - channelValueMin).fill(0),
+    Array(channelValueMax - channelValueMin).fill(0),
+    Array(channelValueMax - channelValueMin).fill(0),
+  ]);
+
   return {
     data,
     filterMin,
     filterMax,
     filterValue,
+    channelDistributions,
   };
 }, Component);

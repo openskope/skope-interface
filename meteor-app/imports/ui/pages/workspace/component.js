@@ -1,5 +1,7 @@
 import { FlowRouter } from "meteor/kadira:flow-router";
 import React from "react";
+import C3Chart from "react-c3js";
+import "c3/c3.css";
 
 export default class Page_Workspace extends React.Component {
   constructor (props) {
@@ -23,6 +25,7 @@ export default class Page_Workspace extends React.Component {
       filterMin,
       filterMax,
       filterValue,
+      channelDistributions,
     } = this.props;
 
     return (
@@ -42,14 +45,31 @@ export default class Page_Workspace extends React.Component {
             />
           </div>
         </fieldset>
-        <map-view id="demo-map" basemap="osm" center="-10997148, 4569099" style={{width: "100%"}}>
-          <map-layer-geojson
-            name="example-geojson"
-            src-json={JSON.stringify(data)}
-            src-projection="EPSG:4326"
-            projection="EPSG:3857"
-          ></map-layer-geojson>
-        </map-view>
+        <div className="section_map">
+          <map-view id="demo-map" basemap="osm" center="-10997148, 4569099" style={{width: "100%"}}>
+            <map-layer-geojson
+              name="example-geojson"
+              src-json={JSON.stringify(data)}
+              src-projection="EPSG:4326"
+              projection="EPSG:3857"
+            ></map-layer-geojson>
+          </map-view>
+        </div>
+        <div className="section_charts">
+          {channelDistributions.map((distData, index) => (
+            <C3Chart
+              key={index}
+              data={{
+                columns: [
+                  [`channel ${index}`, ...distData],
+                ],
+                types: {
+                  [`channel ${index}`]: 'bar',
+                },
+              }}
+            />
+          ))}
+        </div>
       </div>
     );
   }

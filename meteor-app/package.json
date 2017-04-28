@@ -12,6 +12,7 @@
     "prop-types": "^15.5.8",
     "react": "^15.5.4",
     "react-addons-pure-render-mixin": "^15.5.2",
+    "react-c3js": "^0.1.18",
     "react-dom": "^15.5.4",
     "react-mounter": "^1.2.0"
   }
