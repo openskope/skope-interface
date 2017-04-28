@@ -17732,47 +17732,23 @@ var HTMLMapBaseClass = function (_HTMLElement) {
   }, {
     key: 'log_',
     value: function log_() {
-      var _console;
-
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      (_console = console).log.apply(_console, [this.constructor.name + '_' + this.id].concat(args));
+      //     console.log(`${this.constructor.name}_${this.id}`, ...args);
     }
   }, {
     key: 'logInfo_',
     value: function logInfo_() {
-      var _console2;
-
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
-
-      (_console2 = console).info.apply(_console2, [this.constructor.name + '_' + this.id].concat(args));
+      //     console.info(`${this.constructor.name}_${this.id}`, ...args);
     }
   }, {
     key: 'logWarn_',
     value: function logWarn_() {
-      var _console3;
-
-      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        args[_key3] = arguments[_key3];
-      }
-
-      (_console3 = console).warn.apply(_console3, [this.constructor.name + '_' + this.id].concat(args));
+      //     console.warn(`${this.constructor.name}_${this.id}`, ...args);
     }
   }, {
     key: 'logError_',
-    value: function logError_() {
-      var _console4;
+    value: function logError_() {}
+    //     console.error(`${this.constructor.name}_${this.id}`, ...args);
 
-      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-        args[_key4] = arguments[_key4];
-      }
-
-      (_console4 = console).error.apply(_console4, [this.constructor.name + '_' + this.id].concat(args));
-    }
 
     /**
      * string, *, * -> boolean
@@ -17917,8 +17893,8 @@ var HTMLMapBaseClass = function (_HTMLElement) {
 
       var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
-      for (var _len5 = arguments.length, params = Array(_len5 > 2 ? _len5 - 2 : 0), _key5 = 2; _key5 < _len5; _key5++) {
-        params[_key5 - 2] = arguments[_key5];
+      for (var _len = arguments.length, params = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+        params[_key - 2] = arguments[_key];
       }
 
       var timerID = setTimeout.apply(undefined, [function () {
