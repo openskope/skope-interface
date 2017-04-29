@@ -1,7 +1,6 @@
 import { FlowRouter } from "meteor/kadira:flow-router";
 import React from "react";
-import C3Chart from "react-c3js";
-import "c3/c3.css";
+import { Bar } from "react-chartjs-2";
 
 export default class Page_Workspace extends React.Component {
   constructor (props) {
@@ -63,17 +62,46 @@ export default class Page_Workspace extends React.Component {
             dataReady
             ? <div>
                 {channelDistributions.map((distData, index) => (
-                  <C3Chart
+                  <div
                     key={index}
-                    data={{
-                      columns: [
-                        [`channel ${index}`, ...distData],
-                      ],
-                      types: {
-                        [`channel ${index}`]: 'bar',
-                      },
-                    }}
-                  />
+                    style={{height: "200px"}}
+                  >
+                    <Bar
+
+                      data={{
+                        labels: distData.map((count, index) => index),
+                        datasets: [
+                          {
+                            label: `channel ${index}`,
+                            backgroundColor: 'rgba(255,99,132,0.2)',
+                            borderColor: 'rgba(255,99,132,1)',
+                            borderWidth: 1,
+                            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                            hoverBorderColor: 'rgba(255,99,132,1)',
+                            data: distData,
+                          },
+                        ],
+                      }}
+                      options={{
+                        animation: {
+                          duration: 0,
+                        },
+                        maintainAspectRatio: false,
+                        scales: {
+                          xAxes: [
+                            {
+                              type: "category",
+                              position: "bottom",
+                              ticks: {
+                                autoSkip: true,
+                                autoSkipPadding: 8,
+                              },
+                            },
+                          ],
+                        },
+                      }}
+                    />
+                  </div>
                 ))}
               </div>
             : <div>
