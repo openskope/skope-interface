@@ -7,6 +7,8 @@ export default class Page_Workspace extends React.Component {
     super(props);
 
     this._bound_rangeFilterOnChange = this._rangeFilterOnChange.bind(this);
+    this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
+    this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
   }
 
   _rangeFilterOnChange (event) {
@@ -18,6 +20,26 @@ export default class Page_Workspace extends React.Component {
     } = this.props;
 
     updateFilterValue(target.value);
+  }
+
+  _yearStepBackButtonOnClick (/*event*/) {
+    const {
+      filterMin,
+      filterValue,
+      updateFilterValue,
+    } = this.props;
+
+    updateFilterValue(Math.max(filterMin, filterValue - 1));
+  }
+
+  _yearStepForwardButtonOnClick (/*event*/) {
+    const {
+      filterMax,
+      filterValue,
+      updateFilterValue,
+    } = this.props;
+
+    updateFilterValue(Math.min(filterMax, filterValue + 1));
   }
 
   render () {
@@ -45,7 +67,9 @@ export default class Page_Workspace extends React.Component {
               value={filterValue}
               onChange={this._bound_rangeFilterOnChange}
             />
+            <button onClick={this._bound_yearStepBackButtonOnClick}>&lt;</button>
             <label>{filterValue}</label>
+            <button onClick={this._bound_yearStepForwardButtonOnClick}>&gt;</button>
           </div>
         </fieldset>
         <div className="section_map">
