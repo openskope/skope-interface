@@ -56,6 +56,15 @@ export default class Page_Workspace extends React.Component {
               projection="EPSG:3857"
             ></map-layer-geojson>
 
+            <map-layer-xyz
+              name="testing-skope"
+              url="http://demo.openskope.org/static_tiles/PPT_water_year/tiles/PPT_water_year-1-color/{z}/{x}/{-y}.png"
+              min-zoom="5"
+              max-zoom="12"
+              opacity="0.7"
+              extent="-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904"
+            ></map-layer-xyz>
+
             <map-control-defaults></map-control-defaults>
             <map-interaction-defaults></map-interaction-defaults>
           </map-view>
