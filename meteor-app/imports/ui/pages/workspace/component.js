@@ -35,7 +35,7 @@ export default class Page_Workspace extends React.Component {
         <fieldset className="section_filter" disabled={!dataReady}>
           <legend>Filters</legend>
           <div className="filter-row">
-            <label>FilterValue: </label>
+            <label>Year: </label>
             <input
               className="layout_fill"
               type="range"
@@ -45,6 +45,7 @@ export default class Page_Workspace extends React.Component {
               value={filterValue}
               onChange={this._bound_rangeFilterOnChange}
             />
+            <label>{filterValue}</label>
           </div>
         </fieldset>
         <div className="section_map">
@@ -58,7 +59,7 @@ export default class Page_Workspace extends React.Component {
 
             <map-layer-xyz
               name="testing-skope"
-              url="http://demo.openskope.org/static_tiles/PPT_water_year/tiles/PPT_water_year-1-color/{z}/{x}/{-y}.png"
+              url={`http://demo.openskope.org/static_tiles/PPT_water_year/tiles/PPT_water_year-${filterValue}-color/{z}/{x}/{-y}.png`}
               min-zoom="5"
               max-zoom="12"
               opacity="0.7"
