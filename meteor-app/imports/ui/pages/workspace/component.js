@@ -88,6 +88,7 @@ export default class Page_Workspace extends React.Component {
               src-json={JSON.stringify(data)}
               src-projection="EPSG:4326"
               projection="EPSG:3857"
+              opacity="0"
             ></map-layer-geojson>
 
             <map-layer-xyz
