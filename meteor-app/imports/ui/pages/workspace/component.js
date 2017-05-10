@@ -88,7 +88,7 @@ export default class Page_Workspace extends React.Component {
               src-json={JSON.stringify(data)}
               src-projection="EPSG:4326"
               projection="EPSG:3857"
-              opacity="0"
+              invisible={true}
             ></map-layer-geojson>
 
             {(filterMin < filterValue) ? (
@@ -99,7 +99,7 @@ export default class Page_Workspace extends React.Component {
                 max-zoom="12"
                 opacity="0.7"
                 extent="-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904"
-                opacity="0"
+                invisible={true}
               ></map-layer-xyz>
             ) : null}
 
@@ -120,7 +120,7 @@ export default class Page_Workspace extends React.Component {
                 max-zoom="12"
                 opacity="0.7"
                 extent="-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904"
-                opacity="0"
+                invisible={true}
               ></map-layer-xyz>
             ) : null}
 
