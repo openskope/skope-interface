@@ -55,6 +55,9 @@ export default class Page_Workspace extends React.Component {
               src-projection="EPSG:4326"
               projection="EPSG:3857"
             ></map-layer-geojson>
+
+            <map-control-defaults></map-control-defaults>
+            <map-interaction-defaults></map-interaction-defaults>
           </map-view>
         </div>
         <div className="section_charts">
