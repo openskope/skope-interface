@@ -8,8 +8,6 @@ Meteor.methods({
   'samples.get' ({ filterValue }) {
     check(filterValue, Match.Integer);
 
-    Meteor._sleepForMs(300);
-
     const items = Samples.find({
       'properties.filterValue': {
         $lt: filterValue,
