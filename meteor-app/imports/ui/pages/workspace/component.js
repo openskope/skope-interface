@@ -67,6 +67,7 @@ export default class Page_Workspace extends React.Component {
 
             <map-control-defaults></map-control-defaults>
             <map-interaction-defaults></map-interaction-defaults>
+            <map-control-simple-layer-list></map-control-simple-layer-list>
           </map-view>
         </div>
         <div className="section_charts">
