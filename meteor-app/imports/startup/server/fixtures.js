@@ -6,7 +6,7 @@ import { Samples, channelValueMin, channelValueMax } from "/imports/api/samples/
 
 Meteor.startup(() => {
   // if the Links collection is empty
-  if (Samples.find().count() === 0) {
+  if (Samples.find().count() < 2000) {
 
     const fakeDataExtent = [
       [
@@ -18,9 +18,9 @@ Meteor.startup(() => {
         45.089035564831036
       ],
     ];
-    const fakeDataQuantity = 1000;
-    const filterMin = 0,
-          filterMax = 10;
+    const fakeDataQuantity = 2000;
+    const filterMin = 1,
+          filterMax = 2000;
     const fakeDataItems = Array.from({length: fakeDataQuantity}, (value, index) => ({
       "type": "Feature",
       "properties": {

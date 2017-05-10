@@ -5,8 +5,8 @@ import { createContainer } from "meteor/react-meteor-data";
 import _ from "lodash";
 import Component from "./component";
 
-const filterMin = 0,
-      filterMax = 10;
+const filterMin = 1,
+      filterMax = 2000;
 const reactiveState = new ReactiveVar({
   error: null,
   result: null,
