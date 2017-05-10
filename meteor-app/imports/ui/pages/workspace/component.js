@@ -91,6 +91,18 @@ export default class Page_Workspace extends React.Component {
               opacity="0"
             ></map-layer-geojson>
 
+            {(filterMin < filterValue) ? (
+              <map-layer-xyz
+                name="testing-skope-preload-prev"
+                url={`http://demo.openskope.org/static_tiles/PPT_water_year/tiles/PPT_water_year-${filterValue - 1}-color/{z}/{x}/{-y}.png`}
+                min-zoom="5"
+                max-zoom="12"
+                opacity="0.7"
+                extent="-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904"
+                opacity="0"
+              ></map-layer-xyz>
+            ) : null}
+
             <map-layer-xyz
               name="testing-skope"
               url={`http://demo.openskope.org/static_tiles/PPT_water_year/tiles/PPT_water_year-${filterValue}-color/{z}/{x}/{-y}.png`}
@@ -99,6 +111,18 @@ export default class Page_Workspace extends React.Component {
               opacity="0.7"
               extent="-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904"
             ></map-layer-xyz>
+
+            {(filterMax > filterValue) ? (
+              <map-layer-xyz
+                name="testing-skope-preload-next"
+                url={`http://demo.openskope.org/static_tiles/PPT_water_year/tiles/PPT_water_year-${filterValue + 1}-color/{z}/{x}/{-y}.png`}
+                min-zoom="5"
+                max-zoom="12"
+                opacity="0.7"
+                extent="-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904"
+                opacity="0"
+              ></map-layer-xyz>
+            ) : null}
 
             <map-control-defaults></map-control-defaults>
             <map-interaction-defaults></map-interaction-defaults>
