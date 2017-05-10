@@ -73,7 +73,16 @@ export default class Page_Workspace extends React.Component {
           </div>
         </fieldset>
         <div className="section_map">
-          <map-view id="demo-map" basemap="osm" center="-10997148, 4569099" style={{width: "100%"}}>
+          <map-view
+            id="demo-map"
+            basemap="osm"
+            center="-12107625, 4495720"
+            zoom="5"
+            style={{
+              width: "100%",
+              height: "400px",
+            }}
+          >
             <map-layer-geojson
               name="example-geojson"
               src-json={JSON.stringify(data)}
