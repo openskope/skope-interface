@@ -11,6 +11,7 @@ import reducers from "/imports/ui/reducers";
 
 // Import needed templates
 import Layout_Main from "/imports/ui/layouts/main/container";
+import Layout_FullWindow from "/imports/ui/layouts/full-window/container";
 import Page_Home from "/imports/ui/pages/home/container";
 import Page_Search from "/imports/ui/pages/search/container";
 import Page_Workspace from "/imports/ui/pages/workspace/container";
@@ -84,7 +85,7 @@ FlowRouter.route("/workspace", {
       value: queryParams.filterValue,
     });
 
-    mount(Layout_Main, {
+    mount(Layout_FullWindow, {
       store,
       body: (
         <Page_Workspace {...{

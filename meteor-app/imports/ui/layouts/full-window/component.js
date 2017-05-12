@@ -6,14 +6,14 @@ import {
   demo_repository,
 } from "/package.json";
 
-export default class Layout_Main extends React.Component {
+export default class Layout_FullWindow extends React.Component {
   render() {
     const {
       store,
       body,
     } = this.props;
     return (
-      <div className="page layout-main">
+      <div className="page layout-fullWindow">
         <div className="page__header">
           <p>Some header</p>
           <Navbar store={store} />
