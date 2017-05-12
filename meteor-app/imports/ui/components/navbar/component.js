@@ -2,12 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 class NavbarItem extends React.Component {
-  static get propTypes () {
-    return {
-      label: PropTypes.string.isRequired,
-      url: PropTypes.string,
-    };
-  }
+  static propTypes = {
+    label: PropTypes.string.isRequired,
+    url: PropTypes.string,
+  };
 
   render () {
     const {
@@ -26,18 +24,16 @@ class NavbarItem extends React.Component {
 }
 
 export default class Navbar extends React.Component {
-  static get propTypes () {
-    return {
-      items: PropTypes.arrayOf(PropTypes.object),
-    };
-  }
+  static propTypes = {
+    items: PropTypes.arrayOf(PropTypes.object),
+  };
 
   render () {
     const {
       items,
     } = this.props;
 
-    if (!items) {
+    if (!items || items.length === 0) {
       return null;
     }
 

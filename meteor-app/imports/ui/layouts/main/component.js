@@ -1,6 +1,6 @@
 import React from "react";
 
-import Navbar from "/imports/ui/components/navbar/component";
+import Navbar from "/imports/ui/components/navbar/container";
 
 import {
   demo_repository,
@@ -9,14 +9,14 @@ import {
 export default class Layout_Main extends React.Component {
   render() {
     const {
-      navInfo,
+      store,
       body,
     } = this.props;
     return (
       <div className="page">
         <div className="page__header">
           <p>Some header</p>
-          <Navbar items={navInfo} />
+          <Navbar store={store} />
         </div>
         <div className="page__body">
           {body}

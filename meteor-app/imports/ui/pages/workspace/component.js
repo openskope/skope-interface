@@ -1,8 +1,26 @@
-import { FlowRouter } from "meteor/kadira:flow-router";
 import React from "react";
+import PropTypes from "prop-types";
 import { Bar } from "react-chartjs-2";
 
 export default class Page_Workspace extends React.Component {
+
+  static propTypes = {
+    // Indicate if all data needed by this component is ready.
+    dataReady: PropTypes.bool.isRequired,
+    // The feature collection for the vector layer.
+    data: PropTypes.object.isRequired,
+    // Lower bound of the filter slider.
+    filterMin: PropTypes.number.isRequired,
+    // Upper bound of the filter slider.
+    filterMax: PropTypes.number.isRequired,
+    // Current value of the filter slider.
+    filterValue: PropTypes.number.isRequired,
+    // Array of histogram data for the charts.
+    channelDistributions: PropTypes.array,
+    // Callback function for updating filter value.
+    updateFilterValue: PropTypes.func.isRequired,
+  };
+
   constructor (props) {
     super(props);
 
