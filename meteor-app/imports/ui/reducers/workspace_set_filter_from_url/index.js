@@ -12,8 +12,10 @@ export const WORKSPACE_SET_FILTER_FROM_URL = (state, action) => {
 
   return {
     ...state,
+
     workspace: {
       ...state.workspace,
+
       filterValue,
     },
   };

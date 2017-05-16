@@ -19,6 +19,7 @@ export default createContainer((props) => {
   } = props;
   const {
     workspace: {
+      layers,
       filterValue,
       error: dataRequestError,
       result: dataRequestResult,
@@ -49,6 +50,16 @@ export default createContainer((props) => {
 
   return {
     dataReady,
+    layers: layers.map((layer) => ({
+      ...layer,
+      url: `http://demo.openskope.org/static_tiles/${layer.urlTile}/tiles/${layer.urlTile}-${filterValue}-color/{z}/{x}/{-y}.png`,
+    })),
+    toggleLayer: (layerIndex) => {
+      store.dispatch({
+        type: actions.WORKSPACE_TOGGLE_LAYER_VISIBILITY.type,
+        index: layerIndex,
+      });
+    },
     data: {
       "type": "FeatureCollection",
       "features": dataReady ? dataRequestResult.items : [],

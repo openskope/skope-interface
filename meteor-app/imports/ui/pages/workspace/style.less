@@ -16,4 +16,27 @@
       }
     }
   }
+
+  .section_map {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: stretch;
+
+    height: 500px;
+
+    .layer-list {
+      flex: 0 0 auto;
+      width: 300px;
+      height: 100%;
+    }
+
+    .the-map {
+      flex: 1 1 0;
+      width: auto;
+      height: auto;
+    }
+  }
 }

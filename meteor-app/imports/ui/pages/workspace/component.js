@@ -63,6 +63,8 @@ export default class Page_Workspace extends React.Component {
   render () {
     const {
       dataReady,
+      layers,
+      toggleLayer,
       data,
       filterMin,
       filterMax,
@@ -91,15 +93,19 @@ export default class Page_Workspace extends React.Component {
           </div>
         </fieldset>
         <div className="section_map">
+          <ul className="layer-list">
+            {layers.map((layer, layerIndex) => (
+              <li key={layerIndex}>
+                <label>{layer.name}</label>
+                <input type="checkbox" checked={!layer.invisible} onChange={toggleLayer.bind(null, layerIndex)} />
+              </li>
+            ))}
+          </ul>
           <map-view
-            id="demo-map"
+            class="the-map"
             basemap="osm"
             center="-12107625, 4495720"
             zoom="5"
-            style={{
-              width: "100%",
-              height: "400px",
-            }}
           >
             <map-layer-geojson
               name="example-geojson"
@@ -109,38 +115,18 @@ export default class Page_Workspace extends React.Component {
               invisible={true}
             ></map-layer-geojson>
 
-            {(filterMin < filterValue) ? (
+            {layers.map((layer, layerIndex) => (
               <map-layer-xyz
-                name="testing-skope-preload-prev"
-                url={`http://demo.openskope.org/static_tiles/PPT_water_year/tiles/PPT_water_year-${filterValue - 1}-color/{z}/{x}/{-y}.png`}
-                min-zoom="5"
-                max-zoom="12"
-                opacity="0.7"
-                extent="-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904"
-                invisible={true}
+                key={layerIndex}
+                name={layer.name}
+                url={layer.url}
+                min-zoom={layer.minZoom}
+                max-zoom={layer.maxZoom}
+                invisible={layer.invisible ? "invisible" : null}
+                opacity={layer.opacity}
+                extent={layer.extent}
               ></map-layer-xyz>
-            ) : null}
-
-            <map-layer-xyz
-              name="testing-skope"
-              url={`http://demo.openskope.org/static_tiles/PPT_water_year/tiles/PPT_water_year-${filterValue}-color/{z}/{x}/{-y}.png`}
-              min-zoom="5"
-              max-zoom="12"
-              opacity="0.7"
-              extent="-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904"
-            ></map-layer-xyz>
-
-            {(filterMax > filterValue) ? (
-              <map-layer-xyz
-                name="testing-skope-preload-next"
-                url={`http://demo.openskope.org/static_tiles/PPT_water_year/tiles/PPT_water_year-${filterValue + 1}-color/{z}/{x}/{-y}.png`}
-                min-zoom="5"
-                max-zoom="12"
-                opacity="0.7"
-                extent="-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904"
-                invisible={true}
-              ></map-layer-xyz>
-            ) : null}
+            ))}
 
             <map-control-defaults></map-control-defaults>
             <map-interaction-defaults></map-interaction-defaults>
