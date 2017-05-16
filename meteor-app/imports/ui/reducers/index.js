@@ -32,11 +32,12 @@ const defaultState = {
     inspectPointSelected: false,
     // If a point is selected for inspection, this would be its coordinates in lat-long.
     inspectPointCoordinate: [0, 0],
+    // If a point is selected for inspection, this shows if data is still being loaded.
+    inspectPointLoading: false,
+    // If a point is selected for inspection, the loaded data will be stored here.
+    inspectPointData: null,
 
     filterValue: null,
-    error: null,
-    result: null,
-    request: null,
   },
 };
 

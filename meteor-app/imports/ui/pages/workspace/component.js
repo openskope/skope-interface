@@ -1,22 +1,32 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 
 export default class Page_Workspace extends React.Component {
 
   static propTypes = {
-    // Indicate if all data needed by this component is ready.
-    dataReady: PropTypes.bool.isRequired,
-    // The feature collection for the vector layer.
-    data: PropTypes.object.isRequired,
+    // List of layers to display.
+    layers: PropTypes.arrayOf(PropTypes.object).isRequired,
+    // Callback function for toggling the visibility of layers.
+    toggleLayer: PropTypes.func.isRequired,
+
+    // Indicate if a point is selected for inspection.
+    inspectPointSelected: PropTypes.bool.isRequired,
+    // The coordinate of the point being inspected.
+    inspectPointCoordinate: PropTypes.arrayOf(PropTypes.number).isRequired,
+    // Indicate if the data is being loaded for the point.
+    inspectPointLoading: PropTypes.bool.isRequired,
+    // The loaded data for the point.
+    inspectPointData: PropTypes.arrayOf(PropTypes.object),
+    // Callback function for selecting a point to inspect.
+    selectInspectPoint: PropTypes.func.isRequired,
+
     // Lower bound of the filter slider.
     filterMin: PropTypes.number.isRequired,
     // Upper bound of the filter slider.
     filterMax: PropTypes.number.isRequired,
     // Current value of the filter slider.
     filterValue: PropTypes.number.isRequired,
-    // Array of histogram data for the charts.
-    channelDistributions: PropTypes.array,
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
   };
@@ -77,134 +87,158 @@ export default class Page_Workspace extends React.Component {
 
   render () {
     const {
-      dataReady,
-
       layers,
       toggleLayer,
 
       inspectPointSelected,
       inspectPointCoordinate,
+      inspectPointLoading,
+      inspectPointData,
 
-      data,
       filterMin,
       filterMax,
       filterValue,
-      channelDistributions,
     } = this.props;
 
     return (
       <div className="page--workspace">
-        <fieldset className="section_filter" disabled={!dataReady}>
+        <fieldset>
           <legend>Filters</legend>
-          <div className="filter-row">
-            <label>Year: </label>
-            <input
-              className="layout_fill"
-              type="range"
-              min={filterMin}
-              max={filterMax}
-              step="1"
-              value={filterValue}
-              onChange={this._bound_rangeFilterOnChange}
-            />
-            <button onClick={this._bound_yearStepBackButtonOnClick}>&lt;</button>
-            <label>{filterValue}</label>
-            <button onClick={this._bound_yearStepForwardButtonOnClick}>&gt;</button>
+          <div className="section_filter">
+            <div className="filter-row">
+              <label>Year: </label>
+              <input
+                className="layout_fill"
+                type="range"
+                min={filterMin}
+                max={filterMax}
+                step="1"
+                value={filterValue}
+                onChange={this._bound_rangeFilterOnChange}
+              />
+              <button onClick={this._bound_yearStepBackButtonOnClick}>&lt;</button>
+              <label>{filterValue}</label>
+              <button onClick={this._bound_yearStepForwardButtonOnClick}>&gt;</button>
+            </div>
           </div>
         </fieldset>
-        <div className="section_map">
-          <ul className="layer-list">
-            {layers.map((layer, layerIndex) => (
-              <li key={layerIndex}>
-                <label>{layer.name}</label>
-                <input type="checkbox" checked={!layer.invisible} onChange={toggleLayer.bind(null, layerIndex)} />
-              </li>
-            ))}
-          </ul>
-          <map-view
-            class="the-map"
-            basemap="osm"
-            center="-12107625, 4495720"
-            zoom="5"
-            ref={(ref) => this._mapview = ref}
-          >
+        <fieldset>
+          <legend>Map</legend>
+          <div className="section_map">
+            <ul className="layer-list">
+              {layers.map((layer, layerIndex) => (
+                <li key={layerIndex}>
+                  <label>{layer.name}</label>
+                  <input type="checkbox" checked={!layer.invisible} onChange={toggleLayer.bind(null, layerIndex)} />
+                </li>
+              ))}
+            </ul>
+            <map-view
+              class="the-map"
+              basemap="osm"
+              center="-12107625, 4495720"
+              zoom="5"
+              ref={(ref) => this._mapview = ref}
+            >
 
-            {layers.map((layer, layerIndex) => (
-              <map-layer-xyz
-                key={layerIndex}
-                name={layer.name}
-                url={layer.url}
-                min-zoom={layer.minZoom}
-                max-zoom={layer.maxZoom}
-                invisible={layer.invisible ? "invisible" : null}
-                opacity={layer.opacity}
-                extent={layer.extent}
-              ></map-layer-xyz>
-            ))}
+              {layers.map((layer, layerIndex) => (
+                <map-layer-xyz
+                  key={layerIndex}
+                  name={layer.name}
+                  url={layer.url}
+                  min-zoom={layer.minZoom}
+                  max-zoom={layer.maxZoom}
+                  invisible={layer.invisible ? "invisible" : null}
+                  opacity={layer.opacity}
+                  extent={layer.extent}
+                ></map-layer-xyz>
+              ))}
 
-            <map-layer-singlepoint
-              invisible={!inspectPointSelected ? "invisible" : null}
-              latitude={inspectPointCoordinate[0]}
-              longitude={inspectPointCoordinate[1]}
-            ></map-layer-singlepoint>
+              <map-layer-singlepoint
+                invisible={!inspectPointSelected ? "invisible" : null}
+                latitude={inspectPointCoordinate[1]}
+                longitude={inspectPointCoordinate[0]}
+              ></map-layer-singlepoint>
 
-            <map-control-defaults></map-control-defaults>
-            <map-interaction-defaults></map-interaction-defaults>
-            <map-control-simple-layer-list></map-control-simple-layer-list>
-          </map-view>
-        </div>
-        <div className="section_charts">
-          {
-            dataReady
-            ? <div>
-                {channelDistributions.map((distData, index) => (
-                  <div
-                    key={index}
-                    style={{height: "200px"}}
-                  >
-                    <Bar
-
-                      data={{
-                        labels: distData.map((count, index) => index),
-                        datasets: [
-                          {
-                            label: `channel ${index}`,
-                            backgroundColor: 'rgba(255,99,132,0.2)',
-                            borderColor: 'rgba(255,99,132,1)',
-                            borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-                            hoverBorderColor: 'rgba(255,99,132,1)',
-                            data: distData,
-                          },
-                        ],
-                      }}
-                      options={{
-                        animation: {
-                          duration: 0,
-                        },
-                        maintainAspectRatio: false,
-                        scales: {
-                          xAxes: [
-                            {
-                              type: "category",
-                              position: "bottom",
-                              ticks: {
-                                autoSkip: true,
-                                autoSkipPadding: 8,
-                              },
-                            },
-                          ],
-                        },
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            : <div>
-                <span>Loading...</span>
-              </div>
-          }
-        </div>
+              <map-control-defaults></map-control-defaults>
+              <map-interaction-defaults></map-interaction-defaults>
+              <map-control-simple-layer-list></map-control-simple-layer-list>
+            </map-view>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Charts</legend>
+          <div className="section_charts">
+            {
+              !inspectPointSelected
+              ? null
+              : (
+                  inspectPointLoading
+                  ? (
+                      <div>
+                        <span>Loading...</span>
+                      </div>
+                    )
+                  : (
+                      <div>
+                        {inspectPointData.map(({label, data}, dataIndex) => (
+                          <div
+                            key={dataIndex}
+                            style={{height: "200px"}}
+                          >
+                            <Line
+                              data={{
+                                datasets: [
+                                  {
+                                    label,
+                                    lineTension: 0,
+                                    pointRadius: 0,
+                                    backgroundColor: 'rgba(255,99,132,0.2)',
+                                    borderColor: 'rgba(255,99,132,1)',
+                                    borderWidth: 1,
+                                    hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                                    hoverBorderColor: 'rgba(255,99,132,1)',
+                                    data,
+                                  },
+                                ],
+                              }}
+                              options={{
+                                animation: {
+                                  duration: 0,
+                                },
+                                maintainAspectRatio: false,
+                                tooltips: {
+                                  enabled: true,
+                                  mode: "nearest",
+                                  intersect: false,
+                                },
+                                hover: {
+                                  mode: "nearest",
+                                  intersect: false,
+                                  animationDuration: 0,
+                                },
+                                scales: {
+                                  xAxes: [
+                                    {
+                                      type: "linear",
+                                      position: "bottom",
+                                      ticks: {
+                                        autoSkip: true,
+                                        autoSkipPadding: 8,
+                                      },
+                                    },
+                                  ],
+                                },
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )
+                )
+            }
+          </div>
+        </fieldset>
       </div>
     );
   }

@@ -23,38 +23,14 @@ export default createContainer((props) => {
 
       inspectPointSelected,
       inspectPointCoordinate,
+      inspectPointLoading,
+      inspectPointData,
 
       filterValue,
-      error: dataRequestError,
-      result: dataRequestResult,
-      request: dataRequest,
     },
   } = store.getState();
-  const dataReady = Boolean(dataRequestResult);
-
-  if (!dataRequest || dataRequest.filterValue !== filterValue) {
-    const request = {
-      filterValue,
-    };
-
-    store.dispatch({
-      type: actions.WORKSPACE_NEW_DATA_REQUEST.type,
-      request,
-    });
-
-    Meteor.call("samples.get", request, (error, result) => {
-      store.dispatch({
-        type: actions.WORKSPACE_RESOLVE_DATA_REQUEST.type,
-        request,
-        error,
-        result,
-      });
-    });
-  }
 
   return {
-    dataReady,
-
     layers: layers.map((layer) => ({
       ...layer,
       url: `http://demo.openskope.org/static_tiles/${layer.urlTile}/tiles/${layer.urlTile}-${filterValue}-color/{z}/{x}/{-y}.png`,
@@ -68,12 +44,31 @@ export default createContainer((props) => {
 
     inspectPointSelected,
     inspectPointCoordinate,
+    inspectPointLoading,
+    inspectPointData: Object.keys(inspectPointData ? inspectPointData.data : {}).map((sourceName) => ({
+      label: sourceName,
+      data: inspectPointData.data[sourceName]
+            .filter((value, valueIndex) => valueIndex >= filterValue)
+            .map((value, valueIndex) => ({
+              x: filterValue + valueIndex,
+              y: value,
+            })),
+    })),
     selectInspectPoint: (coord) => {
       if (coord) {
         store.dispatch({
           type: actions.WORKSPACE_INSPECT_POINT.type,
           selected: true,
           coordinate: coord,
+        });
+
+        Meteor.call("timeseries.get", {lon: coord[0], lat: coord[1]}, (error, result) => {
+          store.dispatch({
+            type: actions.WORKSPACE_INSPECT_POINT_RESOLVE_DATA.type,
+            coordinate: coord,
+            error,
+            result,
+          });
         });
       } else {
         store.dispatch({
@@ -84,13 +79,8 @@ export default createContainer((props) => {
       }
     },
 
-    data: {
-      "type": "FeatureCollection",
-      "features": dataReady ? dataRequestResult.items : [],
-    },
     filterMin,
     filterMax,
     filterValue,
-    channelDistributions: dataReady ? dataRequestResult.distributions : null,
   };
 }, Component);
