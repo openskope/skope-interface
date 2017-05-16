@@ -21,12 +21,19 @@ export default class Page_Workspace extends React.Component {
     updateFilterValue: PropTypes.func.isRequired,
   };
 
+  componentDidMount () {
+    if (this._mapview) {
+      this._mapview.addEventListener('click:view', this._bound_mapOnClick);
+    }
+  }
+
   constructor (props) {
     super(props);
 
     this._bound_rangeFilterOnChange = this._rangeFilterOnChange.bind(this);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
+    this._bound_mapOnClick = this._mapOnClick.bind(this);
   }
 
   _rangeFilterOnChange (event) {
@@ -60,11 +67,24 @@ export default class Page_Workspace extends React.Component {
     updateFilterValue(Math.min(filterMax, filterValue + 1));
   }
 
+  _mapOnClick (event) {
+    const {
+      selectInspectPoint,
+    } = this.props;
+
+    selectInspectPoint(event.latLongCoordinate);
+  }
+
   render () {
     const {
       dataReady,
+
       layers,
       toggleLayer,
+
+      inspectPointSelected,
+      inspectPointCoordinate,
+
       data,
       filterMin,
       filterMax,
@@ -106,6 +126,7 @@ export default class Page_Workspace extends React.Component {
             basemap="osm"
             center="-12107625, 4495720"
             zoom="5"
+            ref={(ref) => this._mapview = ref}
           >
 
             {layers.map((layer, layerIndex) => (
@@ -120,6 +141,12 @@ export default class Page_Workspace extends React.Component {
                 extent={layer.extent}
               ></map-layer-xyz>
             ))}
+
+            <map-layer-singlepoint
+              invisible={!inspectPointSelected ? "invisible" : null}
+              latitude={inspectPointCoordinate[0]}
+              longitude={inspectPointCoordinate[1]}
+            ></map-layer-singlepoint>
 
             <map-control-defaults></map-control-defaults>
             <map-interaction-defaults></map-interaction-defaults>

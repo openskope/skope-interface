@@ -20,6 +20,10 @@ export default createContainer((props) => {
   const {
     workspace: {
       layers,
+
+      inspectPointSelected,
+      inspectPointCoordinate,
+
       filterValue,
       error: dataRequestError,
       result: dataRequestResult,
@@ -50,6 +54,7 @@ export default createContainer((props) => {
 
   return {
     dataReady,
+
     layers: layers.map((layer) => ({
       ...layer,
       url: `http://demo.openskope.org/static_tiles/${layer.urlTile}/tiles/${layer.urlTile}-${filterValue}-color/{z}/{x}/{-y}.png`,
@@ -60,6 +65,25 @@ export default createContainer((props) => {
         index: layerIndex,
       });
     },
+
+    inspectPointSelected,
+    inspectPointCoordinate,
+    selectInspectPoint: (coord) => {
+      if (coord) {
+        store.dispatch({
+          type: actions.WORKSPACE_INSPECT_POINT.type,
+          selected: true,
+          coordinate: coord,
+        });
+      } else {
+        store.dispatch({
+          type: actions.WORKSPACE_INSPECT_POINT.type,
+          selected: false,
+          coordinate: [0, 0],
+        });
+      }
+    },
+
     data: {
       "type": "FeatureCollection",
       "features": dataReady ? dataRequestResult.items : [],
