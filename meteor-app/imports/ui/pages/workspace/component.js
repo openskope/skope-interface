@@ -107,13 +107,6 @@ export default class Page_Workspace extends React.Component {
             center="-12107625, 4495720"
             zoom="5"
           >
-            <map-layer-geojson
-              name="example-geojson"
-              src-json={JSON.stringify(data)}
-              src-projection="EPSG:4326"
-              projection="EPSG:3857"
-              invisible={true}
-            ></map-layer-geojson>
 
             {layers.map((layer, layerIndex) => (
               <map-layer-xyz
