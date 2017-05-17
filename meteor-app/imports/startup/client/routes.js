@@ -47,21 +47,50 @@ FlowRouter.route("/", {
 
 FlowRouter.route("/search", {
   name: "App.search",
-  action() {
+  action(params, queryParams) {
 
     const {
       path,
     } = this;
+    const {
+      search: {
+        input: prevSearchString,
+      },
+    } = store.getState();
+    const nextSearchString = queryParams.q;
 
     store.dispatch({
       type: actions.PAGE_ENTRY.type,
       path,
     });
 
+    store.dispatch({
+      type: actions.SEARCH_SET_INPUT_FROM_URL.type,
+      value: nextSearchString,
+    });
+
+    if (nextSearchString !== prevSearchString) {
+      Meteor.call("search", {input: nextSearchString}, (error, result) => {
+        store.dispatch({
+          type: actions.SEARCH_RESOLVE_DATA.type,
+          input: nextSearchString,
+          error,
+          result,
+        });
+      });
+    }
+
     mount(Layout_Main, {
       store,
       body: (
-        <Page_Search/>
+        <Page_Search {...{
+          store,
+          updateSearchInput: (newValue) => {
+            FlowRouter.go(path, {}, {
+              q: newValue,
+            });
+          },
+        }}/>
       ),
     });
   },

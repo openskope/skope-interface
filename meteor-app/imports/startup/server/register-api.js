@@ -5,7 +5,7 @@ import { HTTP } from "meteor/http";
 // Register your apis here
 
 Meteor.methods({
-  'timeseries.get' ({ lat, lon }) {
+  "timeseries.get" ({ lat, lon }) {
     check(lat, Number);
     check(lon, Number);
 
@@ -18,5 +18,13 @@ Meteor.methods({
     } = HTTP.get(url);
 
     return data;
+  },
+  "search" ({input, }) {
+    //! Return fake search results.
+    Meteor._sleepForMs(800);
+
+    return {
+      input,
+    };
   },
 });
