@@ -34,6 +34,7 @@ export default createContainer((props) => {
     layers: layers.map((layer) => ({
       ...layer,
       url: `http://demo.openskope.org/static_tiles/${layer.urlTile}/tiles/${layer.urlTile}-${filterValue}-color/{z}/{x}/{-y}.png`,
+      nextUrl: `http://demo.openskope.org/static_tiles/${layer.urlTile}/tiles/${layer.urlTile}-${filterValue + 1}-color/{z}/{x}/{-y}.png`,
     })),
     toggleLayer: (layerIndex) => {
       store.dispatch({

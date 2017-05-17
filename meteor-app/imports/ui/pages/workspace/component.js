@@ -142,16 +142,29 @@ export default class Page_Workspace extends React.Component {
             >
 
               {layers.map((layer, layerIndex) => (
-                <map-layer-xyz
+                <map-layer-group
                   key={layerIndex}
-                  name={layer.name}
-                  url={layer.url}
-                  min-zoom={layer.minZoom}
-                  max-zoom={layer.maxZoom}
-                  invisible={layer.invisible ? "invisible" : null}
-                  opacity={layer.opacity}
-                  extent={layer.extent}
-                ></map-layer-xyz>
+                >
+                  <map-layer-xyz
+                    name={layer.name}
+                    url={layer.url}
+                    min-zoom={layer.minZoom}
+                    max-zoom={layer.maxZoom}
+                    invisible={layer.invisible ? "invisible" : null}
+                    opacity={layer.opacity}
+                    extent={layer.extent}
+                  ></map-layer-xyz>
+                  {!layer.nextUrl ? null : (
+                    <map-layer-xyz
+                      name={`${layer.name} (preload)`}
+                      url={layer.nextUrl}
+                      min-zoom={layer.minZoom}
+                      max-zoom={layer.maxZoom}
+                      opacity="0"
+                      extent={layer.extent}
+                    ></map-layer-xyz>
+                  )}
+                </map-layer-group>
               ))}
 
               <map-layer-singlepoint
