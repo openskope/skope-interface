@@ -8,7 +8,7 @@ export const WORKSPACE_SET_FILTER_FROM_URL = (state, action) => {
   const {
     value,
   } = action;
-  const filterValue = value ? parseInt(value) : filterMax;
+  const filterValue = typeof value === 'undefined' ? filterMax : parseInt(value);
 
   return {
     ...state,
