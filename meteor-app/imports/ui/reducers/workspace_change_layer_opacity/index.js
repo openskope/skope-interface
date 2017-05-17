@@ -1,14 +1,12 @@
 /**
- * This reducer is used to toggle the visibility of a layer in workspace.
+ * This reducer is used to change the opacity of a layer in workspace.
  */
 
-export const WORKSPACE_TOGGLE_LAYER_VISIBILITY = (state, action) => {
+export const WORKSPACE_CHANGE_LAYER_OPACITY = (state, action) => {
   const {
     index,
-    visible,
+    opacity,
   } = action;
-
-  const visibilityGiven = !(typeof visible === 'undefined');
 
   return {
     ...state,
@@ -18,11 +16,11 @@ export const WORKSPACE_TOGGLE_LAYER_VISIBILITY = (state, action) => {
 
       layers: state.workspace.layers.map((layer, layerIndex) => {
         if (layerIndex === index) {
-          // Toggle the visibility of the layer.
+          // Change the opacity of the layer.
           return {
             ...layer,
 
-            invisible: visibilityGiven ? (!visible) : (!layer.invisible),
+            opacity,
           };
         } else {
           return layer;

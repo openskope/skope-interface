@@ -9,6 +9,8 @@ export default class Page_Workspace extends React.Component {
     layers: PropTypes.arrayOf(PropTypes.object).isRequired,
     // Callback function for toggling the visibility of layers.
     toggleLayer: PropTypes.func.isRequired,
+    // Callback function for toggling the opacity of layers.
+    updateLayerOpacity: PropTypes.func.isRequired,
 
     // Indicate if a point is selected for inspection.
     inspectPointSelected: PropTypes.bool.isRequired,
@@ -43,6 +45,8 @@ export default class Page_Workspace extends React.Component {
     this._bound_rangeFilterOnChange = this._rangeFilterOnChange.bind(this);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
+    this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
+    this._bound_layerOpacityOnChange = this._layerOpacityOnChange.bind(this);
     this._bound_mapOnClick = this._mapOnClick.bind(this);
   }
 
@@ -55,6 +59,28 @@ export default class Page_Workspace extends React.Component {
     } = this.props;
 
     updateFilterValue(target.value);
+  }
+
+  _layerVisibilityOnChange (event) {
+    const target = event.currentTarget;
+    const layerIndex = parseInt(target.getAttribute("data-layer-index"));
+    const layerVisible = target.checked;
+    const {
+      toggleLayer,
+    } = this.props;
+
+    toggleLayer(layerIndex, layerVisible);
+  }
+
+  _layerOpacityOnChange (event) {
+    const target = event.currentTarget;
+    const layerIndex = parseInt(target.getAttribute("data-layer-index"));
+    const opacity = target.value / 255;
+    const {
+      updateLayerOpacity,
+    } = this.props;
+
+    updateLayerOpacity(layerIndex, opacity);
   }
 
   _yearStepBackButtonOnClick (/*event*/) {
@@ -128,8 +154,15 @@ export default class Page_Workspace extends React.Component {
             <ul className="layer-list">
               {layers.map((layer, layerIndex) => (
                 <li key={layerIndex}>
-                  <label>{layer.name}</label>
-                  <input type="checkbox" checked={!layer.invisible} onChange={toggleLayer.bind(null, layerIndex)} />
+                  <div>
+                    <input title="Toggle Visibility" type="checkbox" checked={!layer.invisible} data-layer-index={layerIndex} onChange={this._bound_layerVisibilityOnChange} />
+                    <label>{layer.name}</label>
+                  </div>
+                  <div>
+                    <label>Opacity: </label>
+                    <input type="range" min="0" max="255" step="1" value={layer.opacity * 255} data-layer-index={layerIndex} onChange={this._bound_layerOpacityOnChange} />
+                    <label>{layer.opacity.toFixed(2)}</label>
+                  </div>
                 </li>
               ))}
             </ul>

@@ -36,10 +36,18 @@ export default createContainer((props) => {
       url: `http://demo.openskope.org/static_tiles/${layer.urlTile}/tiles/${layer.urlTile}-${filterValue}-color/{z}/{x}/{-y}.png`,
       nextUrl: `http://demo.openskope.org/static_tiles/${layer.urlTile}/tiles/${layer.urlTile}-${filterValue + 1}-color/{z}/{x}/{-y}.png`,
     })),
-    toggleLayer: (layerIndex) => {
+    toggleLayer: (layerIndex, visible) => {
       store.dispatch({
         type: actions.WORKSPACE_TOGGLE_LAYER_VISIBILITY.type,
         index: layerIndex,
+        visible,
+      });
+    },
+    updateLayerOpacity: (layerIndex, opacity) => {
+      store.dispatch({
+        type: actions.WORKSPACE_CHANGE_LAYER_OPACITY.type,
+        index: layerIndex,
+        opacity,
       });
     },
 
