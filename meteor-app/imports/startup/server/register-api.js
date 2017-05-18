@@ -75,7 +75,24 @@ Meteor.methods({
           source: "some-data-source-1",
         }
       ],
-      model: {
+      "data-filters": [
+        {
+          title: "Models",
+          property: "model",
+          definitions: "models",
+        },
+        {
+          title: "Data Types",
+          property: "type",
+          definitions: "types",
+        },
+        {
+          title: "Data Sources",
+          property: "source",
+          definitions: "sources",
+        },
+      ],
+      models: {
         "some-model-id-1": {
           title: "Some Model 1",
         },
@@ -83,7 +100,7 @@ Meteor.methods({
           title: "Some Model 2",
         },
       },
-      type: {
+      types: {
         "some-data-type-1": {
           title: "Some Data Type 1",
         },
@@ -94,7 +111,7 @@ Meteor.methods({
           title: "Some Data Type 3",
         },
       },
-      source: {
+      sources: {
         "some-data-source-1": {
           title: "Some Data Source 1",
         },
