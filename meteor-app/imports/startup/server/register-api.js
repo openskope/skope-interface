@@ -25,6 +25,83 @@ Meteor.methods({
 
     return {
       input,
+      data: [
+        {
+          title: "Some fake result 1",
+          model: "some-model-id-1",
+          type: "some-data-type-1",
+          source: "some-data-source-1",
+        },
+        {
+          title: "Some fake result 2",
+          model: "some-model-id-2",
+          type: "some-data-type-1",
+          source: "some-data-source-1",
+        },
+        {
+          title: "Some fake result 3",
+          model: "some-model-id-1",
+          type: "some-data-type-2",
+          source: "some-data-source-1",
+        },
+        {
+          title: "Some fake result 4",
+          model: "some-model-id-1",
+          type: "some-data-type-1",
+          source: "some-data-source-2",
+        },
+        {
+          title: "Some fake result 5",
+          model: "some-model-id-2",
+          type: "some-data-type-2",
+          source: "some-data-source-1",
+        },
+        {
+          title: "Some fake result 6",
+          model: "some-model-id-2",
+          type: "some-data-type-1",
+          source: "some-data-source-2",
+        },
+        {
+          title: "Some fake result 7",
+          model: "some-model-id-1",
+          type: "some-data-type-2",
+          source: "some-data-source-2",
+        },
+        {
+          title: "Some fake result 1",
+          model: "some-model-id-1",
+          type: "some-data-type-3",
+          source: "some-data-source-1",
+        }
+      ],
+      model: {
+        "some-model-id-1": {
+          title: "Some Model 1",
+        },
+        "some-model-id-2": {
+          title: "Some Model 2",
+        },
+      },
+      type: {
+        "some-data-type-1": {
+          title: "Some Data Type 1",
+        },
+        "some-data-type-2": {
+          title: "Some Data Type 2",
+        },
+        "some-data-type-3": {
+          title: "Some Data Type 3",
+        },
+      },
+      source: {
+        "some-data-source-1": {
+          title: "Some Data Source 1",
+        },
+        "some-data-source-2": {
+          title: "Some Data Source 2",
+        },
+      }
     };
   },
 });
