@@ -18,6 +18,7 @@ export default createContainer((props) => {
   } = store.getState();
 
   let dataFilters = [];
+  let results = [];
 
   if (searchResults) {
     // Generate filter options.
@@ -31,7 +32,16 @@ export default createContainer((props) => {
       })),
     }));
 
-    console.info(dataFilters);
+    // De-reference data items.
+    const dataFilterMapping = searchResults["data-filters"].reduce((acc, filterDef) => ({
+      ...acc,
+      [filterDef.property]: filterDef,
+    }), {});
+
+    results = searchResults.data.map((dataItem) => Object.keys(dataItem).reduce((acc, key) => ({
+      ...acc,
+      [key]: (key in dataFilterMapping) ? searchResults[dataFilterMapping[key].definitions][dataItem[key]] : dataItem[key],
+    }), {}));
   }
 
   return {
@@ -39,6 +49,6 @@ export default createContainer((props) => {
     searchPending,
     searchResults,
     dataFilters,
-    results: searchResults ? searchResults.data : [],
+    results,
   };
 }, Component);

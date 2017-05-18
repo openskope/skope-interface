@@ -4,7 +4,10 @@ import PropTypes from 'prop-types';
 class SearchResultItem extends React.Component {
   render () {
     return (
-      <div>Some Result (Implement this)</div>
+      <div style={{overflow: "auto"}}>
+        <p>Some Result (Implement this)</p>
+        <pre>{JSON.stringify(this.props, null, 2)}</pre>
+      </div>
     );
   }
 }
