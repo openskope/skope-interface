@@ -37,6 +37,7 @@ export default class SearchPage extends React.Component {
     const {
       searchString,
       searchPending,
+      dataFilters,
 
       results = [],
     } = this.props;
@@ -61,31 +62,20 @@ export default class SearchPage extends React.Component {
           :
             <div className="row_2">
               <aside className="box search_filters">
-                <div className="box_body">
-                  <div className="filter-section">
-                    <div className="filter-section__title">Models</div>
-                    <ul>
-                      <li><input type="checkbox" /><label>PaleoCAR (1)</label></li>
-                      <li><input type="checkbox" /><label>Model 2 (3)</label></li>
-                      <li><input type="checkbox" /><label>Model 3 (2)</label></li>
-                    </ul>
+                <div className="box_body">{dataFilters.map((filter, filterIndex) => (
+                  <div
+                    key={filterIndex}
+                    className="filter-section"
+                  >
+                    <div className="filter-section__title">{filter.title}</div>
+                    <ul>{filter.items.map((filterItem, filterItemIndex) => (
+                      <li key={filterItemIndex}>
+                        <input type="checkbox" />
+                        <label>{filterItem.title} ({filterItem.count})</label>
+                      </li>
+                    ))}</ul>
                   </div>
-                  <div className="filter-section">
-                    <div className="filter-section__title">Data Type</div>
-                    <ul>
-                      <li><input type="checkbox" /><label>Temperature (1)</label></li>
-                      <li><input type="checkbox" /><label>Precipitation (3)</label></li>
-                      <li><input type="checkbox" /><label>Maize niche (2)</label></li>
-                    </ul>
-                  </div>
-                  <div className="filter-section">
-                    <div className="filter-section__title">Data Source</div>
-                    <ul>
-                      <li><input type="checkbox" /><label>Peer-reviewd Article (1)</label></li>
-                      <li><input type="checkbox" /><label>SKOPE user-generated (3)</label></li>
-                    </ul>
-                  </div>
-                </div>
+                ))}</div>
               </aside>
               <main className="box search_results">
                 <div className="box_body">
