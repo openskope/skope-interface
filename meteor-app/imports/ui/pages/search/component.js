@@ -1,6 +1,74 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {
+  SearchkitManager,
+  SearchkitProvider,
+  Layout,
+  TopBar,
+  SearchBox,
+  LayoutBody,
+  SideBar,
+  HierarchicalMenuFilter,
+  RefinementListFilter,
+  LayoutResults,
+  ActionBar,
+  ActionBarRow,
+  HitsStats,
+  SelectedFilters,
+  ResetFilters,
+  MovieHitsGridItem,
+  Hits,
+  NoHits,
+} from "searchkit";
+import "searchkit/release/theme.css";
+
+const searchkit = new SearchkitManager("http://demo.searchkit.co/api/movies/");
+
+const App = ()=> (
+  <SearchkitProvider searchkit={searchkit}>
+    <Layout>
+      <TopBar>
+        <SearchBox
+          autofocus={true}
+          searchOnChange={true}
+          prefixQueryFields={["actors^1","type^2","languages","title^10"]}/>
+      </TopBar>
+      <LayoutBody>
+        <SideBar>
+          <HierarchicalMenuFilter
+            fields={["type.raw", "genres.raw"]}
+            title="Categories"
+            id="categories"/>
+          <RefinementListFilter
+            id="actors"
+            title="Actors"
+            field="actors.raw"
+            operator="AND"
+            size={10}/>
+        </SideBar>
+        <LayoutResults>
+          <ActionBar>
+
+            <ActionBarRow>
+              <HitsStats/>
+            </ActionBarRow>
+
+            <ActionBarRow>
+              <SelectedFilters/>
+              <ResetFilters/>
+            </ActionBarRow>
+
+          </ActionBar>
+          <Hits mod="sk-hits-grid" hitsPerPage={10} itemComponent={MovieHitsGridItem}
+            sourceFilter={["title", "poster", "imdbId"]}/>
+          <NoHits/>
+        </LayoutResults>
+      </LayoutBody>
+    </Layout>
+  </SearchkitProvider>
+);
+
 class SearchResultItem extends React.Component {
   render () {
     return (
@@ -47,48 +115,7 @@ export default class SearchPage extends React.Component {
 
     return (
       <div className="page--search">
-        <div className="row_1">
-          <label>Search:</label>
-          <input
-            className="flex-fill"
-            type="text"
-            defaultValue={searchString}
-            ref={ref => this.inputField_ = ref}
-          />
-          <button onClick={this._bound_searchButtonOnClick}>Go!</button>
-        </div>
-
-        {
-          searchPending
-          ?
-            <div className="row_2">Searching...</div>
-          :
-            <div className="row_2">
-              <aside className="box search_filters">
-                <div className="box_body">{dataFilters.map((filter, filterIndex) => (
-                  <div
-                    key={filterIndex}
-                    className="filter-section"
-                  >
-                    <div className="filter-section__title">{filter.title}</div>
-                    <ul>{filter.items.map((filterItem, filterItemIndex) => (
-                      <li key={filterItemIndex}>
-                        <input type="checkbox" />
-                        <label>{filterItem.title} ({filterItem.count})</label>
-                      </li>
-                    ))}</ul>
-                  </div>
-                ))}</div>
-              </aside>
-              <main className="box search_results">
-                <div className="box_body">
-                  {results.map((item, index) => (
-                    <SearchResultItem key={index} {...item} />
-                  ))}
-                </div>
-              </main>
-            </div>
-        }
+        <App />
       </div>
     );
   }
