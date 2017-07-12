@@ -23,52 +23,6 @@ import {
 } from "searchkit";
 import "searchkit/release/theme.css";
 
-const searchkit = new SearchkitManager("http://demo.searchkit.co/api/movies/");
-
-const App = ()=> (
-  <SearchkitProvider searchkit={searchkit}>
-    <Layout>
-      <TopBar>
-        <SearchBox
-          autofocus={true}
-          searchOnChange={true}
-          prefixQueryFields={["actors^1","type^2","languages","title^10"]}/>
-      </TopBar>
-      <LayoutBody>
-        <SideBar>
-          <HierarchicalMenuFilter
-            fields={["type.raw", "genres.raw"]}
-            title="Categories"
-            id="categories"/>
-          <RefinementListFilter
-            id="actors"
-            title="Actors"
-            field="actors.raw"
-            operator="AND"
-            size={10}/>
-        </SideBar>
-        <LayoutResults>
-          <ActionBar>
-
-            <ActionBarRow>
-              <HitsStats/>
-            </ActionBarRow>
-
-            <ActionBarRow>
-              <SelectedFilters/>
-              <ResetFilters/>
-            </ActionBarRow>
-
-          </ActionBar>
-          <Hits mod="sk-hits-grid" hitsPerPage={10} itemComponent={MovieHitsGridItem}
-            sourceFilter={["title", "poster", "imdbId"]}/>
-          <NoHits/>
-        </LayoutResults>
-      </LayoutBody>
-    </Layout>
-  </SearchkitProvider>
-);
-
 class SearchResultItem extends React.Component {
   render () {
     return (
@@ -83,6 +37,8 @@ class SearchResultItem extends React.Component {
 export default class Page_Search extends React.Component {
 
   static propTypes = {
+    // SearchKit Manager instance.
+    searchkit: PropTypes.instanceOf(SearchkitManager),
     // Callback function for updating search input.
     updateSearchInput: PropTypes.func.isRequired,
   };
@@ -106,6 +62,8 @@ export default class Page_Search extends React.Component {
 
   render () {
     const {
+      searchkit,
+
       searchString,
       searchPending,
       searchResults,
@@ -116,7 +74,47 @@ export default class Page_Search extends React.Component {
 
     return (
       <div className="page--search">
-        <App />
+        <SearchkitProvider searchkit={searchkit}>
+          <Layout>
+            <TopBar>
+              <SearchBox
+                autofocus={true}
+                searchOnChange={true}
+                prefixQueryFields={["actors^1","type^2","languages","title^10"]}/>
+            </TopBar>
+            <LayoutBody>
+              <SideBar>
+                <HierarchicalMenuFilter
+                  fields={["type.raw", "genres.raw"]}
+                  title="Categories"
+                  id="categories"/>
+                <RefinementListFilter
+                  id="actors"
+                  title="Actors"
+                  field="actors.raw"
+                  operator="AND"
+                  size={10}/>
+              </SideBar>
+              <LayoutResults>
+                <ActionBar>
+
+                  <ActionBarRow>
+                    <HitsStats/>
+                  </ActionBarRow>
+
+                  <ActionBarRow>
+                    <SelectedFilters/>
+                    <ResetFilters/>
+                  </ActionBarRow>
+
+                </ActionBar>
+                <Hits mod="sk-hits-grid" hitsPerPage={10} itemComponent={MovieHitsGridItem}
+                  sourceFilter={["title", "poster", "imdbId"]}/>
+                <NoHits/>
+              </LayoutResults>
+            </LayoutBody>
+          </Layout>
+        </SearchkitProvider>
       </div>
     );
   }
