@@ -9,5 +9,5 @@ docker run \
     --rm \
     -p 9200:9200 \
     -v $DIR/data:/usr/share/elasticsearch/data \
-    -v $(pwd)/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+    -v $DIR/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
     $VERSION
