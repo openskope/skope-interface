@@ -6,6 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VERSION=elasticsearch:2
 
 docker run \
+    --rm \
     -p 9200:9200 \
     -v $DIR/data:/usr/share/elasticsearch/data \
     -v $(pwd)/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
