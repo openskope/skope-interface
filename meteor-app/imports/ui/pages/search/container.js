@@ -2,6 +2,17 @@ import _ from "lodash";
 import { createContainer } from "meteor/react-meteor-data";
 import Component from "./component";
 
+import {
+  SearchkitManager,
+} from "searchkit";
+
+const searchkit = new SearchkitManager("http://localhost:9200/");
+
+/** This does not work **/
+// const searchkit = new SearchkitManager("http://localhost:9200/", {
+//   basicAuth: "elastic:changeme",
+// });
+
 export default createContainer((props) => {
   // props here will have `main`, passed from the router
   // anything we return from this function will be *added* to it.
@@ -45,6 +56,8 @@ export default createContainer((props) => {
   }
 
   return {
+    searchkit,
+
     searchString,
     searchPending,
     searchResults,
