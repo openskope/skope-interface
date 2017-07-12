@@ -9,9 +9,11 @@ import {
   SearchBox,
   LayoutBody,
   SideBar,
-  HierarchicalMenuFilter,
   RefinementListFilter,
+  NumericRefinementListFilter,
+  RangeFilter,
   LayoutResults,
+  InputFilter,
   ActionBar,
   ActionBarRow,
   HitsStats,
@@ -83,16 +85,49 @@ export default class SearchPage extends React.Component {
             </TopBar>
             <LayoutBody>
               <SideBar>
-                <HierarchicalMenuFilter
-                  fields={["type.raw", "genres.raw"]}
-                  title="Categories"
-                  id="categories"/>
+                <InputFilter
+                  id="lastname-input"
+                  title="Search by last name"
+                  placeholder="Appleseed"
+                  searchOnChange={true}
+                  prefixQueryFields={["lastname"]}
+                  queryFields={["lastname"]}
+                />
                 <RefinementListFilter
-                  id="actors"
-                  title="Actors"
-                  field="actors.raw"
-                  operator="AND"
-                  size={10}/>
+                  id="state-list"
+                  title="State"
+                  field="state"
+                  operator="OR"
+                  size={5}
+                />
+                <NumericRefinementListFilter
+                  id="age-refine"
+                  title="Age Groups"
+                  field="age"
+                  options={[
+                    {title:"All"},
+                    {title:"up to 20", from:0, to:21},
+                    {title:"21 to 40", from:21, to:41},
+                    {title:"41 to 60", from:41, to:61},
+                    {title:"61 to 80", from:61, to:81},
+                    {title:"81 to 100", from:81, to:101},
+                  ]}
+                />
+                <RangeFilter
+                  field="age"
+                  id="age-range"
+                  min={0}
+                  max={100}
+                  showHistogram={true}
+                  title=""
+                />
+                <RefinementListFilter
+                  id="employer-list"
+                  title="Employer"
+                  field="employer"
+                  operator="OR"
+                  size={5}
+                />
               </SideBar>
               <LayoutResults>
                 <ActionBar>
