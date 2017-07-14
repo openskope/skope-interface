@@ -2,7 +2,7 @@ import { FlowRouter } from "meteor/kadira:flow-router";
 import React from "react";
 import { mount } from "react-mounter";
 
-import { createStore } from "/imports/helpers/tracker-redux";
+import { createStore } from "meteor/zodiase:reactive-redux-store";
 
 // Import actions for the redux store.
 import * as actions from "/imports/ui/actions";
