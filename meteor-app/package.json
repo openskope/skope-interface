@@ -38,8 +38,5 @@
     "plugins": [
       "transform-class-properties"
     ]
-  },
-  "eslintConfig": {
-    "extends": "@meteorjs/eslint-config-meteor"
   }
 }
