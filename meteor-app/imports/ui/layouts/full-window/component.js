@@ -15,15 +15,13 @@ export default class FullWindowLayout extends React.Component {
     return (
       <div className="page layout-fullWindow">
         <div className="page__header">
-          <p>Some header</p>
           <Navbar store={store} />
         </div>
         <div className="page__body">
           {body}
         </div>
         <div className="page__footer">
-          <p>Some footer</p>
-          <p><a href={demoRepository} target="_blank">Source code on Github</a></p>
+          <a href={demo_repository} target="_blank">Source code on Github</a>
         </div>
       </div>
     );

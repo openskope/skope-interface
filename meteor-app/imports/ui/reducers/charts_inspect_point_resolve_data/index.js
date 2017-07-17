@@ -4,20 +4,20 @@
 
 import _ from 'lodash';
 
-export const WORKSPACE_INSPECT_POINT_RESOLVE_DATA = (state, action) => {
+export const CHARTS_INSPECT_POINT_RESOLVE_DATA = (state, action) => {
   const {
     coordinate,
     // error,
     result,
   } = action;
 
-  if (state.workspace.inspectPointSelected && state.workspace.inspectPointLoading && _.isEqual(state.workspace.inspectPointCoordinate, coordinate)) {
+  if (state.charts.inspectPointLoading) {
     return {
       ...state,
 
-      workspace: {
-        ...state.workspace,
-
+      charts: {
+        ...state.charts,
+    
         inspectPointLoading: false,
         inspectPointData: result,
       },

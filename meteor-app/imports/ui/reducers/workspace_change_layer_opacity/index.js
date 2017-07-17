@@ -4,7 +4,6 @@
 
 export const WORKSPACE_CHANGE_LAYER_OPACITY = (state, action) => {
   const {
-    index,
     opacity,
   } = action;
 
@@ -14,17 +13,7 @@ export const WORKSPACE_CHANGE_LAYER_OPACITY = (state, action) => {
     workspace: {
       ...state.workspace,
 
-      layers: state.workspace.layers.map((layer, layerIndex) => {
-        if (layerIndex === index) {
-          // Change the opacity of the layer.
-          return {
-            ...layer,
-
-            opacity,
-          };
-        }
-        return layer;
-      }),
+      layerOpacity: opacity,
     },
   };
 };
