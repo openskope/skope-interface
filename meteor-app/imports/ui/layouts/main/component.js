@@ -21,7 +21,7 @@ export default class MainLayout extends React.Component {
           {body}
         </div>
         <div className="page__footer">
-          <a href={demo_repository} target="_blank">Source code on Github</a>
+          <a href={demoRepository} target="_blank">Source code on Github</a>
         </div>
       </div>
     );
