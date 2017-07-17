@@ -22,9 +22,8 @@ export const WORKSPACE_CHANGE_LAYER_OPACITY = (state, action) => {
 
             opacity,
           };
-        } else {
-          return layer;
         }
+        return layer;
       }),
     },
   };

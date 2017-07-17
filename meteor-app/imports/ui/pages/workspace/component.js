@@ -1,8 +1,8 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Line } from "react-chartjs-2";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Line } from 'react-chartjs-2';
 
-export default class Page_Workspace extends React.Component {
+export default class WorkspacePage extends React.Component {
 
   static propTypes = {
     // List of layers to display.
@@ -33,12 +33,6 @@ export default class Page_Workspace extends React.Component {
     updateFilterValue: PropTypes.func.isRequired,
   };
 
-  componentDidMount () {
-    if (this._mapview) {
-      this._mapview.addEventListener('click:view', this._bound_mapOnClick);
-    }
-  }
-
   constructor (props) {
     super(props);
 
@@ -48,6 +42,12 @@ export default class Page_Workspace extends React.Component {
     this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
     this._bound_layerOpacityOnChange = this._layerOpacityOnChange.bind(this);
     this._bound_mapOnClick = this._mapOnClick.bind(this);
+  }
+
+  componentDidMount () {
+    if (this._mapview) {
+      this._mapview.addEventListener('click:view', this._bound_mapOnClick);
+    }
   }
 
   _rangeFilterOnChange (event) {
@@ -63,7 +63,7 @@ export default class Page_Workspace extends React.Component {
 
   _layerVisibilityOnChange (event) {
     const target = event.currentTarget;
-    const layerIndex = parseInt(target.getAttribute("data-layer-index"));
+    const layerIndex = parseInt(target.getAttribute('data-layer-index'), 10);
     const layerVisible = target.checked;
     const {
       toggleLayer,
@@ -74,7 +74,7 @@ export default class Page_Workspace extends React.Component {
 
   _layerOpacityOnChange (event) {
     const target = event.currentTarget;
-    const layerIndex = parseInt(target.getAttribute("data-layer-index"));
+    const layerIndex = parseInt(target.getAttribute('data-layer-index'), 10);
     const opacity = target.value / 255;
     const {
       updateLayerOpacity,
@@ -83,7 +83,7 @@ export default class Page_Workspace extends React.Component {
     updateLayerOpacity(layerIndex, opacity);
   }
 
-  _yearStepBackButtonOnClick (/*event*/) {
+  _yearStepBackButtonOnClick (/* event */) {
     const {
       filterMin,
       filterValue,
@@ -93,7 +93,7 @@ export default class Page_Workspace extends React.Component {
     updateFilterValue(Math.max(filterMin, filterValue - 1));
   }
 
-  _yearStepForwardButtonOnClick (/*event*/) {
+  _yearStepForwardButtonOnClick (/* event */) {
     const {
       filterMax,
       filterValue,
@@ -114,7 +114,6 @@ export default class Page_Workspace extends React.Component {
   render () {
     const {
       layers,
-      toggleLayer,
 
       inspectPointSelected,
       inspectPointCoordinate,
@@ -171,7 +170,7 @@ export default class Page_Workspace extends React.Component {
               basemap="osm"
               center="-12107625, 4495720"
               zoom="5"
-              ref={(ref) => this._mapview = ref}
+              ref={ref => this._mapview = ref}
             >
 
               {layers.map((layer, layerIndex) => (
@@ -183,10 +182,10 @@ export default class Page_Workspace extends React.Component {
                     url={layer.url}
                     min-zoom={layer.minZoom}
                     max-zoom={layer.maxZoom}
-                    invisible={layer.invisible ? "invisible" : null}
+                    invisible={layer.invisible ? 'invisible' : null}
                     opacity={layer.opacity}
                     extent={layer.extent}
-                  ></map-layer-xyz>
+                  />
                   {!layer.nextUrl ? null : (
                     <map-layer-xyz
                       name={`${layer.name} (preload)`}
@@ -195,20 +194,20 @@ export default class Page_Workspace extends React.Component {
                       max-zoom={layer.maxZoom}
                       opacity="0"
                       extent={layer.extent}
-                    ></map-layer-xyz>
+                    />
                   )}
                 </map-layer-group>
               ))}
 
               <map-layer-singlepoint
-                invisible={!inspectPointSelected ? "invisible" : null}
+                invisible={!inspectPointSelected ? 'invisible' : null}
                 latitude={inspectPointCoordinate[1]}
                 longitude={inspectPointCoordinate[0]}
-              ></map-layer-singlepoint>
+              />
 
-              <map-control-defaults></map-control-defaults>
-              <map-interaction-defaults></map-interaction-defaults>
-              <map-control-simple-layer-list></map-control-simple-layer-list>
+              <map-control-defaults />
+              <map-interaction-defaults />
+              <map-control-simple-layer-list />
             </map-view>
           </div>
         </fieldset>
@@ -217,70 +216,69 @@ export default class Page_Workspace extends React.Component {
           <div className="section_charts">
             {
               !inspectPointSelected
-              ? null
-              : (
-                  inspectPointLoading
-                  ? (
-                      <div>
-                        <span>Loading...</span>
-                      </div>
-                    )
-                  : (
-                      <div>
-                        {inspectPointData.map(({label, data}, dataIndex) => (
-                          <div
-                            key={dataIndex}
-                            style={{height: "200px"}}
-                          >
-                            <Line
-                              data={{
-                                datasets: [
-                                  {
-                                    label,
-                                    lineTension: 0,
-                                    pointRadius: 0,
-                                    backgroundColor: 'rgba(255,99,132,0.2)',
-                                    borderColor: 'rgba(255,99,132,1)',
-                                    borderWidth: 1,
-                                    hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-                                    hoverBorderColor: 'rgba(255,99,132,1)',
-                                    data,
+              ?
+                null
+              :
+                (inspectPointLoading
+                ?
+                  <div>
+                    <span>Loading...</span>
+                  </div>
+                :
+                  <div>
+                    {inspectPointData.map(({ label, data }, dataIndex) => (
+                      <div
+                        key={dataIndex}
+                        style={{ height: '200px' }}
+                      >
+                        <Line
+                          data={{
+                            datasets: [
+                              {
+                                label,
+                                lineTension: 0,
+                                pointRadius: 0,
+                                backgroundColor: 'rgba(255,99,132,0.2)',
+                                borderColor: 'rgba(255,99,132,1)',
+                                borderWidth: 1,
+                                hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                                hoverBorderColor: 'rgba(255,99,132,1)',
+                                data,
+                              },
+                            ],
+                          }}
+                          options={{
+                            animation: {
+                              duration: 0,
+                            },
+                            maintainAspectRatio: false,
+                            tooltips: {
+                              enabled: true,
+                              mode: 'nearest',
+                              intersect: false,
+                            },
+                            hover: {
+                              mode: 'nearest',
+                              intersect: false,
+                              animationDuration: 0,
+                            },
+                            scales: {
+                              xAxes: [
+                                {
+                                  type: 'linear',
+                                  position: 'bottom',
+                                  ticks: {
+                                    autoSkip: true,
+                                    autoSkipPadding: 8,
                                   },
-                                ],
-                              }}
-                              options={{
-                                animation: {
-                                  duration: 0,
                                 },
-                                maintainAspectRatio: false,
-                                tooltips: {
-                                  enabled: true,
-                                  mode: "nearest",
-                                  intersect: false,
-                                },
-                                hover: {
-                                  mode: "nearest",
-                                  intersect: false,
-                                  animationDuration: 0,
-                                },
-                                scales: {
-                                  xAxes: [
-                                    {
-                                      type: "linear",
-                                      position: "bottom",
-                                      ticks: {
-                                        autoSkip: true,
-                                        autoSkipPadding: 8,
-                                      },
-                                    },
-                                  ],
-                                },
-                              }}
-                            />
-                          </div>
-                        ))}
+                              ],
+                            },
+                          }}
+                        />
                       </div>
-                    )
+                    ))}
+                  </div>
                 )
             }
           </div>

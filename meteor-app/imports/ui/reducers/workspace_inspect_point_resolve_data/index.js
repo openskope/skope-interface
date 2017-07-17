@@ -2,12 +2,12 @@
  * This reducer is used when a new point is selected for inspection in workspace and the data is ready.
  */
 
-import _ from "lodash";
+import _ from 'lodash';
 
 export const WORKSPACE_INSPECT_POINT_RESOLVE_DATA = (state, action) => {
   const {
     coordinate,
-    error,
+    // error,
     result,
   } = action;
 
@@ -22,7 +22,6 @@ export const WORKSPACE_INSPECT_POINT_RESOLVE_DATA = (state, action) => {
         inspectPointData: result,
       },
     };
-  } else {
-    return state;
   }
+  return state;
 };

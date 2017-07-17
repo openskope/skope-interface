@@ -1,14 +1,14 @@
-import { Meteor } from "meteor/meteor";
-import { Tracker } from "meteor/tracker";
-import { createContainer } from "meteor/react-meteor-data";
-import Component from "./component";
+import { Meteor } from 'meteor/meteor';
+import { createContainer } from 'meteor/react-meteor-data';
 
 import {
   filterMin,
   filterMax,
-} from "/imports/ui/consts";
+} from '/imports/ui/consts';
 
-import * as actions from "/imports/ui/actions";
+import * as actions from '/imports/ui/actions';
+
+import Component from './component';
 
 export default createContainer((props) => {
   // props here will have `main`, passed from the router
@@ -31,7 +31,7 @@ export default createContainer((props) => {
   } = store.getState();
 
   return {
-    layers: layers.map((layer) => ({
+    layers: layers.map(layer => ({
       ...layer,
       url: `http://demo.openskope.org/static_tiles/${layer.urlTile}/tiles/${layer.urlTile}-${filterValue}-color/{z}/{x}/{-y}.png`,
       nextUrl: `http://demo.openskope.org/static_tiles/${layer.urlTile}/tiles/${layer.urlTile}-${filterValue + 1}-color/{z}/{x}/{-y}.png`,
@@ -54,7 +54,7 @@ export default createContainer((props) => {
     inspectPointSelected,
     inspectPointCoordinate,
     inspectPointLoading,
-    inspectPointData: Object.keys(inspectPointData ? inspectPointData.data : {}).map((sourceName) => ({
+    inspectPointData: Object.keys(inspectPointData ? inspectPointData.data : {}).map(sourceName => ({
       label: sourceName,
       data: inspectPointData.data[sourceName]
             .filter((value, valueIndex) => valueIndex >= filterValue)
@@ -71,7 +71,7 @@ export default createContainer((props) => {
           coordinate: coord,
         });
 
-        Meteor.call("timeseries.get", {lon: coord[0], lat: coord[1]}, (error, result) => {
+        Meteor.call('timeseries.get', { lon: coord[0], lat: coord[1] }, (error, result) => {
           store.dispatch({
             type: actions.WORKSPACE_INSPECT_POINT_RESOLVE_DATA.type,
             coordinate: coord,
