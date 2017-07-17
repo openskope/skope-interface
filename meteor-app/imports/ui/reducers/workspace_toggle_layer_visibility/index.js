@@ -24,6 +24,12 @@ export const WORKSPACE_TOGGLE_LAYER_VISIBILITY = (state, action) => {
 
             invisible: visibilityGiven ? (!visible) : (!layer.invisible),
           };
+        } else {
+          return {
+            ...layer,
+
+            invisible: true,
+          };
         }
         return layer;
       }),
