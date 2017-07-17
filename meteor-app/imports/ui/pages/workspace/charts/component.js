@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Line } from "react-chartjs-2";
 
-export default class Page_Charts extends React.Component {
+export default class ChartsPage extends React.Component {
 
   static propTypes = {
     // Indicate if the data is being loaded for the point.

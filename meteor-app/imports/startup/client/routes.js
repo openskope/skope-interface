@@ -156,7 +156,7 @@ FlowRouter.route('/workspace/charts', {
       });
     });
 
-    mount(Page_Charts, {
+    mount(ChartsPage, {
       store,
     });
   },
