@@ -1,6 +1,64 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Line } from 'react-chartjs-2';
+import ifvisible from 'ifvisible.js';
+
+let theWindow = null;
+
+/**
+ * Helper function to minimize a window.
+ * @param {Window} w
+ */
+function Minimize (w) {
+  // There's no way of truely minimizing the window.
+  // The work-around here is to move it out of the screen.
+  w.blur();
+  w.resizeTo(0, 0);
+  w.moveTo(screen.width, screen.height);
+}
+
+/**
+ * Helper function to restore a minimized window.
+ * @param {Window} w
+ */
+function RestoreMinimized(w) {
+  const { width, height, x, y } = w._minimizeRestore;
+  w.moveTo(x, y);
+  w.resizeTo(width, height);
+  w.focus();
+}
+
+function openWindow(coord) {
+  if (theWindow) {
+    theWindow.close();
+  }
+
+  theWindow = window.open(`/workspace/charts?longitude=${coord[0]}&latitude=${coord[1]}`, '_blank', 'height=600,width=800,menubar=no,status=no,titlebar=no');
+
+  theWindow.onfocus = () => {
+    RestoreMinimized(theWindow);
+  };
+
+  theWindow._minimizeRestore = {
+    width: theWindow.outerWidth,
+    height: theWindow.outerHeight,
+    x: theWindow.screenX,
+    y: theWindow.screenY,
+  };
+}
+
+ifvisible.on('blur', function () {
+  if (theWindow) {
+    Minimize(theWindow);
+  }
+});
+
+// Close all child windows when the parent window closes.
+window.onbeforeunload = () => {
+  if (theWindow) {
+    theWindow.close();
+    theWindow = null;
+  }
+};
 
 export default class WorkspacePage extends React.Component {
 
@@ -16,19 +74,15 @@ export default class WorkspacePage extends React.Component {
     inspectPointSelected: PropTypes.bool.isRequired,
     // The coordinate of the point being inspected.
     inspectPointCoordinate: PropTypes.arrayOf(PropTypes.number).isRequired,
-    // Indicate if the data is being loaded for the point.
-    inspectPointLoading: PropTypes.bool.isRequired,
-    // The loaded data for the point.
-    inspectPointData: PropTypes.arrayOf(PropTypes.object),
     // Callback function for selecting a point to inspect.
     selectInspectPoint: PropTypes.func.isRequired,
 
-    // Lower bound of the filter slider.
-    filterMin: PropTypes.number.isRequired,
-    // Upper bound of the filter slider.
-    filterMax: PropTypes.number.isRequired,
     // Current value of the filter slider.
     filterValue: PropTypes.number.isRequired,
+
+    rangeMin: PropTypes.number.isRequired,
+    rangeMax: PropTypes.number.isRequired,
+
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
   };
@@ -85,22 +139,22 @@ export default class WorkspacePage extends React.Component {
 
   _yearStepBackButtonOnClick (/* event */) {
     const {
-      filterMin,
+      rangeMin,
       filterValue,
       updateFilterValue,
     } = this.props;
 
-    updateFilterValue(Math.max(filterMin, filterValue - 1));
+    updateFilterValue(Math.max(rangeMin, filterValue - 1));
   }
 
   _yearStepForwardButtonOnClick (/* event */) {
     const {
-      filterMax,
+      rangeMax,
       filterValue,
       updateFilterValue,
     } = this.props;
 
-    updateFilterValue(Math.min(filterMax, filterValue + 1));
+    updateFilterValue(Math.min(rangeMax, filterValue + 1));
   }
 
   _mapOnClick (event) {
@@ -109,6 +163,7 @@ export default class WorkspacePage extends React.Component {
     } = this.props;
 
     selectInspectPoint(event.latLongCoordinate);
+    openWindow(event.latLongCoordinate);
   }
 
   render () {
@@ -117,12 +172,10 @@ export default class WorkspacePage extends React.Component {
 
       inspectPointSelected,
       inspectPointCoordinate,
-      inspectPointLoading,
-      inspectPointData,
 
-      filterMin,
-      filterMax,
       filterValue,
+      rangeMin,
+      rangeMax,
     } = this.props;
 
     return (
@@ -135,8 +188,8 @@ export default class WorkspacePage extends React.Component {
               <input
                 className="layout_fill"
                 type="range"
-                min={filterMin}
-                max={filterMax}
+                min={rangeMin}
+                max={rangeMax}
                 step="1"
                 value={filterValue}
                 onChange={this._bound_rangeFilterOnChange}
@@ -209,78 +262,6 @@ export default class WorkspacePage extends React.Component {
               <map-interaction-defaults />
               <map-control-simple-layer-list />
             </map-view>
-          </div>
-        </fieldset>
-        <fieldset>
-          <legend>Charts</legend>
-          <div className="section_charts">
-            {
-              !inspectPointSelected
-              ?
-                null
-              :
-                (inspectPointLoading
-                ?
-                  <div>
-                    <span>Loading...</span>
-                  </div>
-                :
-                  <div>
-                    {inspectPointData.map(({ label, data }, dataIndex) => (
-                      <div
-                        key={dataIndex}
-                        style={{ height: '200px' }}
-                      >
-                        <Line
-                          data={{
-                            datasets: [
-                              {
-                                label,
-                                lineTension: 0,
-                                pointRadius: 0,
-                                backgroundColor: 'rgba(255,99,132,0.2)',
-                                borderColor: 'rgba(255,99,132,1)',
-                                borderWidth: 1,
-                                hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-                                hoverBorderColor: 'rgba(255,99,132,1)',
-                                data,
-                              },
-                            ],
-                          }}
-                          options={{
-                            animation: {
-                              duration: 0,
-                            },
-                            maintainAspectRatio: false,
-                            tooltips: {
-                              enabled: true,
-                              mode: 'nearest',
-                              intersect: false,
-                            },
-                            hover: {
-                              mode: 'nearest',
-                              intersect: false,
-                              animationDuration: 0,
-                            },
-                            scales: {
-                              xAxes: [
-                                {
-                                  type: 'linear',
-                                  position: 'bottom',
-                                  ticks: {
-                                    autoSkip: true,
-                                    autoSkipPadding: 8,
-                                  },
-                                },
-                              ],
-                            },
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )
-            }
           </div>
         </fieldset>
       </div>
