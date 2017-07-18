@@ -1,4 +1,4 @@
-export const WORKSPACE_CLOSE_WELCOME_WINDOW = (state, action) => {    
+export const WORKSPACE_CLOSE_WELCOME_WINDOW = (state) => {
   return {
     ...state,
 

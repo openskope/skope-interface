@@ -7,7 +7,7 @@ export const CHARTS_SET_FILTERS = (state, action) => {
     value1,
     value2,
   } = action;
-    
+
   return {
     ...state,
 

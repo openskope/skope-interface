@@ -136,7 +136,6 @@ FlowRouter.route('/workspace', {
 FlowRouter.route('/workspace/charts', {
   name: 'App.workspace.charts',
   action(params, queryParams) {
-
     const {
       path,
     } = this;
@@ -145,14 +144,14 @@ FlowRouter.route('/workspace/charts', {
       type: actions.PAGE_ENTRY.type,
       path,
     });
-      
+
     const coord = [parseFloat(queryParams.longitude), parseFloat(queryParams.latitude)];
-    Meteor.call('timeseries.get', {lon: coord[0], lat: coord[1]}, (error, result) => {
+    Meteor.call('timeseries.get', { lon: coord[0], lat: coord[1] }, (error, result) => {
       store.dispatch({
-          type: actions.CHARTS_INSPECT_POINT_RESOLVE_DATA.type,
-          coordinate: coord,
-          error,
-          result,
+        type: actions.CHARTS_INSPECT_POINT_RESOLVE_DATA.type,
+        coordinate: coord,
+        error,
+        result,
       });
     });
 
