@@ -27,6 +27,8 @@ export default createContainer((props) => {
       inspectPointData,
 
       filterValue,
+
+      welcomeWindowClosed,
     },
   } = store.getState();
 
@@ -91,5 +93,12 @@ export default createContainer((props) => {
     filterMin,
     filterMax,
     filterValue,
+    
+    welcomeWindowClosed,
+    closeWelcomeWindow: () => {
+      store.dispatch({
+        type: actions.WORKSPACE_CLOSE_WELCOME_WINDOW.type,
+      });
+    },
   };
 }, Component);
