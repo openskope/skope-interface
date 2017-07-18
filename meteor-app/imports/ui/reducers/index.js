@@ -5,7 +5,7 @@ import * as reducers from './reducers';
 import initialState from './initialState';
 
 export default (state = initialState, action) => {
-  console.log('run reducer', action.type, { state, action });
+  // console.log('run reducer', action.type, { state, action });
 
   let nextState = state;
 
@@ -15,7 +15,7 @@ export default (state = initialState, action) => {
     nextState = reducers[action.type](state, action);
   }
 
-  console.log('next state', nextState);
+  // console.log('next state', nextState);
 
   return nextState;
 };
