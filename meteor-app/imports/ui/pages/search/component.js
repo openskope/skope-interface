@@ -1,10 +1,35 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {
+  SearchkitManager,
+  SearchkitProvider,
+  Layout,
+  TopBar,
+  SearchBox,
+  LayoutBody,
+  SideBar,
+  HierarchicalMenuFilter,
+  RefinementListFilter,
+  LayoutResults,
+  ActionBar,
+  ActionBarRow,
+  HitsStats,
+  SelectedFilters,
+  ResetFilters,
+  MovieHitsGridItem,
+  Hits,
+  NoHits,
+} from "searchkit";
+import "searchkit/release/theme.css";
+
 class SearchResultItem extends React.Component {
   render () {
     return (
-      <div>Some Result (Implement this)</div>
+      <div style={{overflow: "auto"}}>
+        <p>Some Result (Implement this)</p>
+        <pre>{JSON.stringify(this.props, null, 2)}</pre>
+      </div>
     );
   }
 }
@@ -12,6 +37,8 @@ class SearchResultItem extends React.Component {
 export default class SearchPage extends React.Component {
 
   static propTypes = {
+    // SearchKit Manager instance.
+    searchkit: PropTypes.instanceOf(SearchkitManager),
     // Callback function for updating search input.
     updateSearchInput: PropTypes.func.isRequired,
   };
@@ -35,6 +62,8 @@ export default class SearchPage extends React.Component {
 
   render () {
     const {
+      searchkit,
+
       searchString,
       searchPending,
 

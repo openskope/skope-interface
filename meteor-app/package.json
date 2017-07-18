@@ -20,7 +20,8 @@
     "react-dom": "^15.5.4",
     "react-mounter": "^1.2.0",
     "react-redux": "^5.0.4",
-    "redux": "^3.6.0"
+    "redux": "^3.6.0",
+    "searchkit": "^2.0.0-11"
   },
   "devDependencies": {
     "@meteorjs/eslint-config-meteor": "^1.0.5",
