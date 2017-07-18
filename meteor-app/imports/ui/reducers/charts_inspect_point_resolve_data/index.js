@@ -1,12 +1,10 @@
 /**
- * This reducer is used when a new point is selected for inspection in workspace and the data is ready.
+ * This reducer is used when a new point is selected for inspection in charts and the data is ready.
  */
-
-import _ from 'lodash';
 
 export const CHARTS_INSPECT_POINT_RESOLVE_DATA = (state, action) => {
   const {
-    coordinate,
+    // coordinate,
     // error,
     result,
   } = action;
@@ -17,7 +15,7 @@ export const CHARTS_INSPECT_POINT_RESOLVE_DATA = (state, action) => {
 
       charts: {
         ...state.charts,
-    
+
         inspectPointLoading: false,
         inspectPointData: result,
       },

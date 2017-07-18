@@ -17,7 +17,7 @@ export default class HomePage extends React.Component {
           <div className="box">
             <div className="box_body">
               Compare and compute paleoenvironmental reconstructions!
-              <a href={FlowRouter.url("/workspace")}>
+              <a href={FlowRouter.url('/workspace')}>
                 <button>Workspace</button>
               </a>
             </div>
