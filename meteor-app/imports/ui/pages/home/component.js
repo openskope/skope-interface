@@ -1,7 +1,7 @@
-import { FlowRouter } from "meteor/kadira:flow-router";
+import { FlowRouter } from 'meteor/kadira:flow-router';
 import React from 'react';
 
-export default class Page_Home extends React.Component {
+export default class HomePage extends React.Component {
   render() {
     return (
       <div className="page--home">
@@ -9,7 +9,7 @@ export default class Page_Home extends React.Component {
           <div className="box">
             <div className="box_body">
               Find and download paleoenvironmental data!
-              <a href={FlowRouter.url("/search")}>
+              <a href={FlowRouter.url('/search')}>
                 <button>Search</button>
               </a>
             </div>

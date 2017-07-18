@@ -2,8 +2,6 @@
  * These are reducers for the search page.
  */
 
-import { filterMax } from "/imports/ui/consts";
-
 /**
  * This reducer is used when search input is changed in search page.
  */
@@ -11,7 +9,7 @@ export const SEARCH_SET_INPUT_FROM_URL = (state, action) => {
   const {
     value,
   } = action;
-  const inputString = typeof value === "undefined" ? "" : String(value).trim();
+  const inputString = typeof value === 'undefined' ? '' : String(value).trim();
 
   if (state.search.input !== inputString) {
     return {
@@ -25,9 +23,8 @@ export const SEARCH_SET_INPUT_FROM_URL = (state, action) => {
         results: null,
       },
     };
-  } else {
-    return state;
   }
+  return state;
 };
 
 /**
@@ -36,7 +33,7 @@ export const SEARCH_SET_INPUT_FROM_URL = (state, action) => {
 export const SEARCH_RESOLVE_DATA = (state, action) => {
   const {
     input,
-    error,
+    // error,
     result,
   } = action;
 
@@ -51,8 +48,7 @@ export const SEARCH_RESOLVE_DATA = (state, action) => {
         results: result,
       },
     };
-  } else {
-    return state;
   }
+  return state;
 };
 

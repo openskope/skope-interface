@@ -1,0 +1,18 @@
+{
+  "extends": "@meteorjs/eslint-config-meteor",
+  "rules": {
+    "import/prefer-default-export": "off",
+    "jsx-a11y/label-has-for": "off",
+    "react/prefer-stateless-function": "off",
+    "react/require-default-props": "warn",
+    "react/no-multi-comp": "warn",
+    "react/no-array-index-key": "warn",
+    "react/prop-types": "warn",
+    "arrow-body-style": "off",
+    "max-len": "warn",
+    "no-nested-ternary": "warn",
+    "no-return-assign": "off",
+    "no-underscore-dangle": "off",
+    "linebreak-style": "off"
+  }
+}

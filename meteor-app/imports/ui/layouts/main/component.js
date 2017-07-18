@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
 
-import Navbar from "/imports/ui/components/navbar/container";
+import Navbar from '/imports/ui/components/navbar/container';
 
 import {
-  demo_repository,
-} from "/package.json";
+  demoRepository,
+} from '/package.json';
 
-export default class Layout_Main extends React.Component {
+export default class MainLayout extends React.Component {
   render() {
     const {
       store,
@@ -23,7 +23,7 @@ export default class Layout_Main extends React.Component {
         </div>
         <div className="page__footer">
           <p>Some footer</p>
-          <p><a href={demo_repository} target="_blank">Source code on Github</a></p>
+          <p><a href={demoRepository} target="_blank">Source code on Github</a></p>
         </div>
       </div>
     );
