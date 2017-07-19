@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import React from 'react';
 import { mount } from 'react-mounter';
@@ -48,37 +47,15 @@ FlowRouter.route('/', {
 
 FlowRouter.route('/search', {
   name: 'App.search',
-  action(params, queryParams) {
+  action() {
     const {
       path,
     } = this;
-    const {
-      search: {
-        input: prevSearchString,
-      },
-    } = store.getState();
-    const nextSearchString = queryParams.q;
 
     store.dispatch({
       type: actions.PAGE_ENTRY.type,
       path,
     });
-
-    store.dispatch({
-      type: actions.SEARCH_SET_INPUT_FROM_URL.type,
-      value: nextSearchString,
-    });
-
-    if (nextSearchString !== prevSearchString) {
-      Meteor.call('search', { input: nextSearchString }, (error, result) => {
-        store.dispatch({
-          type: actions.SEARCH_RESOLVE_DATA.type,
-          input: nextSearchString,
-          error,
-          result,
-        });
-      });
-    }
 
     mount(MainLayout, {
       store,
@@ -86,11 +63,6 @@ FlowRouter.route('/search', {
         <SearchPage
           {...{
             store,
-            updateSearchInput: (newValue) => {
-              FlowRouter.go(path, {}, {
-                q: newValue,
-              });
-            },
           }}
         />
       ),
