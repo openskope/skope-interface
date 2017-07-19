@@ -53,12 +53,6 @@ export default class WorkspacePage extends React.Component {
     }
   }
 
-  componentDidMount () {
-    if (this._mapview) {
-      this._mapview.addEventListener('click:view', this._bound_mapOnClick);
-    }
-  }
-
   _rangeFilterOnChange (event) {
     console.info('filter changed', Date.now());
 
