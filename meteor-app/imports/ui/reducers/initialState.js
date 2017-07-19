@@ -2,12 +2,7 @@ export default {
   navInfo: [],
 
   search: {
-    // @type {string} - search string.
-    input: '',
-    // @type {boolean} - whether the results are being loaded.
-    pending: false,
-    // @type {object|null} - search result object.
-    results: null,
+    // Put states specific to search page here.
   },
 
   workspace: {

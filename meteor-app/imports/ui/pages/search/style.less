@@ -1,0 +1,43 @@
+.page--search {
+  display: flex;
+  flex-direction: row;
+
+  .child_common {
+    box-sizing: border-box;
+    width: 250px;
+    padding: 20px;
+
+    background-color: white;
+  }
+
+  &__sidepanel {
+    flex: 0 0 auto;
+
+    .child_common;
+
+    .sk-panel {
+      margin-bottom: 20px;
+    }
+  }
+
+  &__searchpanel {
+    flex: 1 1 0;
+
+    .child_common;
+
+    .sk-search-box {
+      input.sk-search-box__text {
+        color: black;
+
+        &::-webkit-input-placeholder {
+          color: @global-bg-color;
+        }
+      }
+    }
+
+    .sk-pagination-navigation {
+      width: auto !important;
+      margin: 0 30px;
+    }
+  }
+}
