@@ -43,5 +43,6 @@ export default {
     inspectPointData: null,
 
     filterValue: null,
+    welcomeWindowClosed: false,
   },
 };
