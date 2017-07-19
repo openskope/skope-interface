@@ -14,8 +14,7 @@ export default {
     //! For testing only. Should be empty on start.
     layers: [
       {
-        name: 'Water-year Precipitation',
-        urlTile: 'PPT_water_year',
+        name: 'GDD_may_sept_demosaic',
         minZoom: 5,
         maxZoom: 12,
         invisible: false,
@@ -23,11 +22,26 @@ export default {
         extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
       },
       {
-        name: 'Fahrenheit GDD',
-        urlTile: 'GDD_may_sept_demosaic',
+        name: 'PPT_annual_demosaic',
         minZoom: 5,
         maxZoom: 12,
         invisible: false,
+        opacity: 0.7,
+        extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
+      },
+      {
+        name: 'PPT_may_sept_demosaic',
+        minZoom: 5,
+        maxZoom: 12,
+        invisible: true,
+        opacity: 0.7,
+        extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
+      },
+      {
+        name: 'PPT_water_year',
+        minZoom: 5,
+        maxZoom: 12,
+        invisible: true,
         opacity: 0.7,
         extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
       },

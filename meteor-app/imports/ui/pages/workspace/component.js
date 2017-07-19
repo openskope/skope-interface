@@ -149,22 +149,22 @@ export default class WorkspacePage extends React.Component {
         </fieldset>
         <fieldset>
           <legend>Map</legend>
+          <ul className="layer-list">
+            {layers.map((layer, layerIndex) => (
+              <li key={layerIndex}>
+                <div>
+                  <input title="Toggle Visibility" type="checkbox" checked={!layer.invisible} data-layer-index={layerIndex} onChange={this._bound_layerVisibilityOnChange} />
+                  <label>{layer.name}</label>
+                </div>
+                <div>
+                  <label>Opacity: </label>
+                  <input type="range" min="0" max="255" step="1" value={layer.opacity * 255} data-layer-index={layerIndex} onChange={this._bound_layerOpacityOnChange} />
+                  <label>{layer.opacity.toFixed(2)}</label>
+                </div>
+              </li>
+            ))}
+          </ul>
           <div className="section_map">
-            <ul className="layer-list">
-              {layers.map((layer, layerIndex) => (
-                <li key={layerIndex}>
-                  <div>
-                    <input title="Toggle Visibility" type="checkbox" checked={!layer.invisible} data-layer-index={layerIndex} onChange={this._bound_layerVisibilityOnChange} />
-                    <label>{layer.name}</label>
-                  </div>
-                  <div>
-                    <label>Opacity: </label>
-                    <input type="range" min="0" max="255" step="1" value={layer.opacity * 255} data-layer-index={layerIndex} onChange={this._bound_layerOpacityOnChange} />
-                    <label>{layer.opacity.toFixed(2)}</label>
-                  </div>
-                </li>
-              ))}
-            </ul>
             <map-view
               class="the-map"
               basemap="osm"
@@ -172,19 +172,19 @@ export default class WorkspacePage extends React.Component {
               zoom="5"
               ref={ref => this._mapview = ref}
             >
-
               {layers.map((layer, layerIndex) => (
                 <map-layer-group
                   key={layerIndex}
                 >
-                  <map-layer-xyz
-                    name={layer.name}
+                  <map-layer-twms
                     url={layer.url}
                     min-zoom={layer.minZoom}
                     max-zoom={layer.maxZoom}
                     invisible={layer.invisible ? 'invisible' : null}
                     opacity={layer.opacity}
                     extent={layer.extent}
+                    params={`LAYERS=${layer.name}${filterValue}&TILED=true`}
+                    server-type="geoserver"
                   />
                   {!layer.nextUrl ? null : (
                     <map-layer-xyz
@@ -192,19 +192,17 @@ export default class WorkspacePage extends React.Component {
                       url={layer.nextUrl}
                       min-zoom={layer.minZoom}
                       max-zoom={layer.maxZoom}
-                      opacity="0"
+                      opacity={layerOpacity}
                       extent={layer.extent}
                     />
                   )}
                 </map-layer-group>
               ))}
-
               <map-layer-singlepoint
                 invisible={!inspectPointSelected ? 'invisible' : null}
                 latitude={inspectPointCoordinate[1]}
                 longitude={inspectPointCoordinate[0]}
               />
-
               <map-control-defaults />
               <map-interaction-defaults />
               <map-control-simple-layer-list />
