@@ -10,12 +10,15 @@ export default class ChartsPage extends React.Component {
     // The loaded data for the point.
     inspectPointData: PropTypes.arrayOf(PropTypes.object),
 
+    // The current value of the range filters
     filterMin: PropTypes.number.isRequired,
     filterMax: PropTypes.number.isRequired,
 
+    // The range of the range filters
     rangeMin: PropTypes.number.isRequired,
     rangeMax: PropTypes.number.isRequired,
 
+    // Callback function for updating filter values
     updateFilterMin: PropTypes.func.isRequired,
     updateFilterMax: PropTypes.func.isRequired,
   };

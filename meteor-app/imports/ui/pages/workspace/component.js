@@ -46,13 +46,14 @@ function openWindow(coord) {
   };
 }
 
+// Minimize the child window when the parent window becomes inactive
 ifvisible.on('blur', function () {
   if (theWindow) {
     Minimize(theWindow);
   }
 });
 
-// Close all child windows when the parent window closes.
+// Close the child window when the parent window closes.
 window.onbeforeunload = () => {
   if (theWindow) {
     theWindow.close();
@@ -80,6 +81,7 @@ export default class WorkspacePage extends React.Component {
     // Current value of the filter slider.
     filterValue: PropTypes.number.isRequired,
 
+    // The range of the filter
     rangeMin: PropTypes.number.isRequired,
     rangeMax: PropTypes.number.isRequired,
 
