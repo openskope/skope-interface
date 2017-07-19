@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Line } from 'react-chartjs-2';
 
 export default class WorkspacePage extends React.Component {
 
@@ -16,10 +15,6 @@ export default class WorkspacePage extends React.Component {
     inspectPointSelected: PropTypes.bool.isRequired,
     // The coordinate of the point being inspected.
     inspectPointCoordinate: PropTypes.arrayOf(PropTypes.number).isRequired,
-    // Indicate if the data is being loaded for the point.
-    inspectPointLoading: PropTypes.bool.isRequired,
-    // The loaded data for the point.
-    inspectPointData: PropTypes.arrayOf(PropTypes.object),
     // Callback function for selecting a point to inspect.
     selectInspectPoint: PropTypes.func.isRequired,
 
@@ -117,8 +112,6 @@ export default class WorkspacePage extends React.Component {
 
       inspectPointSelected,
       inspectPointCoordinate,
-      inspectPointLoading,
-      inspectPointData,
 
       filterMin,
       filterMax,
@@ -146,17 +139,17 @@ export default class WorkspacePage extends React.Component {
           <ul className="layer-list">
             <p>Layer list:</p>
             {layers.map((layer, layerIndex) => (
-                <li key={layerIndex}>
-                  <div>
-                    <input title="Toggle Visibility" type="checkbox" checked={!layer.invisible} data-layer-index={layerIndex} onChange={this._bound_layerVisibilityOnChange} />
-                    <label>{layer.name}</label>
-                  </div>
-                  <div>
-                    <label>Opacity: </label>
-                    <input type="range" min="0" max="255" step="1" value={layer.opacity * 255} data-layer-index={layerIndex} onChange={this._bound_layerOpacityOnChange} />
-                    <label>{layer.opacity.toFixed(2)}</label>
-                  </div>
-                </li>
+              <li key={layerIndex}>
+                <div>
+                  <input title="Toggle Visibility" type="checkbox" checked={!layer.invisible} data-layer-index={layerIndex} onChange={this._bound_layerVisibilityOnChange} />
+                  <label>{layer.name}</label>
+                </div>
+                <div>
+                  <label>Opacity: </label>
+                  <input type="range" min="0" max="255" step="1" value={layer.opacity * 255} data-layer-index={layerIndex} onChange={this._bound_layerOpacityOnChange} />
+                  <label>{layer.opacity.toFixed(2)}</label>
+                </div>
+              </li>
             ))}
           </ul>
         </div>
