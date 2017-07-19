@@ -55,5 +55,7 @@ export default {
 
     filterMin: rangeMin,
     filterMax: rangeMax,
+    filterValue: null,
+    welcomeWindowClosed: false,
   },
 };

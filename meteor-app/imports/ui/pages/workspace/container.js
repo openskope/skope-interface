@@ -25,6 +25,8 @@ export default createContainer((props) => {
       inspectPointCoordinate,
 
       filterValue,
+
+      welcomeWindowClosed,
     },
   } = store.getState();
 
@@ -62,5 +64,12 @@ export default createContainer((props) => {
     filterValue,
     rangeMin,
     rangeMax,
+
+    welcomeWindowClosed,
+    closeWelcomeWindow: () => {
+      store.dispatch({
+        type: actions.WORKSPACE_CLOSE_WELCOME_WINDOW.type,
+      });
+    },
   };
 }, Component);

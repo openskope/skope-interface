@@ -87,6 +87,8 @@ export default class WorkspacePage extends React.Component {
 
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
+    welcomeWindowClosed: PropTypes.bool.isRequired,
+    closeWelcomeWindow: PropTypes.func.isRequired,
   };
 
   constructor (props) {
@@ -98,6 +100,7 @@ export default class WorkspacePage extends React.Component {
     this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
     this._bound_layerOpacityOnChange = this._layerOpacityOnChange.bind(this);
     this._bound_mapOnClick = this._mapOnClick.bind(this);
+    this._bound_closeWelcomeWindow = this._closeWelcomeWindow.bind(this);
   }
 
   componentDidMount () {
@@ -168,6 +171,14 @@ export default class WorkspacePage extends React.Component {
     openWindow(event.latLongCoordinate);
   }
 
+  _closeWelcomeWindow(/* event */) {
+    const {
+      closeWelcomeWindow,
+    } = this.props;
+
+    closeWelcomeWindow();
+  }
+
   render () {
     const {
       layers,
@@ -178,10 +189,24 @@ export default class WorkspacePage extends React.Component {
       filterValue,
       rangeMin,
       rangeMax,
+      welcomeWindowClosed,
     } = this.props;
 
     return (
       <div className="page--workspace">
+
+        {!welcomeWindowClosed ? (
+          <div className="welcome_frame">
+            <div className="welcome_background" />
+
+            <div className="welcome_info">
+              <h3>Model Run Metadata</h3>
+              <button onClick={this._bound_closeWelcomeWindow}>Close</button>
+              <p>This is the metadata of the layers.</p>
+            </div>
+          </div>
+        ) : null}
+
         <fieldset>
           <legend>Filters</legend>
           <div className="section_filter">
