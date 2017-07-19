@@ -46,21 +46,6 @@ function openWindow(coord) {
   };
 }
 
-// Minimize the child window when the parent window becomes inactive
-ifvisible.on('blur', function () {
-  if (theWindow) {
-    Minimize(theWindow);
-  }
-});
-
-// Close the child window when the parent window closes.
-window.onbeforeunload = () => {
-  if (theWindow) {
-    theWindow.close();
-    theWindow = null;
-  }
-};
-
 export default class WorkspacePage extends React.Component {
 
   static propTypes = {
@@ -101,12 +86,46 @@ export default class WorkspacePage extends React.Component {
     this._bound_layerOpacityOnChange = this._layerOpacityOnChange.bind(this);
     this._bound_mapOnClick = this._mapOnClick.bind(this);
     this._bound_closeWelcomeWindow = this._closeWelcomeWindow.bind(this);
+
+    this._hidePopupWindow = () => {
+      if (theWindow) {
+        Minimize(theWindow);
+      }
+    };
+
+    this._restorePopupWindow = () => {
+      if (theWindow) {
+        RestoreMinimized(theWindow);
+      }
+    };
+
+    this._closePopupWindow = () => {
+      if (theWindow) {
+        theWindow.close();
+        theWindow = null;
+      }
+    };
   }
 
   componentDidMount () {
     if (this._mapview) {
       this._mapview.addEventListener('click:view', this._bound_mapOnClick);
     }
+
+    // Minimize the child window when the parent window becomes inactive
+    ifvisible.on('blur', this._hidePopupWindow);
+
+    // Restore the child window when the parent window becomes active
+    ifvisible.on('focus', this._restorePopupWindow);
+
+    // Close the child window when the parent window closes.
+    window.addEventListener('beforeunload', this._closePopupWindow);
+  }
+
+  componentWillUnmount () {
+    ifvisible.off('blur', this._hidePopupWindow);
+    ifvisible.off('focus', RestoreMinimized(theWindow));
+    window.removeEventListener('beforeunload', this._closePopupWindow);
   }
 
   _rangeFilterOnChange (event) {
