@@ -56,16 +56,16 @@ export default {
     ],
 
     filterValue: null,
+    
     // Whether a point is selected for inspection.
     inspectPointSelected: false,
     // If a point is selected for inspection, this would be its coordinates in [long, lat] (this order).
     inspectPointCoordinate: [0, 0],
+    
     welcomeWindowClosed: false,
   },
 
   charts: {
-    // If a point is selected for inspection, this would be its coordinates in lat-long.
-    inspectPointCoordinate: [0, 0],
     // If a point is selected for inspection, this shows if data is still being loaded.
     inspectPointLoading: true,
     // If a point is selected for inspection, the loaded data will be stored here.
@@ -73,6 +73,5 @@ export default {
 
     filterMin: rangeMin,
     filterMax: rangeMax,
-    filterValue: null,
   },
 };
