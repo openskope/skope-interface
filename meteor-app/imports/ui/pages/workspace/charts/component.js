@@ -108,7 +108,7 @@ export default class ChartsPage extends React.Component {
         {
           inspectPointLoading
           ? (
-            <div>
+            <div className="loading">
               <span>Loading...</span>
             </div>
             )
