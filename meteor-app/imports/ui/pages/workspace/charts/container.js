@@ -17,11 +17,11 @@ export default createContainer((props) => {
   } = props;
   const {
     charts: {
-        inspectPointLoading,
-        inspectPointData,
+      inspectPointLoading,
+      inspectPointData,
 
-        filterMin,
-        filterMax,
+      filterMin,
+      filterMax,
     },
   } = store.getState();
 
