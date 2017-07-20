@@ -127,7 +127,7 @@ export default class WorkspacePage extends React.Component {
 
   componentWillUnmount () {
     ifvisible.off('blur', this._hidePopupWindow);
-    ifvisible.off('focus', RestoreMinimized(theWindow));
+    ifvisible.off('focus', this._restorePopupWindow);
     window.removeEventListener('beforeunload', this._closePopupWindow);
   }
 
