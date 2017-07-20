@@ -1,5 +1,6 @@
 {
-  "name": "meteor-app",
+  "name": "skope",
+  "version": "0.0.1",
   "private": true,
   "demoRepository": "https://github.com/Zodiase/SKOPE-Demo.git",
   "scripts": {
