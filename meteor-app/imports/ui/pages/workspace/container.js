@@ -1,9 +1,8 @@
-import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import {
-  filterMin,
-  filterMax,
+  rangeMin,
+  rangeMax,
 } from '/imports/ui/consts';
 
 import * as actions from '/imports/ui/actions';
@@ -23,10 +22,10 @@ export default createContainer((props) => {
 
       inspectPointSelected,
       inspectPointCoordinate,
-      inspectPointLoading,
-      inspectPointData,
 
       filterValue,
+
+      welcomeWindowClosed,
     },
   } = store.getState();
 
@@ -53,43 +52,23 @@ export default createContainer((props) => {
 
     inspectPointSelected,
     inspectPointCoordinate,
-    inspectPointLoading,
-    inspectPointData: Object.keys(inspectPointData ? inspectPointData.data : {}).map(sourceName => ({
-      label: sourceName,
-      data: inspectPointData.data[sourceName]
-            .filter((value, valueIndex) => valueIndex >= filterValue)
-            .map((value, valueIndex) => ({
-              x: filterValue + valueIndex,
-              y: value,
-            })),
-    })),
     selectInspectPoint: (coord) => {
-      if (coord) {
-        store.dispatch({
-          type: actions.WORKSPACE_INSPECT_POINT.type,
-          selected: true,
-          coordinate: coord,
-        });
-
-        Meteor.call('timeseries.get', { lon: coord[0], lat: coord[1] }, (error, result) => {
-          store.dispatch({
-            type: actions.WORKSPACE_INSPECT_POINT_RESOLVE_DATA.type,
-            coordinate: coord,
-            error,
-            result,
-          });
-        });
-      } else {
-        store.dispatch({
-          type: actions.WORKSPACE_INSPECT_POINT.type,
-          selected: false,
-          coordinate: [0, 0],
-        });
-      }
+      store.dispatch({
+        type: actions.WORKSPACE_INSPECT_POINT.type,
+        selected: true,
+        coordinate: coord,
+      });
     },
 
-    filterMin,
-    filterMax,
     filterValue,
+    rangeMin,
+    rangeMax,
+
+    welcomeWindowClosed,
+    closeWelcomeWindow: () => {
+      store.dispatch({
+        type: actions.WORKSPACE_CLOSE_WELCOME_WINDOW.type,
+      });
+    },
   };
 }, Component);

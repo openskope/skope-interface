@@ -1,5 +1,50 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ifvisible from 'ifvisible.js';
+
+let theWindow = null;
+
+/**
+ * Helper function to minimize a window.
+ * @param {Window} w
+ */
+function Minimize (w) {
+  // There's no way of truely minimizing the window.
+  // The work-around here is to move it out of the screen.
+  w.blur();
+  w.resizeTo(0, 0);
+  w.moveTo(screen.width, screen.height);
+}
+
+/**
+ * Helper function to restore a minimized window.
+ * @param {Window} w
+ */
+function RestoreMinimized(w) {
+  const { width, height, x, y } = w._minimizeRestore;
+  w.moveTo(x, y);
+  w.resizeTo(width, height);
+  w.focus();
+}
+
+function openWindow(coord) {
+  if (theWindow) {
+    theWindow.close();
+  }
+
+  theWindow = window.open(`/workspace/charts?longitude=${coord[0]}&latitude=${coord[1]}`, '_blank', 'height=600,width=800,menubar=no,status=no,titlebar=no');
+
+  theWindow.onfocus = () => {
+    RestoreMinimized(theWindow);
+  };
+
+  theWindow._minimizeRestore = {
+    width: theWindow.outerWidth,
+    height: theWindow.outerHeight,
+    x: theWindow.screenX,
+    y: theWindow.screenY,
+  };
+}
 
 export default class WorkspacePage extends React.Component {
 
@@ -18,14 +63,17 @@ export default class WorkspacePage extends React.Component {
     // Callback function for selecting a point to inspect.
     selectInspectPoint: PropTypes.func.isRequired,
 
-    // Lower bound of the filter slider.
-    filterMin: PropTypes.number.isRequired,
-    // Upper bound of the filter slider.
-    filterMax: PropTypes.number.isRequired,
     // Current value of the filter slider.
     filterValue: PropTypes.number.isRequired,
+
+    // The range of the filter
+    rangeMin: PropTypes.number.isRequired,
+    rangeMax: PropTypes.number.isRequired,
+
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
+    welcomeWindowClosed: PropTypes.bool.isRequired,
+    closeWelcomeWindow: PropTypes.func.isRequired,
   };
 
   constructor (props) {
@@ -37,12 +85,47 @@ export default class WorkspacePage extends React.Component {
     this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
     this._bound_layerOpacityOnChange = this._layerOpacityOnChange.bind(this);
     this._bound_mapOnClick = this._mapOnClick.bind(this);
+    this._bound_closeWelcomeWindow = this._closeWelcomeWindow.bind(this);
+
+    this._hidePopupWindow = () => {
+      if (theWindow) {
+        Minimize(theWindow);
+      }
+    };
+
+    this._restorePopupWindow = () => {
+      if (theWindow) {
+        RestoreMinimized(theWindow);
+      }
+    };
+
+    this._closePopupWindow = () => {
+      if (theWindow) {
+        theWindow.close();
+        theWindow = null;
+      }
+    };
   }
 
   componentDidMount () {
     if (this._mapview) {
       this._mapview.addEventListener('click:view', this._bound_mapOnClick);
     }
+
+    // Minimize the child window when the parent window becomes inactive
+    ifvisible.on('blur', this._hidePopupWindow);
+
+    // Restore the child window when the parent window becomes active
+    ifvisible.on('focus', this._restorePopupWindow);
+
+    // Close the child window when the parent window closes.
+    window.addEventListener('beforeunload', this._closePopupWindow);
+  }
+
+  componentWillUnmount () {
+    ifvisible.off('blur', this._hidePopupWindow);
+    ifvisible.off('focus', RestoreMinimized(theWindow));
+    window.removeEventListener('beforeunload', this._closePopupWindow);
   }
 
   _rangeFilterOnChange (event) {
@@ -80,22 +163,22 @@ export default class WorkspacePage extends React.Component {
 
   _yearStepBackButtonOnClick (/* event */) {
     const {
-      filterMin,
+      rangeMin,
       filterValue,
       updateFilterValue,
     } = this.props;
 
-    updateFilterValue(Math.max(filterMin, filterValue - 1));
+    updateFilterValue(Math.max(rangeMin, filterValue - 1));
   }
 
   _yearStepForwardButtonOnClick (/* event */) {
     const {
-      filterMax,
+      rangeMax,
       filterValue,
       updateFilterValue,
     } = this.props;
 
-    updateFilterValue(Math.min(filterMax, filterValue + 1));
+    updateFilterValue(Math.min(rangeMax, filterValue + 1));
   }
 
   _mapOnClick (event) {
@@ -104,6 +187,15 @@ export default class WorkspacePage extends React.Component {
     } = this.props;
 
     selectInspectPoint(event.latLongCoordinate);
+    openWindow(event.latLongCoordinate);
+  }
+
+  _closeWelcomeWindow(/* event */) {
+    const {
+      closeWelcomeWindow,
+    } = this.props;
+
+    closeWelcomeWindow();
   }
 
   render () {
@@ -113,13 +205,27 @@ export default class WorkspacePage extends React.Component {
       inspectPointSelected,
       inspectPointCoordinate,
 
-      filterMin,
-      filterMax,
       filterValue,
+      rangeMin,
+      rangeMax,
+      welcomeWindowClosed,
     } = this.props;
 
     return (
       <div className="page--workspace">
+
+        {!welcomeWindowClosed ? (
+          <div className="welcome_frame">
+            <div className="welcome_background" />
+
+            <div className="welcome_info">
+              <h3>Model Run Metadata</h3>
+              <button onClick={this._bound_closeWelcomeWindow}>Close</button>
+              <p>This is the metadata of the layers.</p>
+            </div>
+          </div>
+        ) : null}
+
         <div className="section_filter">
           <div className="filter-row">
             <label>Year: </label>

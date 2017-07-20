@@ -4,29 +4,27 @@ import PropTypes from 'prop-types';
 import {
   SearchkitManager,
   SearchkitProvider,
-  Layout,
-  TopBar,
+  Pagination,
   SearchBox,
-  LayoutBody,
-  SideBar,
-  HierarchicalMenuFilter,
   RefinementListFilter,
+  NumericRefinementListFilter,
+  RangeFilter,
   LayoutResults,
+  InputFilter,
   ActionBar,
   ActionBarRow,
   HitsStats,
   SelectedFilters,
   ResetFilters,
-  MovieHitsGridItem,
   Hits,
   NoHits,
-} from "searchkit";
-import "searchkit/release/theme.css";
+} from 'searchkit';
+import '/node_modules/searchkit/release/theme.css';
 
 class SearchResultItem extends React.Component {
   render () {
     return (
-      <div style={{overflow: "auto"}}>
+      <div style={{ overflow: 'auto' }}>
         <p>Some Result (Implement this)</p>
         <pre>{JSON.stringify(this.props, null, 2)}</pre>
       </div>
@@ -39,93 +37,94 @@ export default class SearchPage extends React.Component {
   static propTypes = {
     // SearchKit Manager instance.
     searchkit: PropTypes.instanceOf(SearchkitManager),
-    // Callback function for updating search input.
-    updateSearchInput: PropTypes.func.isRequired,
   };
-
-  constructor (props) {
-    super(props);
-
-    this._bound_searchButtonOnClick = this._searchButtonOnClick.bind(this);
-  }
-
-  _searchButtonOnClick (/* event */) {
-    if (this.inputField_) {
-      const inputValue = this.inputField_.value;
-      const {
-        updateSearchInput,
-      } = this.props;
-
-      updateSearchInput(inputValue);
-    }
-  }
 
   render () {
     const {
       searchkit,
-
-      searchString,
-      searchPending,
-
-      results = [],
     } = this.props;
 
     return (
-      <div className="page--search">
-        <div className="row_1">
-          <label>Search:</label>
-          <input
-            className="flex-fill"
-            type="text"
-            defaultValue={searchString}
-            ref={ref => this.inputField_ = ref}
-          />
-          <button onClick={this._bound_searchButtonOnClick}>Go!</button>
-        </div>
+      <SearchkitProvider searchkit={searchkit}>
+        <div className="page--search">
+          <div className="page--search__sidepanel">
+            <InputFilter
+              id="lastname-input"
+              title="Search by last name"
+              placeholder="Appleseed"
+              searchOnChange
+              prefixQueryFields={['lastname']}
+              queryFields={['lastname']}
+            />
+            <RefinementListFilter
+              id="state-list"
+              title="State"
+              field="state"
+              operator="OR"
+              size={5}
+            />
+            <NumericRefinementListFilter
+              id="age-refine"
+              title="Age Groups"
+              field="age"
+              options={[
+                { title: 'All' },
+                { title: 'up to 20', from: 0, to: 21 },
+                { title: '21 to 40', from: 21, to: 41 },
+                { title: '41 to 60', from: 41, to: 61 },
+                { title: '61 to 80', from: 61, to: 81 },
+                { title: '81 to 100', from: 81, to: 101 },
+              ]}
+            />
+            <RangeFilter
+              field="age"
+              id="age-range"
+              min={0}
+              max={100}
+              showHistogram
+              title=""
+            />
+            <RefinementListFilter
+              id="employer-list"
+              title="Employer"
+              field="employer"
+              operator="OR"
+              size={5}
+            />
+          </div>
 
-        {
-          searchPending
-          ?
-            <div className="row_2">Searching...</div>
-          :
-            <div className="row_2">
-              <aside className="box search_filters">
-                <div className="box_body">
-                  <div className="filter-section">
-                    <div className="filter-section__title">Models</div>
-                    <ul>
-                      <li><input type="checkbox" /><label>PaleoCAR (1)</label></li>
-                      <li><input type="checkbox" /><label>Model 2 (3)</label></li>
-                      <li><input type="checkbox" /><label>Model 3 (2)</label></li>
-                    </ul>
-                  </div>
-                  <div className="filter-section">
-                    <div className="filter-section__title">Data Type</div>
-                    <ul>
-                      <li><input type="checkbox" /><label>Temperature (1)</label></li>
-                      <li><input type="checkbox" /><label>Precipitation (3)</label></li>
-                      <li><input type="checkbox" /><label>Maize niche (2)</label></li>
-                    </ul>
-                  </div>
-                  <div className="filter-section">
-                    <div className="filter-section__title">Data Source</div>
-                    <ul>
-                      <li><input type="checkbox" /><label>Peer-reviewd Article (1)</label></li>
-                      <li><input type="checkbox" /><label>SKOPE user-generated (3)</label></li>
-                    </ul>
-                  </div>
-                </div>
-              </aside>
-              <main className="box search_results">
-                <div className="box_body">
-                  {results.map((item, index) => (
-                    <SearchResultItem key={index} {...item} />
-                  ))}
-                </div>
-              </main>
-            </div>
-        }
-      </div>
+          <div className="page--search__searchpanel">
+
+            <SearchBox
+              autofocus
+              searchOnChange
+              prefixQueryFields={['actors^1', 'type^2', 'languages', 'title^10']}
+            />
+
+            <LayoutResults>
+              <ActionBar>
+
+                <ActionBarRow>
+                  <HitsStats />
+                </ActionBarRow>
+
+                <ActionBarRow>
+                  <SelectedFilters />
+                  <ResetFilters />
+                </ActionBarRow>
+
+              </ActionBar>
+              <Hits mod="sk-hits-grid" hitsPerPage={10} itemComponent={SearchResultItem} />
+              <NoHits />
+
+              <Pagination
+                showNumbers
+              />
+            </LayoutResults>
+
+          </div>
+        </div>
+      </SearchkitProvider>
     );
   }
 }

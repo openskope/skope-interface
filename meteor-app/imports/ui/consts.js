@@ -2,6 +2,6 @@
  * Define UI constants here.
  */
 
-export const filterMin = 1;
+export const rangeMin = 1;
 
-export const filterMax = 2000;
+export const rangeMax = 2000;

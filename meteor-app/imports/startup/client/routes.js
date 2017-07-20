@@ -16,6 +16,7 @@ import FullWindowLayout from '/imports/ui/layouts/full-window/container';
 import HomePage from '/imports/ui/pages/home/container';
 import SearchPage from '/imports/ui/pages/search/container';
 import WorkspacePage from '/imports/ui/pages/workspace/container';
+import ChartsPage from '/imports/ui/pages/workspace/charts/container';
 import NotFoundPage from '/imports/ui/pages/not-found/container';
 
 const store = createStore(reducers);
@@ -47,37 +48,15 @@ FlowRouter.route('/', {
 
 FlowRouter.route('/search', {
   name: 'App.search',
-  action(params, queryParams) {
+  action() {
     const {
       path,
     } = this;
-    const {
-      search: {
-        input: prevSearchString,
-      },
-    } = store.getState();
-    const nextSearchString = queryParams.q;
 
     store.dispatch({
       type: actions.PAGE_ENTRY.type,
       path,
     });
-
-    store.dispatch({
-      type: actions.SEARCH_SET_INPUT_FROM_URL.type,
-      value: nextSearchString,
-    });
-
-    if (nextSearchString !== prevSearchString) {
-      Meteor.call('search', { input: nextSearchString }, (error, result) => {
-        store.dispatch({
-          type: actions.SEARCH_RESOLVE_DATA.type,
-          input: nextSearchString,
-          error,
-          result,
-        });
-      });
-    }
 
     mount(MainLayout, {
       store,
@@ -85,11 +64,6 @@ FlowRouter.route('/search', {
         <SearchPage
           {...{
             store,
-            updateSearchInput: (newValue) => {
-              FlowRouter.go(path, {}, {
-                q: newValue,
-              });
-            },
           }}
         />
       ),
@@ -128,6 +102,34 @@ FlowRouter.route('/workspace', {
           }}
         />
       ),
+    });
+  },
+});
+
+FlowRouter.route('/workspace/charts', {
+  name: 'App.workspace.charts',
+  action(params, queryParams) {
+    const {
+      path,
+    } = this;
+
+    store.dispatch({
+      type: actions.PAGE_ENTRY.type,
+      path,
+    });
+
+    const coord = [parseFloat(queryParams.longitude), parseFloat(queryParams.latitude)];
+    Meteor.call('timeseries.get', { lon: coord[0], lat: coord[1] }, (error, result) => {
+      store.dispatch({
+        type: actions.CHARTS_INSPECT_POINT_RESOLVE_DATA.type,
+        coordinate: coord,
+        error,
+        result,
+      });
+    });
+
+    mount(ChartsPage, {
+      store,
     });
   },
 });
