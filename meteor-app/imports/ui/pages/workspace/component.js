@@ -232,8 +232,8 @@ export default class WorkspacePage extends React.Component {
             <input
               className="layout_fill"
               type="range"
-              min={filterMin}
-              max={filterMax}
+              min={rangeMin}
+              max={rangeMax}
               step="1"
               value={filterValue}
               onChange={this._bound_rangeFilterOnChange}
