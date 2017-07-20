@@ -226,90 +226,84 @@ export default class WorkspacePage extends React.Component {
           </div>
         ) : null}
 
-        <fieldset>
-          <legend>Filters</legend>
-          <div className="section_filter">
-            <div className="filter-row">
-              <label>Year: </label>
-              <input
-                className="layout_fill"
-                type="range"
-                min={rangeMin}
-                max={rangeMax}
-                step="1"
-                value={filterValue}
-                onChange={this._bound_rangeFilterOnChange}
-              />
-              <button onClick={this._bound_yearStepBackButtonOnClick}>&lt;</button>
-              <label>{filterValue}</label>
-              <button onClick={this._bound_yearStepForwardButtonOnClick}>&gt;</button>
-            </div>
+        <div className="section_filter">
+          <div className="filter-row">
+            <label>Year: </label>
+            <input
+              className="layout_fill"
+              type="range"
+              min={rangeMin}
+              max={rangeMax}
+              step="1"
+              value={filterValue}
+              onChange={this._bound_rangeFilterOnChange}
+            />
+            <button onClick={this._bound_yearStepBackButtonOnClick}>&lt;</button>
+            <label>{filterValue}</label>
+            <button onClick={this._bound_yearStepForwardButtonOnClick}>&gt;</button>
           </div>
-        </fieldset>
-        <fieldset>
-          <legend>Map</legend>
-          <div className="section_map">
-            <ul className="layer-list">
-              {layers.map((layer, layerIndex) => (
-                <li key={layerIndex}>
-                  <div>
-                    <input title="Toggle Visibility" type="checkbox" checked={!layer.invisible} data-layer-index={layerIndex} onChange={this._bound_layerVisibilityOnChange} />
-                    <label>{layer.name}</label>
-                  </div>
-                  <div>
-                    <label>Opacity: </label>
-                    <input type="range" min="0" max="255" step="1" value={layer.opacity * 255} data-layer-index={layerIndex} onChange={this._bound_layerOpacityOnChange} />
-                    <label>{layer.opacity.toFixed(2)}</label>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <map-view
-              class="the-map"
-              basemap="osm"
-              center="-12107625, 4495720"
-              zoom="5"
-              ref={ref => this._mapview = ref}
-            >
-
-              {layers.map((layer, layerIndex) => (
-                <map-layer-group
-                  key={layerIndex}
-                >
+          <ul className="layer-list">
+            <p>Layer list:</p>
+            {layers.map((layer, layerIndex) => (
+              <li key={layerIndex}>
+                <div>
+                  <input title="Toggle Visibility" type="checkbox" checked={!layer.invisible} data-layer-index={layerIndex} onChange={this._bound_layerVisibilityOnChange} />
+                  <label>{layer.name}</label>
+                </div>
+                <div className="layer-opacity">
+                  <label>Opacity: </label>
+                  <input type="range" min="0" max="255" step="1" value={layer.opacity * 255} data-layer-index={layerIndex} onChange={this._bound_layerOpacityOnChange} />
+                  <label>{layer.opacity.toFixed(2)}</label>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="section_map">
+          <map-view
+            class="the-map"
+            basemap="osm"
+            center="-12107625, 4495720"
+            zoom="5"
+            ref={ref => this._mapview = ref}
+          >
+            {layers.map((layer, layerIndex) => (
+              <map-layer-group
+                key={layerIndex}
+              >
+                <map-layer-xyz
+                  name={layer.name}
+                  url={layer.url}
+                  min-zoom={layer.minZoom}
+                  max-zoom={layer.maxZoom}
+                  invisible={layer.invisible ? 'invisible' : null}
+                  opacity={layer.opacity}
+                  extent={layer.extent}
+                />
+                {!layer.nextUrl ? null : (
                   <map-layer-xyz
-                    name={layer.name}
-                    url={layer.url}
+                    name={`${layer.name} (preload)`}
+                    url={layer.nextUrl}
                     min-zoom={layer.minZoom}
                     max-zoom={layer.maxZoom}
-                    invisible={layer.invisible ? 'invisible' : null}
-                    opacity={layer.opacity}
+                    opacity="0"
                     extent={layer.extent}
                   />
-                  {!layer.nextUrl ? null : (
-                    <map-layer-xyz
-                      name={`${layer.name} (preload)`}
-                      url={layer.nextUrl}
-                      min-zoom={layer.minZoom}
-                      max-zoom={layer.maxZoom}
-                      opacity="0"
-                      extent={layer.extent}
-                    />
-                  )}
-                </map-layer-group>
-              ))}
+                )}
+              </map-layer-group>
+            ))}
 
-              <map-layer-singlepoint
-                invisible={!inspectPointSelected ? 'invisible' : null}
-                latitude={inspectPointCoordinate[1]}
-                longitude={inspectPointCoordinate[0]}
-              />
+            <map-layer-singlepoint
+              invisible={!inspectPointSelected ? 'invisible' : null}
+              latitude={inspectPointCoordinate[1]}
+              longitude={inspectPointCoordinate[0]}
+            />
 
-              <map-control-defaults />
-              <map-interaction-defaults />
-              <map-control-simple-layer-list />
-            </map-view>
-          </div>
-        </fieldset>
+            <map-control-defaults />
+            <map-interaction-defaults />
+            <map-control-simple-layer-list />
+          </map-view>
+        </div>
       </div>
     );
   }
