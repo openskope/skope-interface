@@ -72,7 +72,7 @@ export default class WorkspacePage extends React.Component {
 
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
-    
+
     // The state of the welcome window.
     welcomeWindowClosed: PropTypes.bool.isRequired,
     // Callback functions for closing the welcome window.
@@ -230,6 +230,7 @@ export default class WorkspacePage extends React.Component {
         ) : null}
 
         <div className="section_filter">
+
           <div className="filter-row">
             <label>Year: </label>
             <input
@@ -245,6 +246,7 @@ export default class WorkspacePage extends React.Component {
             <label>{filterValue}</label>
             <button onClick={this._bound_yearStepForwardButtonOnClick}>&gt;</button>
           </div>
+
           <ul className="layer-list">
             <p>Layer list:</p>
             {layers.map((layer, layerIndex) => (
@@ -261,7 +263,9 @@ export default class WorkspacePage extends React.Component {
               </li>
             ))}
           </ul>
+
         </div>
+
         <div className="section_map">
           <map-view
             class="the-map"
@@ -270,31 +274,7 @@ export default class WorkspacePage extends React.Component {
             zoom="5"
             ref={ref => this._mapview = ref}
           >
-            {layers.map((layer, layerIndex) => (
-              <map-layer-group
-                key={layerIndex}
-              >
-                <map-layer-xyz
-                  name={layer.name}
-                  url={layer.url}
-                  min-zoom={layer.minZoom}
-                  max-zoom={layer.maxZoom}
-                  invisible={layer.invisible ? 'invisible' : null}
-                  opacity={layer.opacity}
-                  extent={layer.extent}
-                />
-                {!layer.nextUrl ? null : (
-                  <map-layer-xyz
-                    name={`${layer.name} (preload)`}
-                    url={layer.nextUrl}
-                    min-zoom={layer.minZoom}
-                    max-zoom={layer.maxZoom}
-                    opacity="0"
-                    extent={layer.extent}
-                  />
-                )}
-              </map-layer-group>
-            ))}
+            {layers.map(o => o.element)}
 
             <map-layer-singlepoint
               invisible={!inspectPointSelected ? 'invisible' : null}

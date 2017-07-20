@@ -1,3 +1,5 @@
+import { Meteor } from 'meteor/meteor';
+import React from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import {
@@ -30,10 +32,38 @@ export default createContainer((props) => {
   } = store.getState();
 
   return {
-    layers: layers.map(layer => ({
+    layers: layers.map((layer, layerIndex) => ({
       ...layer,
-      url: `http://demo.openskope.org/static_tiles/${layer.urlTile}/tiles/${layer.urlTile}-${filterValue}-color/{z}/{x}/{-y}.png`,
-      nextUrl: `http://demo.openskope.org/static_tiles/${layer.urlTile}/tiles/${layer.urlTile}-${filterValue + 1}-color/{z}/{x}/{-y}.png`,
+
+      element: (
+        <map-layer-group
+          key={layerIndex}
+        >
+          <map-layer-twms
+            name={layer.name}
+            url={layer.wmsBaseUrl}
+            min-zoom={layer.minZoom}
+            max-zoom={layer.maxZoom}
+            invisible={layer.invisible ? 'invisible' : null}
+            opacity={layer.opacity}
+            extent={layer.extent}
+            params={`LAYERS=${layer.wmsLayerName}${filterValue}&TILED=true`}
+            server-type="geoserver"
+          />
+          {!layer.nextUrl ? null : (
+            <map-layer-twms
+              name={`${layer.name} (preload)`}
+              url={layer.wmsBaseUrl}
+              min-zoom={layer.minZoom}
+              max-zoom={layer.maxZoom}
+              opacity="0"
+              extent={layer.extent}
+              params={`LAYERS=${layer.wmsLayerName}${filterValue + 1}&TILED=true`}
+              server-type="geoserver"
+            />
+          )}
+        </map-layer-group>
+      )
     })),
     toggleLayer: (layerIndex, visible) => {
       store.dispatch({
