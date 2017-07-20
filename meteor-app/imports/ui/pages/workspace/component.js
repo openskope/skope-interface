@@ -75,8 +75,8 @@ export default class WorkspacePage extends React.Component {
 
     // The state of the welcome window.
     welcomeWindowClosed: PropTypes.bool.isRequired,
-    // Callback functions for closing the welcome window.
-    closeWelcomeWindow: PropTypes.func.isRequired,
+    // Callback functions for switching the welcome window.
+    switchWelcomeWindow: PropTypes.func.isRequired,
   };
 
   constructor (props) {
@@ -88,7 +88,7 @@ export default class WorkspacePage extends React.Component {
     this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
     this._bound_layerOpacityOnChange = this._layerOpacityOnChange.bind(this);
     this._bound_mapOnClick = this._mapOnClick.bind(this);
-    this._bound_closeWelcomeWindow = this._closeWelcomeWindow.bind(this);
+    this._bound_switchWelcomeWindow = this._switchWelcomeWindow.bind(this);
 
     this._hidePopupWindow = () => {
       if (theWindow) {
@@ -193,12 +193,12 @@ export default class WorkspacePage extends React.Component {
     openWindow(event.latLongCoordinate);
   }
 
-  _closeWelcomeWindow(/* event */) {
+  _switchWelcomeWindow(/* event */) {
     const {
-      closeWelcomeWindow,
+      switchWelcomeWindow,
     } = this.props;
 
-    closeWelcomeWindow();
+    switchWelcomeWindow();
   }
 
   render () {
@@ -223,7 +223,7 @@ export default class WorkspacePage extends React.Component {
 
             <div className="welcome_info">
               <h3>Model Run Metadata</h3>
-              <button onClick={this._bound_closeWelcomeWindow}>Close</button>
+              <button onClick={this._bound_switchWelcomeWindow}>Close</button>
               <p>This is the metadata of the layers.</p>
             </div>
           </div>
@@ -263,6 +263,8 @@ export default class WorkspacePage extends React.Component {
               </li>
             ))}
           </ul>
+
+          <button onClick={this._bound_switchWelcomeWindow}>Info</button>
 
         </div>
 
