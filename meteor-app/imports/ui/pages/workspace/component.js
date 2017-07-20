@@ -66,13 +66,16 @@ export default class WorkspacePage extends React.Component {
     // Current value of the filter slider.
     filterValue: PropTypes.number.isRequired,
 
-    // The range of the filter
+    // The range of the filter.
     rangeMin: PropTypes.number.isRequired,
     rangeMax: PropTypes.number.isRequired,
 
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
+    
+    // The state of the welcome window.
     welcomeWindowClosed: PropTypes.bool.isRequired,
+    // Callback functions for closing the welcome window.
     closeWelcomeWindow: PropTypes.func.isRequired,
   };
 
