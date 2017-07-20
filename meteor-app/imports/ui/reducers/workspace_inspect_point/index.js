@@ -16,8 +16,6 @@ export const WORKSPACE_INSPECT_POINT = (state, action) => {
 
       inspectPointSelected: selected,
       inspectPointCoordinate: selected ? [coordinate[0], coordinate[1]] : [0, 0],
-      inspectPointLoading: !!selected,
-      inspectPointData: null,
     },
   };
 };

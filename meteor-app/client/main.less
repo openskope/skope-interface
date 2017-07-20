@@ -1,7 +1,10 @@
+@global-bg-color: #37517C;
+
+@import "{}/imports/ui/pages/search/style";
 @import "{}/imports/ui/stylesheets/not-found.less";
 
 html {
-  background-color: #F7EDBA;
+  background-color: @global-bg-color;
 }
 
 .page.layout-main {
@@ -150,3 +153,4 @@ html {
 }
 
 @import "{}/imports/ui/pages/workspace/style.less";
+@import "{}/imports/ui/pages/workspace/charts/style.less";

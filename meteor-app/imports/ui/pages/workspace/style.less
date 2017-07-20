@@ -1,42 +1,179 @@
 .page--workspace {
   padding: 10px;
   background-color: white;
+  min-width: 700px;
+  min-height: 500px;
+
+  .welcome_info {
+    position: fixed;
+    margin: auto;
+    background-color: gray;
+    padding: 10px;
+    z-index: 10;
+    width: 500px;
+    height: 400px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    h3 {
+        text-align: center;
+    }
+
+    button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+  }
+
+  .welcome_background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    opacity: 0.5;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+  }
+
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -webkit-align-content: stretch;
+  -ms-flex-line-pack: stretch;
+  align-content: stretch;
+  -webkit-align-items: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
 
   .section_filter {
+    -webkit-order: 0;
+    -ms-flex-order: 0;
+    order: 0;
+    -webkit-flex: 0 1 auto;
+    -ms-flex: 0 1 auto;
+    flex: 0 1 auto;
+    -webkit-align-self: auto;
+    -ms-flex-item-align: auto;
+    align-self: auto;
+
     .filter-row {
+      display: -ms-flexbox;
+      display: -webkit-flex;
       display: flex;
+      -webkit-flex-direction: row;
+      -ms-flex-direction: row;
       flex-direction: row;
-      flex-wrap: wrap;
+      -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+      -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
       justify-content: flex-start;
+      -webkit-align-content: stretch;
+      -ms-flex-line-pack: stretch;
       align-content: stretch;
+      -webkit-align-items: stretch;
+      -ms-flex-align: stretch;
       align-items: stretch;
 
+      * {
+        -webkit-order: 0;
+        -ms-flex-order: 0;
+        order: 0;
+        -webkit-flex: 0 0 auto;
+        -ms-flex: 0 0 auto;
+        flex: 0 0 auto;
+        -webkit-align-self: auto;
+        -ms-flex-item-align: auto;
+        align-self: auto;
+      }
+
       .layout_fill {
-        flex: 1 1 0;
+        -webkit-order: 0;
+        -ms-flex-order: 0;
+        order: 0;
+        -webkit-flex: 1 1 auto;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        -webkit-align-self: auto;
+        -ms-flex-item-align: auto;
+        align-self: auto;
+      }
+
+      button {
+        margin: 3px;
+      }
+    }
+
+    li {
+      padding-bottom: 10px;
+    }
+
+    .layer-opacity {
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+      flex-direction: row;
+      -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+      -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+      justify-content: flex-start;
+      -webkit-align-content: stretch;
+      -ms-flex-line-pack: stretch;
+      align-content: stretch;
+      -webkit-align-items: stretch;
+      -ms-flex-align: stretch;
+      align-items: stretch;
+
+      * {
+        -webkit-order: 0;
+        -ms-flex-order: 0;
+        order: 0;
+        -webkit-flex: 0 0 auto;
+        -ms-flex: 0 0 auto;
+        flex: 0 0 auto;
+        -webkit-align-self: auto;
+        -ms-flex-item-align: auto;
+        align-self: auto;
       }
     }
   }
 
   .section_map {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-content: stretch;
-    align-items: stretch;
+    -webkit-order: 0;
+    -ms-flex-order: 0;
+    order: 0;
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    -webkit-align-self: auto;
+    -ms-flex-item-align: auto;
+    align-self: auto;
 
-    height: 500px;
-
-    .layer-list {
-      flex: 0 0 auto;
-      width: 300px;
-      height: 100%;
-    }
+    padding-left: 10px;
 
     .the-map {
-      flex: 1 1 0;
-      width: auto;
-      height: auto;
+        width: 100%;
+        height: 100%;
     }
   }
 }
