@@ -172,32 +172,8 @@ export default class WorkspacePage extends React.Component {
               zoom="5"
               ref={ref => this._mapview = ref}
             >
-              {layers.map((layer, layerIndex) => (
-                <map-layer-group
-                  key={layerIndex}
-                >
-                  <map-layer-twms
-                    url={layer.url}
-                    min-zoom={layer.minZoom}
-                    max-zoom={layer.maxZoom}
-                    invisible={layer.invisible ? 'invisible' : null}
-                    opacity={layer.opacity}
-                    extent={layer.extent}
-                    params={`LAYERS=${layer.urlTitle}${filterValue}&TILED=true`}
-                    server-type="geoserver"
-                  />
-                  {!layer.nextUrl ? null : (
-                    <map-layer-xyz
-                      name={`${layer.urlTitle} (preload)`}
-                      url={layer.nextUrl}
-                      min-zoom={layer.minZoom}
-                      max-zoom={layer.maxZoom}
-                      opacity="0"
-                      extent={layer.extent}
-                    />
-                  )}
-                </map-layer-group>
-              ))}
+              {layers.map(o => o.element)}
+
               <map-layer-singlepoint
                 invisible={!inspectPointSelected ? 'invisible' : null}
                 latitude={inspectPointCoordinate[1]}

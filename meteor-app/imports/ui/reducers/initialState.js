@@ -15,7 +15,8 @@ export default {
     layers: [
       {
         name: 'GDD may sept demosaic',
-        urlTitle: 'GDD_may_sept_demosaic',
+        wmsBaseUrl: 'http://141.142.170.103:8080/geoserver/skope/wms',
+        wmsLayerName: 'GDD_may_sept_demosaic',
         minZoom: 5,
         maxZoom: 12,
         invisible: false,
@@ -24,7 +25,8 @@ export default {
       },
       {
         name: 'PPT annual demosaic',
-        urlTitle: 'PPT_annual_demosaic',
+        wmsBaseUrl: 'http://141.142.170.103:8080/geoserver/skope/wms',
+        wmsLayerName: 'PPT_annual_demosaic',
         minZoom: 5,
         maxZoom: 12,
         invisible: false,
@@ -33,7 +35,8 @@ export default {
       },
       {
         name: 'PPT may sept demosaic',
-        urlTitle: 'PPT_may_sept_demosaic',
+        wmsBaseUrl: 'http://141.142.170.103:8080/geoserver/skope/wms',
+        wmsLayerName: 'PPT_may_sept_demosaic',
         minZoom: 5,
         maxZoom: 12,
         invisible: true,
@@ -42,7 +45,8 @@ export default {
       },
       {
         name: 'PPT water year',
-        urlTitle: 'PPT_water_year',
+        wmsBaseUrl: 'http://141.142.170.103:8080/geoserver/skope/wms',
+        wmsLayerName: 'PPT_water_year',
         minZoom: 5,
         maxZoom: 12,
         invisible: true,
