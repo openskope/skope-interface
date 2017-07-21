@@ -137,9 +137,15 @@ export default class WorkspacePage extends React.Component {
     const target = event.currentTarget;
     const {
       updateFilterValue,
+      rangeMin,
+      rangeMax,
     } = this.props;
 
-    updateFilterValue(target.value);
+    let newValue = parseInt(target.value, 10);
+    newValue = isNaN(newValue) ? rangeMin : newValue;
+    newValue = Math.max(rangeMin, newValue);
+    newValue = Math.min(newValue, rangeMax);
+    updateFilterValue(newValue);
   }
 
   _layerVisibilityOnChange (event) {
@@ -243,7 +249,7 @@ export default class WorkspacePage extends React.Component {
               onChange={this._bound_rangeFilterOnChange}
             />
             <button onClick={this._bound_yearStepBackButtonOnClick}>&lt;</button>
-            <label>{filterValue}</label>
+            <input type="text" value={filterValue} onChange={this._bound_rangeFilterOnChange} />
             <button onClick={this._bound_yearStepForwardButtonOnClick}>&gt;</button>
           </div>
 

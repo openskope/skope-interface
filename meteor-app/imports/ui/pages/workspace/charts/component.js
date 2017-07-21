@@ -38,18 +38,30 @@ export default class ChartsPage extends React.Component {
     const target = event.currentTarget;
     const {
       updateFilterMin,
+      rangeMin,
+      filterMax,
     } = this.props;
 
-    updateFilterMin(parseInt(target.value, 10));
+    let newValue = parseInt(target.value, 10);
+    newValue = isNaN(newValue) ? rangeMin : newValue;
+    newValue = Math.max(rangeMin, newValue);
+    newValue = Math.min(newValue, filterMax);
+    updateFilterMin(newValue);
   }
 
   _rangeFilterMaxOnChange (event) {
     const target = event.currentTarget;
     const {
       updateFilterMax,
+      filterMin,
+      rangeMax,
     } = this.props;
 
-    updateFilterMax(parseInt(target.value, 10));
+    let newValue = parseInt(target.value, 10);
+    newValue = isNaN(newValue) ? filterMin : newValue;
+    newValue = Math.max(filterMin, newValue);
+    newValue = Math.min(newValue, rangeMax);
+    updateFilterMax(newValue);
   }
 
   _yearMinStepBackButtonOnClick (/* event */) {
@@ -122,13 +134,13 @@ export default class ChartsPage extends React.Component {
                     className="layout_fill"
                     type="range"
                     min={rangeMin}
-                    max={filterMax}
+                    max={rangeMax}
                     step="1"
                     value={filterMin}
                     onChange={this._bound_rangeFilterMinOnChange}
                   />
                   <button onClick={this._bound_yearMinStepBackButtonOnClick}>&lt;</button>
-                  <label>{filterMin}</label>
+                  <input className="text-field" type="text" value={filterMin} onChange={this._bound_rangeFilterMinOnChange} />
                   <button onClick={this._bound_yearMinStepForwardButtonOnClick}>&gt;</button>
                 </div>
                 <div className="filter-max">
@@ -136,14 +148,14 @@ export default class ChartsPage extends React.Component {
                   <input
                     className="layout_fill"
                     type="range"
-                    min={filterMin}
+                    min={rangeMin}
                     max={rangeMax}
                     step="1"
                     value={filterMax}
                     onChange={this._bound_rangeFilterMaxOnChange}
                   />
                   <button onClick={this._bound_yearMaxStepBackButtonOnClick}>&lt;</button>
-                  <label>{filterMax}</label>
+                  <input className="text-field" type="text" value={filterMax} onChange={this._bound_rangeFilterMaxOnChange} />
                   <button onClick={this._bound_yearMaxStepForwardButtonOnClick}>&gt;</button>
                 </div>
               </div>
