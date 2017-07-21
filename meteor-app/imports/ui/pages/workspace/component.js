@@ -129,6 +129,8 @@ export default class WorkspacePage extends React.Component {
     ifvisible.off('blur', this._hidePopupWindow);
     ifvisible.off('focus', this._restorePopupWindow);
     window.removeEventListener('beforeunload', this._closePopupWindow);
+
+    this._closePopupWindow();
   }
 
   _rangeFilterOnChange (event) {

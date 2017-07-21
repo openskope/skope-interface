@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import React from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 
@@ -63,7 +62,7 @@ export default createContainer((props) => {
             />
           )}
         </map-layer-group>
-      )
+      ),
     })),
     toggleLayer: (layerIndex, visible) => {
       store.dispatch({

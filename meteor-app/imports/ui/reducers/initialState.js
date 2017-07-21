@@ -56,12 +56,12 @@ export default {
     ],
 
     filterValue: null,
-    
+
     // Whether a point is selected for inspection.
     inspectPointSelected: false,
     // If a point is selected for inspection, this would be its coordinates in [long, lat] (this order).
     inspectPointCoordinate: [0, 0],
-    
+
     welcomeWindowClosed: false,
   },
 
