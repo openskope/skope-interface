@@ -97,7 +97,6 @@ export default createContainer((props) => {
     toggleWelcomeWindow: () => {
       store.dispatch({
         type: actions.WORKSPACE_TOGGLE_WELCOME_WINDOW.type,
-        value: welcomeWindowClosed,
       });
     },
   };

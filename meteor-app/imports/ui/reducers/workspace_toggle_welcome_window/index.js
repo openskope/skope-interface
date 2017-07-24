@@ -1,15 +1,11 @@
-export const WORKSPACE_TOGGLE_WELCOME_WINDOW = (state, action) => {
-  const {
-    value,
-  } = action;
-
+export const WORKSPACE_TOGGLE_WELCOME_WINDOW = (state) => {
   return {
     ...state,
 
     workspace: {
       ...state.workspace,
 
-      welcomeWindowClosed: !value,
+      welcomeWindowClosed: !state.workspace.welcomeWindowClosed,
     },
   };
 };
