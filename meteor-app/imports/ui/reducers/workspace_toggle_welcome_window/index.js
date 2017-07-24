@@ -1,4 +1,4 @@
-export const WORKSPACE_SWITCH_WELCOME_WINDOW = (state, action) => {
+export const WORKSPACE_TOGGLE_WELCOME_WINDOW = (state, action) => {
   const {
     value,
   } = action;
