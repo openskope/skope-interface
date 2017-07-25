@@ -1,50 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ifvisible from 'ifvisible.js';
 
-let theWindow = null;
-
-/**
- * Helper function to minimize a window.
- * @param {Window} w
- */
-function Minimize (w) {
-  // There's no way of truely minimizing the window.
-  // The work-around here is to move it out of the screen.
-  w.blur();
-  w.resizeTo(0, 0);
-  w.moveTo(screen.width, screen.height);
-}
-
-/**
- * Helper function to restore a minimized window.
- * @param {Window} w
- */
-function RestoreMinimized(w) {
-  const { width, height, x, y } = w._minimizeRestore;
-  w.moveTo(x, y);
-  w.resizeTo(width, height);
-  w.focus();
-}
-
-function openWindow(coord) {
-  if (theWindow) {
-    theWindow.close();
-  }
-
-  theWindow = window.open(`/workspace/charts?longitude=${coord[0]}&latitude=${coord[1]}`, '_blank', 'height=600,width=800,menubar=no,status=no,titlebar=no');
-
-  theWindow.onfocus = () => {
-    RestoreMinimized(theWindow);
-  };
-
-  theWindow._minimizeRestore = {
-    width: theWindow.outerWidth,
-    height: theWindow.outerHeight,
-    x: theWindow.screenX,
-    y: theWindow.screenY,
-  };
-}
+import Charts from '/imports/ui/components/charts/container';
 
 export default class WorkspacePage extends React.Component {
 
@@ -89,48 +46,18 @@ export default class WorkspacePage extends React.Component {
     this._bound_layerOpacityOnChange = this._layerOpacityOnChange.bind(this);
     this._bound_mapOnClick = this._mapOnClick.bind(this);
     this._bound_closeWelcomeWindow = this._closeWelcomeWindow.bind(this);
-
-    this._hidePopupWindow = () => {
-      if (theWindow) {
-        Minimize(theWindow);
-      }
-    };
-
-    this._restorePopupWindow = () => {
-      if (theWindow) {
-        RestoreMinimized(theWindow);
-      }
-    };
-
-    this._closePopupWindow = () => {
-      if (theWindow) {
-        theWindow.close();
-        theWindow = null;
-      }
-    };
   }
 
   componentDidMount () {
     if (this._mapview) {
       this._mapview.addEventListener('click:view', this._bound_mapOnClick);
     }
-
-    // Minimize the child window when the parent window becomes inactive
-    ifvisible.on('blur', this._hidePopupWindow);
-
-    // Restore the child window when the parent window becomes active
-    ifvisible.on('focus', this._restorePopupWindow);
-
-    // Close the child window when the parent window closes.
-    window.addEventListener('beforeunload', this._closePopupWindow);
   }
 
   componentWillUnmount () {
-    ifvisible.off('blur', this._hidePopupWindow);
-    ifvisible.off('focus', this._restorePopupWindow);
-    window.removeEventListener('beforeunload', this._closePopupWindow);
-
-    this._closePopupWindow();
+    if (this._mapview) {
+      this._mapview.removeEventListener('click:view', this._bound_mapOnClick);
+    }
   }
 
   _rangeFilterOnChange (event) {
@@ -198,7 +125,6 @@ export default class WorkspacePage extends React.Component {
     } = this.props;
 
     selectInspectPoint(event.latLongCoordinate);
-    openWindow(event.latLongCoordinate);
   }
 
   _closeWelcomeWindow(/* event */) {
@@ -327,6 +253,11 @@ export default class WorkspacePage extends React.Component {
             <map-control-simple-layer-list />
 
           </map-view>
+
+          <Charts
+            inspectPointSelected={inspectPointSelected}
+            inspectPointCoordinate={inspectPointCoordinate}
+          />
 
         </div>
 
