@@ -1,0 +1,39 @@
+.page.layout-fullWindow {
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-content: stretch;
+  align-items: stretch;
+
+  .page__header {
+    flex: 0 0 auto;
+  }
+
+  .page__body {
+    flex: 1 1 0;
+  }
+
+  .page__footer {
+    flex: 0 0 auto;
+  }
+
+  .page__header {
+    padding: @global-layout-padding;
+    margin-bottom: @global-layout-margin;
+    background-color: white;
+  }
+
+  .page__body {
+    margin-bottom: @global-layout-margin;
+    background-color: white;
+  }
+
+  .page__footer {
+    padding: @global-layout-padding;
+    background-color: white;
+  }
+}

@@ -1,8 +1,8 @@
 .page--workspace {
-  padding: 10px;
-  background-color: white;
-  min-width: 700px;
-  min-height: 500px;
+  .flex-col;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
 
   .welcome_info {
     position: fixed;
@@ -41,146 +41,81 @@
     z-index: 5;
   }
 
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-flex-wrap: nowrap;
-  -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
-  -webkit-justify-content: flex-start;
-  -ms-flex-pack: start;
-  justify-content: flex-start;
-  -webkit-align-content: stretch;
-  -ms-flex-line-pack: stretch;
-  align-content: stretch;
-  -webkit-align-items: stretch;
-  -ms-flex-align: stretch;
-  align-items: stretch;
-
-  .section_filter {
-    -webkit-order: 0;
-    -ms-flex-order: 0;
-    order: 0;
-    -webkit-flex: 0 1 auto;
-    -ms-flex: 0 1 auto;
-    flex: 0 1 auto;
-    -webkit-align-self: auto;
-    -ms-flex-item-align: auto;
-    align-self: auto;
-    
-    width: 260px;
-
-    .filter-row {
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-      flex-direction: row;
-      -webkit-flex-wrap: nowrap;
-      -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
-      -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-      justify-content: flex-start;
-      -webkit-align-content: stretch;
-      -ms-flex-line-pack: stretch;
-      align-content: stretch;
-      -webkit-align-items: stretch;
-      -ms-flex-align: stretch;
-      align-items: stretch;
-
-      * {
-        -webkit-order: 0;
-        -ms-flex-order: 0;
-        order: 0;
-        -webkit-flex: 0 0 auto;
-        -ms-flex: 0 0 auto;
-        flex: 0 0 auto;
-        -webkit-align-self: auto;
-        -ms-flex-item-align: auto;
-        align-self: auto;
-      }
-
-      .layout_fill {
-        -webkit-order: 0;
-        -ms-flex-order: 0;
-        order: 0;
-        -webkit-flex: 1 1 auto;
-        -ms-flex: 1 1 auto;
-        flex: 1 1 auto;
-        -webkit-align-self: auto;
-        -ms-flex-item-align: auto;
-        align-self: auto;
-      }
-
-      button {
-        margin: 3px;
-      }
-      
-      input {
-        width: 30px;
-      }
-    }
-
-    li {
-      padding-bottom: 10px;
-    }
-
-    .layer-opacity {
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-      flex-direction: row;
-      -webkit-flex-wrap: nowrap;
-      -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
-      -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-      justify-content: flex-start;
-      -webkit-align-content: stretch;
-      -ms-flex-line-pack: stretch;
-      align-content: stretch;
-      -webkit-align-items: stretch;
-      -ms-flex-align: stretch;
-      align-items: stretch;
-
-      * {
-        -webkit-order: 0;
-        -ms-flex-order: 0;
-        order: 0;
-        -webkit-flex: 0 0 auto;
-        -ms-flex: 0 0 auto;
-        flex: 0 0 auto;
-        -webkit-align-self: auto;
-        -ms-flex-item-align: auto;
-        align-self: auto;
-      }
-    }
+  & > .section-map {
+    .flex-col .layout-fill;
   }
 
-  .section_map {
-    -webkit-order: 0;
-    -ms-flex-order: 0;
-    order: 0;
-    -webkit-flex: 1 1 0;
-    -ms-flex: 1 1 0;
-    flex: 1 1 0;
-    -webkit-align-self: auto;
-    -ms-flex-item-align: auto;
-    align-self: auto;
+  .section-map {
+    .flex-row;
 
-    height: 500px;
-    padding-left: 10px;
+    & > .the-map {
+      .flex-row .layout-fill;
+      height: 100%;
+    }
+
+    .side-panel {
+      .flex-col;
+      width: 300px;
+      border-right: @global-layout-margin solid @global-bg-color;
+      padding: @global-layout-padding;
+
+      & > fieldset {
+        margin: 0;
+        border: 0;
+        padding: 0;
+
+        & > legend {
+          display: block;
+          padding: 0.5em 0.2em 0.3em 0.2em;
+          font-size: 1.3em;
+          font-weight: bold;
+        }
+      }
+
+      .map-animation-controls {
+        .field--year {
+          .flex-row;
+
+          .input-slider--year {
+            .flex-row .layout-fill;
+          }
+
+          .action--prev-year,
+          .action--next-year {
+            margin: 3px;
+          }
+
+          .input--year {
+            width: 40px;
+          }
+        }
+      }
+
+      .layer-list {
+        &__item {
+          margin-bottom: 10px;
+
+          .layer-title-row {
+            .flex-row;
+
+            .layer-title-label {
+              .flex-row .layout-fill;
+            }
+          }
+
+          .layer-opacity-row {
+            .flex-row;
+
+            .input-slider--layer-opacity {
+              .flex-row .layout-fill;
+            }
+          }
+        }
+      }
+    }
 
     .the-map {
-        width: 100%;
-        height: 100%;
+      border: 0;
     }
   }
 }
