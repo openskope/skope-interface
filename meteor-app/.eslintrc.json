@@ -11,6 +11,12 @@
     "arrow-body-style": "off",
     "max-len": "warn",
     "no-nested-ternary": "warn",
+    "no-param-reassign": [
+      "error",
+      {
+        "props": false
+      }
+    ],
     "no-return-assign": "off",
     "no-underscore-dangle": "off",
     "linebreak-style": "off"

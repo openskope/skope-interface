@@ -16,7 +16,7 @@ import FullWindowLayout from '/imports/ui/layouts/full-window/container';
 import HomePage from '/imports/ui/pages/home/container';
 import SearchPage from '/imports/ui/pages/search/container';
 import WorkspacePage from '/imports/ui/pages/workspace/container';
-import ChartsPage from '/imports/ui/pages/workspace/charts/container';
+import ChartsPage from '/imports/ui/pages/workspace-charts/container';
 import NotFoundPage from '/imports/ui/pages/not-found/container';
 
 const store = createStore(reducers);
