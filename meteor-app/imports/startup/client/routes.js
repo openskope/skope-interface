@@ -146,6 +146,7 @@ FlowRouter.notFound = {
     });
 
     mount(MainLayout, {
+      store,
       body: <NotFoundPage />,
     });
   },

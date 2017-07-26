@@ -129,6 +129,8 @@ export default class WorkspacePage extends React.Component {
     ifvisible.off('blur', this._hidePopupWindow);
     ifvisible.off('focus', this._restorePopupWindow);
     window.removeEventListener('beforeunload', this._closePopupWindow);
+
+    this._closePopupWindow();
   }
 
   _rangeFilterOnChange (event) {
@@ -137,9 +139,15 @@ export default class WorkspacePage extends React.Component {
     const target = event.currentTarget;
     const {
       updateFilterValue,
+      rangeMin,
+      rangeMax,
     } = this.props;
 
-    updateFilterValue(target.value);
+    let newValue = parseInt(target.value, 10);
+    newValue = isNaN(newValue) ? rangeMin : newValue;
+    newValue = Math.max(rangeMin, newValue);
+    newValue = Math.min(newValue, rangeMax);
+    updateFilterValue(newValue);
   }
 
   _layerVisibilityOnChange (event) {
@@ -229,46 +237,77 @@ export default class WorkspacePage extends React.Component {
           </div>
         ) : null}
 
-        <div className="section_filter">
+        <div className="section-map">
+          <div className="side-panel">
 
-          <div className="filter-row">
-            <label>Year: </label>
-            <input
-              className="layout_fill"
-              type="range"
-              min={rangeMin}
-              max={rangeMax}
-              step="1"
-              value={filterValue}
-              onChange={this._bound_rangeFilterOnChange}
-            />
-            <button onClick={this._bound_yearStepBackButtonOnClick}>&lt;</button>
-            <label>{filterValue}</label>
-            <button onClick={this._bound_yearStepForwardButtonOnClick}>&gt;</button>
+            <fieldset className="side-panel__section map-animation-controls">
+              <div className="field--year">
+                <label>Year: </label>
+                <input
+                  className="input-slider--year"
+                  type="range"
+                  min={rangeMin}
+                  max={rangeMax}
+                  step="1"
+                  value={filterValue}
+                  onChange={this._bound_rangeFilterOnChange}
+                />
+                <button
+                  className="action--prev-year"
+                  onClick={this._bound_yearStepBackButtonOnClick}
+                >&lt;</button>
+                <input
+                  className="input--year"
+                  type="text"
+                  value={filterValue}
+                  onChange={this._bound_rangeFilterOnChange}
+                />
+                <button
+                  className="action--next-year"
+                  onClick={this._bound_yearStepForwardButtonOnClick}
+                >&gt;</button>
+              </div>
+            </fieldset>
+
+            <fieldset className="side-panel__section layer-list">
+              <legend>Layers</legend>
+              {layers.map((layer, layerIndex) => (
+                <div
+                  key={layerIndex}
+                  className="layer-list__item"
+                >
+                  <div className="layer-title-row">
+                    <input
+                      title="Toggle Visibility"
+                      type="checkbox"
+                      checked={!layer.invisible}
+                      data-layer-index={layerIndex}
+                      onChange={this._bound_layerVisibilityOnChange}
+                    />
+                    <label className="layer-title-label">{layer.name}</label>
+                  </div>
+                  <div className="layer-opacity-row">
+                    <label>Opacity: </label>
+                    <input
+                      className="input-slider--layer-opacity"
+                      type="range"
+                      min="0"
+                      max="255"
+                      step="1"
+                      value={layer.opacity * 255}
+                      data-layer-index={layerIndex}
+                      onChange={this._bound_layerOpacityOnChange}
+                    />
+                    <label>{layer.opacity.toFixed(2)}</label>
+                  </div>
+                </div>
+              ))}
+            </fieldset>
+
+            <button onClick={this._bound_toggleWelcomeWindow}>Info</button>
+
           </div>
 
-          <ul className="layer-list">
-            <p>Layer list:</p>
-            {layers.map((layer, layerIndex) => (
-              <li key={layerIndex}>
-                <div>
-                  <input title="Toggle Visibility" type="checkbox" checked={!layer.invisible} data-layer-index={layerIndex} onChange={this._bound_layerVisibilityOnChange} />
-                  <label>{layer.name}</label>
-                </div>
-                <div className="layer-opacity">
-                  <label>Opacity: </label>
-                  <input type="range" min="0" max="255" step="1" value={layer.opacity * 255} data-layer-index={layerIndex} onChange={this._bound_layerOpacityOnChange} />
-                  <label>{layer.opacity.toFixed(2)}</label>
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          <button onClick={this._bound_toggleWelcomeWindow}>Info</button>
-
-        </div>
-
-        <div className="section_map">
           <map-view
             class="the-map"
             basemap="osm"
@@ -276,6 +315,7 @@ export default class WorkspacePage extends React.Component {
             zoom="5"
             ref={ref => this._mapview = ref}
           >
+
             {layers.map(o => o.element)}
 
             <map-layer-singlepoint
@@ -287,8 +327,11 @@ export default class WorkspacePage extends React.Component {
             <map-control-defaults />
             <map-interaction-defaults />
             <map-control-simple-layer-list />
+
           </map-view>
+
         </div>
+
       </div>
     );
   }
