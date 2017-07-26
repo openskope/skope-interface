@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
+import Range from 'rc-slider/lib/Range';
 
 export default class ChartsPage extends React.Component {
 
@@ -19,13 +20,13 @@ export default class ChartsPage extends React.Component {
     rangeMax: PropTypes.number.isRequired,
 
     // Callback function for updating filter values
-    updateFilterMin: PropTypes.func.isRequired,
-    updateFilterMax: PropTypes.func.isRequired,
+    updateFilter: PropTypes.func.isRequired,
   };
 
   constructor (props) {
     super(props);
 
+    this._bound_rangeFilterOnChange = this._rangeFilterOnChange.bind(this);
     this._bound_rangeFilterMinOnChange = this._rangeFilterMinOnChange.bind(this);
     this._bound_rangeFilterMaxOnChange = this._rangeFilterMaxOnChange.bind(this);
     this._bound_yearMinStepBackButtonOnClick = this._yearMinStepBackButtonOnClick.bind(this);
@@ -34,74 +35,86 @@ export default class ChartsPage extends React.Component {
     this._bound_yearMaxStepForwardButtonOnClick = this._yearMaxStepForwardButtonOnClick.bind(this);
   }
 
+  _rangeFilterOnChange (values) {
+    const {
+      updateFilter,
+      filterMin,
+      filterMax,
+      rangeMin,
+      rangeMax,
+    } = this.props;
+
+    let newValue1 = parseInt(values[0], 10);
+    newValue1 = isNaN(newValue1) ? rangeMin : newValue1;
+    newValue1 = Math.max(rangeMin, newValue1);
+    newValue1 = Math.min(newValue1, filterMax);
+
+    let newValue2 = parseInt(values[1], 10);
+    newValue2 = isNaN(newValue2) ? filterMin : newValue2;
+    newValue2 = Math.max(filterMin, newValue2);
+    newValue2 = Math.min(newValue2, rangeMax);
+
+    updateFilter(newValue1, newValue2);
+  }
+
   _rangeFilterMinOnChange (event) {
     const target = event.currentTarget;
     const {
-      updateFilterMin,
-      rangeMin,
       filterMax,
     } = this.props;
 
-    let newValue = parseInt(target.value, 10);
-    newValue = isNaN(newValue) ? rangeMin : newValue;
-    newValue = Math.max(rangeMin, newValue);
-    newValue = Math.min(newValue, filterMax);
-    updateFilterMin(newValue);
+    this._rangeFilterOnChange([target.value, filterMax]);
   }
 
   _rangeFilterMaxOnChange (event) {
     const target = event.currentTarget;
     const {
-      updateFilterMax,
       filterMin,
-      rangeMax,
     } = this.props;
 
-    let newValue = parseInt(target.value, 10);
-    newValue = isNaN(newValue) ? filterMin : newValue;
-    newValue = Math.max(filterMin, newValue);
-    newValue = Math.min(newValue, rangeMax);
-    updateFilterMax(newValue);
+    this._rangeFilterOnChange([filterMin, target.value]);
   }
 
   _yearMinStepBackButtonOnClick (/* event */) {
     const {
       filterMin,
+      filterMax,
       rangeMin,
-      updateFilterMin,
+      updateFilter,
     } = this.props;
 
-    updateFilterMin(Math.max(filterMin - 1, rangeMin));
+    updateFilter(Math.max(filterMin - 1, rangeMin), filterMax);
   }
 
   _yearMinStepForwardButtonOnClick (/* event */) {
     const {
       filterMin,
       filterMax,
-      updateFilterMin,
+      updateFilter,
     } = this.props;
 
-    updateFilterMin(Math.min(filterMin + 1, filterMax));
+    updateFilter(Math.min(filterMin + 1, filterMax), filterMax);
   }
 
   _yearMaxStepBackButtonOnClick (/* event */) {
     const {
-      filterMax,
       filterMin,
-      updateFilterMax,
+      filterMax,
+      updateFilter,
     } = this.props;
 
-    updateFilterMax(Math.max(filterMax - 1, filterMin));
+    updateFilter(filterMin, Math.max(filterMax - 1, filterMin));
   }
 
   _yearMaxStepForwardButtonOnClick (/* event */) {
     const {
+      filterMin,
       filterMax,
       rangeMax,
-      updateFilterMax,
+      updateFilter,
     } = this.props;
 
-    updateFilterMax(Math.min(filterMax + 1, rangeMax));
+    updateFilter(filterMin, Math.min(filterMax + 1, rangeMax));
   }
 
   render () {
@@ -128,36 +141,19 @@ export default class ChartsPage extends React.Component {
             <div className="section_charts">
 
               <div className="section_range">
-                <div className="filter-min">
-                  <label>Start: </label>
-                  <input
-                    className="layout_fill"
-                    type="range"
-                    min={rangeMin}
-                    max={rangeMax}
-                    step="1"
-                    value={filterMin}
-                    onChange={this._bound_rangeFilterMinOnChange}
-                  />
-                  <button onClick={this._bound_yearMinStepBackButtonOnClick}>&lt;</button>
-                  <input className="text-field" type="text" value={filterMin} onChange={this._bound_rangeFilterMinOnChange} />
-                  <button onClick={this._bound_yearMinStepForwardButtonOnClick}>&gt;</button>
-                </div>
-                <div className="filter-max">
-                  <label>End: </label>
-                  <input
-                    className="layout_fill"
-                    type="range"
-                    min={rangeMin}
-                    max={rangeMax}
-                    step="1"
-                    value={filterMax}
-                    onChange={this._bound_rangeFilterMaxOnChange}
-                  />
-                  <button onClick={this._bound_yearMaxStepBackButtonOnClick}>&lt;</button>
-                  <input className="text-field" type="text" value={filterMax} onChange={this._bound_rangeFilterMaxOnChange} />
-                  <button onClick={this._bound_yearMaxStepForwardButtonOnClick}>&gt;</button>
-                </div>
+                <button onClick={this._bound_yearMinStepBackButtonOnClick}>&lt;</button>
+                <input className="text-field" type="text" value={filterMin} onChange={this._bound_rangeFilterMinOnChange} />
+                <button onClick={this._bound_yearMinStepForwardButtonOnClick}>&gt;</button>
+                <Range
+                  className="filter"
+                  min={rangeMin}
+                  max={rangeMax}
+                  value={[filterMin, filterMax]}
+                  onChange={this._bound_rangeFilterOnChange}
+                />
+                <button onClick={this._bound_yearMaxStepBackButtonOnClick}>&lt;</button>
+                <input className="text-field" type="text" value={filterMax} onChange={this._bound_rangeFilterMaxOnChange} />
+                <button onClick={this._bound_yearMaxStepForwardButtonOnClick}>&gt;</button>
               </div>
 
               <div className="section_data">

@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import Slider from 'rc-slider/lib/Slider';
 import Charts from '/imports/ui/components/charts/container';
+
+let lastFilterChange = 0;
 
 export default class WorkspacePage extends React.Component {
 
@@ -40,6 +42,7 @@ export default class WorkspacePage extends React.Component {
     super(props);
 
     this._bound_rangeFilterOnChange = this._rangeFilterOnChange.bind(this);
+    this._bound_rangeFilterOnChangeEvent = this._rangeFilterOnChangeEvent.bind(this);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
     this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
@@ -60,21 +63,30 @@ export default class WorkspacePage extends React.Component {
     }
   }
 
-  _rangeFilterOnChange (event) {
+  _rangeFilterOnChange (value) {
+    if (Date.now() - lastFilterChange < 50) {
+      return;
+    }
+    lastFilterChange = Date.now();
+
     console.info('filter changed', Date.now());
 
-    const target = event.currentTarget;
     const {
       updateFilterValue,
       rangeMin,
       rangeMax,
     } = this.props;
 
-    let newValue = parseInt(target.value, 10);
+    let newValue = parseInt(value, 10);
     newValue = isNaN(newValue) ? rangeMin : newValue;
     newValue = Math.max(rangeMin, newValue);
     newValue = Math.min(newValue, rangeMax);
     updateFilterValue(newValue);
+  }
+
+  _rangeFilterOnChangeEvent (event) {
+    const target = event.currentTarget;
+    this._rangeFilterOnChange(target.value);
   }
 
   _layerVisibilityOnChange (event) {
@@ -88,10 +100,8 @@ export default class WorkspacePage extends React.Component {
     toggleLayer(layerIndex, layerVisible);
   }
 
-  _layerOpacityOnChange (event) {
-    const target = event.currentTarget;
-    const layerIndex = parseInt(target.getAttribute('data-layer-index'), 10);
-    const opacity = target.value / 255;
+  _layerOpacityOnChange (value, layerIndex) {
+    const opacity = value / 255;
     const {
       updateLayerOpacity,
     } = this.props;
@@ -169,12 +179,10 @@ export default class WorkspacePage extends React.Component {
             <fieldset className="side-panel__section map-animation-controls">
               <div className="field--year">
                 <label>Year: </label>
-                <input
+                <Slider
                   className="input-slider--year"
-                  type="range"
                   min={rangeMin}
                   max={rangeMax}
-                  step="1"
                   value={filterValue}
                   onChange={this._bound_rangeFilterOnChange}
                 />
@@ -186,7 +194,7 @@ export default class WorkspacePage extends React.Component {
                   className="input--year"
                   type="text"
                   value={filterValue}
-                  onChange={this._bound_rangeFilterOnChange}
+                  onChange={event => this._bound_rangeFilterOnChange(event.target.value)}
                 />
                 <button
                   className="action--next-year"
@@ -214,15 +222,13 @@ export default class WorkspacePage extends React.Component {
                   </div>
                   <div className="layer-opacity-row">
                     <label>Opacity: </label>
-                    <input
+                    <Slider
                       className="input-slider--layer-opacity"
-                      type="range"
-                      min="0"
-                      max="255"
-                      step="1"
+                      min={0}
+                      max={255}
                       value={layer.opacity * 255}
                       data-layer-index={layerIndex}
-                      onChange={this._bound_layerOpacityOnChange}
+                      onChange={newValue => this._bound_layerOpacityOnChange(newValue, layerIndex)}
                     />
                     <label>{layer.opacity.toFixed(2)}</label>
                   </div>

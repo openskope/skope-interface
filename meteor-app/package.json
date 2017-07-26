@@ -16,6 +16,7 @@
     "lodash": "^4.17.4",
     "meteor-node-stubs": "~0.2.4",
     "prop-types": "^15.5.8",
+    "rc-slider": "^8.2.0",
     "react": "^15.5.4",
     "react-addons-pure-render-mixin": "^15.5.2",
     "react-chartjs-2": "^2.0.5",
