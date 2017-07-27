@@ -15,6 +15,7 @@
     "ifvisible.js": "^1.0.6",
     "lodash": "^4.17.4",
     "meteor-node-stubs": "~0.2.4",
+    "muicss": "^0.9.18",
     "prop-types": "^15.5.8",
     "react": "^15.5.4",
     "react-addons-pure-render-mixin": "^15.5.2",
