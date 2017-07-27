@@ -65,6 +65,18 @@ export default {
     welcomeWindowClosed: false,
   },
 
+  model: {
+    // Whether a point is selected for inspection.
+    inspectPointSelected: false,
+    // If a point is selected for inspection, this would be its coordinates in [long, lat] (this order).
+    inspectPointCoordinate: [0, 0],
+
+    mapShown: false,
+    predictionYears: rangeMax,
+    meanVar: 'none',
+    minWidth: 0,
+  },
+
   charts: {
     // If a point is selected for inspection, this shows if data is still being loaded.
     inspectPointLoading: true,

@@ -1,0 +1,38 @@
+.page--model {
+  .flex-col;
+  
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+
+  .section-form {
+    .flex-col;
+
+    padding: @global-layout-padding;
+    align-items: center;
+
+    & > * {
+      .flex-row;
+
+      margin-bottom: 20px;
+
+      & > label, button {
+        margin-right: 10px;
+      }
+    }
+  }
+  
+  .section-map {
+    .the-map {
+      .modal;
+    }
+
+    .map_background {
+      .modal-background;
+    }
+  }
+  
+  .hidden {
+    visibility: hidden;
+  }
+}
