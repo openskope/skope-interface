@@ -1,5 +1,6 @@
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import React from 'react';
+import { Button } from 'muicss/react';
 
 export default class HomePage extends React.Component {
   render() {
@@ -10,7 +11,7 @@ export default class HomePage extends React.Component {
             <div className="box_body">
               Find and download paleoenvironmental data!
               <a href={FlowRouter.url('/search')}>
-                <button>Search</button>
+              <Button color="primary">Search</Button>
               </a>
             </div>
           </div>
@@ -18,7 +19,7 @@ export default class HomePage extends React.Component {
             <div className="box_body">
               Compare and compute paleoenvironmental reconstructions!
               <a href={FlowRouter.url('/workspace')}>
-                <button>Workspace</button>
+                <Button color="primary">Workspace</Button>
               </a>
             </div>
           </div>
