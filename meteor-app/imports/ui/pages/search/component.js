@@ -111,7 +111,6 @@ export default class SearchPage extends React.Component {
   render () {
     const {
       searchkit,
-      CreationDate,
     } = this.props;
       return (
           <SearchkitProvider searchkit={searchkit}>
@@ -145,47 +144,50 @@ export default class SearchPage extends React.Component {
                     size={4}
                 />
                   <Divider></Divider>
-                <RefinementListFilter
-                    id="creationdate-list"
-                    title="Creation Date"
-                    field="CreationDate"
-                    operator="OR"
-                    orderKey="_term"
-                    orderDirection="asc"
-                    size={4}
-                />
-                <Divider></Divider>
-                <RefinementListFilter
-                    id="startdate-list"
-                    title="Start Date"
-                    field="StartDate"
-                    operator="OR"
-                    orderKey="_term"
-                    orderDirection="asc"
-                    size={4}
-                />
-                  <RefinementListFilter
-                      id="enddate-list"
-                      title="End Date"
-                      field="EndDate"
-                      operator="OR"
-                      orderKey="_term"
-                      orderDirection="asc"
-                      size={4}
-                  />
+                {/*<RefinementListFilter*/}
+                    {/*id="creationdate-list"*/}
+                    {/*title="Creation Date"*/}
+                    {/*field="CreationDate"*/}
+                    {/*operator="OR"*/}
+                    {/*orderKey="_term"*/}
+                    {/*orderDirection="asc"*/}
+                    {/*size={4}*/}
+                {/*/>*/}
+                {/*<Divider></Divider>*/}
+                {/*<RefinementListFilter*/}
+                    {/*id="startdate-list"*/}
+                    {/*title="Start Date"*/}
+                    {/*field="StartDate"*/}
+                    {/*operator="OR"*/}
+                    {/*orderKey="_term"*/}
+                    {/*orderDirection="asc"*/}
+                    {/*size={4}*/}
+                {/*/>*/}
+                {/*<Divider></Divider>  */}
+                  {/*<RefinementListFilter*/}
+                      {/*id="enddate-list"*/}
+                      {/*title="End Date"*/}
+                      {/*field="EndDate"*/}
+                      {/*operator="OR"*/}
+                      {/*orderKey="_term"*/}
+                      {/*orderDirection="asc"*/}
+                      {/*size={4}*/}
+                  {/*/>*/}
+                  <Divider></Divider>
                   <NumericRefinementListFilter
                   id="creationdate-refine"
                   title="Creation Date"
                   field="CreationDate"
                   options={[
                   { title: 'All' },
-                  { title: 'up to 1', from: 0, to: 1 },
-                  { title: '1 to 2', from: 1, to: 2 },
-                  { title: '2 to 3', from: 2, to: 3 },
-                  { title: '3 to 4', from: 3, to: 4 },
-                  { title: '4 to 5', from: 4, to: 5 },
+                  { title: '2016 to 2017', from: 0, to: 1500000000000 },
+                  { title: '2017 to 2018', from: 1500000000000, to: 1600000000000 },
+                  // { title: '2 to 3', from: 2, to: 3 },
+                  // { title: '3 to 4', from: 3, to: 4 },
+                  // { title: '4 to 5', from: 4, to: 5 },
                   ]}
                   />
+                  <Divider></Divider>
                 <RefinementListFilter
                     id="status-list"
                     title="Status"
