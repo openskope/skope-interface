@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { FlowRouter } from 'meteor/kadira:flow-router';
+import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import React from 'react';
 import { mount } from 'react-mounter';
 
@@ -160,7 +160,8 @@ FlowRouter.route('/model', {
   },
 });
 
-FlowRouter.notFound = {
+FlowRouter.route('*', {
+  name: 'App.notFound',
   action() {
     const {
       path,
@@ -176,4 +177,4 @@ FlowRouter.notFound = {
       body: <NotFoundPage />,
     });
   },
-};
+});
