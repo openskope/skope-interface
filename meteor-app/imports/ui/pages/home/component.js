@@ -25,6 +25,9 @@ export default class HomePage extends React.Component {
           <div className="box">
             <div className="box_body">
               Contribute your paleoenvironmental model!
+              <a href={FlowRouter.url('/model')}>
+                <button>Model</button>
+              </a>
             </div>
           </div>
         </div>
