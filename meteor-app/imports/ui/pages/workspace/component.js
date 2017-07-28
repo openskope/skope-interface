@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Slider from 'rc-slider/lib/Slider';
+import _ from 'lodash';
 import Charts from '/imports/ui/components/charts/container';
 
 export default class WorkspacePage extends React.Component {
@@ -39,7 +40,7 @@ export default class WorkspacePage extends React.Component {
   constructor (props) {
     super(props);
 
-    this._bound_rangeFilterOnChange = _.debounce(this._rangeFilterOnChange, 10, {leading: true, trailing: false}).bind(this);
+    this._bound_rangeFilterOnChange = _.debounce(this._rangeFilterOnChange, 10, { leading: true, trailing: false }).bind(this);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
     this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
