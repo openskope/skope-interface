@@ -8,7 +8,7 @@
   .welcome_info {
     position: fixed;
     margin: auto;
-    background-color: gray;
+    background-color: white;
     padding: 10px;
     z-index: 10;
     width: 500px;
@@ -17,15 +17,22 @@
     left: 0;
     right: 0;
     bottom: 0;
+    box-shadow: 1px 1px 10px grey;
 
     h3 {
         text-align: center;
     }
 
-    button {
-        position: absolute;
-        top: 5px;
-        right: 5px;
+    .close_button {
+      position: absolute;
+      top: -25px;
+      right: -25px;
+      cursor: pointer;
+      font-size: 31px;
+
+    }
+    .close_button:before {
+      content: "×";
     }
   }
 

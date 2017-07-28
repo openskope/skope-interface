@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Slider from 'rc-slider/lib/Slider';
 import _ from 'lodash';
 import Charts from '/imports/ui/components/charts/container';
+import { Button, Divider } from 'muicss/react';
 
 export default class WorkspacePage extends React.Component {
 
@@ -155,7 +156,13 @@ export default class WorkspacePage extends React.Component {
 
             <div className="welcome_info">
               <h3>Model Run Metadata</h3>
-              <button onClick={this._bound_toggleWelcomeWindow}>Close</button>
+              <Button
+                  className="close_button"
+                  variant="fab"
+                  color="primary"
+                  onClick={this._bound_toggleWelcomeWindow}>
+              </Button>
+              <Divider />
               <p>This is the metadata of the layers.</p>
             </div>
           </div>
@@ -166,6 +173,7 @@ export default class WorkspacePage extends React.Component {
 
             <fieldset className="side-panel__section map-animation-controls">
               <div className="field--year">
+                <div className="field--year-row1">
                 <label>Year: </label>
                 <Slider
                   className="input-slider--year"
@@ -174,20 +182,25 @@ export default class WorkspacePage extends React.Component {
                   value={filterValue}
                   onChange={this._bound_rangeFilterOnChange}
                 />
-                <button
+                </div>
+                <div className="field--year-row2">
+                <Button
+                  color="primary"
                   className="action--prev-year"
                   onClick={this._bound_yearStepBackButtonOnClick}
-                >&lt;</button>
+                >&lt;</Button>
                 <input
                   className="input--year"
                   type="text"
                   value={filterValue}
                   onChange={event => this._bound_rangeFilterOnChange(event.target.value)}
                 />
-                <button
+                <Button
+                  color="primary"
                   className="action--next-year"
                   onClick={this._bound_yearStepForwardButtonOnClick}
-                >&gt;</button>
+                >&gt;</Button>
+                </div>
               </div>
             </fieldset>
 
@@ -199,13 +212,27 @@ export default class WorkspacePage extends React.Component {
                   className="layer-list__item"
                 >
                   <div className="layer-title-row">
+                    <div className="mdc-checkbox">
                     <input
+                      className="mdc-checkbox__native-control"
                       title="Toggle Visibility"
                       type="checkbox"
                       checked={!layer.invisible}
                       data-layer-index={layerIndex}
                       onChange={this._bound_layerVisibilityOnChange}
                     />
+                      <div className="mdc-checkbox__background">
+                        <svg className="mdc-checkbox__checkmark"
+                             viewBox="0 0 24 24">
+                          <path className="mdc-checkbox__checkmark__path"
+                                fill="none"
+                                stroke="white"
+                                d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                        </svg>
+                        <div className="mdc-checkbox__mixedmark"></div>
+                      </div>
+
+                    </div>
                     <label className="layer-title-label">{layer.name}</label>
                   </div>
                   <div className="layer-opacity-row">
@@ -224,7 +251,10 @@ export default class WorkspacePage extends React.Component {
               ))}
             </fieldset>
 
-            <button onClick={this._bound_toggleWelcomeWindow}>Info</button>
+            <Button
+                color="primary"
+                onClick={this._bound_toggleWelcomeWindow}>Info
+            </Button>
 
           </div>
 
