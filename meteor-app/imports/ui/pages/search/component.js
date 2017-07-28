@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Appbar, Divider, Container, Row, Col } from 'muicss/react';
+import { Button, Appbar, Divider, Container, Row, Col} from 'muicss/react';
 
 import {
   SearchkitManager,
@@ -61,33 +61,41 @@ class SearchResultItem extends React.Component {
             <div className="container">
               <div className="result-container">
                 <Appbar className="appbar">
-                  <div className="header">{ModelName}</div>
-                  <div className="date">Run date: {CreationDate}</div>
+                  <div className="header">{Title}</div>
+                  <div className="date"><b>Creation Date</b>: {CreationDate}</div>
                 </Appbar>
-                <div className="column">
-                  <div className="column-item">
+              <Container fluid={true} className="column">
+                <Row>
+                  <Col md = "2">
                     <img src="http://www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp"></img>
-                  </div>
-                  <div className="column-item">
-                    <p><b>Creator:</b>{Creator}</p>
-                    <p><b>Status:</b>{Status}</p>
-                  </div>
-                  <div className="column-item">
-                    <p><b>Rating:</b>{Rating}</p>
-                  </div>
-                </div>
+                   </Col>
+                  <Col md = "10">
+                    <Row>
+                      <Col md = "5" className = "block"><b>ResultTypes</b>:{ResultTypes}</Col>
+                      <Col md = "5" className = "block"><b>Creator</b>:{Creator}</Col>
+                    </Row>
+                  </Col>
+                  <Col md = "10">
+                    <Row>
+                      <Col md="5" className ="block"><b>Rating</b>:{Rating}</Col>
+                      <Col md="5" className ="block"><b>Status</b>:{Status}</Col>
+                      <Col md="5" className ="block"><b>EndDate</b>:{EndDate}</Col>
+                      <Col md="5" className ="block"><b>StartDate</b>:{StartDate}</Col>
+                    </Row>
+                  </Col>
+                  <Col md = "10">
+                    <Row>
+                      <Col md="10" className ="block-big"><b>Info</b>:{Info}</Col>
+                    </Row>
+                  </Col>
+                </Row>
+              </Container>
                 <div className="button">
                   <Button className="button-item" color="primary">View Data</Button>
                   <Button className="button-item" color="primary">Download</Button>
                   <Button className="button-item" color="primary">More Information</Button>
                 </div>
               </div>
-
-                <div style={{ overflow: 'auto' }}>
-                    <p>Some Result (Implement this)</p>
-                    <pre>{JSON.stringify(this.props, null, 2)}</pre>
-                </div>
-
             </div>
         );
     }
