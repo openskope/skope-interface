@@ -19,7 +19,7 @@ const getNavInfo = (state, { path }) => {
     navInfo = [
       {
         label: 'SKOPE',
-        url: FlowRouter.url('/'),
+        url: Meteor.absoluteUrl(),
       },
       ...(pathLevels.map((v) => {
         currPathLevels.push(v);
