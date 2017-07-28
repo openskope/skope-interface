@@ -5,6 +5,8 @@ var parseCSV = require('csv-parse/lib/sync');
 var elastic = require('elasticsearch');
 
 var sourcePath = process.argv[2];
+var elasticHost = process.env.ELASTIC_HOST || 'localhost:9200';
+var httpAuth = process.env.ELASTIC_BASIC_AUTH || 'elastic:changeme';
 
 if (typeof sourcePath === 'undefined') {
   return;
@@ -77,9 +79,9 @@ dataItems = dataItems.map(function (item) {
 });
 
 var esClient = new elastic.Client({
-  host: 'localhost:9200',
+  host: elasticHost,
   apiVersion: '2.4',
-  httpAuth: 'elastic:changeme',
+  httpAuth: httpAuth,
   log: 'trace',
 });
 

@@ -1,4 +1,4 @@
-import { FlowRouter } from 'meteor/kadira:flow-router';
+import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import React from 'react';
 import PropTypes from 'prop-types';
 import ifvisible from 'ifvisible.js';

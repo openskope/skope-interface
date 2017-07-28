@@ -1,4 +1,4 @@
-import { FlowRouter } from 'meteor/kadira:flow-router';
+import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import React from 'react';
 import { Button } from 'muicss/react';
 
@@ -26,6 +26,9 @@ export default class HomePage extends React.Component {
           <div className="box">
             <div className="box_body">
               Contribute your paleoenvironmental model!
+              <a href={FlowRouter.url('/model')}>
+                <button>Model</button>
+              </a>
             </div>
           </div>
         </div>

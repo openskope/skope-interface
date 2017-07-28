@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { FlowRouter } from 'meteor/kadira:flow-router';
+import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import React from 'react';
 import { mount } from 'react-mounter';
 
@@ -17,6 +17,7 @@ import HomePage from '/imports/ui/pages/home/container';
 import SearchPage from '/imports/ui/pages/search/container';
 import WorkspacePage from '/imports/ui/pages/workspace/container';
 import ChartsPage from '/imports/ui/pages/workspace-charts/container';
+import ModelPage from '/imports/ui/pages/model/container';
 import NotFoundPage from '/imports/ui/pages/not-found/container';
 
 const store = createStore(reducers);
@@ -134,7 +135,33 @@ FlowRouter.route('/workspace/charts', {
   },
 });
 
-FlowRouter.notFound = {
+FlowRouter.route('/model', {
+  name: 'App.model',
+  action() {
+    const {
+      path,
+    } = this;
+
+    store.dispatch({
+      type: actions.PAGE_ENTRY.type,
+      path,
+    });
+
+    mount(FullWindowLayout, {
+      store,
+      body: (
+        <ModelPage
+          {...{
+            store,
+          }}
+        />
+      ),
+    });
+  },
+});
+
+FlowRouter.route('*', {
+  name: 'App.notFound',
   action() {
     const {
       path,
@@ -150,4 +177,4 @@ FlowRouter.notFound = {
       body: <NotFoundPage />,
     });
   },
-};
+});

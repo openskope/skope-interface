@@ -5,7 +5,8 @@ import {
 
 import Component from './component';
 
-const searchkit = new SearchkitManager('http://localhost:9200/');
+const elasticEndpoint = Meteor.settings && Meteor.settings.public && Meteor.settings.public.elasticEndpoint || 'http://localhost:9200/';
+const searchkit = new SearchkitManager(elasticEndpoint);
 
 /** This does not work **/
 // const searchkit = new SearchkitManager("http://localhost:9200/", {
