@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import Slider from 'rc-slider/lib/Slider';
 import Charts from '/imports/ui/components/charts/container';
 
-let lastFilterChange = 0;
-
 export default class WorkspacePage extends React.Component {
 
   static propTypes = {
@@ -41,8 +39,7 @@ export default class WorkspacePage extends React.Component {
   constructor (props) {
     super(props);
 
-    this._bound_rangeFilterOnChange = this._rangeFilterOnChange.bind(this);
-    this._bound_rangeFilterOnChangeEvent = this._rangeFilterOnChangeEvent.bind(this);
+    this._bound_rangeFilterOnChange = _.debounce(this._rangeFilterOnChange, 10, {leading: true, trailing: false}).bind(this);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
     this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
@@ -64,11 +61,6 @@ export default class WorkspacePage extends React.Component {
   }
 
   _rangeFilterOnChange (value) {
-    if (Date.now() - lastFilterChange < 50) {
-      return;
-    }
-    lastFilterChange = Date.now();
-
     console.info('filter changed', Date.now());
 
     const {
@@ -82,11 +74,6 @@ export default class WorkspacePage extends React.Component {
     newValue = Math.max(rangeMin, newValue);
     newValue = Math.min(newValue, rangeMax);
     updateFilterValue(newValue);
-  }
-
-  _rangeFilterOnChangeEvent (event) {
-    const target = event.currentTarget;
-    this._rangeFilterOnChange(target.value);
   }
 
   _layerVisibilityOnChange (event) {
