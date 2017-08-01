@@ -1,6 +1,6 @@
 {
   "name": "skope",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "private": true,
   "demoRepository": "https://github.com/Zodiase/SKOPE-Demo.git",
   "scripts": {
@@ -14,7 +14,9 @@
     "chart.js": "^2.5.0",
     "ifvisible.js": "^1.0.6",
     "lodash": "^4.17.4",
+    "material-components-web": "^0.16.0",
     "meteor-node-stubs": "~0.2.4",
+    "muicss": "^0.9.18",
     "prop-types": "^15.5.8",
     "rc-slider": "^8.2.0",
     "react": "^15.5.4",
