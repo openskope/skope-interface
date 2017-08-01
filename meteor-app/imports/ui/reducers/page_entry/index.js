@@ -3,8 +3,8 @@
  */
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 
-const getNavInfo = (state, { path }) => {
-  let navInfo = [];
+const getNavInfo = (navInfo, { path }) => {
+  let newNavInfo = [];
   let pathLevels = path.split('/').map(v => v.trim());
 
   // Pop off the top level (which is always "").
@@ -16,7 +16,7 @@ const getNavInfo = (state, { path }) => {
   if (pathLevels.length > 0) {
     const currPathLevels = [''];
 
-    navInfo = [
+    newNavInfo = [
       {
         label: 'SKOPE',
         url: Meteor.absoluteUrl(),
@@ -31,10 +31,17 @@ const getNavInfo = (state, { path }) => {
     ];
   }
 
-  return navInfo;
+  return newNavInfo;
+};
+
+const getHelpUrlForPage = (helpUrl, { path }) => {
+  //! Implement this!
+
+  return helpUrl;
 };
 
 export const PAGE_ENTRY = (state, action) => ({
   ...state,
-  navInfo: getNavInfo(state, action),
+  navInfo: getNavInfo(state.navInfo, action),
+  helpUrl: getHelpUrlForPage(state.helpUrl, action),
 });
