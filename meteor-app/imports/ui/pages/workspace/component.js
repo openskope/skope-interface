@@ -31,7 +31,7 @@ export default class WorkspacePage extends React.Component {
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
     updateURL: PropTypes.func.isRequired,
-    
+
     // Make sure the filter value is correct.
     checkFilterValue: PropTypes.func.isRequired,
 
@@ -70,7 +70,7 @@ export default class WorkspacePage extends React.Component {
       updateFilterValue,
       updateURL,
     } = this.props;
-    
+
     updateFilterValue(value);
     updateURL(value);
   }

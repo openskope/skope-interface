@@ -21,7 +21,7 @@ export default class ChartsPage extends React.Component {
 
     // Callback function for updating filter values
     updateFilter: PropTypes.func.isRequired,
-    
+
     // Make sure the filter value is correct.
     checkFilterValue: PropTypes.func.isRequired,
   };
