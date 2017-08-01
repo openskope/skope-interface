@@ -95,6 +95,12 @@ export default createContainer((props) => {
     rangeMin,
     rangeMax,
     checkFilterValue,
+    updateFilterValue: (value) => {
+      store.dispatch({
+        type: actions.WORKSPACE_SET_FILTER.type,
+        value,
+      });
+    },
 
     welcomeWindowClosed,
     toggleWelcomeWindow: () => {

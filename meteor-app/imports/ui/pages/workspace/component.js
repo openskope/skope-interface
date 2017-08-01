@@ -30,6 +30,7 @@ export default class WorkspacePage extends React.Component {
 
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
+    updateURL: PropTypes.func.isRequired,
     
     // Make sure the filter value is correct.
     checkFilterValue: PropTypes.func.isRequired,
@@ -43,7 +44,7 @@ export default class WorkspacePage extends React.Component {
   constructor (props) {
     super(props);
 
-    this._bound_rangeFilterOnChange = _.debounce(this._rangeFilterOnChange.bind(this), 100, { leading: true, trailing: false });
+    this._bound_rangeFilterOnChange = _.debounce(this._rangeFilterOnChange.bind(this), 0);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
     this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
@@ -64,17 +65,26 @@ export default class WorkspacePage extends React.Component {
     }
   }
 
+  _updateFilterValue (value) {
+    const {
+      updateFilterValue,
+      updateURL,
+    } = this.props;
+    
+    updateFilterValue(value);
+    updateURL(value);
+  }
+
   _rangeFilterOnChange (value) {
     console.info('filter changed', Date.now());
 
     const {
-      updateFilterValue,
       checkFilterValue,
       rangeMin,
       rangeMax,
     } = this.props;
 
-    updateFilterValue(checkFilterValue(value, rangeMin, rangeMax));
+    this._updateFilterValue(checkFilterValue(value, rangeMin, rangeMax));
   }
 
   _layerVisibilityOnChange (event) {
@@ -101,20 +111,18 @@ export default class WorkspacePage extends React.Component {
     const {
       rangeMin,
       filterValue,
-      updateFilterValue,
     } = this.props;
 
-    updateFilterValue(Math.max(rangeMin, filterValue - 1));
+    this._updateFilterValue(Math.max(rangeMin, filterValue - 1));
   }
 
   _yearStepForwardButtonOnClick (/* event */) {
     const {
       rangeMax,
       filterValue,
-      updateFilterValue,
     } = this.props;
 
-    updateFilterValue(Math.min(rangeMax, filterValue + 1));
+    this._updateFilterValue(Math.min(rangeMax, filterValue + 1));
   }
 
   _mapOnClick (event) {

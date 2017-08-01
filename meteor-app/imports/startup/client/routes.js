@@ -20,6 +20,13 @@ import ChartsPage from '/imports/ui/pages/workspace-charts/container';
 import ModelPage from '/imports/ui/pages/model/container';
 import NotFoundPage from '/imports/ui/pages/not-found/container';
 
+import { checkFilterValue } from '/imports/ui/filter-value';
+
+import {
+  rangeMin,
+  rangeMax,
+} from '/imports/ui/consts';
+
 const store = createStore(reducers);
 //! Attach to window for debugging.
 window.store = store;
@@ -85,8 +92,8 @@ FlowRouter.route('/workspace', {
     });
 
     store.dispatch({
-      type: actions.WORKSPACE_SET_FILTER_FROM_URL.type,
-      value: queryParams.filterValue,
+      type: actions.WORKSPACE_SET_FILTER.type,
+      value: checkFilterValue(queryParams.filterValue === undefined ? rangeMax : queryParams.filterValue, rangeMin, rangeMax),
     });
 
     mount(FullWindowLayout, {
@@ -95,8 +102,8 @@ FlowRouter.route('/workspace', {
         <WorkspacePage
           {...{
             store,
-            updateFilterValue: (newValue) => {
-              FlowRouter.go(path, {}, {
+            updateURL: (newValue) => {
+              FlowRouter.setQueryParams({
                 filterValue: newValue,
               });
             },
