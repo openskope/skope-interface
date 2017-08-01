@@ -6,6 +6,8 @@ import {
   rangeMax,
 } from '/imports/ui/consts';
 
+import { checkFilterValue } from '/imports/ui/filter-value';
+
 import * as actions from '/imports/ui/actions';
 
 import Component from './component';
@@ -92,6 +94,7 @@ export default createContainer((props) => {
     filterValue,
     rangeMin,
     rangeMax,
+    checkFilterValue,
 
     welcomeWindowClosed,
     toggleWelcomeWindow: () => {

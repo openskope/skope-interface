@@ -21,6 +21,9 @@ export default class ChartsPage extends React.Component {
 
     // Callback function for updating filter values
     updateFilter: PropTypes.func.isRequired,
+    
+    // Make sure the filter value is correct.
+    checkFilterValue: PropTypes.func.isRequired,
   };
 
   constructor (props) {
@@ -38,23 +41,14 @@ export default class ChartsPage extends React.Component {
   _rangeFilterOnChange (values) {
     const {
       updateFilter,
+      checkFilterValue,
       filterMin,
       filterMax,
       rangeMin,
       rangeMax,
     } = this.props;
 
-    let newValue1 = parseInt(values[0], 10);
-    newValue1 = isNaN(newValue1) ? rangeMin : newValue1;
-    newValue1 = Math.max(rangeMin, newValue1);
-    newValue1 = Math.min(newValue1, filterMax);
-
-    let newValue2 = parseInt(values[1], 10);
-    newValue2 = isNaN(newValue2) ? filterMin : newValue2;
-    newValue2 = Math.max(filterMin, newValue2);
-    newValue2 = Math.min(newValue2, rangeMax);
-
-    updateFilter(newValue1, newValue2);
+    updateFilter(checkFilterValue(values[0], rangeMin, filterMax), checkFilterValue(values[1], filterMin, rangeMax));
   }
 
   _rangeFilterMinOnChange (event) {

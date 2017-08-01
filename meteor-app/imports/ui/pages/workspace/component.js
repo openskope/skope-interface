@@ -30,6 +30,9 @@ export default class WorkspacePage extends React.Component {
 
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
+    
+    // Make sure the filter value is correct.
+    checkFilterValue: PropTypes.func.isRequired,
 
     // The state of the welcome window.
     welcomeWindowClosed: PropTypes.bool.isRequired,
@@ -66,15 +69,12 @@ export default class WorkspacePage extends React.Component {
 
     const {
       updateFilterValue,
+      checkFilterValue,
       rangeMin,
       rangeMax,
     } = this.props;
 
-    let newValue = parseInt(value, 10);
-    newValue = isNaN(newValue) ? rangeMin : newValue;
-    newValue = Math.max(rangeMin, newValue);
-    newValue = Math.min(newValue, rangeMax);
-    updateFilterValue(newValue);
+    updateFilterValue(checkFilterValue(value, rangeMin, rangeMax));
   }
 
   _layerVisibilityOnChange (event) {
