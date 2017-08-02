@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
 import Range from 'rc-slider/lib/Range';
+import { clampFilterValue } from '/imports/ui/helper';
 
 export default class ChartsPage extends React.Component {
 
@@ -21,9 +22,6 @@ export default class ChartsPage extends React.Component {
 
     // Callback function for updating filter values
     updateFilter: PropTypes.func.isRequired,
-
-    // Make sure the filter value is correct.
-    checkFilterValue: PropTypes.func.isRequired,
   };
 
   constructor (props) {
@@ -41,14 +39,13 @@ export default class ChartsPage extends React.Component {
   _rangeFilterOnChange (values) {
     const {
       updateFilter,
-      checkFilterValue,
       filterMin,
       filterMax,
       rangeMin,
       rangeMax,
     } = this.props;
 
-    updateFilter(checkFilterValue(values[0], rangeMin, filterMax), checkFilterValue(values[1], filterMin, rangeMax));
+    updateFilter(clampFilterValue(values[0], rangeMin, filterMax), clampFilterValue(values[1], filterMin, rangeMax));
   }
 
   _rangeFilterMinOnChange (event) {

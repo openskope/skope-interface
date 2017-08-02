@@ -5,8 +5,6 @@ import {
 
 import * as actions from '/imports/ui/actions';
 
-import { checkFilterValue } from '/imports/ui/filter-value';
-
 import { createContainer } from 'meteor/react-meteor-data';
 import Component from './component';
 
@@ -50,6 +48,5 @@ export default createContainer((props) => {
     },
     rangeMin,
     rangeMax,
-    checkFilterValue,
   };
 }, Component);

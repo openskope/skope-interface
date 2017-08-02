@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Slider from 'rc-slider/lib/Slider';
 import _ from 'lodash';
 import Charts from '/imports/ui/components/charts/container';
+import { clampFilterValue } from '/imports/ui/helper';
 
 export default class WorkspacePage extends React.Component {
 
@@ -30,10 +31,7 @@ export default class WorkspacePage extends React.Component {
 
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
-    updateURL: PropTypes.func.isRequired,
-
-    // Make sure the filter value is correct.
-    checkFilterValue: PropTypes.func.isRequired,
+    putFilterValueInUrl: PropTypes.func.isRequired,
 
     // The state of the welcome window.
     welcomeWindowClosed: PropTypes.bool.isRequired,
@@ -45,10 +43,11 @@ export default class WorkspacePage extends React.Component {
     super(props);
 
     this._bound_rangeFilterOnChange = _.debounce(this._rangeFilterOnChange.bind(this), 0);
+    this._bound_rangeFilterOnChangeInput = this._rangeFilterOnChangeInput.bind(this);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
     this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
-    this._bound_layerOpacityOnChange = this._layerOpacityOnChange.bind(this);
+    this._bound_layerOpacityOnChange = this._relayContext(this._layerOpacityOnChange.bind(this));
     this._bound_mapOnClick = this._mapOnClick.bind(this);
     this._bound_toggleWelcomeWindow = this._toggleWelcomeWindow.bind(this);
   }
@@ -68,23 +67,26 @@ export default class WorkspacePage extends React.Component {
   _updateFilterValue (value) {
     const {
       updateFilterValue,
-      updateURL,
+      putFilterValueInUrl,
     } = this.props;
 
     updateFilterValue(value);
-    updateURL(value);
+    putFilterValueInUrl(value);
   }
 
   _rangeFilterOnChange (value) {
     console.info('filter changed', Date.now());
 
     const {
-      checkFilterValue,
       rangeMin,
       rangeMax,
     } = this.props;
 
-    this._updateFilterValue(checkFilterValue(value, rangeMin, rangeMax));
+    this._updateFilterValue(clampFilterValue(value, rangeMin, rangeMax));
+  }
+
+  _rangeFilterOnChangeInput (event) {
+    this._rangeFilterOnChange(event.target.value);
   }
 
   _layerVisibilityOnChange (event) {
@@ -98,13 +100,13 @@ export default class WorkspacePage extends React.Component {
     toggleLayer(layerIndex, layerVisible);
   }
 
-  _layerOpacityOnChange (value, layerIndex) {
+  _layerOpacityOnChange (context, value) {
     const opacity = value / 255;
     const {
       updateLayerOpacity,
     } = this.props;
 
-    updateLayerOpacity(layerIndex, opacity);
+    updateLayerOpacity(context['data-layer-index'], opacity);
   }
 
   _yearStepBackButtonOnClick (/* event */) {
@@ -140,6 +142,12 @@ export default class WorkspacePage extends React.Component {
 
     toggleWelcomeWindow();
   }
+
+  _relayContext = (func) => {
+    return function (...args) {
+      return func(this, ...args);
+    };
+  };
 
   render () {
     const {
@@ -190,7 +198,7 @@ export default class WorkspacePage extends React.Component {
                   className="input--year"
                   type="text"
                   value={filterValue}
-                  onChange={event => this._bound_rangeFilterOnChange(event.target.value)}
+                  onChange={this._bound_rangeFilterOnChangeInput}
                 />
                 <button
                   className="action--next-year"
@@ -224,7 +232,7 @@ export default class WorkspacePage extends React.Component {
                       max={255}
                       value={layer.opacity * 255}
                       data-layer-index={layerIndex}
-                      onChange={newValue => this._bound_layerOpacityOnChange(newValue, layerIndex)}
+                      onChange={this._bound_layerOpacityOnChange}
                     />
                     <label>{layer.opacity.toFixed(2)}</label>
                   </div>
