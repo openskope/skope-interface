@@ -116,14 +116,6 @@ export default class SearchPage extends React.Component {
           <SearchkitProvider searchkit={searchkit}>
             <div className="page--search">
               <div className="page--search__sidepanel">
-                <InputFilter
-                    id="category-input"
-                    title="Search by Catgory"
-                    placeholder="PaleoClimate"
-                    searchOnChange
-                    prefixQueryFields={['paleoclimate']}
-                    queryFields={['paleoclimate',]}
-                />
                 <RefinementListFilter
                     id="modelname-list"
                     title="Model Name"
@@ -144,50 +136,21 @@ export default class SearchPage extends React.Component {
                     size={4}
                 />
                   <Divider></Divider>
-                {/*<RefinementListFilter*/}
-                    {/*id="creationdate-list"*/}
-                    {/*title="Creation Date"*/}
-                    {/*field="CreationDate"*/}
-                    {/*operator="OR"*/}
-                    {/*orderKey="_term"*/}
-                    {/*orderDirection="asc"*/}
-                    {/*size={4}*/}
-                {/*/>*/}
-                {/*<Divider></Divider>*/}
-                {/*<RefinementListFilter*/}
-                    {/*id="startdate-list"*/}
-                    {/*title="Start Date"*/}
-                    {/*field="StartDate"*/}
-                    {/*operator="OR"*/}
-                    {/*orderKey="_term"*/}
-                    {/*orderDirection="asc"*/}
-                    {/*size={4}*/}
-                {/*/>*/}
-                {/*<Divider></Divider>  */}
-                  {/*<RefinementListFilter*/}
-                      {/*id="enddate-list"*/}
-                      {/*title="End Date"*/}
-                      {/*field="EndDate"*/}
-                      {/*operator="OR"*/}
-                      {/*orderKey="_term"*/}
-                      {/*orderDirection="asc"*/}
-                      {/*size={4}*/}
                   {/*/>*/}
-                  <Divider></Divider>
-                  <NumericRefinementListFilter
-                  id="creationdate-refine"
-                  title="Creation Date"
-                  field="CreationDate"
-                  options={[
-                  { title: 'All' },
-                  { title: '2016 to 2017', from: 0, to: 1500000000000 },
-                  { title: '2017 to 2018', from: 1500000000000, to: 1600000000000 },
-                  // { title: '2 to 3', from: 2, to: 3 },
-                  // { title: '3 to 4', from: 3, to: 4 },
-                  // { title: '4 to 5', from: 4, to: 5 },
-                  ]}
-                  />
-                  <Divider></Divider>
+                  {/*<NumericRefinementListFilter*/}
+                  {/*id="creationdate-refine"*/}
+                  {/*title="Creation Date"*/}
+                  {/*field="CreationDate"*/}
+                  {/*options={[*/}
+                  {/*{ title: 'All' },*/}
+                  {/*{ title: '2016 to 2017', from: 0, to: 1500000000000 },*/}
+                  {/*{ title: '2017 to 2018', from: 1500000000000, to: 1600000000000 },*/}
+                  {/*// { title: '2 to 3', from: 2, to: 3 },*/}
+                  {/*// { title: '3 to 4', from: 3, to: 4 },*/}
+                  {/*// { title: '4 to 5', from: 4, to: 5 },*/}
+                  {/*]}*/}
+                  {/*/>*/}
+                  {/*<Divider></Divider>*/}
                 <RefinementListFilter
                     id="status-list"
                     title="Status"
@@ -197,44 +160,39 @@ export default class SearchPage extends React.Component {
                     orderDirection="asc"
                     size={5}
                 />
+                <Divider></Divider>
                 <RefinementListFilter
                     id="rating-list"
-                    title="Rating"
+                    title="Range"
                     field="Rating"
                     operator="OR"
                     orderKey="_term"
                     orderDirection="asc"
                     size={5}
                 />
-                <RangeFilter
+                  <RangeFilter
                     id="rating-range"
                     field="Rating"
                     min={0}
-                    max={10}
+                    max={5}
                     showHistogram
                     title=""
                 />
-                <RangeFilter
-                    id="creationdate-range"
-                    field="CreationDate"
-                    min={0}
-                    max={200}
-                    showHistogram
-                    title="Creation Date"
-                />
-                <RefinementListFilter
-                    id="resultTypes-list"
-                    title="Result Types"
-                    field="ResultTypes"
-                    operator="OR"
-                    orderKey="_term"
-                    orderDirection="asc"
-                    size={5}
-                />
+                <Divider></Divider>
                 <RefinementListFilter
                     id="inputs-list"
                     title="Input"
                     field="Inputs"
+                    operator="OR"
+                    orderKey="_term"
+                    orderDirection="asc"
+                    size={5}
+                />
+                <Divider></Divider>
+                <RefinementListFilter
+                    id="resultTypes-list"
+                    title="Result Types"
+                    field="ResultTypes"
                     operator="OR"
                     orderKey="_term"
                     orderDirection="asc"
