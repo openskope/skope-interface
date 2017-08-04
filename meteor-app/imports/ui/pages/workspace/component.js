@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import Charts from '/imports/ui/components/charts/container';
+import { Button } from 'muicss/react';
 
 export default class WorkspacePage extends React.Component {
 
@@ -163,6 +163,12 @@ export default class WorkspacePage extends React.Component {
           </div>
         ) : null}
 
+        <div className="section-toolbar">
+          <Button variant="flat" color="primary">Help</Button>
+          <Button variant="flat" color="primary" onClick={this._bound_toggleWelcomeWindow}>Info</Button>
+          <Button variant="flat" color="primary">Metadata</Button>
+        </div>
+
         <div className="section-map">
           <div className="side-panel">
 
@@ -229,8 +235,6 @@ export default class WorkspacePage extends React.Component {
                 </div>
               ))}
             </fieldset>
-
-            <button onClick={this._bound_toggleWelcomeWindow}>Info</button>
 
           </div>
 
