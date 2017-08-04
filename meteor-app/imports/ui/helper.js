@@ -7,4 +7,4 @@ export const clampFilterValue = (value, min, max) => {
   newValue = Math.max(min, newValue);
   newValue = Math.min(newValue, max);
   return newValue;
-}
+};
