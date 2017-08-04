@@ -10,30 +10,25 @@
   align-items: stretch;
 
   .page__header {
-    flex: 0 0 auto;
+    .flex-row;
+
+    padding: @global-layout-padding;
+    margin-bottom: @global-layout-margin;
+    background-color: white;
   }
 
   .page__body {
     flex: 1 1 0;
-  }
-
-  .page__footer {
-    flex: 0 0 auto;
-  }
-
-  .page__header {
-    padding: @global-layout-padding;
-    margin-bottom: @global-layout-margin;
-    background-color: white;
-  }
-
-  .page__body {
     margin-bottom: @global-layout-margin;
     background-color: white;
   }
 
   .page__footer {
-    padding: @global-layout-padding;
+    .flex-row;
+
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 20px;
     background-color: white;
   }
 }
