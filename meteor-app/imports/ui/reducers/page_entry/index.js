@@ -2,6 +2,7 @@
  * This reducer is used when entering a new page.
  */
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
+import { Meteor } from 'meteor/meteor';
 
 const getNavInfo = (navInfo, { path }) => {
   let newNavInfo = [];
@@ -35,9 +36,7 @@ const getNavInfo = (navInfo, { path }) => {
 };
 
 const getHelpUrlForPage = (helpUrl, { path }) => {
-  //! Implement this!
-
-  return helpUrl;
+  return `${path}/help`;
 };
 
 export const PAGE_ENTRY = (state, action) => ({

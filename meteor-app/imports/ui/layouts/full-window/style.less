@@ -10,6 +10,8 @@
   align-items: stretch;
 
   .page__header {
+    .flex-row;
+    
     flex: 0 0 auto;
   }
 
@@ -18,6 +20,8 @@
   }
 
   .page__footer {
+    .flex-row;
+    
     flex: 0 0 auto;
   }
 
@@ -33,7 +37,9 @@
   }
 
   .page__footer {
-    padding: @global-layout-padding;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 20px;
     background-color: white;
   }
 }

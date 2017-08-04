@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Button } from 'muicss/react';
 import Navbar from '/imports/ui/components/navbar/container';
 
 import {
@@ -11,7 +11,9 @@ export default class MainLayout extends React.Component {
     const {
       store,
       body,
+      helpUrl,
     } = this.props;
+
     return (
       <div className="page layout-main">
         <div className="page__header">
@@ -22,8 +24,10 @@ export default class MainLayout extends React.Component {
           {body}
         </div>
         <div className="page__footer">
-          <p>Some footer</p>
-          <p><a href={demoRepository} target="_blank">Source code on Github</a></p>
+          <a href={helpUrl}>
+            <Button color="primary" size="small">Help</Button>
+          </a>
+          <a href={demoRepository} target="_blank">Source code on Github</a>
         </div>
       </div>
     );
