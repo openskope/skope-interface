@@ -6,6 +6,9 @@ import {
 export default {
   navInfo: [],
 
+  // Url for the global help button.
+  helpUrl: '',
+
   search: {
     // Put states specific to search page here.
   },

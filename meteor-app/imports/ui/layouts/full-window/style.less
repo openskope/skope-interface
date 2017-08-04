@@ -25,6 +25,8 @@
   }
 
   .page__header {
+    .flex-row;
+    
     padding: @global-layout-padding;
     margin-bottom: @global-layout-margin;
     background-color: white;
@@ -36,7 +38,11 @@
   }
 
   .page__footer {
-    padding: @global-layout-padding;
+    .flex-row;
+    
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 20px;
     background-color: white;
   }
 }
