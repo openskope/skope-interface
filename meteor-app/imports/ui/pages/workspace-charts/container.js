@@ -38,19 +38,12 @@ export default createContainer((props) => {
     })),
 
     filterMin,
-    updateFilterMin: (value) => {
-      store.dispatch({
-        type: actions.CHARTS_SET_FILTERS.type,
-        value1: value,
-        value2: filterMax,
-      });
-    },
     filterMax,
-    updateFilterMax: (value) => {
+    updateFilter: (value1, value2) => {
       store.dispatch({
         type: actions.CHARTS_SET_FILTERS.type,
-        value1: filterMin,
-        value2: value,
+        value1,
+        value2,
       });
     },
     rangeMin,

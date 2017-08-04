@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
+import Range from 'rc-slider/lib/Range';
+import { clampFilterValue } from '/imports/ui/helper';
 
 export default class ChartsPage extends React.Component {
 
@@ -19,13 +21,13 @@ export default class ChartsPage extends React.Component {
     rangeMax: PropTypes.number.isRequired,
 
     // Callback function for updating filter values
-    updateFilterMin: PropTypes.func.isRequired,
-    updateFilterMax: PropTypes.func.isRequired,
+    updateFilter: PropTypes.func.isRequired,
   };
 
   constructor (props) {
     super(props);
 
+    this._bound_rangeFilterOnChange = this._rangeFilterOnChange.bind(this);
     this._bound_rangeFilterMinOnChange = this._rangeFilterMinOnChange.bind(this);
     this._bound_rangeFilterMaxOnChange = this._rangeFilterMaxOnChange.bind(this);
     this._bound_yearMinStepBackButtonOnClick = this._yearMinStepBackButtonOnClick.bind(this);
@@ -34,74 +36,70 @@ export default class ChartsPage extends React.Component {
     this._bound_yearMaxStepForwardButtonOnClick = this._yearMaxStepForwardButtonOnClick.bind(this);
   }
 
+  _rangeFilterOnChange (values) {
+    const {
+      updateFilter,
+      filterMin,
+      filterMax,
+      rangeMin,
+      rangeMax,
+    } = this.props;
+
+    updateFilter(clampFilterValue(values[0], rangeMin, filterMax), clampFilterValue(values[1], filterMin, rangeMax));
+  }
+
   _rangeFilterMinOnChange (event) {
     const target = event.currentTarget;
     const {
-      updateFilterMin,
-      rangeMin,
       filterMax,
     } = this.props;
 
-    let newValue = parseInt(target.value, 10);
-    newValue = isNaN(newValue) ? rangeMin : newValue;
-    newValue = Math.max(rangeMin, newValue);
-    newValue = Math.min(newValue, filterMax);
-    updateFilterMin(newValue);
+    this._rangeFilterOnChange([target.value, filterMax]);
   }
 
   _rangeFilterMaxOnChange (event) {
     const target = event.currentTarget;
     const {
-      updateFilterMax,
       filterMin,
-      rangeMax,
     } = this.props;
 
-    let newValue = parseInt(target.value, 10);
-    newValue = isNaN(newValue) ? filterMin : newValue;
-    newValue = Math.max(filterMin, newValue);
-    newValue = Math.min(newValue, rangeMax);
-    updateFilterMax(newValue);
+    this._rangeFilterOnChange([filterMin, target.value]);
   }
 
   _yearMinStepBackButtonOnClick (/* event */) {
     const {
       filterMin,
-      rangeMin,
-      updateFilterMin,
+      filterMax,
     } = this.props;
 
-    updateFilterMin(Math.max(filterMin - 1, rangeMin));
+    this._rangeFilterOnChange([filterMin - 1, filterMax]);
   }
 
   _yearMinStepForwardButtonOnClick (/* event */) {
     const {
       filterMin,
       filterMax,
-      updateFilterMin,
     } = this.props;
 
-    updateFilterMin(Math.min(filterMin + 1, filterMax));
+    this._rangeFilterOnChange([filterMin + 1, filterMax]);
   }
 
   _yearMaxStepBackButtonOnClick (/* event */) {
     const {
-      filterMax,
       filterMin,
-      updateFilterMax,
+      filterMax,
     } = this.props;
 
-    updateFilterMax(Math.max(filterMax - 1, filterMin));
+    this._rangeFilterOnChange([filterMin, filterMax - 1]);
   }
 
   _yearMaxStepForwardButtonOnClick (/* event */) {
     const {
+      filterMin,
       filterMax,
-      rangeMax,
-      updateFilterMax,
     } = this.props;
 
-    updateFilterMax(Math.min(filterMax + 1, rangeMax));
+    this._rangeFilterOnChange([filterMin, filterMax + 1]);
   }
 
   render () {
@@ -128,36 +126,19 @@ export default class ChartsPage extends React.Component {
             <div className="section_charts">
 
               <div className="section_range">
-                <div className="filter-min">
-                  <label>Start: </label>
-                  <input
-                    className="layout_fill"
-                    type="range"
-                    min={rangeMin}
-                    max={rangeMax}
-                    step="1"
-                    value={filterMin}
-                    onChange={this._bound_rangeFilterMinOnChange}
-                  />
-                  <button onClick={this._bound_yearMinStepBackButtonOnClick}>&lt;</button>
-                  <input className="text-field" type="text" value={filterMin} onChange={this._bound_rangeFilterMinOnChange} />
-                  <button onClick={this._bound_yearMinStepForwardButtonOnClick}>&gt;</button>
-                </div>
-                <div className="filter-max">
-                  <label>End: </label>
-                  <input
-                    className="layout_fill"
-                    type="range"
-                    min={rangeMin}
-                    max={rangeMax}
-                    step="1"
-                    value={filterMax}
-                    onChange={this._bound_rangeFilterMaxOnChange}
-                  />
-                  <button onClick={this._bound_yearMaxStepBackButtonOnClick}>&lt;</button>
-                  <input className="text-field" type="text" value={filterMax} onChange={this._bound_rangeFilterMaxOnChange} />
-                  <button onClick={this._bound_yearMaxStepForwardButtonOnClick}>&gt;</button>
-                </div>
+                <button onClick={this._bound_yearMinStepBackButtonOnClick}>&lt;</button>
+                <input className="text-field" type="text" value={filterMin} onChange={this._bound_rangeFilterMinOnChange} />
+                <button onClick={this._bound_yearMinStepForwardButtonOnClick}>&gt;</button>
+                <Range
+                  className="filter"
+                  min={rangeMin}
+                  max={rangeMax}
+                  value={[filterMin, filterMax]}
+                  onChange={this._bound_rangeFilterOnChange}
+                />
+                <button onClick={this._bound_yearMaxStepBackButtonOnClick}>&lt;</button>
+                <input className="text-field" type="text" value={filterMax} onChange={this._bound_rangeFilterMaxOnChange} />
+                <button onClick={this._bound_yearMaxStepForwardButtonOnClick}>&gt;</button>
               </div>
 
               <div className="section_data">

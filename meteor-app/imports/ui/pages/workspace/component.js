@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Slider from 'rc-slider/lib/Slider';
+import _ from 'lodash';
 import Charts from '/imports/ui/components/charts/container';
+import { clampFilterValue } from '/imports/ui/helper';
 import { Button } from 'muicss/react';
 
 export default class WorkspacePage extends React.Component {
@@ -29,6 +32,7 @@ export default class WorkspacePage extends React.Component {
 
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
+    putFilterValueInUrl: PropTypes.func.isRequired,
 
     // The state of the welcome window.
     welcomeWindowClosed: PropTypes.bool.isRequired,
@@ -39,11 +43,12 @@ export default class WorkspacePage extends React.Component {
   constructor (props) {
     super(props);
 
-    this._bound_rangeFilterOnChange = this._rangeFilterOnChange.bind(this);
+    this._bound_rangeFilterOnChange = _.debounce(this._rangeFilterOnChange.bind(this), 0);
+    this._bound_rangeFilterOnChangeInput = this._rangeFilterOnChangeInput.bind(this);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
     this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
-    this._bound_layerOpacityOnChange = this._layerOpacityOnChange.bind(this);
+    this._bound_layerOpacityOnChange = this._relayContext(this._layerOpacityOnChange.bind(this));
     this._bound_mapOnClick = this._mapOnClick.bind(this);
     this._bound_toggleWelcomeWindow = this._toggleWelcomeWindow.bind(this);
   }
@@ -60,21 +65,29 @@ export default class WorkspacePage extends React.Component {
     }
   }
 
-  _rangeFilterOnChange (event) {
-    console.info('filter changed', Date.now());
-
-    const target = event.currentTarget;
+  _updateFilterValue (value) {
     const {
       updateFilterValue,
+      putFilterValueInUrl,
+    } = this.props;
+
+    updateFilterValue(value);
+    putFilterValueInUrl(value);
+  }
+
+  _rangeFilterOnChange (value) {
+    console.info('filter changed', Date.now());
+
+    const {
       rangeMin,
       rangeMax,
     } = this.props;
 
-    let newValue = parseInt(target.value, 10);
-    newValue = isNaN(newValue) ? rangeMin : newValue;
-    newValue = Math.max(rangeMin, newValue);
-    newValue = Math.min(newValue, rangeMax);
-    updateFilterValue(newValue);
+    this._updateFilterValue(clampFilterValue(value, rangeMin, rangeMax));
+  }
+
+  _rangeFilterOnChangeInput (event) {
+    this._rangeFilterOnChange(event.target.value);
   }
 
   _layerVisibilityOnChange (event) {
@@ -88,35 +101,31 @@ export default class WorkspacePage extends React.Component {
     toggleLayer(layerIndex, layerVisible);
   }
 
-  _layerOpacityOnChange (event) {
-    const target = event.currentTarget;
-    const layerIndex = parseInt(target.getAttribute('data-layer-index'), 10);
-    const opacity = target.value / 255;
+  _layerOpacityOnChange (element, value) {
+    const opacity = value / 255;
     const {
       updateLayerOpacity,
     } = this.props;
 
-    updateLayerOpacity(layerIndex, opacity);
+    updateLayerOpacity(element['data-layer-index'], opacity);
   }
 
   _yearStepBackButtonOnClick (/* event */) {
     const {
       rangeMin,
       filterValue,
-      updateFilterValue,
     } = this.props;
 
-    updateFilterValue(Math.max(rangeMin, filterValue - 1));
+    this._updateFilterValue(Math.max(rangeMin, filterValue - 1));
   }
 
   _yearStepForwardButtonOnClick (/* event */) {
     const {
       rangeMax,
       filterValue,
-      updateFilterValue,
     } = this.props;
 
-    updateFilterValue(Math.min(rangeMax, filterValue + 1));
+    this._updateFilterValue(Math.min(rangeMax, filterValue + 1));
   }
 
   _mapOnClick (event) {
@@ -134,6 +143,12 @@ export default class WorkspacePage extends React.Component {
 
     toggleWelcomeWindow();
   }
+
+  _relayContext = (func) => {
+    return function (...args) {
+      return func(this, ...args);
+    };
+  };
 
   render () {
     const {
@@ -175,12 +190,10 @@ export default class WorkspacePage extends React.Component {
             <fieldset className="side-panel__section map-animation-controls">
               <div className="field--year">
                 <label>Year: </label>
-                <input
+                <Slider
                   className="input-slider--year"
-                  type="range"
                   min={rangeMin}
                   max={rangeMax}
-                  step="1"
                   value={filterValue}
                   onChange={this._bound_rangeFilterOnChange}
                 />
@@ -192,7 +205,7 @@ export default class WorkspacePage extends React.Component {
                   className="input--year"
                   type="text"
                   value={filterValue}
-                  onChange={this._bound_rangeFilterOnChange}
+                  onChange={this._bound_rangeFilterOnChangeInput}
                 />
                 <button
                   className="action--next-year"
@@ -220,12 +233,10 @@ export default class WorkspacePage extends React.Component {
                   </div>
                   <div className="layer-opacity-row">
                     <label>Opacity: </label>
-                    <input
+                    <Slider
                       className="input-slider--layer-opacity"
-                      type="range"
-                      min="0"
-                      max="255"
-                      step="1"
+                      min={0}
+                      max={255}
                       value={layer.opacity * 255}
                       data-layer-index={layerIndex}
                       onChange={this._bound_layerOpacityOnChange}
