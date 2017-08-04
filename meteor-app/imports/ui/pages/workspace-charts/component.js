@@ -70,42 +70,36 @@ export default class ChartsPage extends React.Component {
     const {
       filterMin,
       filterMax,
-      rangeMin,
-      updateFilter,
     } = this.props;
 
-    updateFilter(Math.max(filterMin - 1, rangeMin), filterMax);
+    this._rangeFilterOnChange([filterMin - 1, filterMax]);
   }
 
   _yearMinStepForwardButtonOnClick (/* event */) {
     const {
       filterMin,
       filterMax,
-      updateFilter,
     } = this.props;
 
-    updateFilter(Math.min(filterMin + 1, filterMax), filterMax);
+    this._rangeFilterOnChange([filterMin + 1, filterMax]);
   }
 
   _yearMaxStepBackButtonOnClick (/* event */) {
     const {
       filterMin,
       filterMax,
-      updateFilter,
     } = this.props;
 
-    updateFilter(filterMin, Math.max(filterMax - 1, filterMin));
+    this._rangeFilterOnChange([filterMin, filterMax - 1]);
   }
 
   _yearMaxStepForwardButtonOnClick (/* event */) {
     const {
       filterMin,
       filterMax,
-      rangeMax,
-      updateFilter,
     } = this.props;
 
-    updateFilter(filterMin, Math.min(filterMax + 1, rangeMax));
+    this._rangeFilterOnChange([filterMin, filterMax + 1]);
   }
 
   render () {

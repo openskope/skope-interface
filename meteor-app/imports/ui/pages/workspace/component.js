@@ -101,13 +101,13 @@ export default class WorkspacePage extends React.Component {
     toggleLayer(layerIndex, layerVisible);
   }
 
-  _layerOpacityOnChange (context, value) {
+  _layerOpacityOnChange (element, value) {
     const opacity = value / 255;
     const {
       updateLayerOpacity,
     } = this.props;
 
-    updateLayerOpacity(context['data-layer-index'], opacity);
+    updateLayerOpacity(element['data-layer-index'], opacity);
   }
 
   _yearStepBackButtonOnClick (/* event */) {
