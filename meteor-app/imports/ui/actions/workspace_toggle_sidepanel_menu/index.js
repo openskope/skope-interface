@@ -1,0 +1,3 @@
+export const WORKSPACE_TOGGLE_PANEL_MENU = {
+    type: 'WORKSPACE_TOGGLE_PANEL_MENU',
+};

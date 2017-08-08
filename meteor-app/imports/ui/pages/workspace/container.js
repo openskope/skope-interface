@@ -27,6 +27,7 @@ export default createContainer((props) => {
       filterValue,
 
       welcomeWindowClosed,
+      sidePanelMenuClosed,
     },
   } = store.getState();
 
@@ -99,5 +100,13 @@ export default createContainer((props) => {
         type: actions.WORKSPACE_TOGGLE_WELCOME_WINDOW.type,
       });
     },
+
+    sidePanelMenuClosed,
+    toggleSideMenu: () => {
+      store.dispatch({
+        type: actions.WORKSPACE_TOGGLE_PANEL_MENU.type,
+      });
+    },
+
   };
 }, Component);

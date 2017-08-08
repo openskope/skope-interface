@@ -36,6 +36,11 @@ export default class WorkspacePage extends React.Component {
     welcomeWindowClosed: PropTypes.bool.isRequired,
     // Callback functions for toggling the welcome window.
     toggleWelcomeWindow: PropTypes.func.isRequired,
+
+    //The state of the side panel menu.
+    sidePanelMenuClosed: PropTypes.bool.isRequired,
+    //Callback function for toggling side panel menu.
+    toggleSideMenu: PropTypes.func.isRequired,
   };
 
   constructor (props) {
@@ -48,6 +53,7 @@ export default class WorkspacePage extends React.Component {
     this._bound_layerOpacityOnChange = this._layerOpacityOnChange.bind(this);
     this._bound_mapOnClick = this._mapOnClick.bind(this);
     this._bound_toggleWelcomeWindow = this._toggleWelcomeWindow.bind(this);
+    this._bound_toggleSideMenu = this._toggleSideMenu.bind(this);
   }
 
   componentDidMount () {
@@ -134,6 +140,14 @@ export default class WorkspacePage extends React.Component {
     toggleWelcomeWindow();
   }
 
+  _toggleSideMenu() {
+    const {
+      toggleSideMenu,
+    } = this.props;
+
+    toggleSideMenu();
+  }
+
   render () {
     const {
       layers,
@@ -145,6 +159,7 @@ export default class WorkspacePage extends React.Component {
       rangeMin,
       rangeMax,
       welcomeWindowClosed,
+      sidePanelMenuClosed
     } = this.props;
 
     return (
@@ -156,19 +171,35 @@ export default class WorkspacePage extends React.Component {
 
             <div className="welcome_info">
               <h3>Model Run Metadata</h3>
-              <Button
-                  className="close_button"
-                  variant="fab"
-                  color="primary"
+              <button
+                  className="mdc-fab material-icons close_button"
                   onClick={this._bound_toggleWelcomeWindow}>
-              </Button>
+                <span className="mdc-fab__icon">close</span>
+              </button>
               <Divider />
               <p>This is the metadata of the layers.</p>
             </div>
           </div>
         ) : null}
 
+          <div className="mdc-toolbar">
+            <div className="mdc-toolbar__row">
+              <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
+                <span className="mdc-toolbar__title">Title</span>
+              </section>
+              <section className="mdc-toolbar__section mdc-toolbar__section--align-end">
+                <span className="mdc-toolbar__title">Info</span>
+                <a className="material-icons mdc-toolbar__icon"
+                   onClick={this._bound_toggleWelcomeWindow}>more_vert</a>
+                <span className="mdc-toolbar__title">Help</span>
+                <a className="material-icons mdc-toolbar__icon">help</a>
+              </section>
+            </div>
+          </div>
+
         <div className="section-map">
+
+
           <div className="side-panel">
 
             <fieldset className="side-panel__section map-animation-controls">
@@ -184,32 +215,34 @@ export default class WorkspacePage extends React.Component {
                 />
                 </div>
                 <div className="field--year-row2">
-                <Button
-                  color="primary"
-                  className="action--prev-year"
+                <button
+                  className="mdc-fab material-icons action--prev-year"
                   onClick={this._bound_yearStepBackButtonOnClick}
-                >&lt;</Button>
+                >
+                  <span className="mdc-fab__icon">keyboard_arrow_left</span>
+                </button>
                 <input
                   className="input--year"
                   type="text"
                   value={filterValue}
                   onChange={event => this._bound_rangeFilterOnChange(event.target.value)}
                 />
-                <Button
-                  color="primary"
-                  className="action--next-year"
+                <button
+                  className="mdc-fab material-icons action--next-year"
                   onClick={this._bound_yearStepForwardButtonOnClick}
-                >&gt;</Button>
+                >
+                  <span className="mdc-fab__icon">keyboard_arrow_right</span>
+                </button>
                 </div>
               </div>
             </fieldset>
 
-            <fieldset className="side-panel__section layer-list">
+            <div className="side-panel__section layer-list">
               <legend>Layers</legend>
               {layers.map((layer, layerIndex) => (
                 <div
                   key={layerIndex}
-                  className="layer-list__item"
+                  className="layer-list__item layer-list__item--opacity-control-expand"
                 >
                   <div className="layer-title-row">
                     <div className="mdc-checkbox">
@@ -231,30 +264,35 @@ export default class WorkspacePage extends React.Component {
                         </svg>
                         <div className="mdc-checkbox__mixedmark"></div>
                       </div>
-
                     </div>
+
                     <label className="layer-title-label">{layer.name}</label>
+
+                    <a className="material-icons mdc-list-item__end-detail"
+                       onClick={this._bound_toggleSideMenu}>
+                      keyboard_arrow_down</a>
+
                   </div>
-                  <div className="layer-opacity-row">
-                    <label>Opacity: </label>
-                    <Slider
-                      className="input-slider--layer-opacity"
-                      min={0}
-                      max={255}
-                      value={layer.opacity * 255}
-                      data-layer-index={layerIndex}
-                      onChange={newValue => this._bound_layerOpacityOnChange(newValue, layerIndex)}
-                    />
-                    <label>{layer.opacity.toFixed(2)}</label>
-                  </div>
+
+                    {sidePanelMenuClosed ? null : (
+                      <div className="layer-opacity-row">
+                      <label>Opacity: </label>
+                      <Slider
+                          className="input-slider--layer-opacity"
+                          min={0}
+                          max={255}
+                          value={layer.opacity * 255}
+                          data-layer-index={layerIndex}
+                          onChange={newValue => this._bound_layerOpacityOnChange(newValue, layerIndex)}
+                      />
+                      <label>{layer.opacity.toFixed(2)}</label>
+                    </div> )
+                    }
+
+                  <div className="mdc-list-divider"></div>
                 </div>
               ))}
-            </fieldset>
-
-            <Button
-                color="primary"
-                onClick={this._bound_toggleWelcomeWindow}>Info
-            </Button>
+            </div>
 
           </div>
 
@@ -284,7 +322,6 @@ export default class WorkspacePage extends React.Component {
             inspectPointSelected={inspectPointSelected}
             inspectPointCoordinate={inspectPointCoordinate}
           />
-
         </div>
 
       </div>

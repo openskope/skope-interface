@@ -63,6 +63,7 @@ export default {
     inspectPointCoordinate: [0, 0],
 
     welcomeWindowClosed: false,
+    sidePanelMenuClosed: true,
   },
 
   charts: {
