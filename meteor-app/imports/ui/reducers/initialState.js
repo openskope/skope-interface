@@ -20,6 +20,7 @@ export default {
         minZoom: 5,
         maxZoom: 12,
         invisible: false,
+        sidePanelMenuClosed: true,
         opacity: 0.7,
         extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
       },
@@ -30,6 +31,7 @@ export default {
         minZoom: 5,
         maxZoom: 12,
         invisible: false,
+        sidePanelMenuClosed: true,
         opacity: 0.7,
         extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
       },
@@ -40,6 +42,7 @@ export default {
         minZoom: 5,
         maxZoom: 12,
         invisible: true,
+        sidePanelMenuClosed: true,
         opacity: 0.7,
         extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
       },
@@ -50,6 +53,7 @@ export default {
         minZoom: 5,
         maxZoom: 12,
         invisible: true,
+        sidePanelMenuClosed: true,
         opacity: 0.7,
         extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
       },
@@ -63,7 +67,6 @@ export default {
     inspectPointCoordinate: [0, 0],
 
     welcomeWindowClosed: false,
-    sidePanelMenuClosed: true,
   },
 
   charts: {

@@ -27,7 +27,7 @@ export default createContainer((props) => {
       filterValue,
 
       welcomeWindowClosed,
-      sidePanelMenuClosed,
+
     },
   } = store.getState();
 
@@ -45,6 +45,7 @@ export default createContainer((props) => {
             min-zoom={layer.minZoom}
             max-zoom={layer.maxZoom}
             invisible={layer.invisible ? 'invisible' : null}
+            sidePanelMenuClosed={layer.sidePanelMenuClosed ? 'sidePanelMenuClosed' : null}
             opacity={layer.opacity}
             extent={layer.extent}
             params={`LAYERS=${layer.wmsLayerName}${filterValue}&TILED=true`}
@@ -101,10 +102,12 @@ export default createContainer((props) => {
       });
     },
 
-    sidePanelMenuClosed,
-    toggleSideMenu: () => {
+
+    toggleSideMenu: (layerIndex, invisible) => {
       store.dispatch({
         type: actions.WORKSPACE_TOGGLE_PANEL_MENU.type,
+        index: layerIndex,
+        invisible,
       });
     },
 

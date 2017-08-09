@@ -37,8 +37,6 @@ export default class WorkspacePage extends React.Component {
     // Callback functions for toggling the welcome window.
     toggleWelcomeWindow: PropTypes.func.isRequired,
 
-    //The state of the side panel menu.
-    sidePanelMenuClosed: PropTypes.bool.isRequired,
     //Callback function for toggling side panel menu.
     toggleSideMenu: PropTypes.func.isRequired,
   };
@@ -140,12 +138,15 @@ export default class WorkspacePage extends React.Component {
     toggleWelcomeWindow();
   }
 
-  _toggleSideMenu() {
+  _toggleSideMenu(event) {
+    const target = event.currentTarget;
+    const layerIndex = parseInt(target.getAttribute('data-layer-index'), 10);
+    const menuInvisible = target.checked;
     const {
       toggleSideMenu,
     } = this.props;
 
-    toggleSideMenu();
+    toggleSideMenu(layerIndex, menuInvisible);
   }
 
   render () {
@@ -159,7 +160,7 @@ export default class WorkspacePage extends React.Component {
       rangeMin,
       rangeMax,
       welcomeWindowClosed,
-      sidePanelMenuClosed
+
     } = this.props;
 
     return (
@@ -269,12 +270,13 @@ export default class WorkspacePage extends React.Component {
                     <label className="layer-title-label">{layer.name}</label>
 
                     <a className="material-icons mdc-list-item__end-detail"
+                       data-layer-index={layerIndex}
                        onClick={this._bound_toggleSideMenu}>
                       keyboard_arrow_down</a>
 
                   </div>
 
-                    {sidePanelMenuClosed ? null : (
+                    {layer.sidePanelMenuClosed ? null : (
                       <div className="layer-opacity-row">
                       <label>Opacity: </label>
                       <Slider
