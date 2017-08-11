@@ -26,6 +26,7 @@ export default createContainer((props) => {
 
       filterValue,
 
+      toolbarMenuClosed,
       welcomeWindowClosed,
 
     },
@@ -109,6 +110,13 @@ export default createContainer((props) => {
         index: layerIndex,
         invisible,
       });
+    },
+
+    toolbarMenuClosed,
+    toggleToolbarMenu: () => {
+      store.dispatch({
+          type: actions.WORKSPACE_TOGGLE_TOOLBAR_MENU.type,
+      })
     },
 
   };

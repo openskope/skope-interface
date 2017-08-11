@@ -14,4 +14,5 @@ export * from './charts_set_filters';
 export * from './charts_inspect_point_resolve_data';
 export * from './workspace_toggle_welcome_window';
 export * from './workspace_toggle_sidepanel_menu';
+export * from './workspace_toggle_toolbar_menu';
 
