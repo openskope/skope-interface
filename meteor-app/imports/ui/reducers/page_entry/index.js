@@ -1,10 +1,11 @@
 /**
  * This reducer is used when entering a new page.
  */
-import { FlowRouter } from 'meteor/kadira:flow-router';
+import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
+import { Meteor } from 'meteor/meteor';
 
-const getNavInfo = (state, { path }) => {
-  let navInfo = [];
+const getNavInfo = (navInfo, { path }) => {
+  let newNavInfo = [];
   let pathLevels = path.split('/').map(v => v.trim());
 
   // Pop off the top level (which is always "").
@@ -16,10 +17,10 @@ const getNavInfo = (state, { path }) => {
   if (pathLevels.length > 0) {
     const currPathLevels = [''];
 
-    navInfo = [
+    newNavInfo = [
       {
         label: 'SKOPE',
-        url: FlowRouter.url('/'),
+        url: Meteor.absoluteUrl(),
       },
       ...(pathLevels.map((v) => {
         currPathLevels.push(v);
@@ -31,10 +32,15 @@ const getNavInfo = (state, { path }) => {
     ];
   }
 
-  return navInfo;
+  return newNavInfo;
+};
+
+const getHelpUrlForPage = (helpUrl, { path }) => {
+  return `${path}/help`;
 };
 
 export const PAGE_ENTRY = (state, action) => ({
   ...state,
-  navInfo: getNavInfo(state, action),
+  navInfo: getNavInfo(state.navInfo, action),
+  helpUrl: getHelpUrlForPage(state.helpUrl, action),
 });

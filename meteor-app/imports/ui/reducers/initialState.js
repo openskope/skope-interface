@@ -6,6 +6,9 @@ import {
 export default {
   navInfo: [],
 
+  // Url for the global help button.
+  helpUrl: '',
+
   search: {
     // Put states specific to search page here.
   },
@@ -68,6 +71,18 @@ export default {
 
     welcomeWindowClosed: true,
     toolbarMenuClosed: true,
+  },
+
+  model: {
+    // Whether a point is selected for inspection.
+    inspectPointSelected: false,
+    // If a point is selected for inspection, this would be its coordinates in [long, lat] (this order).
+    inspectPointCoordinate: [0, 0],
+
+    mapShown: false,
+    predictionYears: rangeMax,
+    meanVar: 'none',
+    minWidth: 0,
   },
 
   charts: {

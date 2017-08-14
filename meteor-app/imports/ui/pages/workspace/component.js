@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Slider from 'rc-slider/lib/Slider';
 import _ from 'lodash';
 import Charts from '/imports/ui/components/charts/container';
-
+import { clampFilterValue } from '/imports/ui/helper';
 
 export default class WorkspacePage extends React.Component {
 
@@ -31,6 +31,7 @@ export default class WorkspacePage extends React.Component {
 
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
+    putFilterValueInUrl: PropTypes.func.isRequired,
 
     // The state of the welcome window.
     welcomeWindowClosed: PropTypes.bool.isRequired,
@@ -49,11 +50,12 @@ export default class WorkspacePage extends React.Component {
   constructor (props) {
     super(props);
 
-    this._bound_rangeFilterOnChange = _.debounce(this._rangeFilterOnChange.bind(this), 100, { leading: true, trailing: false });
+    this._bound_rangeFilterOnChange = _.debounce(this._rangeFilterOnChange.bind(this), 0);
+    this._bound_rangeFilterOnChangeInput = this._rangeFilterOnChangeInput.bind(this);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
     this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
-    this._bound_layerOpacityOnChange = this._layerOpacityOnChange.bind(this);
+    this._bound_layerOpacityOnChange = this._relayContext(this._layerOpacityOnChange.bind(this));
     this._bound_mapOnClick = this._mapOnClick.bind(this);
     this._bound_toggleWelcomeWindow = this._toggleWelcomeWindow.bind(this);
     this._bound_toggleSideMenu = this._toggleSideMenu.bind(this);
@@ -72,20 +74,29 @@ export default class WorkspacePage extends React.Component {
     }
   }
 
+  _updateFilterValue (value) {
+    const {
+      updateFilterValue,
+      putFilterValueInUrl,
+    } = this.props;
+
+    updateFilterValue(value);
+    putFilterValueInUrl(value);
+  }
+
   _rangeFilterOnChange (value) {
     console.info('filter changed', Date.now());
 
     const {
-      updateFilterValue,
       rangeMin,
       rangeMax,
     } = this.props;
 
-    let newValue = parseInt(value, 10);
-    newValue = isNaN(newValue) ? rangeMin : newValue;
-    newValue = Math.max(rangeMin, newValue);
-    newValue = Math.min(newValue, rangeMax);
-    updateFilterValue(newValue);
+    this._updateFilterValue(clampFilterValue(value, rangeMin, rangeMax));
+  }
+
+  _rangeFilterOnChangeInput (event) {
+    this._rangeFilterOnChange(event.target.value);
   }
 
   _layerVisibilityOnChange (event) {
@@ -99,33 +110,31 @@ export default class WorkspacePage extends React.Component {
     toggleLayer(layerIndex, layerVisible);
   }
 
-  _layerOpacityOnChange (value, layerIndex) {
+  _layerOpacityOnChange (element, value) {
     const opacity = value / 255;
     const {
       updateLayerOpacity,
     } = this.props;
 
-    updateLayerOpacity(layerIndex, opacity);
+    updateLayerOpacity(element['data-layer-index'], opacity);
   }
 
   _yearStepBackButtonOnClick (/* event */) {
     const {
       rangeMin,
       filterValue,
-      updateFilterValue,
     } = this.props;
 
-    updateFilterValue(Math.max(rangeMin, filterValue - 1));
+    this._updateFilterValue(Math.max(rangeMin, filterValue - 1));
   }
 
   _yearStepForwardButtonOnClick (/* event */) {
     const {
       rangeMax,
       filterValue,
-      updateFilterValue,
     } = this.props;
 
-    updateFilterValue(Math.min(rangeMax, filterValue + 1));
+    this._updateFilterValue(Math.min(rangeMax, filterValue + 1));
   }
 
   _mapOnClick (event) {
@@ -144,6 +153,12 @@ export default class WorkspacePage extends React.Component {
     toggleWelcomeWindow();
   }
 
+    _relayContext = (func) => {
+        return function (...args) {
+            return func(this, ...args);
+        };
+    };
+
   _toggleSideMenu(event) {
     const target = event.currentTarget;
     const layerIndex = parseInt(target.getAttribute('data-layer-index'), 10);
@@ -157,7 +172,7 @@ export default class WorkspacePage extends React.Component {
 
   _toggleToolbarMenu() {
     const {
-      toggleToolbarMenu
+      toggleToolbarMenu,
     } = this.props;
 
     toggleToolbarMenu();
@@ -182,7 +197,6 @@ export default class WorkspacePage extends React.Component {
       <div className="page--workspace">
 
 
-
           <div className="mdc-toolbar">
             <div className="mdc-toolbar__row">
               <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
@@ -198,26 +212,27 @@ export default class WorkspacePage extends React.Component {
 
                     {toolbarMenuClosed ? null : (
                       <div className="mdc-simple-menu mdc-simple-menu--open" tabIndex={-1}>
-                      <ul className="mdc-simple-menu__items mdc-list" role="menu" aria-hidden={true}>
-                        <li className="mdc-list-item"
-                            role="menuitem"
-                            onClick={this._bound_toggleWelcomeWindow}
-                            tabIndex={0}>
-                          Metadata
-                          <a className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</a>
-                        </li>
-                        <li className="mdc-list-item" role="menuitem" tabIndex={0}>
-                          Help
-                          <a className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</a>
-                        </li>
-                      </ul>
+                        <ul className="mdc-simple-menu__items mdc-list" role="menu" aria-hidden={true}>
+                          <li className="mdc-list-item"
+                              role="menuitem"
+                              onClick={this._bound_toggleWelcomeWindow}
+                              tabIndex={0}>
+                            Metadata
+                            <a className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</a>
+                          </li>
+                          <li className="mdc-list-item" role="menuitem" tabIndex={0}>
+                            Help
+                            <a className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</a>
+                          </li>
+                        </ul>
                       </div>
-                    )}
-                </div>
+                  )}
+              </div>
 
                 <div className="media-large-size">
                   <div className="toolbar-info-dropdown">
-                    <button className="info-dropdown-button mdc-button" onClick={this._bound_toggleWelcomeWindow}>Info</button>
+                    <button className="info-dropdown-button mdc-button"
+                            onClick={this._bound_toggleWelcomeWindow}>Info</button>
                       {welcomeWindowClosed ? null : (
                           <div className="info-content">
                             <h3>Metadata</h3>
@@ -235,35 +250,35 @@ export default class WorkspacePage extends React.Component {
 
           <div className="side-panel">
 
-            <div className="side-panel__section map-animation-controls">
-              <legend>RANGE</legend>
-              <div className="field--year">
-                <div className="field--year-row1">
-                <a className="material-icons action--prev-year"
-                   onClick={this._bound_yearStepBackButtonOnClick}
-                >keyboard_arrow_left</a>
-                <input
-                  className="input--year"
-                  type="text"
-                  value={filterValue}
-                  onChange={event => this._bound_rangeFilterOnChange(event.target.value)}
-                />
-                <a className="material-icons action--next-year"
-                   onClick={this._bound_yearStepForwardButtonOnClick}
-                >keyboard_arrow_right</a>
-                </div>
-                <div className="label-year">Year</div>
+              <div className="side-panel__section map-animation-controls">
+                  <legend>RANGE</legend>
+                  <div className="field--year">
+                      <div className="field--year-row1">
+                          <a className="material-icons action--prev-year"
+                             onClick={this._bound_yearStepBackButtonOnClick}
+                          >keyboard_arrow_left</a>
+                          <input
+                              className="input--year"
+                              type="text"
+                              value={filterValue}
+                              onChange={this._bound_rangeFilterOnChangeInput}
+                          />
+                          <a className="material-icons action--next-year"
+                             onClick={this._bound_yearStepForwardButtonOnClick}
+                          >keyboard_arrow_right</a>
+                      </div>
+                      <div className="label-year">Year</div>
+                  </div>
+                  <div className="field--year-row2">
+                      <Slider
+                          className="input-slider--year"
+                          min={rangeMin}
+                          max={rangeMax}
+                          value={filterValue}
+                          onChange={this._bound_rangeFilterOnChange}
+                      />
+                  </div>
               </div>
-              <div className="field--year-row2">
-                <Slider
-                    className="input-slider--year"
-                    min={rangeMin}
-                    max={rangeMax}
-                    value={filterValue}
-                    onChange={this._bound_rangeFilterOnChange}
-                />
-              </div>
-            </div>
 
             <div className="side-panel__section layer-list">
               <legend>LAYERS</legend>
@@ -312,7 +327,7 @@ export default class WorkspacePage extends React.Component {
                           max={255}
                           value={layer.opacity * 255}
                           data-layer-index={layerIndex}
-                          onChange={newValue => this._bound_layerOpacityOnChange(newValue, layerIndex)}
+                          onChange={this._bound_layerOpacityOnChange}
                       />
                       <label>{layer.opacity.toFixed(2)}</label>
                     </div>

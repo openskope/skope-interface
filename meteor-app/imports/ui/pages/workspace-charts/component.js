@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
 import Range from 'rc-slider/lib/Range';
+import { clampFilterValue } from '/imports/ui/helper';
 
 export default class ChartsPage extends React.Component {
 
@@ -44,17 +45,7 @@ export default class ChartsPage extends React.Component {
       rangeMax,
     } = this.props;
 
-    let newValue1 = parseInt(values[0], 10);
-    newValue1 = isNaN(newValue1) ? rangeMin : newValue1;
-    newValue1 = Math.max(rangeMin, newValue1);
-    newValue1 = Math.min(newValue1, filterMax);
-
-    let newValue2 = parseInt(values[1], 10);
-    newValue2 = isNaN(newValue2) ? filterMin : newValue2;
-    newValue2 = Math.max(filterMin, newValue2);
-    newValue2 = Math.min(newValue2, rangeMax);
-
-    updateFilter(newValue1, newValue2);
+    updateFilter(clampFilterValue(values[0], rangeMin, filterMax), clampFilterValue(values[1], filterMin, rangeMax));
   }
 
   _rangeFilterMinOnChange (event) {
@@ -79,42 +70,36 @@ export default class ChartsPage extends React.Component {
     const {
       filterMin,
       filterMax,
-      rangeMin,
-      updateFilter,
     } = this.props;
 
-    updateFilter(Math.max(filterMin - 1, rangeMin), filterMax);
+    this._rangeFilterOnChange([filterMin - 1, filterMax]);
   }
 
   _yearMinStepForwardButtonOnClick (/* event */) {
     const {
       filterMin,
       filterMax,
-      updateFilter,
     } = this.props;
 
-    updateFilter(Math.min(filterMin + 1, filterMax), filterMax);
+    this._rangeFilterOnChange([filterMin + 1, filterMax]);
   }
 
   _yearMaxStepBackButtonOnClick (/* event */) {
     const {
       filterMin,
       filterMax,
-      updateFilter,
     } = this.props;
 
-    updateFilter(filterMin, Math.max(filterMax - 1, filterMin));
+    this._rangeFilterOnChange([filterMin, filterMax - 1]);
   }
 
   _yearMaxStepForwardButtonOnClick (/* event */) {
     const {
       filterMin,
       filterMax,
-      rangeMax,
-      updateFilter,
     } = this.props;
 
-    updateFilter(filterMin, Math.min(filterMax + 1, rangeMax));
+    this._rangeFilterOnChange([filterMin, filterMax + 1]);
   }
 
   render () {
