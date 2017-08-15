@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from 'muicss/react';
 import Navbar from '/imports/ui/components/navbar/container';
 
 import {
@@ -25,7 +24,7 @@ export default class MainLayout extends React.Component {
         </div>
         <div className="page__footer">
           <a href={helpUrl}>
-            <Button color="primary" size="small">Help</Button>
+            <button className="mdc-button mdc-button--raised">Help</button>
           </a>
           <a href={demoRepository} target="_blank">Source code on Github</a>
         </div>

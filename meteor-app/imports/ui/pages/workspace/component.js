@@ -4,7 +4,6 @@ import Slider from 'rc-slider/lib/Slider';
 import _ from 'lodash';
 import Charts from '/imports/ui/components/charts/container';
 import { clampFilterValue } from '/imports/ui/helper';
-import { Button } from 'muicss/react';
 
 export default class WorkspacePage extends React.Component {
 
@@ -38,6 +37,14 @@ export default class WorkspacePage extends React.Component {
     welcomeWindowClosed: PropTypes.bool.isRequired,
     // Callback functions for toggling the welcome window.
     toggleWelcomeWindow: PropTypes.func.isRequired,
+
+    //Callback function for toggling side panel menu.
+    toggleSideMenu: PropTypes.func.isRequired,
+
+    //The state of toolbar menu.
+    toolbarMenuClosed: PropTypes.bool.isRequired,
+    //Callback funciton for toggling toolbar menu.
+    toggleToolbarMenu: PropTypes.func.isRequired,
   };
 
   constructor (props) {
@@ -51,6 +58,8 @@ export default class WorkspacePage extends React.Component {
     this._bound_layerOpacityOnChange = this._relayContext(this._layerOpacityOnChange.bind(this));
     this._bound_mapOnClick = this._mapOnClick.bind(this);
     this._bound_toggleWelcomeWindow = this._toggleWelcomeWindow.bind(this);
+    this._bound_toggleSideMenu = this._toggleSideMenu.bind(this);
+    this._bound_toggleToolbarMenu = this._toggleToolbarMenu.bind(this);
   }
 
   componentDidMount () {
@@ -144,11 +153,30 @@ export default class WorkspacePage extends React.Component {
     toggleWelcomeWindow();
   }
 
-  _relayContext = (func) => {
-    return function (...args) {
-      return func(this, ...args);
+    _relayContext = (func) => {
+        return function (...args) {
+            return func(this, ...args);
+        };
     };
-  };
+
+  _toggleSideMenu(event) {
+    const target = event.currentTarget;
+    const layerIndex = parseInt(target.getAttribute('data-layer-index'), 10);
+    const menuInvisible = target.checked;
+    const {
+      toggleSideMenu,
+    } = this.props;
+
+    toggleSideMenu(layerIndex, menuInvisible);
+  }
+
+  _toggleToolbarMenu() {
+    const {
+      toggleToolbarMenu,
+    } = this.props;
+
+    toggleToolbarMenu();
+  }
 
   render () {
     const {
@@ -161,91 +189,165 @@ export default class WorkspacePage extends React.Component {
       rangeMin,
       rangeMax,
       welcomeWindowClosed,
+      toolbarMenuClosed,
+
+      titleName,
+
+
     } = this.props;
 
     return (
       <div className="page--workspace">
 
-        {!welcomeWindowClosed ? (
-          <div className="welcome_frame">
-            <div className="welcome_background" />
 
-            <div className="welcome_info">
-              <h3>Model Run Metadata</h3>
-              <button onClick={this._bound_toggleWelcomeWindow}>Close</button>
-              <p>This is the metadata of the layers.</p>
+          <div className="mdc-toolbar">
+            <div className="mdc-toolbar__row">
+              <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
+                <span className="mdc-toolbar__title">{titleName}</span>
+              </section>
+              <section className="mdc-toolbar__section mdc-toolbar__section--align-end">
+
+                <div className="mdc-menu-anchor" onClick={this._bound_toggleToolbarMenu}>
+                  <a className="material-icons mdc-toolbar__icon">menu</a>
+
+
+                    {toolbarMenuClosed ? null : (
+                      <div className="mdc-simple-menu mdc-simple-menu--open" tabIndex={-1}>
+                        <ul className="mdc-simple-menu__items mdc-list" role="menu" aria-hidden={true}>
+                          <li className="mdc-list-item"
+                              role="menuitem"
+                              onClick={this._bound_toggleWelcomeWindow}
+                              tabIndex={0}>
+                            Metadata
+                            <a className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</a>
+                          </li>
+                          <li className="mdc-list-item" role="menuitem" tabIndex={0}>
+                            Help
+                            <a className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</a>
+                          </li>
+                        </ul>
+                      </div>
+                  )}
+              </div>
+
+                <div className="media-large-size">
+                  <div className="toolbar--dropdown">
+                    <div className="dropdown-1"
+                            onClick={this._bound_toggleWelcomeWindow}>
+                        <a className="material-icons" >info
+                          <span className="tooltip-text">INFO</span>
+                          /*"INFO" must capitalize since "material-icons" class*/
+                        </a>
+                    </div>
+
+                      {welcomeWindowClosed ? null : (
+                          <div className="info-content">
+                            <h3>Metadata</h3>
+                          </div>)}
+
+                    <div className="dropdown-2">
+                      <a className="material-icons">help
+                        <span className="tooltip-text">HELP</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </section>
             </div>
           </div>
-        ) : null}
-
-        <div className="section-toolbar">
-          <Button variant="flat" color="primary">Help</Button>
-          <Button variant="flat" color="primary" onClick={this._bound_toggleWelcomeWindow}>Info</Button>
-          <Button variant="flat" color="primary">Metadata</Button>
-        </div>
 
         <div className="section-map">
+
+
           <div className="side-panel">
 
-            <fieldset className="side-panel__section map-animation-controls">
-              <div className="field--year">
-                <label>Year: </label>
-                <Slider
-                  className="input-slider--year"
-                  min={rangeMin}
-                  max={rangeMax}
-                  value={filterValue}
-                  onChange={this._bound_rangeFilterOnChange}
-                />
-                <button
-                  className="action--prev-year"
-                  onClick={this._bound_yearStepBackButtonOnClick}
-                >&lt;</button>
-                <input
-                  className="input--year"
-                  type="text"
-                  value={filterValue}
-                  onChange={this._bound_rangeFilterOnChangeInput}
-                />
-                <button
-                  className="action--next-year"
-                  onClick={this._bound_yearStepForwardButtonOnClick}
-                >&gt;</button>
+              <div className="side-panel__section map-animation-controls">
+                  <legend>TIME</legend>
+                  <div className="field--year">
+                      <div className="field--year-row1">
+                          <a className="material-icons action--prev-year"
+                             onClick={this._bound_yearStepBackButtonOnClick}
+                          >keyboard_arrow_left</a>
+                          <input
+                              className="input--year"
+                              type="text"
+                              value={filterValue}
+                              onChange={this._bound_rangeFilterOnChangeInput}
+                          />
+                          <a className="material-icons action--next-year"
+                             onClick={this._bound_yearStepForwardButtonOnClick}
+                          >keyboard_arrow_right</a>
+                      </div>
+                      <div className="label-year">Year</div>
+                  </div>
+                  <div className="field--year-row2">
+                      <Slider
+                          className="input-slider--year"
+                          min={rangeMin}
+                          max={rangeMax}
+                          value={filterValue}
+                          onChange={this._bound_rangeFilterOnChange}
+                      />
+                  </div>
               </div>
-            </fieldset>
 
-            <fieldset className="side-panel__section layer-list">
-              <legend>Layers</legend>
+            <div className="side-panel__section layer-list">
+              <legend>LAYERS</legend>
               {layers.map((layer, layerIndex) => (
                 <div
                   key={layerIndex}
-                  className="layer-list__item"
+                  className="layer-list__item layer-list__item--opacity-control-expand"
                 >
                   <div className="layer-title-row">
+                    <div className="mdc-checkbox">
                     <input
+                      className="mdc-checkbox__native-control"
                       title="Toggle Visibility"
                       type="checkbox"
                       checked={!layer.invisible}
                       data-layer-index={layerIndex}
                       onChange={this._bound_layerVisibilityOnChange}
                     />
+                      <div className="mdc-checkbox__background">
+                        <svg className="mdc-checkbox__checkmark"
+                             viewBox="0 0 24 24">
+                          <path className="mdc-checkbox__checkmark__path"
+                                fill="none"
+                                stroke="white"
+                                d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                        </svg>
+                        <div className="mdc-checkbox__mixedmark"></div>
+                      </div>
+                    </div>
+
                     <label className="layer-title-label">{layer.name}</label>
+
+                    <a className="material-icons mdc-list-item__end-detail"
+                       data-layer-index={layerIndex}
+                       onClick={this._bound_toggleSideMenu}>
+                      keyboard_arrow_down</a>
+
                   </div>
-                  <div className="layer-opacity-row">
-                    <label>Opacity: </label>
-                    <Slider
-                      className="input-slider--layer-opacity"
-                      min={0}
-                      max={255}
-                      value={layer.opacity * 255}
-                      data-layer-index={layerIndex}
-                      onChange={this._bound_layerOpacityOnChange}
-                    />
-                    <label>{layer.opacity.toFixed(2)}</label>
-                  </div>
+
+                    {layer.sidePanelMenuClosed ? null : (
+                      <div className="layer-opacity-row">
+                      <label>Opacity: </label>
+                      <Slider
+                          className="input-slider--layer-opacity"
+                          min={0}
+                          max={255}
+                          value={layer.opacity * 255}
+                          data-layer-index={layerIndex}
+                          onChange={this._bound_layerOpacityOnChange}
+                      />
+                      <label>{layer.opacity.toFixed(2)}</label>
+                    </div>
+                    )}
+
+                  <div className="mdc-list-divider"></div>
                 </div>
               ))}
-            </fieldset>
+            </div>
 
           </div>
 
@@ -275,7 +377,6 @@ export default class WorkspacePage extends React.Component {
             inspectPointSelected={inspectPointSelected}
             inspectPointCoordinate={inspectPointCoordinate}
           />
-
         </div>
 
       </div>
