@@ -29,6 +29,7 @@ export default createContainer((props) => {
       toolbarMenuClosed,
       welcomeWindowClosed,
 
+      titleName,
     },
   } = store.getState();
 
@@ -125,5 +126,6 @@ export default createContainer((props) => {
       })
     },
 
+    titleName,
   };
 }, Component);

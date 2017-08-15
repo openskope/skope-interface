@@ -191,6 +191,9 @@ export default class WorkspacePage extends React.Component {
       welcomeWindowClosed,
       toolbarMenuClosed,
 
+      titleName,
+
+
     } = this.props;
 
     return (
@@ -200,9 +203,7 @@ export default class WorkspacePage extends React.Component {
           <div className="mdc-toolbar">
             <div className="mdc-toolbar__row">
               <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
-                <span className="mdc-toolbar__title">
-                  Workspace
-                </span>
+                <span className="mdc-toolbar__title">{titleName}</span>
               </section>
               <section className="mdc-toolbar__section mdc-toolbar__section--align-end">
 
@@ -230,16 +231,26 @@ export default class WorkspacePage extends React.Component {
               </div>
 
                 <div className="media-large-size">
-                  <div className="toolbar-info-dropdown">
-                    <button className="info-dropdown-button mdc-button"
-                            onClick={this._bound_toggleWelcomeWindow}>Info</button>
+                  <div className="toolbar--dropdown">
+                    <div className="dropdown-1"
+                            onClick={this._bound_toggleWelcomeWindow}>
+                        <a className="material-icons" >info
+                          <span className="tooltip-text">INFO</span>
+                          /*"INFO" must capitalize since "material-icons" class*/
+                        </a>
+                    </div>
+
                       {welcomeWindowClosed ? null : (
                           <div className="info-content">
                             <h3>Metadata</h3>
                           </div>)}
-                  </div>
 
-                  <button className="info-dropdown-button mdc-button">Help</button>
+                    <div className="dropdown-2">
+                      <a className="material-icons">help
+                        <span className="tooltip-text">HELP</span>
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </section>
             </div>
@@ -251,7 +262,7 @@ export default class WorkspacePage extends React.Component {
           <div className="side-panel">
 
               <div className="side-panel__section map-animation-controls">
-                  <legend>RANGE</legend>
+                  <legend>TIME</legend>
                   <div className="field--year">
                       <div className="field--year-row1">
                           <a className="material-icons action--prev-year"
