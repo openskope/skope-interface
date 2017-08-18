@@ -9,6 +9,8 @@ export default {
   // Url for the global help button.
   helpUrl: '',
 
+  globalMenuClosed: true,
+
   search: {
     // Put states specific to search page here.
   },
@@ -76,7 +78,7 @@ export default {
 
     mapShown: false,
     predictionYears: rangeMax,
-    meanVar: 'none',
+    meanVar: '',
     minWidth: 0,
   },
 

@@ -12,6 +12,7 @@ export default createContainer((props) => {
     store,
   } = props;
   const {
+    globalMenuClosed,
     model: {
       inspectPointSelected,
       inspectPointCoordinate,
@@ -24,6 +25,13 @@ export default createContainer((props) => {
   } = store.getState();
 
   return {
+    globalMenuClosed,
+    toggleMenu: () => {
+      store.dispatch({
+        type: actions.TOGGLE_GLOBAL_MENU.type,
+      });
+    },
+
     inspectPointSelected,
     inspectPointCoordinate,
     selectInspectPoint: (coord) => {

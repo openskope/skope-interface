@@ -16,3 +16,4 @@ export * from './workspace_toggle_welcome_window';
 export * from './model_inspect_point';
 export * from './model_toggle_map';
 export * from './model_update_form';
+export * from './toggle_global_menu';

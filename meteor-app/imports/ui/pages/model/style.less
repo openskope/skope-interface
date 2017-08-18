@@ -1,39 +1,104 @@
-.page--model {
+.page--paleocar {
   .flex-col;
-  
+
   box-sizing: border-box;
   width: 100%;
   height: 100%;
 
-  .section-form {
-    .flex-col;
+  input[type="text"]
+  {
+    font-size:20px;
+  }
 
-    padding: @global-layout-padding;
-    align-items: center;
+  & > .section-map {
+    .flex-col .layout-fill;
+  }
 
-    & > * {
-      .flex-row;
+  .section-map {
+    .flex-row;
 
-      margin-bottom: 20px;
+    & > .the-map {
+      .flex-col .layout-fill;
 
-      & > label, button {
-        margin-right: 10px;
+      height: 100%;
+    }
+
+    .mdc-simple-menu--open {
+      display: none;
+    }
+
+    .mdc-menu-anchor {
+     .mdc-toolbar__icon--menu:hover {
+       .mdc-simple-menu--open {
+         display: flex;
+       }
+    }
+    }
+
+    .side-panel {
+      .flex-col;
+
+      width: 300px;
+      border: 1px lightgray solid;
+      box-sizing: content-box;
+      padding: @global-layout-padding;
+      overflow: auto;
+
+      label {
+        font-size: 15px;
+      }
+
+      select {
+        display: block;
+        font-size: 20px;
+        width: 100%
+      }
+
+      option {
+        font-size: 20px
+      }
+
+      textarea {
+        font-size: 18px;
+        width: 100%;
+        padding: inherit;
+      }
+
+      textarea::selection {
+        width: 100%;
+      }
+
+      .form-row {
+        padding-bottom: 15px;
+
+        .mdc-textfield--fullwidth {
+          height: 30px
+        }
+      }
+
+      .form-row-button {
+        display:flex;
+        width: 100%;
+
+        a {
+          display: inline-block;
+        }
+
+        a:nth-child(even) {
+          margin-left: 10%;
+        }
       }
     }
-  }
-  
-  .section-map {
+
+
     .the-map {
-      .modal;
+      .flex-col .layout-fill;
+
+      height: 100%;
+      border: 0;
     }
 
-    .map_background {
-      .modal-background;
-    }
   }
-  
-  .hidden {
-    visibility: hidden;
-    position: absolute;
-  }
+
+
 }
