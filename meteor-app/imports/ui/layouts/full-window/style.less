@@ -12,6 +12,14 @@
   align-content: stretch;
   align-items: stretch;
 
+  .mdc-toolbar {
+    background-color: #F7f5E7;
+    z-index: 100;
+    &__row {
+      min-height: 50px;
+    }
+  }
+
   .page__header {
     flex: 0 0 auto;
   }
@@ -26,10 +34,15 @@
 
   .page__header {
     .flex-row;
-    
-    padding: @global-layout-padding;
-    margin-bottom: @global-layout-margin;
-    background-color: white;
+
+    img {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-content: stretch;
+      justify-content: stretch;
+    }
+
   }
 
   .page__body {

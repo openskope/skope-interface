@@ -7,7 +7,7 @@
 
   input[type="text"]
   {
-    font-size:20px;
+    font-size:16px;
   }
 
   & > .section-map {
@@ -23,43 +23,46 @@
       height: 100%;
     }
 
-    .mdc-simple-menu--open {
-      display: none;
-    }
-
-    .mdc-menu-anchor {
-     .mdc-toolbar__icon--menu:hover {
-       .mdc-simple-menu--open {
-         display: flex;
-       }
-    }
-    }
-
     .side-panel {
       .flex-col;
 
-      width: 300px;
-      border: 1px lightgray solid;
+      width: 350px;
       box-sizing: content-box;
-      padding: @global-layout-padding;
       overflow: auto;
 
+      .mdc-toolbar {
+        background-color: #220E10;
+        z-index: 1;
+
+        &__row {
+          min-height: 50px;
+        }
+
+        &__title {
+          color: white;
+        }
+      }
+
+      &__form {
+        padding: @global-layout-padding;
+      }
+
       label {
-        font-size: 15px;
+        font-size: 13px;
       }
 
       select {
         display: block;
-        font-size: 20px;
+        font-size: 13px;
         width: 100%
       }
 
       option {
-        font-size: 20px
+        font-size: 13px
       }
 
       textarea {
-        font-size: 18px;
+        font-size: 13px;
         width: 100%;
         padding: inherit;
       }
@@ -69,7 +72,7 @@
       }
 
       .form-row {
-        padding-bottom: 15px;
+        padding-bottom: 10px;
 
         .mdc-textfield--fullwidth {
           height: 30px

@@ -9,8 +9,6 @@ export default {
   // Url for the global help button.
   helpUrl: '',
 
-  globalMenuClosed: true,
-
   search: {
     // Put states specific to search page here.
   },
@@ -25,6 +23,7 @@ export default {
         minZoom: 5,
         maxZoom: 12,
         invisible: false,
+        sidePanelMenuClosed: true,
         opacity: 0.7,
         extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
       },
@@ -35,6 +34,7 @@ export default {
         minZoom: 5,
         maxZoom: 12,
         invisible: false,
+        sidePanelMenuClosed: true,
         opacity: 0.7,
         extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
       },
@@ -45,6 +45,7 @@ export default {
         minZoom: 5,
         maxZoom: 12,
         invisible: true,
+        sidePanelMenuClosed: true,
         opacity: 0.7,
         extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
       },
@@ -55,6 +56,7 @@ export default {
         minZoom: 5,
         maxZoom: 12,
         invisible: true,
+        sidePanelMenuClosed: true,
         opacity: 0.7,
         extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
       },
@@ -67,7 +69,11 @@ export default {
     // If a point is selected for inspection, this would be its coordinates in [long, lat] (this order).
     inspectPointCoordinate: [0, 0],
 
-    welcomeWindowClosed: false,
+    welcomeWindowClosed: true,
+    toolbarMenuClosed: true,
+
+    //title name from user click search tile in search page, and this ia one of example.
+    titleName: 'National Elevation Data (NED)',
   },
 
   model: {

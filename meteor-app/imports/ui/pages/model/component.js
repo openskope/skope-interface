@@ -25,10 +25,6 @@ export default class ModelPage extends React.Component {
     meanVar: PropTypes.string.isRequired,
     minWidth: PropTypes.number.isRequired,
 
-    // The state of global menu.
-    globalMenuClosed: PropTypes.bool.isRequired,
-    //Callback function for the menu.
-    toggleMenu: PropTypes.func.isRequired,
   };
 
   constructor (props) {
@@ -41,7 +37,6 @@ export default class ModelPage extends React.Component {
     this._bound_updatePredictionYears = this._updatePredictionYears.bind(this);
     this._bound_updateMeanVar = this._updateMeanVar.bind(this);
     this._bound_updateMinWidth = this._updateMinWidth.bind(this);
-    this._bound_toggleMenu = this._toggleMenu.bind(this);
   }
 
   componentDidMount () {
@@ -158,17 +153,8 @@ export default class ModelPage extends React.Component {
     });
   }
 
-  _toggleMenu() {
-    const {
-      toggleMenu,
-    } = this.props;
-
-    toggleMenu();
-  }
-
   render () {
     const {
-      globalMenuClosed,
       inspectPointSelected,
       inspectPointCoordinate,
 
@@ -181,47 +167,18 @@ export default class ModelPage extends React.Component {
     return (
       <div className="page--paleocar">
 
-        <div className="mdc-toolbar">
-          <div className="mdc-toolbar__row">
-            <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
-
-              <div className="mdc-menu-anchor">
-                <a className="material-icons mdc-toolbar__icon--menu" onClick={this._bound_toggleMenu}>menu</a>
-
-                {globalMenuClosed ? null :(
-                  <div className="mdc-simple-menu mdc-simple-menu--open" tabIndex={-1}>
-                    <ul className="mdc-simple-menu__items mdc-list" role="menu" aria-hidden={true}>
-                      <a href={FlowRouter.url('/')}>
-                        <li className="mdc-list-item" role="menuitem" tabIndex={0}>Home</li>
-                      </a>
-                      <a href={FlowRouter.url('/model')}>
-                        <li className="mdc-list-item" role="menuitem" tabIndex={0}>PaleoCAR</li>
-                      </a>
-                      <a href={FlowRouter.url('/search')}>
-                        <li className="mdc-list-item" role="menuitem" tabIndex={0}>Search</li>
-                      </a>
-                      <a href={FlowRouter.url('/workspace')}>
-                        <li className="mdc-list-item" role="menuitem" tabIndex={0}>Workspace</li>
-                      </a>
-
-                    </ul>
-                  </div>
-                )}
-
-
-              </div>
-
-              <span className="mdc-toolbar__title">PaleoCAR</span>
-            </section>
-            <section className="mdc-toolbar__section mdc-toolbar__section--align-end">
-            </section>
-          </div>
-        </div>
-
         <div className="section-map">
           <div className="side-panel">
-            <div className="section-form">
 
+            <div className="mdc-toolbar">
+              <div className="mdc-toolbar__row">
+                <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
+                  <span className="mdc-toolbar__title">PaleoCAR</span>
+                </section>
+              </div>
+            </div>
+
+            <div className="side-panel__form">
               <div className="form-row">
                 <label htmlFor="css-only-textfield">Scenario Name:</label>
                 <div className="mdc-textfield mdc-textfield--fullwidth">
