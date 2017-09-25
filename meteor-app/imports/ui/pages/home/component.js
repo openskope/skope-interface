@@ -10,24 +10,27 @@ export default class HomePage extends React.Component {
           <div className="box">
             <div className="box_body">
               Find and download paleoenvironmental data!
+              <br></br>
               <a href={FlowRouter.url('/search')}>
-              <Button color="primary">Search</Button>
+              <button className="mdc-button mdc-button--accent">Search</button>
               </a>
             </div>
           </div>
           <div className="box">
             <div className="box_body">
               Compare and compute paleoenvironmental reconstructions!
+              <br></br>
               <a href={FlowRouter.url('/workspace')}>
-                <Button color="primary">Workspace</Button>
+                <button className="mdc-button mdc-button--accent">Workspace</button>
               </a>
             </div>
           </div>
           <div className="box">
             <div className="box_body">
               Contribute your paleoenvironmental model!
+              <br></br>
               <a href={FlowRouter.url('/model')}>
-                <button>Model</button>
+                <button className="mdc-button mdc-button--accent">Model</button>
               </a>
             </div>
           </div>

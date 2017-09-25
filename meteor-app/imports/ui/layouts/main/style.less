@@ -1,8 +1,29 @@
 .page.layout-main {
-  width: 80%;
-  margin: 0 auto 30px auto;
 
-  .page__header,
+  .mdc-toolbar {
+    background-color: #F7f5E7;
+    &__row {
+      width: 80%;
+      margin: 0 auto 0 auto;
+      min-height: 50px;
+    }
+  }
+
+  .content{
+    width: 80%;
+    margin: 0 auto 0 auto;
+  }
+
+
+  .page__header {
+    img {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-content: stretch;
+      justify-content: stretch;
+    }
+  }
   .page__body,
   .page__footer {
     padding: @global-layout-padding;

@@ -1,13 +1,70 @@
-@global-bg-color: #37517C;
+@global-bg-color: #F4F7FA;
 @global-layout-padding: 20px;
 @global-layout-margin: 5px;
+
+#react-root {
+  --mdc-theme-primary: #220E10;
+}
 
 html {
   background-color: @global-bg-color;
 }
-#react-root {
-  background-color: @global-bg-color;
+
+a {
+  text-decoration: none;
+  color:black
 }
+
+.mdc-toolbar__section {
+  span {
+    color: black;
+    padding: 15px 20px;
+    font-size: 15px;
+  }
+  .mdc-toolbar__title {
+    margin-left: 0px;
+  }
+  .mdc-simple-menu {
+    min-width: 200px;
+    border-radius: 0px;
+    background-color: black;
+    left: 0px;
+    top: 30px;
+
+    .mdc-list {
+      padding: 0px;
+    }
+    .mdc-list-item {
+      font-size: 15px;
+      color: white;
+      background-color: black;
+    }
+  }
+  .mdc-menu-anchor:hover {
+    span {
+      background-color: black;
+      color: white
+    }
+
+    a {
+      text-decoration: none;
+      color:white;
+    }
+
+    .mdc-simple-menu {
+      display: inline-block;
+      transform: scale(1);
+      opacity: 1;
+      background-color: black;
+    }
+  }
+  .mdc-list-item:hover {
+    background-color: #DB572F;
+  }
+}
+
+
+
 
 .clearfix {
   &:after {
@@ -21,6 +78,8 @@ html {
 
 
 .flex-row {
+  font-family: Roboto;
+
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Appbar, Divider, Container, Row, Col} from 'muicss/react';
+import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 
 import {
   SearchkitManager,
@@ -51,49 +52,92 @@ class SearchResultItem extends React.Component {
             },
         } = this.props;
 
-        // const _index = this.props.result._index;
-        // const _type = this.props.result._type;
-        // const account_number = this.props.result._source.account_number;
-
         return (
             // <div style={{overflow: "auto"}}>
 
             <div className="container">
               <div className="result-container">
-                <Appbar className="appbar">
-                  <div className="header">{Title}</div>
-                  <div className="date"><b>Creation Date</b>: {CreationDate}</div>
-                </Appbar>
-              <Container fluid={true} className="column">
-                <Row>
-                  <Col md = "2">
-                    <img src="http://www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp"></img>
-                   </Col>
-                  <Col md = "10">
-                    <Row>
-                      <Col md = "5" className = "block"><b>ResultTypes</b>:{ResultTypes}</Col>
-                      <Col md = "5" className = "block"><b>Creator</b>:{Creator}</Col>
-                    </Row>
-                  </Col>
-                  <Col md = "10">
-                    <Row>
-                      <Col md="5" className ="block"><b>Rating</b>:{Rating}</Col>
-                      <Col md="5" className ="block"><b>Status</b>:{Status}</Col>
-                      <Col md="5" className ="block"><b>EndDate</b>:{EndDate}</Col>
-                      <Col md="5" className ="block"><b>StartDate</b>:{StartDate}</Col>
-                    </Row>
-                  </Col>
-                  <Col md = "10">
-                    <Row>
-                      <Col md="10" className ="block-big"><b>Info</b>:{Info}</Col>
-                    </Row>
-                  </Col>
-                </Row>
-              </Container>
-                <div className="button">
-                  <Button className="button-item" color="primary">View Data</Button>
-                  <Button className="button-item" color="primary">Download</Button>
-                  <Button className="button-item" color="primary">More Information</Button>
+                <div className="app-bar">
+                  <div className="header"><a href={FlowRouter.url('/workspace')}>{Title}</a></div>
+                  <div className="date">Creation Date: {CreationDate.substring(0,10)}</div>
+                </div>
+
+                <div className="mdc-layout-grid">
+                  <div className="mdc-layout-grid__inner">
+                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
+                      <img src="http://www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp" />
+                    </div>
+                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+                      <div className="content-row-1">
+                        <div className="mdc-layout-grid__inner">
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><b>Creator</b></div>
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><b>Rating</b></div>
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><b>Status</b></div>
+                        </div>
+                        <div className="mdc-layout-grid__inner">
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><span>{Creator}</span></div>
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><span>{Rating}</span></div>
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><span>{Status}</span></div>
+                        </div>
+                      </div>
+
+                      <div className="content-row-2">
+                        <div className="mdc-layout-grid__inner">
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"><b>Input types</b></div>
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"><b>Result types</b></div>
+                        </div>
+                        <div className="mdc-layout-grid__inner">
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                            {Inputs !== null && Inputs.length > 0 ?
+                              Inputs.map((input, index)=> (
+                                <span key={index}>
+                                  <span>{Inputs[index]}</span>
+                                  {(index < (Inputs.length-1)) ? <span className="vertical-divider">&#44;&#32;</span> : null}
+                                </span>
+                              )) : 'N/A'}
+                         </div>
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                            {ResultTypes !== null && ResultTypes.length > 0 ?
+                              ResultTypes.map((type, index) => (
+                                <span key={index}>
+                                  <span>{ResultTypes[index]}</span>
+                                  {(index < (ResultTypes.length - 1)) ? <span className="vertical-divider">&#44;&#32;</span> : null}
+                                </span>
+                              )): 'N/A'}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="content-row-3">
+                        <div className="mdc-layout-grid__inner">
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"><b>Start date</b></div>
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"><b>End date</b></div>
+                        </div>
+                        <div className="mdc-layout-grid__inner">
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                            <span>{StartDate !== null && StartDate.length > 0 ? StartDate.substring(0,10) : 'N/A'}</span></div>
+                          <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                            <span>{EndDate !== null && EndDate.length > 0 ? EndDate.substring(0,10) : 'N/A'}</span></div>
+                        </div>
+                      </div>
+
+                    </div>
+
+
+                  </div>
+                </div>
+
+                <div className="mdc-layout-grid">
+                  <div className="mdc-layout-grid__inner">
+                    <a className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3" href={Info}>
+                      <button className="mdc-button">Information</button></a>
+                    <a className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3" href={Reference}>
+                      <button className="mdc-button">Reference</button></a>
+                    <a className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3" download="data.json">
+                      <button className="mdc-button">Download</button></a>
+                    <a className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3" href={FlowRouter.url('/model')}>
+                      <button className="mdc-button">Create<span>Form</span></button></a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -116,138 +160,81 @@ export default class SearchPage extends React.Component {
           <SearchkitProvider searchkit={searchkit}>
             <div className="page--search">
               <div className="page--search__sidepanel">
-                <InputFilter
-                    id="category-input"
-                    title="Search by Catgory"
-                    placeholder="PaleoClimate"
-                    searchOnChange
-                    prefixQueryFields={['paleoclimate']}
-                    queryFields={['paleoclimate',]}
-                />
                 <RefinementListFilter
-                    id="modelname-list"
-                    title="Model Name"
-                    field="ModelName"
-                    operator="OR"
-                    orderKey="_term"
-                    orderDirection="asc"
-                    size={4}
+                  id="modelname-list"
+                  title="Model Name"
+                  field="ModelName"
+                  operator="OR"
+                  orderKey="_term"
+                  orderDirection="asc"
+                  size={4}
                 />
                 <Divider></Divider>
                 <RefinementListFilter
-                    id="creator-list"
-                    title="Creator"
-                    field="Creator"
-                    operator="OR"
-                    orderKey="_term"
-                    orderDirection="asc"
-                    size={4}
+                  id="creator-list"
+                  title="Creator"
+                  field="Creator"
+                  operator="OR"
+                  orderKey="_term"
+                  orderDirection="asc"
+                  size={4}
                 />
-                  <Divider></Divider>
-                {/*<RefinementListFilter*/}
-                    {/*id="creationdate-list"*/}
-                    {/*title="Creation Date"*/}
-                    {/*field="CreationDate"*/}
-                    {/*operator="OR"*/}
-                    {/*orderKey="_term"*/}
-                    {/*orderDirection="asc"*/}
-                    {/*size={4}*/}
-                {/*/>*/}
-                {/*<Divider></Divider>*/}
-                {/*<RefinementListFilter*/}
-                    {/*id="startdate-list"*/}
-                    {/*title="Start Date"*/}
-                    {/*field="StartDate"*/}
-                    {/*operator="OR"*/}
-                    {/*orderKey="_term"*/}
-                    {/*orderDirection="asc"*/}
-                    {/*size={4}*/}
-                {/*/>*/}
-                {/*<Divider></Divider>  */}
-                  {/*<RefinementListFilter*/}
-                      {/*id="enddate-list"*/}
-                      {/*title="End Date"*/}
-                      {/*field="EndDate"*/}
-                      {/*operator="OR"*/}
-                      {/*orderKey="_term"*/}
-                      {/*orderDirection="asc"*/}
-                      {/*size={4}*/}
-                  {/*/>*/}
-                  <Divider></Divider>
-                  <NumericRefinementListFilter
-                  id="creationdate-refine"
-                  title="Creation Date"
-                  field="CreationDate"
-                  options={[
-                  { title: 'All' },
-                  { title: '2016 to 2017', from: 0, to: 1500000000000 },
-                  { title: '2017 to 2018', from: 1500000000000, to: 1600000000000 },
-                  // { title: '2 to 3', from: 2, to: 3 },
-                  // { title: '3 to 4', from: 3, to: 4 },
-                  // { title: '4 to 5', from: 4, to: 5 },
-                  ]}
-                  />
-                  <Divider></Divider>
+                <Divider></Divider>
                 <RefinementListFilter
-                    id="status-list"
-                    title="Status"
-                    field="Status"
-                    operator="OR"
-                    orderKey="_term"
-                    orderDirection="asc"
-                    size={5}
+                  id="status-list"
+                  title="Status"
+                  field="Status"
+                  operator="OR"
+                  orderKey="_term"
+                  orderDirection="asc"
+                  size={5}
                 />
+                <Divider></Divider>
                 <RefinementListFilter
-                    id="rating-list"
-                    title="Rating"
-                    field="Rating"
-                    operator="OR"
-                    orderKey="_term"
-                    orderDirection="asc"
-                    size={5}
+                  id="rating-list"
+                  title="Ratings"
+                  field="Rating"
+                  operator="OR"
+                  orderKey="_term"
+                  orderDirection="asc"
+                  size={5}
                 />
                 <RangeFilter
-                    id="rating-range"
-                    field="Rating"
-                    min={0}
-                    max={10}
-                    showHistogram
-                    title=""
+                  id="rating-range"
+                  field="Rating"
+                  min={0}
+                  max={5}
+                  showHistogram
+                  title=""
                 />
-                <RangeFilter
-                    id="creationdate-range"
-                    field="CreationDate"
-                    min={0}
-                    max={200}
-                    showHistogram
-                    title="Creation Date"
-                />
+                <Divider></Divider>
                 <RefinementListFilter
-                    id="resultTypes-list"
-                    title="Result Types"
-                    field="ResultTypes"
-                    operator="OR"
-                    orderKey="_term"
-                    orderDirection="asc"
-                    size={5}
+                  id="inputs-list"
+                  title="Input"
+                  field="Inputs"
+                  operator="OR"
+                  orderKey="_term"
+                  orderDirection="asc"
+                  size={5}
                 />
+                <Divider></Divider>
                 <RefinementListFilter
-                    id="inputs-list"
-                    title="Input"
-                    field="Inputs"
-                    operator="OR"
-                    orderKey="_term"
-                    orderDirection="asc"
-                    size={5}
+                  id="resultTypes-list"
+                  title="Result Types"
+                  field="ResultTypes"
+                  operator="OR"
+                  orderKey="_term"
+                  orderDirection="asc"
+                  size={5}
                 />
               </div>
 
               <div className="page--search__searchpanel">
 
                 <SearchBox
-                    autofocus
-                    searchOnChange
-                    prefixQueryFields={['actors^1', 'type^2', 'languages', 'title^10']}
+                  autofocus
+                  searchOnChange
+                  prefixQueryFields={['actors^1', 'type^2', 'languages', 'title^10']}
                 />
 
                 <LayoutResults>
@@ -267,7 +254,7 @@ export default class SearchPage extends React.Component {
                   <NoHits />
 
                   <Pagination
-                      showNumbers
+                    showNumbers
                   />
                 </LayoutResults>
 

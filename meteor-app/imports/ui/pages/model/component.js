@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 
 export default class ModelPage extends React.Component {
 
@@ -23,6 +24,7 @@ export default class ModelPage extends React.Component {
     predictionYears: PropTypes.number.isRequired,
     meanVar: PropTypes.string.isRequired,
     minWidth: PropTypes.number.isRequired,
+
   };
 
   constructor (props) {
@@ -163,72 +165,97 @@ export default class ModelPage extends React.Component {
     } = this.props;
 
     return (
-      <div className="page--model">
+      <div className="page--paleocar">
 
-        <div className="section-form">
+        <div className="section-map">
+          <div className="side-panel">
 
-          <div>
-            <button onClick={this._bound_toggleMap}>Select coordinates</button>
+            <div className="mdc-toolbar">
+              <div className="mdc-toolbar__row">
+                <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
+                  <span className="mdc-toolbar__title">PaleoCAR</span>
+                </section>
+              </div>
+            </div>
+
+            <div className="side-panel__form">
+              <div className="form-row">
+                <label htmlFor="css-only-textfield">Scenario Name:</label>
+                <div className="mdc-textfield mdc-textfield--fullwidth">
+                  <input type="text" className="mdc-textfield__input" id="css-only-textfield" placeholder="Name" />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <label htmlFor="css-only-multiline">Description</label>
+                <div className="mdc-textfield mdc-textfield--multiline" htmlFor="css-only-multiline">
+                  <textarea className="mdc-textfield__input" id="css-only-multiline" placeholder="Describe your scenario." rows="8" cols="40"></textarea>
+                </div>
+              </div>
+              <div className="form-row">
+                <label for="css-only-textfield">Prediction years:</label>
+                <div className="mdc-textfield mdc-textfield--fullwidth">
+                  <input type="text"
+                         className="mdc-textfield__input"
+                         id="css-only-textfield"
+                         placeholder="1775,1901-1905"
+                         onChange={this._bound_updatePredictionYears} />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <label htmlFor="css-only-textfield">Minimum width:</label>
+                <div className="mdc-textfield mdc-textfield--fullwidth">
+                  <input type="text"
+                         className="mdc-textfield__input"
+                         id="css-only-textfield"
+                         placeholder="Number"
+                         onChange={this._bound_updateMinWidth} />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <label>Mean variance:</label>
+                <select className="mdc-select" value={meanVar} onChange={this._bound_updateMeanVar}>
+                  <option value="">Pick a variance</option>
+                  <option value="none">None</option>
+                  <option value="calibration">Calibration</option>
+                  <option value="chained">Chained</option>
+                </select>
+              </div>
+
+              <div className="form-row-button">
+                <a href={FlowRouter.url('/search')}><button className="mdc-button mdc-button--raised">Submit</button></a>
+                <a
+                      href={`data:text/json;base64,${btoa(JSON.stringify({
+                          latitude: inspectPointCoordinate[1],
+                          longitude: inspectPointCoordinate[0],
+                          predictionYears,
+                          meanVar,
+                          minWidth,
+                      }, null, 2))}`}
+                      download="data.json">
+                  <button className="mdc-button mdc-button--raised">Download JSON</button></a>
+
+              </div>
+
+
+            </div>
           </div>
-
-          <div>
-            <label>Latitude:</label>
-            <input type="text" value={inspectPointCoordinate[1]} onChange={this._bound_updateLatitude} />
-          </div>
-
-          <div>
-            <label>Longitude:</label>
-            <input type="text" value={inspectPointCoordinate[0]} onChange={this._bound_updateLongitude} />
-          </div>
-
-          <div>
-            <label>Prediction years:</label>
-            <input type="text" value={predictionYears} onChange={this._bound_updatePredictionYears} />
-          </div>
-
-          <div>
-            <label>Mean variance:</label>
-            <select value={meanVar} onChange={this._bound_updateMeanVar}>
-              <option value="none">none</option>
-              <option value="calibration">calibration</option>
-              <option value="chained">chained</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Minimum width:</label>
-            <input type="text" value={minWidth} onChange={this._bound_updateMinWidth} />
-          </div>
-
-          <a
-            href={`data:text/json;base64,${btoa(JSON.stringify({
-              latitude: inspectPointCoordinate[1],
-              longitude: inspectPointCoordinate[0],
-              predictionYears,
-              meanVar,
-              minWidth,
-            }, null, 2))}`}
-            download="data.json"
-          >Download JSON</a>
-
-        </div>
-
-        <div className={mapShown ? 'section-map' : 'hidden'}>
-
-          <div className="map_background" />
 
           <map-view
-            class="the-map"
-            basemap="osm"
-            center="-12107625, 4495720"
-            zoom="5"
-            ref={ref => this._mapview = ref}
+              class="the-map"
+              basemap="osm"
+              center="-12107625, 4495720"
+              zoom="5"
+              ref={ref => this._mapview = ref}
           >
 
+
             <map-layer-singlepoint
-              invisible={!inspectPointSelected ? 'invisible' : null}
-              latitude={inspectPointCoordinate[1]}
-              longitude={inspectPointCoordinate[0]}
+                invisible={!inspectPointSelected ? 'invisible' : null}
+                latitude={inspectPointCoordinate[1]}
+                longitude={inspectPointCoordinate[0]}
             />
 
             <map-control-defaults />
@@ -236,8 +263,8 @@ export default class ModelPage extends React.Component {
             <map-control-simple-layer-list />
 
           </map-view>
-
         </div>
+
 
       </div>
     );
