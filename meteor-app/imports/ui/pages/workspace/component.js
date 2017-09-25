@@ -39,12 +39,10 @@ export default class WorkspacePage extends React.Component {
     // Callback functions for toggling the welcome window.
     toggleWelcomeWindow: PropTypes.func.isRequired,
 
-    //Callback function for toggling side panel menu.
+    // Callback function for toggling side panel menu.
     toggleSideMenu: PropTypes.func.isRequired,
 
-    //The state of toolbar menu.
-    toolbarMenuClosed: PropTypes.bool.isRequired,
-    //Callback funciton for toggling toolbar menu.
+    // Callback funciton for toggling toolbar menu.
     toggleToolbarMenu: PropTypes.func.isRequired,
 
   };
@@ -62,14 +60,13 @@ export default class WorkspacePage extends React.Component {
     this._bound_toggleWelcomeWindow = this._toggleWelcomeWindow.bind(this);
     this._bound_toggleSideMenu = this._toggleSideMenu.bind(this);
     this._bound_toggleToolbarMenu = this._toggleToolbarMenu.bind(this);
-
   }
 
   componentDidMount () {
     if (this._mapview) {
       this._mapview.addEventListener('click:view', this._bound_mapOnClick);
     }
-    if(this.target) {
+    if (this.target) {
       this.target.addEventListener('click', this._bound_toggleMenu);
     }
   }
@@ -79,7 +76,7 @@ export default class WorkspacePage extends React.Component {
       this._mapview.removeEventListener('click:view', this._bound_mapOnClick);
     }
 
-    if(this.target) {
+    if (this.target) {
       this.target.removeEventListener('click', this._bound_toggleMenu);
     }
   }
@@ -163,11 +160,11 @@ export default class WorkspacePage extends React.Component {
     toggleWelcomeWindow();
   }
 
-    _relayContext = (func) => {
-        return function (...args) {
-            return func(this, ...args);
-        };
+  _relayContext = (func) => {
+    return function (...args) {
+      return func(this, ...args);
     };
+  };
 
   _toggleSideMenu(event) {
     const target = event.currentTarget;
@@ -199,7 +196,6 @@ export default class WorkspacePage extends React.Component {
       rangeMin,
       rangeMax,
       welcomeWindowClosed,
-      toolbarMenuClosed,
 
       titleName,
 
@@ -207,15 +203,8 @@ export default class WorkspacePage extends React.Component {
 
     return (
       <div className="page--workspace">
-
-
-
-
         <div className="section-map">
-
-
           <div className="side-panel">
-
             <div className="mdc-toolbar">
               <div className="mdc-toolbar__row">
                 <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
@@ -225,17 +214,19 @@ export default class WorkspacePage extends React.Component {
                   <div className="mdc-menu-anchor">
                     <a className="material-icons mdc-toolbar__icon--menu">more_vert</a>
 
-                    <div className="mdc-simple-menu" tabIndex={-1}>
-                      <ul className="mdc-simple-menu__items mdc-list" role="menu" aria-hidden={true}>
-                        <li className="mdc-list-item list-metadata"
-                            role="menuitem"
-                            tabIndex={0}>
+                    <div className="mdc-simple-menu" tabIndex="-1">
+                      <ul className="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
+                        <li
+                          className="mdc-list-item list-metadata"
+                          role="menuitem"
+                          tabIndex="0"
+                        >
                           Metadata
                           <a className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</a>
                         </li>
 
                         <a href={FlowRouter.url('/workspace/help')}>
-                          <li className="mdc-list-item" role="menuitem" tabIndex={0}>
+                          <li className="mdc-list-item" role="menuitem" tabIndex="0">
                             Help<span className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</span>
                           </li>
                         </a>
@@ -247,26 +238,33 @@ export default class WorkspacePage extends React.Component {
                     <h3>Metadata</h3>
                   </div>
 
-
                   <div className="media-large-size">
                     <div className="toolbar--dropdown">
-                      <div className="dropdown-1"
-                           onClick={this._bound_toggleWelcomeWindow}>
-                        <a className="material-icons mdc-toolbar__icon--menu">info
-                          <span className="tooltip-text">INFO</span>
-                        </a>
+                      <div
+                        className="dropdown-1"
+                        onClick={this._bound_toggleWelcomeWindow}
+                      >
+                        <a
+                          className="material-icons mdc-toolbar__icon--menu"
+                        >info<span className="tooltip-text">INFO</span></a>
                       </div>
 
-                      {welcomeWindowClosed ? null : (
-                        <div className="info-content">
-                          <h3>Metadata</h3>
-                          <div className="mdc-list-divider"></div>
-                        </div>)}
+                      {
+                        welcomeWindowClosed
+                        ? null
+                        : (
+                          <div className="info-content">
+                            <h3>Metadata</h3>
+                            <div className="mdc-list-divider" />
+                          </div>
+                        )
+                      }
 
                       <div className="dropdown-2">
-                        <a className="material-icons mdc-toolbar__icon--menu" href={FlowRouter.url('/workspace/help')}>help
-                          <span className="tooltip-text">HELP</span>
-                        </a>
+                        <a
+                          className="material-icons mdc-toolbar__icon--menu"
+                          href={FlowRouter.url('/workspace/help')}
+                        >help<span className="tooltip-text">HELP</span></a>
                       </div>
                     </div>
                   </div>
@@ -280,8 +278,9 @@ export default class WorkspacePage extends React.Component {
                 <legend>TIME</legend>
                 <div className="field--year">
                   <div className="field--year-row1">
-                    <a className="material-icons action--prev-year"
-                       onClick={this._bound_yearStepBackButtonOnClick}
+                    <a
+                      className="material-icons action--prev-year"
+                      onClick={this._bound_yearStepBackButtonOnClick}
                     >keyboard_arrow_left</a>
                     <input
                       className="input--year"
@@ -289,8 +288,9 @@ export default class WorkspacePage extends React.Component {
                       value={filterValue}
                       onChange={this._bound_rangeFilterOnChangeInput}
                     />
-                    <a className="material-icons action--next-year"
-                       onClick={this._bound_yearStepForwardButtonOnClick}
+                    <a
+                      className="material-icons action--next-year"
+                      onClick={this._bound_yearStepForwardButtonOnClick}
                     >keyboard_arrow_right</a>
                   </div>
                   <div className="label-year">Year</div>
@@ -324,79 +324,85 @@ export default class WorkspacePage extends React.Component {
                           onChange={this._bound_layerVisibilityOnChange}
                         />
                         <div className="mdc-checkbox__background">
-                          <svg className="mdc-checkbox__checkmark"
-                               viewBox="0 0 24 24">
-                            <path className="mdc-checkbox__checkmark__path"
-                                  fill="none"
-                                  stroke="white"
-                                  d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                          <svg
+                            className="mdc-checkbox__checkmark"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              className="mdc-checkbox__checkmark__path"
+                              fill="none"
+                              stroke="white"
+                              d="M1.73,12.91 8.1,19.28 22.79,4.59"
+                            />
                           </svg>
-                          <div className="mdc-checkbox__mixedmark"></div>
+                          <div className="mdc-checkbox__mixedmark" />
                         </div>
                       </div>
 
                       <label className="layer-title-label">{layer.name}</label>
 
-                      <a className="material-icons mdc-list-item__end-detail"
-                         data-layer-index={layerIndex}
-                         onClick={this._bound_toggleSideMenu}>
-                        keyboard_arrow_down</a>
+                      <a
+                        className="material-icons mdc-list-item__end-detail"
+                        data-layer-index={layerIndex}
+                        onClick={this._bound_toggleSideMenu}
+                      >keyboard_arrow_down</a>
 
                     </div>
 
-                    {layer.sidePanelMenuClosed ? null : (
-                      <div className="layer-opacity-row">
-                        <label>Opacity: </label>
-                        <Slider
-                          className="input-slider--layer-opacity"
-                          min={0}
-                          max={255}
-                          value={layer.opacity * 255}
-                          data-layer-index={layerIndex}
-                          onChange={this._bound_layerOpacityOnChange}
-                        />
-                        <label>{layer.opacity.toFixed(2)}</label>
-                      </div>
-                    )}
+                    {
+                      layer.sidePanelMenuClosed
+                      ? null
+                      : (
+                        <div className="layer-opacity-row">
+                          <label>Opacity: </label>
+                          <Slider
+                            className="input-slider--layer-opacity"
+                            min={0}
+                            max={255}
+                            value={layer.opacity * 255}
+                            data-layer-index={layerIndex}
+                            onChange={this._bound_layerOpacityOnChange}
+                          />
+                          <label>{layer.opacity.toFixed(2)}</label>
+                        </div>
+                      )
+                    }
 
-                    <div className="mdc-list-divider"></div>
+                    <div className="mdc-list-divider" />
                   </div>
                 ))}
               </div>
             </div>
-
-
           </div>
 
-            <map-view
-              class="the-map"
-              basemap="osm"
-              center="-12107625, 4495720"
-              zoom="5"
-              ref={ref => this._mapview = ref}
-            >
+          <map-view
+            class="the-map"
+            basemap="osm"
+            center="-12107625, 4495720"
+            zoom="5"
+            ref={ref => this._mapview = ref}
+          >
 
-              {layers.map(o => o.element)}
+            {layers.map(o => o.element)}
 
-              <map-layer-singlepoint
-                invisible={!inspectPointSelected ? 'invisible' : null}
-                latitude={inspectPointCoordinate[1]}
-                longitude={inspectPointCoordinate[0]}
-              />
-
-              <map-control-defaults />
-              <map-interaction-defaults />
-              <map-control-simple-layer-list />
-
-            </map-view>
-
-            <Charts
-              inspectPointSelected={inspectPointSelected}
-              inspectPointCoordinate={inspectPointCoordinate}
+            <map-layer-singlepoint
+              invisible={!inspectPointSelected ? 'invisible' : null}
+              latitude={inspectPointCoordinate[1]}
+              longitude={inspectPointCoordinate[0]}
             />
 
-        </div>
+            <map-control-defaults />
+            <map-interaction-defaults />
+            <map-control-simple-layer-list />
 
+          </map-view>
+
+          <Charts
+            inspectPointSelected={inspectPointSelected}
+            inspectPointCoordinate={inspectPointCoordinate}
+          />
+
+        </div>
       </div>
     );
   }

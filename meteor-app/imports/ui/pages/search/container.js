@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 import {
   SearchkitManager,
@@ -5,10 +6,10 @@ import {
 
 import Component from './component';
 
-const elasticEndpoint = Meteor.settings && Meteor.settings.public && Meteor.settings.public.elasticEndpoint || 'http://localhost:9200/';
+const elasticEndpoint = (Meteor.settings && Meteor.settings.public && Meteor.settings.public.elasticEndpoint) || 'http://localhost:9200/';
 const searchkit = new SearchkitManager(elasticEndpoint);
 
-/** This does not work **/
+//! This does not work
 // const searchkit = new SearchkitManager("http://localhost:9200/", {
 //   basicAuth: "elastic:changeme",
 // });

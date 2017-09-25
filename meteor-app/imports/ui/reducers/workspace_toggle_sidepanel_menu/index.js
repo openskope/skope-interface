@@ -1,29 +1,28 @@
-export const WORKSPACE_TOGGLE_PANEL_MENU= (state, action) => {
-    const {
-        index,
-        invisible,
-    } = action;
+export const WORKSPACE_TOGGLE_PANEL_MENU = (state, action) => {
+  const {
+    index,
+    invisible,
+  } = action;
 
-    const invisibilityGiven = !(typeof invisible === 'undefined');
+  const invisibilityGiven = !(typeof invisible === 'undefined');
 
-    return {
-        ...state,
+  return {
+    ...state,
 
-        workspace: {
-            ...state.workspace,
+    workspace: {
+      ...state.workspace,
 
-            layers: state.workspace.layers.map((layer, layerIndex) => {
-                if (layerIndex === index) {
-                    // Toggle the visibility of the layer.
-                    return {
-                        ...layer,
+      layers: state.workspace.layers.map((layer, layerIndex) => {
+        if (layerIndex === index) {
+          // Toggle the visibility of the layer.
+          return {
+            ...layer,
 
-                        sidePanelMenuClosed: invisibilityGiven ? (!invisible) : (!layer.sidePanelMenuClosed),
-                    };
-                }
-                return layer;
-            }),
-
-        },
-    };
+            sidePanelMenuClosed: invisibilityGiven ? (!invisible) : (!layer.sidePanelMenuClosed),
+          };
+        }
+        return layer;
+      }),
+    },
+  };
 };

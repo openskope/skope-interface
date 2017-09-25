@@ -72,7 +72,7 @@ export default {
     welcomeWindowClosed: true,
     toolbarMenuClosed: true,
 
-    //title name from user click search tile in search page, and this ia one of example.
+    // title name from user click search tile in search page, and this ia one of example.
     titleName: 'National Elevation Data (NED)',
   },
 

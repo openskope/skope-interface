@@ -12,8 +12,6 @@ export default class ModelPage extends React.Component {
     // Callback function for selecting a point to inspect.
     selectInspectPoint: PropTypes.func.isRequired,
 
-    // The state of the map modal.
-    mapShown: PropTypes.bool.isRequired,
     // Callback function for the map modal.
     toggleMap: PropTypes.func.isRequired,
 
@@ -158,7 +156,6 @@ export default class ModelPage extends React.Component {
       inspectPointSelected,
       inspectPointCoordinate,
 
-      mapShown,
       predictionYears,
       meanVar,
       minWidth,
@@ -189,28 +186,32 @@ export default class ModelPage extends React.Component {
               <div className="form-row">
                 <label htmlFor="css-only-multiline">Description</label>
                 <div className="mdc-textfield mdc-textfield--multiline" htmlFor="css-only-multiline">
-                  <textarea className="mdc-textfield__input" id="css-only-multiline" placeholder="Describe your scenario." rows="8" cols="40"></textarea>
+                  <textarea className="mdc-textfield__input" id="css-only-multiline" placeholder="Describe your scenario." rows="8" cols="40" />
                 </div>
               </div>
               <div className="form-row">
-                <label for="css-only-textfield">Prediction years:</label>
+                <label htmlFor="css-only-textfield">Prediction years:</label>
                 <div className="mdc-textfield mdc-textfield--fullwidth">
-                  <input type="text"
-                         className="mdc-textfield__input"
-                         id="css-only-textfield"
-                         placeholder="1775,1901-1905"
-                         onChange={this._bound_updatePredictionYears} />
+                  <input
+                    type="text"
+                    className="mdc-textfield__input"
+                    id="css-only-textfield"
+                    placeholder="1775,1901-1905"
+                    onChange={this._bound_updatePredictionYears}
+                  />
                 </div>
               </div>
 
               <div className="form-row">
                 <label htmlFor="css-only-textfield">Minimum width:</label>
                 <div className="mdc-textfield mdc-textfield--fullwidth">
-                  <input type="text"
-                         className="mdc-textfield__input"
-                         id="css-only-textfield"
-                         placeholder="Number"
-                         onChange={this._bound_updateMinWidth} />
+                  <input
+                    type="text"
+                    className="mdc-textfield__input"
+                    id="css-only-textfield"
+                    placeholder="Number"
+                    onChange={this._bound_updateMinWidth}
+                  />
                 </div>
               </div>
 
@@ -227,35 +228,32 @@ export default class ModelPage extends React.Component {
               <div className="form-row-button">
                 <a href={FlowRouter.url('/search')}><button className="mdc-button mdc-button--raised">Submit</button></a>
                 <a
-                      href={`data:text/json;base64,${btoa(JSON.stringify({
-                          latitude: inspectPointCoordinate[1],
-                          longitude: inspectPointCoordinate[0],
-                          predictionYears,
-                          meanVar,
-                          minWidth,
-                      }, null, 2))}`}
-                      download="data.json">
-                  <button className="mdc-button mdc-button--raised">Download JSON</button></a>
-
+                  href={`data:text/json;base64,${btoa(JSON.stringify({
+                    latitude: inspectPointCoordinate[1],
+                    longitude: inspectPointCoordinate[0],
+                    predictionYears,
+                    meanVar,
+                    minWidth,
+                  }, null, 2))}`}
+                  download="data.json"
+                ><button className="mdc-button mdc-button--raised">Download JSON</button></a>
               </div>
-
 
             </div>
           </div>
 
           <map-view
-              class="the-map"
-              basemap="osm"
-              center="-12107625, 4495720"
-              zoom="5"
-              ref={ref => this._mapview = ref}
+            class="the-map"
+            basemap="osm"
+            center="-12107625, 4495720"
+            zoom="5"
+            ref={ref => this._mapview = ref}
           >
 
-
             <map-layer-singlepoint
-                invisible={!inspectPointSelected ? 'invisible' : null}
-                latitude={inspectPointCoordinate[1]}
-                longitude={inspectPointCoordinate[0]}
+              invisible={!inspectPointSelected ? 'invisible' : null}
+              latitude={inspectPointCoordinate[1]}
+              longitude={inspectPointCoordinate[0]}
             />
 
             <map-control-defaults />

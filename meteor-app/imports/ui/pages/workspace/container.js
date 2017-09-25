@@ -122,8 +122,8 @@ export default createContainer((props) => {
     toolbarMenuClosed,
     toggleToolbarMenu: () => {
       store.dispatch({
-          type: actions.WORKSPACE_TOGGLE_TOOLBAR_MENU.type,
-      })
+        type: actions.WORKSPACE_TOGGLE_TOOLBAR_MENU.type,
+      });
     },
 
     titleName,
