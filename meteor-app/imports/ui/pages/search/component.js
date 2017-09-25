@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Appbar, Divider, Container, Row, Col} from 'muicss/react';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 
 import {
@@ -169,7 +168,6 @@ export default class SearchPage extends React.Component {
                   orderDirection="asc"
                   size={4}
                 />
-                <Divider></Divider>
                 <RefinementListFilter
                   id="creator-list"
                   title="Creator"
@@ -179,7 +177,6 @@ export default class SearchPage extends React.Component {
                   orderDirection="asc"
                   size={4}
                 />
-                <Divider></Divider>
                 <RefinementListFilter
                   id="status-list"
                   title="Status"
@@ -189,7 +186,6 @@ export default class SearchPage extends React.Component {
                   orderDirection="asc"
                   size={5}
                 />
-                <Divider></Divider>
                 <RefinementListFilter
                   id="rating-list"
                   title="Ratings"
@@ -207,7 +203,6 @@ export default class SearchPage extends React.Component {
                   showHistogram
                   title=""
                 />
-                <Divider></Divider>
                 <RefinementListFilter
                   id="inputs-list"
                   title="Input"
@@ -217,7 +212,6 @@ export default class SearchPage extends React.Component {
                   orderDirection="asc"
                   size={5}
                 />
-                <Divider></Divider>
                 <RefinementListFilter
                   id="resultTypes-list"
                   title="Result Types"

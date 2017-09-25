@@ -16,7 +16,6 @@
     "lodash": "^4.17.4",
     "material-components-web": "^0.16.0",
     "meteor-node-stubs": "~0.2.4",
-    "muicss": "^0.9.18",
     "prop-types": "^15.5.8",
     "rc-slider": "^8.2.0",
     "react": "^15.5.4",

@@ -1,6 +1,5 @@
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import React from 'react';
-import { Button } from 'muicss/react';
 
 export default class HomePage extends React.Component {
   render() {
