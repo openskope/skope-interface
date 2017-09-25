@@ -2,7 +2,7 @@
   "name": "skope",
   "version": "0.0.3",
   "private": true,
-  "demoRepository": "https://github.com/Zodiase/SKOPE-Demo.git",
+  "demoRepository": "https://github.com/openskope/skope-interface.git",
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint --silent",

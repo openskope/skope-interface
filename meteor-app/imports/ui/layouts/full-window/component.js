@@ -3,6 +3,7 @@ import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 
 import {
   demoRepository,
+  version,
 } from '/package.json';
 
 export default class FullWindowLayout extends React.Component {
@@ -132,7 +133,7 @@ export default class FullWindowLayout extends React.Component {
           <a href={helpUrl}>
             <button className="mdc-button">Help</button>
           </a>
-          <a href={demoRepository} target="_blank">Source code on Github</a>
+          <a href={demoRepository} target="_blank">{`ver ${version}`}</a>
         </div>
       </div>
     );
