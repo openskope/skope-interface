@@ -1,9 +1,10 @@
 {
-  "name": "skope",
+  "name": "skope-dev-elasticsearch",
   "version": "1.0.0",
   "description": "",
-  "main": "load-data.js",
   "scripts": {
+    "start": "bash docker-run.sh",
+    "load-data": "node load-data.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
