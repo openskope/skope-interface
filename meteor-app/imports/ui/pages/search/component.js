@@ -163,7 +163,7 @@ export default class SearchPage extends React.Component {
           <div className="page--search__sidepanel">
             <RefinementListFilter
               id="modelname-list"
-              title="Model Name"
+              title="Model"
               field="ModelName"
               operator="OR"
               orderKey="_term"
@@ -190,24 +190,16 @@ export default class SearchPage extends React.Component {
             />
             <RefinementListFilter
               id="rating-list"
-              title="Ratings"
+              title="Range"
               field="Rating"
               operator="OR"
               orderKey="_term"
               orderDirection="asc"
               size={5}
             />
-            <RangeFilter
-              id="rating-range"
-              field="Rating"
-              min={0}
-              max={5}
-              showHistogram
-              title=""
-            />
             <RefinementListFilter
               id="inputs-list"
-              title="Input"
+              title="Inputs"
               field="Inputs"
               operator="OR"
               orderKey="_term"
@@ -216,7 +208,7 @@ export default class SearchPage extends React.Component {
             />
             <RefinementListFilter
               id="resultTypes-list"
-              title="Result Types"
+              title="Results"
               field="ResultTypes"
               operator="OR"
               orderKey="_term"
