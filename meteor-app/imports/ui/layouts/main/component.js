@@ -14,8 +14,8 @@ export default class MainLayout extends React.Component {
     } = this.props;
 
     return (
-      <div className="page layout-main">
-        <div className="page__header">
+      <div className="layout layout-main">
+        <div className="layout__header">
           <img src={FlowRouter.url('/img/header.jpg')} alt="" />
         </div>
 
@@ -127,10 +127,10 @@ export default class MainLayout extends React.Component {
         </div>
 
         <div className="content">
-          <div className="page__body">
+          <div className="layout__body">
             {body}
           </div>
-          <div className="page__footer">
+          <div className="layout__footer">
             <a href={helpUrl}>
               <button className="mdc-button">Help</button>
             </a>

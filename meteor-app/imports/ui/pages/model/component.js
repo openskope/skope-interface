@@ -162,9 +162,10 @@ export default class ModelPage extends React.Component {
     } = this.props;
 
     return (
-      <div className="page--paleocar">
+      <div className="page-paleocar">
 
         <div className="section-map">
+
           <div className="side-panel">
 
             <div className="mdc-toolbar">
@@ -175,7 +176,7 @@ export default class ModelPage extends React.Component {
               </div>
             </div>
 
-            <div className="side-panel__form">
+            <div className="side-panel__content">
               <div className="form-row">
                 <label htmlFor="css-only-textfield">Scenario Name:</label>
                 <div className="mdc-textfield mdc-textfield--fullwidth">

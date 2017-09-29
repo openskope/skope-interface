@@ -14,9 +14,9 @@ export default class FullWindowLayout extends React.Component {
     } = this.props;
 
     return (
-      <div className="page layout-fullWindow">
-        <div className="page__header">
-          <img src={FlowRouter.url('/img/header.jpg')} alt="" />
+      <div className="layout layout-fullWindow">
+        <div className="layout__header">
+          <img className="header-image" src={FlowRouter.url('/img/header.jpg')} alt="" />
         </div>
 
         <div className="mdc-toolbar">
@@ -126,10 +126,9 @@ export default class FullWindowLayout extends React.Component {
           </div>
         </div>
 
-        <div className="page__body">
-          {body}
-        </div>
-        <div className="page__footer">
+        <div className="layout__body">{body}</div>
+
+        <div className="layout__footer">
           <a href={helpUrl}>
             <button className="mdc-button">Help</button>
           </a>

@@ -1,4 +1,4 @@
-.page--paleocar {
+.page-paleocar {
   .flex-col;
 
   box-sizing: border-box;
@@ -15,20 +15,41 @@
   }
 
   .section-map {
+
+    //=================================================================
+    // Parent-child positioning styling.
+    //=================================================================
+
     .flex-row;
 
     & > .the-map {
-      .flex-col .layout-fill;
+      .layout-fill;
 
       height: 100%;
     }
 
-    .side-panel {
-      .flex-col;
+    //=================================================================
+    // Children's own styling.
+    //=================================================================
 
+    .side-panel {
       width: 350px;
       box-sizing: content-box;
-      overflow: auto;
+
+      //=================================================================
+      // Parent-child positioning styling.
+      //=================================================================
+
+      .flex-col;
+
+      &__content {
+        .layout-fill;
+        overflow: auto;
+      }
+
+      //=================================================================
+      // Children's own styling.
+      //=================================================================
 
       .mdc-toolbar {
         background-color: #220E10;
@@ -43,7 +64,7 @@
         }
       }
 
-      &__form {
+      &__content {
         padding: @global-layout-padding;
       }
 
@@ -93,15 +114,8 @@
       }
     }
 
-
     .the-map {
-      .flex-col .layout-fill;
-
-      height: 100%;
       border: 0;
     }
-
   }
-
-
 }

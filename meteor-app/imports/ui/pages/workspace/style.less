@@ -1,29 +1,50 @@
-.page--workspace {
+.page-workspace {
   .flex-col;
 
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  overflow: auto;
 
   & > .section-map {
     .flex-col .layout-fill;
   }
 
   .section-map {
+
+    //=================================================================
+    // Parent-child positioning styling.
+    //=================================================================
+
     .flex-row;
 
     & > .the-map {
-      .flex-row .layout-fill;
+      .layout-fill;
 
       height: 100%;
     }
 
-    .side-panel {
-      .flex-col;
+    //=================================================================
+    // Children's own styling.
+    //=================================================================
 
+    .side-panel {
       width: 400px;
       box-sizing: content-box;
+
+      //=================================================================
+      // Parent-child positioning styling.
+      //=================================================================
+
+      .flex-col;
+
+      &__content {
+        .layout-fill;
+        overflow: auto;
+      }
+
+      //=================================================================
+      // Children's own styling.
+      //=================================================================
 
       .mdc-toolbar {
         background-color: #220E10;
@@ -139,7 +160,6 @@
         padding: @global-layout-padding;
       }
 
-
       .rc-slider{
         .rc-slider-track {
           background-color: #220E10;
@@ -148,9 +168,8 @@
         .rc-slider-handle {
           border-color: #220E10;
         }
-
-
       }
+
       .map-animation-controls {
         padding-bottom: @global-layout-padding;
         legend {
@@ -240,9 +259,9 @@
         }
       }
     }
+
     .the-map {
       border: 0;
-      z-index: 0;
     }
   }
 }

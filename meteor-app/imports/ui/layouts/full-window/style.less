@@ -1,16 +1,23 @@
-.page.layout-fullWindow {
+.layout-fullWindow {
   width: 100%;
   height: 100vh;
-  
+
   min-height: 500px;
   min-width: 500px;
 
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  align-content: stretch;
-  align-items: stretch;
+  //=================================================================
+  // Parent-child positioning styling.
+  //=================================================================
+
+  .flex-col;
+
+  & > .layout__body {
+    .layout-fill;
+  }
+
+  //=================================================================
+  // Children's own styling.
+  //=================================================================
 
   .mdc-toolbar {
     background-color: #F7f5E7;
@@ -20,39 +27,23 @@
     }
   }
 
-  .page__header {
-    flex: 0 0 auto;
-  }
-
-  .page__body {
-    flex: 1 1 0;
-  }
-
-  .page__footer {
-    flex: 0 0 auto;
-  }
-
-  .page__header {
+  .layout__header {
     .flex-row;
 
-    img {
-      display: flex;
+    .header-image {
       width: 100%;
       height: 100%;
-      align-content: stretch;
-      justify-content: stretch;
     }
-
   }
 
-  .page__body {
+  .layout__body {
     margin-bottom: @global-layout-margin;
     background-color: white;
   }
 
-  .page__footer {
+  .layout__footer {
     .flex-row;
-    
+
     justify-content: space-between;
     align-items: center;
     padding: 5px 20px;

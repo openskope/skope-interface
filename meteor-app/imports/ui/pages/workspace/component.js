@@ -202,9 +202,12 @@ export default class WorkspacePage extends React.Component {
     } = this.props;
 
     return (
-      <div className="page--workspace">
+      <div className="page-workspace">
+
         <div className="section-map">
+
           <div className="side-panel">
+
             <div className="mdc-toolbar">
               <div className="mdc-toolbar__row">
                 <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
@@ -373,6 +376,7 @@ export default class WorkspacePage extends React.Component {
                 ))}
               </div>
             </div>
+
           </div>
 
           <map-view
@@ -403,6 +407,7 @@ export default class WorkspacePage extends React.Component {
           />
 
         </div>
+
       </div>
     );
   }
