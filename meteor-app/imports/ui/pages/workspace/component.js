@@ -216,17 +216,13 @@ export default class WorkspacePage extends React.Component {
                 </section>
 
                 <section className="mdc-toolbar__section mdc-toolbar__section--align-end">
-                  <a
-                    className="material-icons mdc-toolbar__icon mdc-menu-anchor"
-                    onClick={() => this._sidePanelMoreMenu.show()}
-                  >
-                    more_vert
+                  <span className="mdc-menu-anchor">
+                    <a
+                      className="material-icons mdc-toolbar__icon"
+                      onClick={() => this._sidePanelMoreMenu.show()}
+                    >more_vert</a>
                     <div
-                      className="mdc-simple-menu mdc-simple-menu--open-from-top-right"
-                      style={{
-                        top: 0,
-                        right: 0,
-                      }}
+                      className="mdc-simple-menu mdc-extra__simple-menu--open-from-top-right"
                       tabIndex="-1"
                       ref={(ref) => this._sidePanelMoreMenu = new menu.MDCSimpleMenu(ref)}
                     >
@@ -245,9 +241,7 @@ export default class WorkspacePage extends React.Component {
                         </a>
                       </ul>
                     </div>
-
-                    </a>
-
+                  </span>
 
                   <div className="menu-info-content">
                     <h3>Metadata</h3>

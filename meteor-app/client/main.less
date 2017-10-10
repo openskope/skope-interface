@@ -25,28 +25,6 @@ a {
   }
 }
 
-.flex-row {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  align-content: stretch;
-  align-items: stretch;
-
-  & > * {
-    flex: 0 0 auto;
-  }
-
-  & > .layout-fill {
-    flex: 1 1 0;
-  }
-}
-
-.flex-col {
-  .flex-row;
-  flex-direction: column;
-}
-
 .modal {
   position: fixed;
   margin: auto;
@@ -69,6 +47,9 @@ a {
   bottom: 0;
   z-index: 5;
 }
+
+@import "{}/imports/ui/styling/flexbox-mixins";
+@import "{}/imports/ui/styling/mdc-extra";
 
 @import "{}/imports/ui/layouts/main/style";
 @import "{}/imports/ui/layouts/full-window/style";
