@@ -8,13 +8,10 @@ import IconButton from 'material-ui/IconButton';
 import Drawer from 'material-ui/Drawer';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
-import FlatButton from 'material-ui/FlatButton';
 import ArrowRightIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import MenuIcon from 'material-ui/svg-icons/navigation/menu';
 import HelpIcon from 'material-ui/svg-icons/action/help';
 import AccountIcon from 'material-ui/svg-icons/action/account-circle';
-import NotificationIcon from 'material-ui/svg-icons/social/notifications';
 import NoNotificationIcon from 'material-ui/svg-icons/social/notifications-none';
 import CodeIcon from 'material-ui/svg-icons/action/code';
 
@@ -84,8 +81,14 @@ const Component = ({
                   tooltip="Boring Stuff"
                 ><CodeIcon color="white" /></IconButton>
               }
-              targetOrigin={{horizontal: 'right', vertical: 'top'}}
-              anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+              targetOrigin={{
+                horizontal: 'right',
+                vertical: 'top',
+              }}
+              anchorOrigin={{
+                horizontal: 'right',
+                vertical: 'bottom',
+              }}
             >
               <MenuItem>
                 <a href={demoRepository} target="_blank" rel="noopener noreferrer">{`ver ${version}`}</a>
@@ -98,7 +101,7 @@ const Component = ({
         docked={false}
         width={appSettings.drawerWidth}
         open={drawerIsOpen}
-        onRequestChange={(open) => setDrawerOpenState(open)}
+        onRequestChange={setDrawerOpenState}
       >
         {appSettings.drawerItems.map(({
           title,
@@ -117,12 +120,12 @@ const Component = ({
 
 export default connect(
   // mapStateToProps
-  (state, ownProps) => ({
+  (state) => ({
     currentRouterPath: state.path,
     drawerIsOpen: state.drawer.isOpen,
   }),
   // mapDispatchToProps
-  (dispatch, ownProps) => ({
+  (dispatch) => ({
     onClickHamburgerButton: () => dispatch({
       type: actions.OPEN_DRAWER.type,
     }),

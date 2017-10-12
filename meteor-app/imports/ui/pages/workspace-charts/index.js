@@ -2,7 +2,6 @@
  * The charts page for the workspace page.
  */
 
-import React from 'react';
 import {
   connect,
 } from 'react-redux';
@@ -17,7 +16,7 @@ import './style.css';
 
 export default connect(
   // mapStateToProps
-  (state, ownProps) => {
+  (state) => {
     const {
       charts: {
         inspectPointLoading,
@@ -45,7 +44,7 @@ export default connect(
     };
   },
   // mapDispatchToProps
-  (dispatch, ownProps) => ({
+  (dispatch) => ({
     updateFilter: (value1, value2) => dispatch({
       type: actions.CHARTS_SET_FILTERS.type,
       value1,

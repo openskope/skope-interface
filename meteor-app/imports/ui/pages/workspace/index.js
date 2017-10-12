@@ -47,7 +47,7 @@ const buildLayerElement = (layer, layerIndex, temporalIndex) => (
 
 export default connect(
   // mapStateToProps
-  (state, ownProps) => {
+  (state) => {
     const {
       workspace: {
         layers,
@@ -77,7 +77,7 @@ export default connect(
     };
   },
   // mapDispatchToProps
-  (dispatch, ownProps) => ({
+  (dispatch) => ({
     toggleLayer: (layerIndex, visible) => dispatch({
       type: actions.WORKSPACE_TOGGLE_LAYER_VISIBILITY.type,
       index: layerIndex,

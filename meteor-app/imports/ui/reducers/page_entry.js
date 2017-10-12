@@ -6,13 +6,13 @@ import { Meteor } from 'meteor/meteor';
 
 const getNavInfo = (navInfo, { path }) => {
   let newNavInfo = [];
-  let pathLevels = path.split('/').map(v => v.trim());
+  let pathLevels = path.split('/').map((v) => v.trim());
 
   // Pop off the top level (which is always "").
   pathLevels.shift();
 
   // Get rid of empty ones.
-  pathLevels = pathLevels.filter(v => v.length > 0);
+  pathLevels = pathLevels.filter((v) => v.length > 0);
 
   if (pathLevels.length > 0) {
     const currPathLevels = [''];

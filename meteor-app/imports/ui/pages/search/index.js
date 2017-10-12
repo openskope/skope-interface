@@ -2,7 +2,6 @@
  * Search page.
  */
 
-import React from 'react';
 import {
   connect,
 } from 'react-redux';
@@ -23,7 +22,7 @@ const searchkit = new SearchkitManager(elasticEndpoint);
 
 export default connect(
   // mapStateToProps
-  (state, ownProps) => ({
+  () => ({
     searchkit,
   }),
   // mapDispatchToProps

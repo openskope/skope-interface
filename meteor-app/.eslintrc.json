@@ -10,6 +10,10 @@
     "react/no-array-index-key": "warn",
     "react/prop-types": "warn",
     "arrow-body-style": "off",
+    "arrow-parens": [
+      "error",
+      "always"
+    ],
     "max-len": "warn",
     "no-nested-ternary": "warn",
     "no-param-reassign": [

@@ -2,7 +2,6 @@
  * Not-found page.
  */
 
-import React from 'react';
 import {
   connect,
 } from 'react-redux';
@@ -12,7 +11,7 @@ import Component from './component';
 
 export default connect(
   // mapStateToProps
-  (state, ownProps) => {
+  (state) => {
     const {
       model: {
         inspectPointSelected,
@@ -35,7 +34,7 @@ export default connect(
     };
   },
   // mapDispatchToProps
-  (dispatch, ownProps) => ({
+  (dispatch) => ({
     selectInspectPoint: (coordinate) => {
       dispatch({
         type: actions.MODEL_INSPECT_POINT.type,

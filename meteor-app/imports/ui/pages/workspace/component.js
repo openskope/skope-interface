@@ -6,8 +6,7 @@ import Charts from '/imports/ui/components/charts';
 import {
   clampFilterValue,
 } from '/imports/ui/helpers';
-import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
-import { menu } from 'meteor/zodiase:mdc-styleless';
+import { menu } from 'meteor/zodiase:mdc';
 
 export default class WorkspacePage extends React.Component {
 
@@ -37,8 +36,6 @@ export default class WorkspacePage extends React.Component {
     updateFilterValue: PropTypes.func.isRequired,
     putFilterValueInUrl: PropTypes.func.isRequired,
 
-    // The state of the welcome window.
-    welcomeWindowClosed: PropTypes.bool.isRequired,
     // Callback functions for toggling the welcome window.
     toggleWelcomeWindow: PropTypes.func.isRequired,
 
@@ -194,7 +191,6 @@ export default class WorkspacePage extends React.Component {
       filterValue,
       rangeMin,
       rangeMax,
-      welcomeWindowClosed,
 
       titleName,
 
@@ -356,10 +352,10 @@ export default class WorkspacePage extends React.Component {
             basemap="osm"
             center="-12107625, 4495720"
             zoom="5"
-            ref={ref => this._mapview = ref}
+            ref={(ref) => this._mapview = ref}
           >
 
-            {layers.map(o => o.element)}
+            {layers.map((o) => o.element)}
 
             <map-layer-singlepoint
               invisible={!inspectPointSelected ? 'invisible' : null}
