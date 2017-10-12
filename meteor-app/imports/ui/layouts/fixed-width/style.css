@@ -1,4 +1,5 @@
-.layout-fixedWidth > .layout__body {
+.layout-fixedWidth > .layout__body,
+.layout-fixedWidth > .layout__footer {
   width: 800px;
   margin-left: auto;
   margin-right: auto;

@@ -4,15 +4,26 @@ import {
 } from 'react-redux';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
+import IconButton from 'material-ui/IconButton';
 import Drawer from 'material-ui/Drawer';
+import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import FlatButton from 'material-ui/FlatButton';
 import ArrowRightIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import MenuIcon from 'material-ui/svg-icons/navigation/menu';
+import HelpIcon from 'material-ui/svg-icons/action/help';
+import AccountIcon from 'material-ui/svg-icons/action/account-circle';
+import NotificationIcon from 'material-ui/svg-icons/social/notifications';
+import NoNotificationIcon from 'material-ui/svg-icons/social/notifications-none';
+import CodeIcon from 'material-ui/svg-icons/action/code';
 
 // Import actions for the redux store.
 import * as actions from '/imports/ui/actions';
 
 import {
+  demoRepository,
+  version,
   appSettings,
 } from '/package.json';
 
@@ -37,14 +48,50 @@ const Component = ({
    * @type {Function}
    */
   navigateTo,
+  /**
+   * Do whatever you want when the help button is clicked.
+   * @type {Function}
+   */
+  onClickHelpButton,
 }) => (
   <MuiThemeProvider>
     <div className="appbar">
       <AppBar
         title="SKOPE"
-        onLeftIconButtonTouchTap={onClickHamburgerButton}
+        iconElementLeft={
+          <IconButton
+            tooltip="Menu"
+            onClick={onClickHamburgerButton}
+          ><MenuIcon /></IconButton>
+        }
         iconElementRight={
-          <FlatButton label="Stuff on the right side" onClick={() => alert('Clicked!')} />
+          <span>
+            <IconButton
+              tooltip="Notifications"
+            ><NoNotificationIcon color="white" /></IconButton>
+
+            <IconButton
+              tooltip="Account"
+            ><AccountIcon color="white" /></IconButton>
+            <IconButton
+              tooltip="Help"
+              onClick={onClickHelpButton}
+            ><HelpIcon color="white" /></IconButton>
+
+            <IconMenu
+              iconButtonElement={
+                <IconButton
+                  tooltip="Boring Stuff"
+                ><CodeIcon color="white" /></IconButton>
+              }
+              targetOrigin={{horizontal: 'right', vertical: 'top'}}
+              anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+            >
+              <MenuItem>
+                <a href={demoRepository} target="_blank" rel="noopener noreferrer">{`ver ${version}`}</a>
+              </MenuItem>
+            </IconMenu>
+          </span>
         }
       />
       <Drawer

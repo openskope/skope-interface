@@ -1,7 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import React from 'react';
-import { mount } from 'react-mounter';
 
 import { createStore } from 'meteor/zodiase:reactive-redux-store';
 
@@ -57,7 +56,11 @@ FlowRouter.route('/', {
     });
 
     mountWithStore(store, FixedWidthLayout, {
-      header: <AppbarHeader />,
+      header: (
+        <AppbarHeader
+          onClickHelpButton={() => alert('Show help for home page.')}
+        />
+      ),
       body: <HomePage />,
       footer: null,
     });
@@ -73,7 +76,11 @@ FlowRouter.route('/search', {
     });
 
     mountWithStore(store, FixedWidthLayout, {
-      header: <AppbarHeader />,
+      header: (
+        <AppbarHeader
+          onClickHelpButton={() => alert('Show help for search page.')}
+        />
+      ),
       body: <SearchPage />,
       footer: null,
     });
@@ -94,7 +101,11 @@ FlowRouter.route('/workspace', {
     });
 
     mountWithStore(store, FullWindowLayout, {
-      header: <AppbarHeader />,
+      header: (
+        <AppbarHeader
+          onClickHelpButton={() => alert('Show help for workspace page.')}
+        />
+      ),
       body: (
         <WorkspacePage
           putFilterValueInUrl={(newValue) => {
@@ -144,7 +155,11 @@ FlowRouter.route('/model/paleocar', {
     });
 
     mountWithStore(store, FullWindowLayout, {
-      header: <AppbarHeader />,
+      header: (
+        <AppbarHeader
+          onClickHelpButton={() => alert('Show help for PaleoCAR model page.')}
+        />
+      ),
       body: <PaleoCarModelPage />,
       footer: null,
     });
@@ -160,7 +175,11 @@ FlowRouter.route('*', {
     });
 
     mountWithStore(store, FixedWidthLayout, {
-      header: <AppbarHeader />,
+      header: (
+        <AppbarHeader
+          onClickHelpButton={() => alert('Show help for 404 page.')}
+        />
+      ),
       body: <NotFoundPage />,
       footer: null,
     });
