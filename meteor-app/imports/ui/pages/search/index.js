@@ -1,8 +1,15 @@
-import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
+/**
+ * Search page.
+ */
+
+import React from 'react';
+import {
+  connect,
+} from 'react-redux';
 import {
   SearchkitManager,
 } from 'searchkit';
+import { Meteor } from 'meteor/meteor';
 
 import Component from './component';
 
@@ -14,6 +21,11 @@ const searchkit = new SearchkitManager(elasticEndpoint);
 //   basicAuth: "elastic:changeme",
 // });
 
-export default createContainer(() => ({
-  searchkit,
-}), Component);
+export default connect(
+  // mapStateToProps
+  (state, ownProps) => ({
+    searchkit,
+  }),
+  // mapDispatchToProps
+  null,
+)(Component);

@@ -42,5 +42,27 @@
     "plugins": [
       "transform-class-properties"
     ]
+  },
+  "appSettings": {
+    "exposeStoreToGlobal": true,
+    "drawerWidth": 250,
+    "drawerItems": [
+      {
+        "title": "Home",
+        "url": "/"
+      },
+      {
+        "title": "Search",
+        "url": "/search"
+      },
+      {
+        "title": "Workspace",
+        "url": "/workspace"
+      },
+      {
+        "title": "Model - PaleoCAR",
+        "url": "/model/paleocar"
+      }
+    ]
   }
 }

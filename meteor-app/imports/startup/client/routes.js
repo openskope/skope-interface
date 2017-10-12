@@ -11,45 +11,55 @@ import * as actions from '/imports/ui/actions';
 import reducers from '/imports/ui/reducers';
 
 // Import needed templates
-import MainLayout from '/imports/ui/layouts/main/container';
-import FullWindowLayout from '/imports/ui/layouts/full-window/container';
-import HomePage from '/imports/ui/pages/home/container';
-import SearchPage from '/imports/ui/pages/search/container';
-import WorkspacePage from '/imports/ui/pages/workspace/container';
-import ChartsPage from '/imports/ui/pages/workspace-charts/container';
-import ModelPage from '/imports/ui/pages/model/container';
-import NotFoundPage from '/imports/ui/pages/not-found/container';
+import FixedWidthLayout from '/imports/ui/layouts/fixed-width';
+import FullWindowLayout from '/imports/ui/layouts/full-window';
+import HomePage from '/imports/ui/pages/home';
+import SearchPage from '/imports/ui/pages/search';
+import WorkspacePage from '/imports/ui/pages/workspace';
+import ChartsPage from '/imports/ui/pages/workspace-charts';
+import PaleoCarModelPage from '/imports/ui/pages/model-paleocar';
+import NotFoundPage from '/imports/ui/pages/not-found';
+import AppbarHeader from '/imports/ui/components/appbar';
 
-import { clampFilterValue } from '/imports/ui/helper';
+import {
+  clampFilterValue,
+  mountWithStore,
+} from '/imports/ui/helpers';
 
 import {
   rangeMin,
   rangeMax,
 } from '/imports/ui/consts';
 
+import {
+  appSettings,
+} from '/package.json';
+
 const store = createStore(reducers);
-//! Attach to window for debugging.
-window.store = store;
+
+if (appSettings.exposeStoreToGlobal) {
+  window.store = store;
+}
 
 // Set up all routes in the app
 FlowRouter.route('/', {
   name: 'App.home',
   action() {
-    const {
-      // group,
-      // name,
-      path,
-      // pathDef,
-    } = this;
+    // These are available properties on the context.
+    // - this.group
+    // - this.name
+    // - this.path
+    // - this.pathDef
 
     store.dispatch({
       type: actions.PAGE_ENTRY.type,
-      path,
+      path: this.pathDef,
     });
 
-    mount(MainLayout, {
-      store,
+    mountWithStore(store, FixedWidthLayout, {
+      header: <AppbarHeader />,
       body: <HomePage />,
+      footer: null,
     });
   },
 });
@@ -57,24 +67,15 @@ FlowRouter.route('/', {
 FlowRouter.route('/search', {
   name: 'App.search',
   action() {
-    const {
-      path,
-    } = this;
-
     store.dispatch({
       type: actions.PAGE_ENTRY.type,
-      path,
+      path: this.pathDef,
     });
 
-    mount(MainLayout, {
-      store,
-      body: (
-        <SearchPage
-          {...{
-            store,
-          }}
-        />
-      ),
+    mountWithStore(store, FixedWidthLayout, {
+      header: <AppbarHeader />,
+      body: <SearchPage />,
+      footer: null,
     });
   },
 });
@@ -82,13 +83,9 @@ FlowRouter.route('/search', {
 FlowRouter.route('/workspace', {
   name: 'App.workspace',
   action(params, queryParams) {
-    const {
-      path,
-    } = this;
-
     store.dispatch({
       type: actions.PAGE_ENTRY.type,
-      path,
+      path: this.pathDef,
     });
 
     store.dispatch({
@@ -96,20 +93,18 @@ FlowRouter.route('/workspace', {
       value: clampFilterValue(queryParams.filterValue === undefined ? rangeMax : queryParams.filterValue, rangeMin, rangeMax),
     });
 
-    mount(FullWindowLayout, {
-      store,
+    mountWithStore(store, FullWindowLayout, {
+      header: <AppbarHeader />,
       body: (
         <WorkspacePage
-          {...{
-            store,
-            putFilterValueInUrl: (newValue) => {
-              FlowRouter.setQueryParams({
-                filterValue: newValue,
-              });
-            },
+          putFilterValueInUrl={(newValue) => {
+            FlowRouter.setQueryParams({
+              filterValue: newValue,
+            });
           }}
         />
       ),
+      footer: null,
     });
   },
 });
@@ -117,16 +112,16 @@ FlowRouter.route('/workspace', {
 FlowRouter.route('/workspace/charts', {
   name: 'App.workspace.charts',
   action(params, queryParams) {
-    const {
-      path,
-    } = this;
-
     store.dispatch({
       type: actions.PAGE_ENTRY.type,
-      path,
+      path: this.pathDef,
     });
 
-    const coord = [parseFloat(queryParams.longitude), parseFloat(queryParams.latitude)];
+    const coord = [
+      parseFloat(queryParams.longitude),
+      parseFloat(queryParams.latitude),
+    ];
+
     Meteor.call('timeseries.get', { lon: coord[0], lat: coord[1] }, (error, result) => {
       store.dispatch({
         type: actions.CHARTS_INSPECT_POINT_RESOLVE_DATA.type,
@@ -136,33 +131,22 @@ FlowRouter.route('/workspace/charts', {
       });
     });
 
-    mount(ChartsPage, {
-      store,
-    });
+    mountWithStore(store, ChartsPage);
   },
 });
 
-FlowRouter.route('/model', {
-  name: 'App.model',
+FlowRouter.route('/model/paleocar', {
+  name: 'App.model.paleocar',
   action() {
-    const {
-      path,
-    } = this;
-
     store.dispatch({
       type: actions.PAGE_ENTRY.type,
-      path,
+      path: this.pathDef,
     });
 
-    mount(FullWindowLayout, {
-      store,
-      body: (
-        <ModelPage
-          {...{
-            store,
-          }}
-        />
-      ),
+    mountWithStore(store, FullWindowLayout, {
+      header: <AppbarHeader />,
+      body: <PaleoCarModelPage />,
+      footer: null,
     });
   },
 });
@@ -170,18 +154,15 @@ FlowRouter.route('/model', {
 FlowRouter.route('*', {
   name: 'App.notFound',
   action() {
-    const {
-      path,
-    } = this;
-
     store.dispatch({
       type: actions.PAGE_ENTRY.type,
-      path,
+      path: this.pathDef,
     });
 
-    mount(MainLayout, {
-      store,
+    mountWithStore(store, FixedWidthLayout, {
+      header: <AppbarHeader />,
       body: <NotFoundPage />,
+      footer: null,
     });
   },
 });

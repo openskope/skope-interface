@@ -41,6 +41,16 @@ const getHelpUrlForPage = (helpUrl, { path }) => {
 
 export const PAGE_ENTRY = (state, action) => ({
   ...state,
+
+  path: action.path,
+
+  // Close drawer.
+  drawer: {
+    ...state.drawer,
+
+    isOpen: false,
+  },
+
   navInfo: getNavInfo(state.navInfo, action),
   helpUrl: getHelpUrlForPage(state.helpUrl, action),
 });

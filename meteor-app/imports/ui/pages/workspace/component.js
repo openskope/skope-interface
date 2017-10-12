@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import Slider from 'rc-slider/lib/Slider';
 import _ from 'lodash';
 import Charts from '/imports/ui/components/charts/container';
-import { clampFilterValue } from '/imports/ui/helper';
+import {
+  clampFilterValue,
+} from '/imports/ui/helpers';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import { menu } from 'meteor/zodiase:mdc-styleless';
 
@@ -153,12 +155,8 @@ export default class WorkspacePage extends React.Component {
     selectInspectPoint(event.latLongCoordinate);
   }
 
-  _toggleWelcomeWindow(/* event */) {
-    const {
-      toggleWelcomeWindow,
-    } = this.props;
-
-    toggleWelcomeWindow();
+  _toggleWelcomeWindow() {
+    this.props.toggleWelcomeWindow();
   }
 
   _relayContext = (func) => {
@@ -224,7 +222,7 @@ export default class WorkspacePage extends React.Component {
                     <div
                       className="mdc-simple-menu mdc-extra__simple-menu--open-from-top-right"
                       tabIndex="-1"
-                      ref={(ref) => this._sidePanelMoreMenu = new menu.MDCSimpleMenu(ref)}
+                      ref={(ref) => this._sidePanelMoreMenu = ref ? new menu.MDCSimpleMenu(ref) : null}
                     >
                       <ul className="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
                         <li
@@ -234,11 +232,9 @@ export default class WorkspacePage extends React.Component {
                           onClick={this._bound_toggleWelcomeWindow}
                         >Show Metadata</li>
 
-                        <a href={FlowRouter.url('/workspace/help')}>
-                          <li className="mdc-list-item" role="menuitem" tabIndex="0">
-                            Help<span className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</span>
-                          </li>
-                        </a>
+                        <li className="mdc-list-item" role="menuitem" tabIndex="0">
+                          Help<span className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</span>
+                        </li>
                       </ul>
                     </div>
                   </span>
