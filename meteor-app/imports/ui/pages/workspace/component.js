@@ -2,9 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Slider from 'rc-slider/lib/Slider';
 import _ from 'lodash';
-import Charts from '/imports/ui/components/charts/container';
-import { clampFilterValue } from '/imports/ui/helper';
-import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
+import Charts from '/imports/ui/components/charts';
+import {
+  clampFilterValue,
+} from '/imports/ui/helpers';
+import { menu } from 'meteor/zodiase:mdc';
 
 export default class WorkspacePage extends React.Component {
 
@@ -34,8 +36,6 @@ export default class WorkspacePage extends React.Component {
     updateFilterValue: PropTypes.func.isRequired,
     putFilterValueInUrl: PropTypes.func.isRequired,
 
-    // The state of the welcome window.
-    welcomeWindowClosed: PropTypes.bool.isRequired,
     // Callback functions for toggling the welcome window.
     toggleWelcomeWindow: PropTypes.func.isRequired,
 
@@ -152,12 +152,8 @@ export default class WorkspacePage extends React.Component {
     selectInspectPoint(event.latLongCoordinate);
   }
 
-  _toggleWelcomeWindow(/* event */) {
-    const {
-      toggleWelcomeWindow,
-    } = this.props;
-
-    toggleWelcomeWindow();
+  _toggleWelcomeWindow() {
+    this.props.toggleWelcomeWindow();
   }
 
   _relayContext = (func) => {
@@ -195,7 +191,6 @@ export default class WorkspacePage extends React.Component {
       filterValue,
       rangeMin,
       rangeMax,
-      welcomeWindowClosed,
 
       titleName,
 
@@ -213,64 +208,37 @@ export default class WorkspacePage extends React.Component {
                 <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
                   <span className="mdc-toolbar__title">{titleName}</span>
                 </section>
-                <section className="mdc-toolbar__section mdc-toolbar__section--align-end">
-                  <div className="mdc-menu-anchor">
-                    <a className="material-icons mdc-toolbar__icon--menu">more_vert</a>
 
-                    <div className="mdc-simple-menu" tabIndex="-1">
+                <section className="mdc-toolbar__section mdc-toolbar__section--align-end">
+                  <span className="mdc-menu-anchor">
+                    <a
+                      className="material-icons mdc-toolbar__icon"
+                      onClick={() => this._sidePanelMoreMenu.show()}
+                    >more_vert</a>
+                    <div
+                      className="mdc-simple-menu mdc-extra__simple-menu--open-from-top-right"
+                      tabIndex="-1"
+                      ref={(ref) => this._sidePanelMoreMenu = ref ? new menu.MDCSimpleMenu(ref) : null}
+                    >
                       <ul className="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
                         <li
                           className="mdc-list-item list-metadata"
                           role="menuitem"
                           tabIndex="0"
-                        >
-                          Metadata
-                          <a className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</a>
-                        </li>
+                          onClick={this._bound_toggleWelcomeWindow}
+                        >Show Metadata</li>
 
-                        <a href={FlowRouter.url('/workspace/help')}>
-                          <li className="mdc-list-item" role="menuitem" tabIndex="0">
-                            Help<span className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</span>
-                          </li>
-                        </a>
+                        <li className="mdc-list-item" role="menuitem" tabIndex="0">
+                          Help<span className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</span>
+                        </li>
                       </ul>
                     </div>
-                  </div>
+                  </span>
 
                   <div className="menu-info-content">
                     <h3>Metadata</h3>
                   </div>
 
-                  <div className="media-large-size">
-                    <div className="toolbar--dropdown">
-                      <div
-                        className="dropdown-1"
-                        onClick={this._bound_toggleWelcomeWindow}
-                      >
-                        <a
-                          className="material-icons mdc-toolbar__icon--menu"
-                        >info<span className="tooltip-text">INFO</span></a>
-                      </div>
-
-                      {
-                        welcomeWindowClosed
-                        ? null
-                        : (
-                          <div className="info-content">
-                            <h3>Metadata</h3>
-                            <div className="mdc-list-divider" />
-                          </div>
-                        )
-                      }
-
-                      <div className="dropdown-2">
-                        <a
-                          className="material-icons mdc-toolbar__icon--menu"
-                          href={FlowRouter.url('/workspace/help')}
-                        >help<span className="tooltip-text">HELP</span></a>
-                      </div>
-                    </div>
-                  </div>
                 </section>
               </div>
             </div>
@@ -384,10 +352,10 @@ export default class WorkspacePage extends React.Component {
             basemap="osm"
             center="-12107625, 4495720"
             zoom="5"
-            ref={ref => this._mapview = ref}
+            ref={(ref) => this._mapview = ref}
           >
 
-            {layers.map(o => o.element)}
+            {layers.map((o) => o.element)}
 
             <map-layer-singlepoint
               invisible={!inspectPointSelected ? 'invisible' : null}

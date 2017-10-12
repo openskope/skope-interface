@@ -14,3 +14,5 @@ export * from './model_toggle_map';
 export * from './model_update_form';
 export * from './workspace_toggle_sidepanel_menu';
 export * from './workspace_toggle_toolbar_menu';
+export * from './open_drawer';
+export * from './change_route';

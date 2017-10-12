@@ -8,7 +8,6 @@ import {
   Pagination,
   SearchBox,
   RefinementListFilter,
-  RangeFilter,
   LayoutResults,
   ActionBar,
   ActionBarRow,

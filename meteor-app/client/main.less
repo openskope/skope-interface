@@ -15,54 +15,6 @@ a {
   color:black
 }
 
-.mdc-toolbar__section {
-  span {
-    color: black;
-    padding: 15px 20px;
-    font-size: 15px;
-  }
-  .mdc-toolbar__title {
-    margin-left: 0px;
-  }
-  .mdc-simple-menu {
-    min-width: 200px;
-    border-radius: 0px;
-    background-color: black;
-    left: 0px;
-    top: 30px;
-
-    .mdc-list {
-      padding: 0px;
-    }
-    .mdc-list-item {
-      font-size: 15px;
-      color: white;
-      background-color: black;
-    }
-  }
-  .mdc-menu-anchor:hover {
-    span {
-      background-color: black;
-      color: white
-    }
-
-    a {
-      text-decoration: none;
-      color:white;
-    }
-
-    .mdc-simple-menu {
-      display: inline-block;
-      transform: scale(1);
-      opacity: 1;
-      background-color: black;
-    }
-  }
-  .mdc-list-item:hover {
-    background-color: #DB572F;
-  }
-}
-
 .clearfix {
   &:after {
     visibility: hidden;
@@ -71,28 +23,6 @@ a {
     clear: both;
     height: 0;
   }
-}
-
-.flex-row {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  align-content: stretch;
-  align-items: stretch;
-
-  & > * {
-    flex: 0 0 auto;
-  }
-
-  & > .layout-fill {
-    flex: 1 1 0;
-  }
-}
-
-.flex-col {
-  .flex-row;
-  flex-direction: column;
 }
 
 .modal {
@@ -118,12 +48,13 @@ a {
   z-index: 5;
 }
 
-@import "{}/imports/ui/layouts/main/style";
-@import "{}/imports/ui/layouts/full-window/style";
-@import "{}/imports/ui/pages/not-found/style";
-@import "{}/imports/ui/pages/home/style";
-@import "{}/imports/ui/pages/search/style";
-@import "{}/imports/ui/pages/workspace/style";
-@import "{}/imports/ui/pages/workspace-charts/style";
-@import "{}/imports/ui/pages/model/style";
-@import 'rc-slider/assets/index.css';
+@import "{}/imports/ui/styling/flexbox-mixins";
+@import "{}/imports/ui/styling/mdc-extra";
+
+@import "{}/imports/ui/styling/pages/not-found";
+@import "{}/imports/ui/styling/pages/home";
+@import "{}/imports/ui/styling/pages/search";
+@import "{}/imports/ui/styling/pages/workspace";
+@import "{}/imports/ui/styling/pages/model-paleocar";
+
+@import "rc-slider/assets/index.css";

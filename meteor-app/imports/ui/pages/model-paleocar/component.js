@@ -248,7 +248,7 @@ export default class ModelPage extends React.Component {
             basemap="osm"
             center="-12107625, 4495720"
             zoom="5"
-            ref={ref => this._mapview = ref}
+            ref={(ref) => this._mapview = ref}
           >
 
             <map-layer-singlepoint

@@ -4,6 +4,19 @@ import {
 } from '/imports/ui/consts';
 
 export default {
+
+  // The current path from the router.
+  path: '',
+
+  // Stuff related to the (global) drawer.
+  drawer: {
+    /**
+     * Determines if the drawer is open.
+     * @type {Boolean}
+     */
+    isOpen: false,
+  },
+
   navInfo: [],
 
   // Url for the global help button.
