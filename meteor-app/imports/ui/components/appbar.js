@@ -3,6 +3,7 @@ import {
   connect,
 } from 'react-redux';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import customTheme from '/imports/ui/styling/muiTheme';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import Drawer from 'material-ui/Drawer';
@@ -51,7 +52,7 @@ const Component = ({
    */
   onClickHelpButton,
 }) => (
-  <MuiThemeProvider>
+  <MuiThemeProvider muiTheme={customTheme}>
     <div className="appbar">
       <AppBar
         title="SKOPE"
@@ -65,21 +66,21 @@ const Component = ({
           <span>
             <IconButton
               tooltip="Notifications"
-            ><NoNotificationIcon color="white" /></IconButton>
+            ><NoNotificationIcon color={customTheme.palette.alternateTextColor} /></IconButton>
 
             <IconButton
               tooltip="Account"
-            ><AccountIcon color="white" /></IconButton>
+            ><AccountIcon color={customTheme.palette.alternateTextColor} /></IconButton>
             <IconButton
               tooltip="Help"
               onClick={onClickHelpButton}
-            ><HelpIcon color="white" /></IconButton>
+            ><HelpIcon color={customTheme.palette.alternateTextColor} /></IconButton>
 
             <IconMenu
               iconButtonElement={
                 <IconButton
                   tooltip="Boring Stuff"
-                ><CodeIcon color="white" /></IconButton>
+                ><CodeIcon color={customTheme.palette.alternateTextColor} /></IconButton>
               }
               targetOrigin={{
                 horizontal: 'right',
