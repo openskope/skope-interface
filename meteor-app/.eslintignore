@@ -1,1 +1,11 @@
-public
+# The Meteor folder should not contain any code.
+/.meteor/
+
+# Do not lint third party code.
+/node_modules/
+
+# The private folder should not contain any code.
+/private/
+
+# The public folder should not contain any code.
+/public/
