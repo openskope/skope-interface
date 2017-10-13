@@ -30,6 +30,27 @@
     .side-panel {
       width: 400px;
       box-sizing: content-box;
+
+      &__content {
+        padding: @global-layout-padding;
+      }
+
+      .layer-list__item {
+        margin-bottom: 10px;
+
+        .layer-opacity-row {
+          .flex-row;
+
+          align-items: center;
+
+          .input-slider--layer-opacity {
+            .layout-fill;
+
+            margin-left: 10px;
+            margin-right: 10px;
+          }
+        }
+      }
     }
 
     .the-map {

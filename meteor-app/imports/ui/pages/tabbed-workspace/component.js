@@ -7,6 +7,17 @@ import {
   Tabs,
   Tab,
 } from 'material-ui/Tabs';
+import {
+  Card,
+  CardActions,
+  CardHeader,
+  CardMedia,
+  CardTitle,
+  CardText,
+} from 'material-ui/Card';
+import Checkbox from 'material-ui/Checkbox';
+import FlatButton from 'material-ui/FlatButton';
+import Slider from 'material-ui/Slider';
 import Charts from '/imports/ui/components/charts';
 import {
   clampFilterValue,
@@ -122,7 +133,7 @@ export default class WorkspacePage extends React.Component {
     toggleLayer(layerIndex, layerVisible);
   }
 
-  _layerOpacityOnChange (element, value) {
+  _layerOpacityOnChange (element, event, value) {
     const opacity = value / 255;
     const {
       updateLayerOpacity,
@@ -209,20 +220,19 @@ export default class WorkspacePage extends React.Component {
 
             <div className="side-panel">
 
-              <Tabs>
+              <Tabs
+                contentContainerClassName="side-panel__content"
+                //! Make this a controlled tab.
+              >
 
                 <Tab
                   label="Info"
                   data-slug="info"
                 >
-                  <div>
-                    <h2>Info</h2>
-                    <p>
-                      This is the info tab.
-                    </p>
-                    <p>
-                      You can put any sort of HTML or react component in here. It even keeps the component state!
-                    </p>
+                  <div className="side-panel__section">
+                    <p>Status</p>
+                    <p>Description: general description about this dataset. For environmental data this description is provided by domain experts, for model results it is provide by model configuration time.</p>
+                    <p>Download link(s)</p>
                   </div>
                 </Tab>
 
@@ -230,11 +240,49 @@ export default class WorkspacePage extends React.Component {
                   label="Layers"
                   data-slug="layers"
                 >
-                  <div>
-                    <h2>Layers</h2>
-                    <p>
-                      This is the layers tab.
-                    </p>
+                  <div className="side-panel__section layer-list">
+                    {layers.map((layer, layerIndex) => (
+                      <Card
+                        key={layerIndex}
+                        className="layer-list__item"
+                      >
+                        <CardHeader
+                          title={
+                            <Checkbox
+                              label={layer.name}
+                              checked={!layer.invisible}
+                              data-layer-index={layerIndex}
+                              onCheck={this._bound_layerVisibilityOnChange}
+                              style={{
+                                'white-space': 'nowrap',
+                              }}
+                            />
+                          }
+                          showExpandableButton={true}
+                        >
+                        </CardHeader>
+                        <CardText
+                          expandable={true}
+                        >
+                          <div className="layer-opacity-row">
+                            <label>Opacity: </label>
+                            <Slider
+                              className="input-slider--layer-opacity"
+                              min={0}
+                              max={255}
+                              value={layer.opacity * 255}
+                              data-layer-index={layerIndex}
+                              onChange={this._bound_layerOpacityOnChange}
+                              sliderStyle={{
+                                'margin-top': 0,
+                                'margin-bottom': 0,
+                              }}
+                            />
+                            <label>{layer.opacity.toFixed(2)}</label>
+                          </div>
+                        </CardText>
+                      </Card>
+                    ))}
                   </div>
                 </Tab>
 
