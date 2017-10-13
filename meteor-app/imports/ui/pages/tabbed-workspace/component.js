@@ -254,7 +254,7 @@ export default class WorkspacePage extends React.Component {
                               data-layer-index={layerIndex}
                               onCheck={this._bound_layerVisibilityOnChange}
                               style={{
-                                'white-space': 'nowrap',
+                                whiteSpace: 'nowrap',
                               }}
                             />
                           }
@@ -274,8 +274,8 @@ export default class WorkspacePage extends React.Component {
                               data-layer-index={layerIndex}
                               onChange={this._bound_layerOpacityOnChange}
                               sliderStyle={{
-                                'margin-top': 0,
-                                'margin-bottom': 0,
+                                marginTop: 0,
+                                marginBottom: 0,
                               }}
                             />
                             <label>{layer.opacity.toFixed(2)}</label>
