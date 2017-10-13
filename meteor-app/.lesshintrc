@@ -1,0 +1,106 @@
+{
+  "fileExtensions": [
+    ".less",
+    ".css"
+  ],
+
+  "excludedFiles": [
+    ".meteor",
+    "node_modules",
+    "private",
+    "public"
+  ],
+
+  "attributeQuotes": true,
+  "borderZero": {
+    "enabled": true,
+    "style": "zero"
+  },
+  "colorVariables": false,
+  "comment": true,
+  "decimalZero": {
+    "enabled": true,
+    "style": "leading"
+  },
+  "depthLevel": false,
+  "duplicateProperty": true,
+  "emptyRule": true,
+  "finalNewline": true,
+  "hexLength": {
+    "enabled": true,
+    "style": "long"
+  },
+  "hexNotation": {
+    "enabled": true,
+    "style": "uppercase"
+  },
+  "hexValidation": true,
+  "idSelector": {
+    "enabled": true,
+    "exclude": []
+  },
+  "importantRule": true,
+  "importPath": {
+    "enabled": true,
+    "filenameExtension": false,
+    "leadingUnderscore": false,
+    "exclude": []
+  },
+  "maxCharPerLine": 100,
+  "newlineAfterBlock": true,
+  // Properties should be organized by relationship, not name.
+  "propertyOrdering": false,
+  "propertyUnits": false,
+  "qualifyingElement": {
+    "enabled": true,
+    "allowWithAttribute": true,
+    "allowWithClass": false,
+    "allowWithId": false
+  },
+  "selectorNaming": false,
+  "singleLinePerProperty": true,
+  "singleLinePerSelector": true,
+  "spaceAfterPropertyColon": {
+    "enabled": true,
+    "style": "one_space"
+  },
+  "spaceAfterPropertyName": {
+    "enabled": true,
+    "style": "no_space"
+  },
+  "spaceAfterPropertyValue": {
+    "enabled": true,
+    "style": "no_space"
+  },
+  "spaceAroundComma": {
+    "enabled": true,
+    "style": "after",
+    "allowNewline": true
+  },
+  "spaceAroundOperator": {
+    "enabled": true,
+    "style": "both"
+  },
+  "spaceBeforeBrace": {
+    "enabled": true,
+    "style": "one_space"
+  },
+  "spaceBetweenParens": {
+    "enabled": true,
+    "style": "no_space"
+  },
+  "stringQuotes": {
+    "enabled": true,
+    "style": "single"
+  },
+  "trailingSemicolon": true,
+  "trailingWhitespace": true,
+  "urlFormat": {
+    "enabled": true,
+    "style": "relative"
+  },
+  "universalSelector": false,
+  "urlQuotes": true,
+  "variableValue": false,
+  "zeroUnit": false
+}

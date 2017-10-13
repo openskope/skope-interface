@@ -4,7 +4,9 @@
   "private": true,
   "demoRepository": "https://github.com/openskope/skope-interface.git",
   "scripts": {
-    "lint": "eslint .",
+    "lint-js": "eslint .",
+    "lint-less": "lesshint .",
+    "lint": "npm run lint-js && npm run lint-less",
     "pretest": "npm run lint --silent",
     "start": "meteor run"
   },
@@ -36,6 +38,7 @@
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-meteor": "^4.0.1",
     "eslint-plugin-react": "^7.1.0",
+    "lesshint": "^4.1.3",
     "redux-devtools": "^3.4.0"
   },
   "babel": {
