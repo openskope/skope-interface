@@ -1,7 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Slider from 'rc-slider/lib/Slider';
 import _ from 'lodash';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import customTheme from '/imports/ui/styling/muiTheme';
+import {
+  Tabs,
+  Tab,
+} from 'material-ui/Tabs';
 import Charts from '/imports/ui/components/charts';
 import {
   clampFilterValue,
@@ -197,186 +202,101 @@ export default class WorkspacePage extends React.Component {
     } = this.props;
 
     return (
-      <div className="page-workspace">
+      <MuiThemeProvider muiTheme={customTheme}>
+        <div className="page-workspace">
 
-        <div className="section-map">
+          <div className="section-map">
 
-          <div className="side-panel">
+            <div className="side-panel">
 
-            <div className="mdc-toolbar">
-              <div className="mdc-toolbar__row">
-                <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
-                  <span className="mdc-toolbar__title">{titleName}</span>
-                </section>
+              <Tabs>
 
-                <section className="mdc-toolbar__section mdc-toolbar__section--align-end">
-                  <span className="mdc-menu-anchor">
-                    <a
-                      className="material-icons mdc-toolbar__icon"
-                      onClick={() => this._sidePanelMoreMenu.show()}
-                    >more_vert</a>
-                    <div
-                      className="mdc-simple-menu mdc-extra__simple-menu--open-from-top-right"
-                      tabIndex="-1"
-                      ref={(ref) => this._sidePanelMoreMenu = ref ? new menu.MDCSimpleMenu(ref) : null}
-                    >
-                      <ul className="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
-                        <li
-                          className="mdc-list-item list-metadata"
-                          role="menuitem"
-                          tabIndex="0"
-                          onClick={this._bound_toggleWelcomeWindow}
-                        >Show Metadata</li>
-
-                        <li className="mdc-list-item" role="menuitem" tabIndex="0">
-                          Help<span className="material-icons mdc-list-item__end-detail">keyboard_arrow_right</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </span>
-
-                  <div className="menu-info-content">
-                    <h3>Metadata</h3>
+                <Tab
+                  label="Info"
+                  data-slug="info"
+                >
+                  <div>
+                    <h2>Info</h2>
+                    <p>
+                      This is the info tab.
+                    </p>
+                    <p>
+                      You can put any sort of HTML or react component in here. It even keeps the component state!
+                    </p>
                   </div>
+                </Tab>
 
-                </section>
-              </div>
+                <Tab
+                  label="Layers"
+                  data-slug="layers"
+                >
+                  <div>
+                    <h2>Layers</h2>
+                    <p>
+                      This is the layers tab.
+                    </p>
+                  </div>
+                </Tab>
+
+                <Tab
+                  label="Graphs"
+                  data-slug="graphs"
+                >
+                  <div>
+                    <h2>Graphs</h2>
+                    <p>
+                      This is the graphs tab.
+                    </p>
+                  </div>
+                </Tab>
+
+                <Tab
+                  label="Metadata"
+                  data-slug="metadata"
+                >
+                  <div>
+                    <h2>Metadata</h2>
+                    <p>
+                      This is the metadata tab.
+                    </p>
+                  </div>
+                </Tab>
+
+              </Tabs>
+
             </div>
 
-            <div className="side-panel__content">
-              <div className="side-panel__section map-animation-controls">
+            <map-view
+              class="the-map"
+              basemap="osm"
+              center="-12107625, 4495720"
+              zoom="5"
+              ref={(ref) => this._mapview = ref}
+            >
 
-                <legend>TIME</legend>
-                <div className="field--year">
-                  <div className="field--year-row1">
-                    <a
-                      className="material-icons action--prev-year"
-                      onClick={this._bound_yearStepBackButtonOnClick}
-                    >keyboard_arrow_left</a>
-                    <input
-                      className="input--year"
-                      type="text"
-                      value={filterValue}
-                      onChange={this._bound_rangeFilterOnChangeInput}
-                    />
-                    <a
-                      className="material-icons action--next-year"
-                      onClick={this._bound_yearStepForwardButtonOnClick}
-                    >keyboard_arrow_right</a>
-                  </div>
-                  <div className="label-year">Year</div>
-                </div>
-                <div className="field--year-row2">
-                  <Slider
-                    className="input-slider--year"
-                    min={rangeMin}
-                    max={rangeMax}
-                    value={filterValue}
-                    onChange={this._bound_rangeFilterOnChange}
-                  />
-                </div>
-              </div>
+              {layers.map((o) => o.element)}
 
-              <div className="side-panel__section layer-list">
-                <legend>LAYERS</legend>
-                {layers.map((layer, layerIndex) => (
-                  <div
-                    key={layerIndex}
-                    className="layer-list__item layer-list__item--opacity-control-expand"
-                  >
-                    <div className="layer-title-row">
-                      <div className="mdc-checkbox">
-                        <input
-                          className="mdc-checkbox__native-control"
-                          title="Toggle Visibility"
-                          type="checkbox"
-                          checked={!layer.invisible}
-                          data-layer-index={layerIndex}
-                          onChange={this._bound_layerVisibilityOnChange}
-                        />
-                        <div className="mdc-checkbox__background">
-                          <svg
-                            className="mdc-checkbox__checkmark"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              className="mdc-checkbox__checkmark__path"
-                              fill="none"
-                              stroke="white"
-                              d="M1.73,12.91 8.1,19.28 22.79,4.59"
-                            />
-                          </svg>
-                          <div className="mdc-checkbox__mixedmark" />
-                        </div>
-                      </div>
+              <map-layer-singlepoint
+                invisible={!inspectPointSelected ? 'invisible' : null}
+                latitude={inspectPointCoordinate[1]}
+                longitude={inspectPointCoordinate[0]}
+              />
 
-                      <label className="layer-title-label">{layer.name}</label>
+              <map-control-defaults />
+              <map-interaction-defaults />
+              <map-control-simple-layer-list />
 
-                      <a
-                        className="material-icons mdc-list-item__end-detail"
-                        data-layer-index={layerIndex}
-                        onClick={this._bound_toggleSideMenu}
-                      >keyboard_arrow_down</a>
+            </map-view>
 
-                    </div>
-
-                    {
-                      layer.sidePanelMenuClosed
-                      ? null
-                      : (
-                        <div className="layer-opacity-row">
-                          <label>Opacity: </label>
-                          <Slider
-                            className="input-slider--layer-opacity"
-                            min={0}
-                            max={255}
-                            value={layer.opacity * 255}
-                            data-layer-index={layerIndex}
-                            onChange={this._bound_layerOpacityOnChange}
-                          />
-                          <label>{layer.opacity.toFixed(2)}</label>
-                        </div>
-                      )
-                    }
-
-                    <div className="mdc-list-divider" />
-                  </div>
-                ))}
-              </div>
-            </div>
+            <Charts
+              inspectPointSelected={inspectPointSelected}
+              inspectPointCoordinate={inspectPointCoordinate}
+            />
 
           </div>
 
-          <map-view
-            class="the-map"
-            basemap="osm"
-            center="-12107625, 4495720"
-            zoom="5"
-            ref={(ref) => this._mapview = ref}
-          >
-
-            {layers.map((o) => o.element)}
-
-            <map-layer-singlepoint
-              invisible={!inspectPointSelected ? 'invisible' : null}
-              latitude={inspectPointCoordinate[1]}
-              longitude={inspectPointCoordinate[0]}
-            />
-
-            <map-control-defaults />
-            <map-interaction-defaults />
-            <map-control-simple-layer-list />
-
-          </map-view>
-
-          <Charts
-            inspectPointSelected={inspectPointSelected}
-            inspectPointCoordinate={inspectPointCoordinate}
-          />
-
         </div>
-
-      </div>
+      </MuiThemeProvider>
     );
   }
 }

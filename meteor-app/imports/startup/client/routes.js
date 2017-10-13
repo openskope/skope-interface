@@ -14,7 +14,7 @@ import FixedWidthLayout from '/imports/ui/layouts/fixed-width';
 import FullWindowLayout from '/imports/ui/layouts/full-window';
 import HomePage from '/imports/ui/pages/home';
 import SearchPage from '/imports/ui/pages/search';
-import WorkspacePage from '/imports/ui/pages/workspace';
+import WorkspacePage from '/imports/ui/pages/tabbed-workspace';
 import ChartsPage from '/imports/ui/pages/workspace-charts';
 import PaleoCarModelPage from '/imports/ui/pages/model-paleocar';
 import NotFoundPage from '/imports/ui/pages/not-found';
