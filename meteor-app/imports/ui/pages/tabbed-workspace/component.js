@@ -201,7 +201,11 @@ export default class WorkspacePage extends React.Component {
 
             <div className="map-panel">
 
-              <Toolbar>
+              <Toolbar
+                style={{
+                  height: 48,
+                }}
+              >
                 <ToolbarGroup>
                   <ToolbarTitle text="Time" />
 
