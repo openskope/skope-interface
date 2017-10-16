@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import ChartsContent from '/imports/ui/pages/workspace-charts';
+import Charts from '/imports/ui/components/workspace-charts';
 
-export default class Charts extends React.Component {
+export default class ChartsWrapper extends React.Component {
   static propTypes = {
     // Indicate if a point is selected for inspection.
     inspectPointSelected: PropTypes.bool.isRequired,
@@ -61,6 +61,6 @@ export default class Charts extends React.Component {
   }
 
   render () {
-    return <ChartsContent />;
+    return <Charts />;
   }
 }
