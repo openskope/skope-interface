@@ -78,16 +78,6 @@ export default connect(
   },
   // mapDispatchToProps
   (dispatch) => ({
-    toggleLayer: (layerIndex, visible) => dispatch({
-      type: actions.WORKSPACE_TOGGLE_LAYER_VISIBILITY.type,
-      index: layerIndex,
-      visible,
-    }),
-    updateLayerOpacity: (layerIndex, opacity) => dispatch({
-      type: actions.WORKSPACE_CHANGE_LAYER_OPACITY.type,
-      index: layerIndex,
-      opacity,
-    }),
     selectInspectPoint: (coordinate) => dispatch({
       type: actions.WORKSPACE_INSPECT_POINT.type,
       selected: true,

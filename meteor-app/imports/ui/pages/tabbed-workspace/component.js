@@ -7,32 +7,17 @@ import {
   Tabs,
   Tab,
 } from 'material-ui/Tabs';
-import {
-  Card,
-  CardActions,
-  CardHeader,
-  CardMedia,
-  CardTitle,
-  CardText,
-} from 'material-ui/Card';
-import Checkbox from 'material-ui/Checkbox';
-import FlatButton from 'material-ui/FlatButton';
-import Slider from 'material-ui/Slider';
+import LayerList from '/imports/ui/components/layerlist';
 import Charts from '/imports/ui/components/charts';
 import {
   clampFilterValue,
 } from '/imports/ui/helpers';
-import { menu } from 'meteor/zodiase:mdc';
 
 export default class WorkspacePage extends React.Component {
 
   static propTypes = {
     // List of layers to display.
     layers: PropTypes.arrayOf(PropTypes.object).isRequired,
-    // Callback function for toggling the visibility of layers.
-    toggleLayer: PropTypes.func.isRequired,
-    // Callback function for toggling the opacity of layers.
-    updateLayerOpacity: PropTypes.func.isRequired,
 
     // Indicate if a point is selected for inspection.
     inspectPointSelected: PropTypes.bool.isRequired,
@@ -70,8 +55,6 @@ export default class WorkspacePage extends React.Component {
     this._bound_rangeFilterOnChangeInput = this._rangeFilterOnChangeInput.bind(this);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
-    this._bound_layerVisibilityOnChange = this._layerVisibilityOnChange.bind(this);
-    this._bound_layerOpacityOnChange = this._relayContext(this._layerOpacityOnChange.bind(this));
     this._bound_mapOnClick = this._mapOnClick.bind(this);
     this._bound_toggleWelcomeWindow = this._toggleWelcomeWindow.bind(this);
     this._bound_toggleSideMenu = this._toggleSideMenu.bind(this);
@@ -120,26 +103,6 @@ export default class WorkspacePage extends React.Component {
 
   _rangeFilterOnChangeInput (event) {
     this._rangeFilterOnChange(event.target.value);
-  }
-
-  _layerVisibilityOnChange (event) {
-    const target = event.currentTarget;
-    const layerIndex = parseInt(target.getAttribute('data-layer-index'), 10);
-    const layerVisible = target.checked;
-    const {
-      toggleLayer,
-    } = this.props;
-
-    toggleLayer(layerIndex, layerVisible);
-  }
-
-  _layerOpacityOnChange (element, event, value) {
-    const opacity = value / 255;
-    const {
-      updateLayerOpacity,
-    } = this.props;
-
-    updateLayerOpacity(element['data-layer-index'], opacity);
   }
 
   _yearStepBackButtonOnClick (/* event */) {
@@ -240,50 +203,10 @@ export default class WorkspacePage extends React.Component {
                   label="Layers"
                   data-slug="layers"
                 >
-                  <div className="side-panel__section layer-list">
-                    {layers.map((layer, layerIndex) => (
-                      <Card
-                        key={layerIndex}
-                        className="layer-list__item"
-                      >
-                        <CardHeader
-                          title={
-                            <Checkbox
-                              label={layer.name}
-                              checked={!layer.invisible}
-                              data-layer-index={layerIndex}
-                              onCheck={this._bound_layerVisibilityOnChange}
-                              style={{
-                                whiteSpace: 'nowrap',
-                              }}
-                            />
-                          }
-                          showExpandableButton={true}
-                        >
-                        </CardHeader>
-                        <CardText
-                          expandable={true}
-                        >
-                          <div className="layer-opacity-row">
-                            <label>Opacity: </label>
-                            <Slider
-                              className="input-slider--layer-opacity"
-                              min={0}
-                              max={255}
-                              value={layer.opacity * 255}
-                              data-layer-index={layerIndex}
-                              onChange={this._bound_layerOpacityOnChange}
-                              sliderStyle={{
-                                marginTop: 0,
-                                marginBottom: 0,
-                              }}
-                            />
-                            <label>{layer.opacity.toFixed(2)}</label>
-                          </div>
-                        </CardText>
-                      </Card>
-                    ))}
-                  </div>
+                  <LayerList
+                    className="side-panel__section"
+                    layers={layers}
+                  />
                 </Tab>
 
                 <Tab
