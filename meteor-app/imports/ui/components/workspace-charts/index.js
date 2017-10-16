@@ -27,8 +27,9 @@ export default connect(
     } = state;
 
     return {
-      inspectPointLoading: inspectPointDataRequest !== null,
-      inspectPointData: Object.keys(inspectPointData ? inspectPointData.data : {}).map((sourceName) => ({
+      dataIsLoading: inspectPointDataRequest !== null,
+      hasLoadedData: inspectPointData !== null,
+      sources: Object.keys(inspectPointData ? inspectPointData.data : {}).map((sourceName) => ({
         label: sourceName,
         data: inspectPointData.data[sourceName]
               .filter((value, valueIndex) => (valueIndex >= filterMin && valueIndex <= filterMax))

@@ -1,5 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import customTheme from '/imports/ui/styling/muiTheme';
+import CircularProgress from 'material-ui/CircularProgress';
+import RefreshIndicator from 'material-ui/RefreshIndicator';
 import { Line } from 'react-chartjs-2';
 import Range from 'rc-slider/lib/Range';
 import {
@@ -10,9 +14,11 @@ export default class ChartsPage extends React.Component {
 
   static propTypes = {
     // Indicate if the data is being loaded for the point.
-    inspectPointLoading: PropTypes.bool.isRequired,
+    dataIsLoading: PropTypes.bool.isRequired,
+    // Indicate if any data is loaded.
+    hasLoadedData: PropTypes.bool.isRequired,
     // The loaded data for the point.
-    inspectPointData: PropTypes.arrayOf(PropTypes.object),
+    sources: PropTypes.arrayOf(PropTypes.object),
 
     // The current value of the range filters
     filterMin: PropTypes.number.isRequired,
@@ -106,8 +112,9 @@ export default class ChartsPage extends React.Component {
 
   render () {
     const {
-      inspectPointLoading,
-      inspectPointData,
+      dataIsLoading,
+      hasLoadedData,
+      sources,
 
       filterMin,
       filterMax,
@@ -116,91 +123,93 @@ export default class ChartsPage extends React.Component {
     } = this.props;
 
     return (
-      <div className="page--charts">
-        {
-          inspectPointLoading
-          ? (
-            <div className="loading">
-              <span>Loading...</span>
-            </div>
-            )
-          : (
-            <div className="section_charts">
+      <MuiThemeProvider muiTheme={customTheme}>
+        <div className="workspace-charts">
+          {
+            dataIsLoading
+            ? <CircularProgress color="blue" />
+            : (
+              !hasLoadedData
+              ? null
+              : (
+                <div className="section_charts">
 
-              <div className="section_range">
-                <button onClick={this._bound_yearMinStepBackButtonOnClick}>&lt;</button>
-                <input className="text-field" type="text" value={filterMin} onChange={this._bound_rangeFilterMinOnChange} />
-                <button onClick={this._bound_yearMinStepForwardButtonOnClick}>&gt;</button>
-                <Range
-                  className="filter"
-                  min={rangeMin}
-                  max={rangeMax}
-                  value={[filterMin, filterMax]}
-                  onChange={this._bound_rangeFilterOnChange}
-                />
-                <button onClick={this._bound_yearMaxStepBackButtonOnClick}>&lt;</button>
-                <input className="text-field" type="text" value={filterMax} onChange={this._bound_rangeFilterMaxOnChange} />
-                <button onClick={this._bound_yearMaxStepForwardButtonOnClick}>&gt;</button>
-              </div>
-
-              <div className="section_data">
-                { inspectPointData.map(({ label, data }, dataIndex) => (
-                  <div
-                    key={dataIndex}
-                    style={{ height: '200px' }}
-                  >
-                    <Line
-                      data={{
-                        datasets: [
-                          {
-                            label,
-                            lineTension: 0,
-                            pointRadius: 0,
-                            backgroundColor: 'rgba(255,99,132,0.2)',
-                            borderColor: 'rgba(255,99,132,1)',
-                            borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-                            hoverBorderColor: 'rgba(255,99,132,1)',
-                            data,
-                          },
-                        ],
-                      }}
-                      options={{
-                        animation: {
-                          duration: 0,
-                        },
-                        maintainAspectRatio: false,
-                        tooltips: {
-                          enabled: true,
-                          mode: 'nearest',
-                          intersect: false,
-                        },
-                        hover: {
-                          mode: 'nearest',
-                          intersect: false,
-                          animationDuration: 0,
-                        },
-                        scales: {
-                          xAxes: [
-                            {
-                              type: 'linear',
-                              position: 'bottom',
-                              ticks: {
-                                autoSkip: true,
-                                autoSkipPadding: 8,
-                              },
-                            },
-                          ],
-                        },
-                      }}
+                  <div className="section_range">
+                    <button onClick={this._bound_yearMinStepBackButtonOnClick}>&lt;</button>
+                    <input className="text-field" type="text" value={filterMin} onChange={this._bound_rangeFilterMinOnChange} />
+                    <button onClick={this._bound_yearMinStepForwardButtonOnClick}>&gt;</button>
+                    <Range
+                      className="filter"
+                      min={rangeMin}
+                      max={rangeMax}
+                      value={[filterMin, filterMax]}
+                      onChange={this._bound_rangeFilterOnChange}
                     />
+                    <button onClick={this._bound_yearMaxStepBackButtonOnClick}>&lt;</button>
+                    <input className="text-field" type="text" value={filterMax} onChange={this._bound_rangeFilterMaxOnChange} />
+                    <button onClick={this._bound_yearMaxStepForwardButtonOnClick}>&gt;</button>
                   </div>
-                ))}
-              </div>
-            </div>
-          )
-        }
-      </div>
+
+                  <div className="section_data">
+                    { sources.map(({ label, data }, dataIndex) => (
+                      <div
+                        key={dataIndex}
+                        style={{ height: '200px' }}
+                      >
+                        <Line
+                          data={{
+                            datasets: [
+                              {
+                                label,
+                                lineTension: 0,
+                                pointRadius: 0,
+                                backgroundColor: 'rgba(255,99,132,0.2)',
+                                borderColor: 'rgba(255,99,132,1)',
+                                borderWidth: 1,
+                                hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                                hoverBorderColor: 'rgba(255,99,132,1)',
+                                data,
+                              },
+                            ],
+                          }}
+                          options={{
+                            animation: {
+                              duration: 0,
+                            },
+                            maintainAspectRatio: false,
+                            tooltips: {
+                              enabled: true,
+                              mode: 'nearest',
+                              intersect: false,
+                            },
+                            hover: {
+                              mode: 'nearest',
+                              intersect: false,
+                              animationDuration: 0,
+                            },
+                            scales: {
+                              xAxes: [
+                                {
+                                  type: 'linear',
+                                  position: 'bottom',
+                                  ticks: {
+                                    autoSkip: true,
+                                    autoSkipPadding: 8,
+                                  },
+                                },
+                              ],
+                            },
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            )
+          }
+        </div>
+      </MuiThemeProvider>
     );
   }
 }
