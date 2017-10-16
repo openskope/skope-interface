@@ -36,16 +36,6 @@ export default class WorkspacePage extends React.Component {
     // Callback function for updating filter value.
     updateFilterValue: PropTypes.func.isRequired,
     putFilterValueInUrl: PropTypes.func.isRequired,
-
-    // Callback functions for toggling the welcome window.
-    toggleWelcomeWindow: PropTypes.func.isRequired,
-
-    // Callback function for toggling side panel menu.
-    toggleSideMenu: PropTypes.func.isRequired,
-
-    // Callback funciton for toggling toolbar menu.
-    toggleToolbarMenu: PropTypes.func.isRequired,
-
   };
 
   constructor (props) {
@@ -56,9 +46,6 @@ export default class WorkspacePage extends React.Component {
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
     this._bound_mapOnClick = this._mapOnClick.bind(this);
-    this._bound_toggleWelcomeWindow = this._toggleWelcomeWindow.bind(this);
-    this._bound_toggleSideMenu = this._toggleSideMenu.bind(this);
-    this._bound_toggleToolbarMenu = this._toggleToolbarMenu.bind(this);
   }
 
   componentDidMount () {
@@ -131,34 +118,11 @@ export default class WorkspacePage extends React.Component {
     selectInspectPoint(event.latLongCoordinate);
   }
 
-  _toggleWelcomeWindow() {
-    this.props.toggleWelcomeWindow();
-  }
-
   _relayContext = (func) => {
     return function (...args) {
       return func(this, ...args);
     };
   };
-
-  _toggleSideMenu(event) {
-    const target = event.currentTarget;
-    const layerIndex = parseInt(target.getAttribute('data-layer-index'), 10);
-    const menuInvisible = target.checked;
-    const {
-      toggleSideMenu,
-    } = this.props;
-
-    toggleSideMenu(layerIndex, menuInvisible);
-  }
-
-  _toggleToolbarMenu() {
-    const {
-      toggleToolbarMenu,
-    } = this.props;
-
-    toggleToolbarMenu();
-  }
 
   render () {
     const {

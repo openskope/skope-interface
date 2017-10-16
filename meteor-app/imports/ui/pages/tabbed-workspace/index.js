@@ -87,16 +87,5 @@ export default connect(
       type: actions.WORKSPACE_SET_FILTER.type,
       value,
     }),
-    toggleWelcomeWindow: () => dispatch({
-      type: actions.WORKSPACE_TOGGLE_WELCOME_WINDOW.type,
-    }),
-    toggleSideMenu: (layerIndex, invisible) => dispatch({
-      type: actions.WORKSPACE_TOGGLE_PANEL_MENU.type,
-      index: layerIndex,
-      invisible,
-    }),
-    toggleToolbarMenu: () => dispatch({
-      type: actions.WORKSPACE_TOGGLE_TOOLBAR_MENU.type,
-    }),
   }),
 )(Component);
