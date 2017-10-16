@@ -19,15 +19,15 @@ export default connect(
   (state) => {
     const {
       charts: {
-        inspectPointLoading,
         inspectPointData,
+        inspectPointDataRequest,
         filterMin,
         filterMax,
       },
     } = state;
 
     return {
-      inspectPointLoading,
+      inspectPointLoading: inspectPointDataRequest !== null,
       inspectPointData: Object.keys(inspectPointData ? inspectPointData.data : {}).map((sourceName) => ({
         label: sourceName,
         data: inspectPointData.data[sourceName]

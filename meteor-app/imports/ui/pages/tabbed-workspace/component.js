@@ -20,7 +20,7 @@ import PauseIcon from 'material-ui/svg-icons/av/pause';
 import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
 import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
 import LayerList from '/imports/ui/components/layerlist';
-import Charts from '/imports/ui/components/charts-popup';
+import Charts from '/imports/ui/components/charts-embedded';
 import {
   clampFilterValue,
 } from '/imports/ui/helpers';
@@ -63,18 +63,11 @@ export default class WorkspacePage extends React.Component {
     if (this._mapview) {
       this._mapview.addEventListener('click:view', this._bound_mapOnClick);
     }
-    if (this.target) {
-      this.target.addEventListener('click', this._bound_toggleMenu);
-    }
   }
 
   componentWillUnmount () {
     if (this._mapview) {
       this._mapview.removeEventListener('click:view', this._bound_mapOnClick);
-    }
-
-    if (this.target) {
-      this.target.removeEventListener('click', this._bound_toggleMenu);
     }
   }
 
@@ -175,12 +168,7 @@ export default class WorkspacePage extends React.Component {
                   label="Graphs"
                   data-slug="graphs"
                 >
-                  <div>
-                    <h2>Graphs</h2>
-                    <p>
-                      This is the graphs tab.
-                    </p>
-                  </div>
+                  <Charts />
                 </Tab>
 
                 <Tab
@@ -269,11 +257,6 @@ export default class WorkspacePage extends React.Component {
               </div>
 
             </div>
-
-            <Charts
-              inspectPointSelected={inspectPointSelected}
-              inspectPointCoordinate={inspectPointCoordinate}
-            />
 
           </div>
 
