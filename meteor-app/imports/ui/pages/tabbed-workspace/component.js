@@ -20,7 +20,7 @@ import PauseIcon from 'material-ui/svg-icons/av/pause';
 import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
 import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
 import LayerList from '/imports/ui/components/layerlist';
-import Charts from '/imports/ui/components/charts';
+import Charts from '/imports/ui/components/charts-popup';
 import {
   clampFilterValue,
 } from '/imports/ui/helpers';
