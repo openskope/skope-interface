@@ -1,12 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import customTheme from '/imports/ui/styling/muiTheme';
 import {
   Tabs,
   Tab,
 } from 'material-ui/Tabs';
+import Slider from 'material-ui/Slider';
+import {
+  Toolbar,
+  ToolbarGroup,
+  ToolbarSeparator,
+  ToolbarTitle,
+} from 'material-ui/Toolbar';
+import IconButton from 'material-ui/IconButton';
+import TextField from 'material-ui/TextField';
+import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
+import PauseIcon from 'material-ui/svg-icons/av/pause';
+import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
+import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
 import LayerList from '/imports/ui/components/layerlist';
 import Charts from '/imports/ui/components/charts';
 import {
@@ -41,7 +53,6 @@ export default class WorkspacePage extends React.Component {
   constructor (props) {
     super(props);
 
-    this._bound_rangeFilterOnChange = _.debounce(this._rangeFilterOnChange.bind(this), 0);
     this._bound_rangeFilterOnChangeInput = this._rangeFilterOnChangeInput.bind(this);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
@@ -78,8 +89,6 @@ export default class WorkspacePage extends React.Component {
   }
 
   _rangeFilterOnChange (value) {
-    console.info('filter changed', Date.now());
-
     const {
       rangeMin,
       rangeMax,
@@ -118,12 +127,6 @@ export default class WorkspacePage extends React.Component {
     selectInspectPoint(event.latLongCoordinate);
   }
 
-  _relayContext = (func) => {
-    return function (...args) {
-      return func(this, ...args);
-    };
-  };
-
   render () {
     const {
       layers,
@@ -132,11 +135,6 @@ export default class WorkspacePage extends React.Component {
       inspectPointCoordinate,
 
       filterValue,
-      rangeMin,
-      rangeMax,
-
-      titleName,
-
     } = this.props;
 
     return (
@@ -201,27 +199,72 @@ export default class WorkspacePage extends React.Component {
 
             </div>
 
-            <map-view
-              class="the-map"
-              basemap="osm"
-              center="-12107625, 4495720"
-              zoom="5"
-              ref={(ref) => this._mapview = ref}
-            >
+            <div className="map-panel">
 
-              {layers.map((o) => o.element)}
+              <Toolbar>
+                <ToolbarGroup>
+                  <ToolbarTitle text="Time" />
 
-              <map-layer-singlepoint
-                invisible={!inspectPointSelected ? 'invisible' : null}
-                latitude={inspectPointCoordinate[1]}
-                longitude={inspectPointCoordinate[0]}
-              />
+                  <IconButton
+                    tooltip="Step back"
+                    onClick={this._bound_yearStepBackButtonOnClick}
+                  >
+                    <LeftArrowIcon />
+                  </IconButton>
 
-              <map-control-defaults />
-              <map-interaction-defaults />
-              <map-control-simple-layer-list />
+                  <TextField
+                    hintText="Year"
+                    type="text"
+                    style={{
+                      width: 70,
+                    }}
+                    inputStyle={{
+                      textAlign: 'center',
+                    }}
+                    value={filterValue}
+                    onChange={this._bound_rangeFilterOnChangeInput}
+                  />
 
-            </map-view>
+                  <IconButton
+                    tooltip="Step forward"
+                    onClick={this._bound_yearStepForwardButtonOnClick}
+                  >
+                    <RightArrowIcon />
+                  </IconButton>
+
+                  <ToolbarSeparator />
+
+                  <IconButton tooltip="Play/Pause">
+                    <PlayIcon />
+                  </IconButton>
+                </ToolbarGroup>
+              </Toolbar>
+
+              <div className="map-wrapper">
+                <map-view
+                  class="the-map"
+                  basemap="osm"
+                  center="-12107625, 4495720"
+                  zoom="5"
+                  ref={(ref) => this._mapview = ref}
+                >
+
+                  {layers.map((o) => o.element)}
+
+                  <map-layer-singlepoint
+                    invisible={!inspectPointSelected ? 'invisible' : null}
+                    latitude={inspectPointCoordinate[1]}
+                    longitude={inspectPointCoordinate[0]}
+                  />
+
+                  <map-control-defaults />
+                  <map-interaction-defaults />
+                  <map-control-simple-layer-list />
+
+                </map-view>
+              </div>
+
+            </div>
 
             <Charts
               inspectPointSelected={inspectPointSelected}

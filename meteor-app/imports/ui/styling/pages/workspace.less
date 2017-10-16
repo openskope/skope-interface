@@ -17,10 +17,8 @@
 
     .flex-row;
 
-    & > .the-map {
+    & > .map-panel {
       .layout-fill;
-
-      height: 100%;
     }
 
     //=================================================================
@@ -34,23 +32,39 @@
       &__content {
         padding: @global-layout-padding;
       }
+    }
 
-      .layer-list__item {
+    .layer-list {
+      &__item {
         margin-bottom: 10px;
+      }
 
-        .layer-opacity-row {
-          .flex-row;
+      .layer-opacity-row {
+        .flex-row;
 
-          align-items: center;
+        align-items: center;
 
-          .input-slider--layer-opacity {
-            .layout-fill;
+        .input-slider--layer-opacity {
+          .layout-fill;
 
-            margin-left: 10px;
-            margin-right: 10px;
-          }
+          margin-left: 10px;
+          margin-right: 10px;
         }
       }
+    }
+
+    .map-panel {
+      .flex-col;
+
+      & > .map-wrapper {
+        .layout-fill;
+      }
+    }
+
+    .map-wrapper > .the-map {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
 
     .the-map {
