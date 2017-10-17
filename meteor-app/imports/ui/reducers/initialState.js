@@ -102,10 +102,10 @@ export default {
   },
 
   charts: {
-    // If a point is selected for inspection, this shows if data is still being loaded.
-    inspectPointLoading: true,
     // If a point is selected for inspection, the loaded data will be stored here.
     inspectPointData: null,
+    // If a request is pending, this will be an object with at least a unique request ID.
+    inspectPointDataRequest: null,
 
     filterMin: rangeMin,
     filterMax: rangeMax,

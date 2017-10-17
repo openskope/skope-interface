@@ -17,7 +17,6 @@ import {
   Hits,
   NoHits,
 } from 'searchkit';
-import '/node_modules/searchkit/release/theme.css';
 
 class SearchResultItem extends React.Component {
   render () {

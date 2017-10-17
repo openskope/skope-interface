@@ -17,10 +17,8 @@
 
     .flex-row;
 
-    & > .the-map {
+    & > .map-panel {
       .layout-fill;
-
-      height: 100%;
     }
 
     //=================================================================
@@ -31,223 +29,50 @@
       width: 400px;
       box-sizing: content-box;
 
-      //=================================================================
-      // Parent-child positioning styling.
-      //=================================================================
-
       .flex-col;
 
       &__content {
         .layout-fill;
+
         overflow: auto;
       }
 
-      //=================================================================
-      // Children's own styling.
-      //=================================================================
+      &__section {
+        padding: 10px;
+      }
+    }
 
-      .mdc-toolbar {
-        background-color: #220E10;
-        z-index: 1;
-
-        &__row {
-          min-height: 50px;
-        }
-
-        &__title {
-          color: white;
-        }
+    .layer-list {
+      &__item {
+        margin-bottom: 5px;
       }
 
-      .mdc-toolbar__section--align-end {
-        .menu-info-content {
-          display: none;
+      .layer-opacity-row {
+        .flex-row;
 
-          h3 {
-            display: none;
-          }
+        align-items: center;
+
+        .input-slider--layer-opacity {
+          .layout-fill;
+
+          margin-left: 10px;
+          margin-right: 10px;
         }
       }
+    }
 
-      .mdc-toolbar__section {
-        .toolbar--dropdown {
-          display: flex;
-          justify-content: flex-end;
+    .map-panel {
+      .flex-col;
 
-          .material-icons {
-            cursor: pointer;
-            position: relative;
-            display: inline-block;
-          }
-
-          .material-icons:hover {
-            .tooltip-text {
-              opacity: 0.9;
-              filter: alpha(opacity=100);
-              top: 90%;
-              left: -40%;
-              z-index: 99;
-              -webkit-transition: all 0.2s ease;
-              transition: all 0.2s ease;
-            }
-          }
-
-          .tooltip-text {
-            background: none repeat scroll 0 0 #222222; // some basic styling
-            color: white;
-            font-size: 10px;
-            font-weight: normal;
-            padding: 10px;
-            width: 70px;
-            top: 80%; // this is the original position of the tooltip when it's hidden
-            left: -40%;
-            margin-left: 0;
-            border-radius: 5px;
-            // set opacity to 0 otherwise our animations won't work
-            opacity: 0;
-            filter: alpha(opacity=0);
-            position: absolute;
-            text-align: center;
-            z-index: 40;
-            text-transform: none;
-            -webkit-transition: all 0.3s ease;
-            -moz-transition: all 0.3s ease-in-out;
-            -o-transition: all 0.3s ease;
-            transition: all 0.3s ease-in-out;
-          }
-
-          .info-content {
-            position: absolute;
-            border: 0.5px solid lightgray;
-            background-color: white;
-            min-height: 500px;
-            width: 320px;
-            left: 400px;
-            z-index: 99;
-
-            h3 {
-              font-family: inherit;
-              text-align: center;
-              color: black;
-            }
-          }
-        }
+      & > .map-wrapper {
+        .layout-fill;
       }
+    }
 
-      &__content {
-        padding: @global-layout-padding;
-      }
-
-      .rc-slider {
-        .rc-slider-track {
-          background-color: #220E10;
-        }
-
-        .rc-slider-handle {
-          border-color: #220E10;
-        }
-      }
-
-      .map-animation-controls {
-        padding-bottom: @global-layout-padding;
-
-        legend {
-          margin-bottom: 10px;
-        }
-
-        .field--year {
-          .flex-col;
-
-          .field-year-row2 {
-            .layout-fill;
-
-            .input-slider--year {
-              margin-left: 10px;
-              margin-right: 10px;
-            }
-
-            .action--prev-year,
-            .action--next-year {
-              margin: 0 10px 0 10px;
-            }
-          }
-
-          .field--year-row1 {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            .material-icons {
-              font-size: 40px;
-            }
-
-            .material-icons:hover {
-              cursor: pointer;
-            }
-
-            .input--year {
-              width: 70px;
-              font-size: 1.7rem;
-              text-align: center;
-
-              border: 0;
-
-              .input--year:hover {
-                text-decoration: underline;
-              }
-            }
-          }
-
-          .label-year {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-          }
-        }
-      }
-
-      .layer-list {
-        padding-top: 40px;
-
-        legend {
-          margin-bottom: 10px;
-        }
-
-        &__item {
-          margin-bottom: 10px;
-
-          .layer-title-row {
-            .flex-row;
-
-            .layer-title-label {
-              padding: 10px;
-            }
-
-            .mdc-list-item__end-detail {
-              padding: 10px 0px 10px 0px;
-              cursor: pointer;
-            }
-          }
-
-          .layer-opacity-row {
-            .flex-row;
-
-            align-items: center;
-
-            .input-slider--layer-opacity {
-              .layout-fill;
-
-              margin-left: 10px;
-              margin-right: 10px;
-            }
-          }
-
-          .mdc-list-divider {
-            padding: 5px;
-          }
-        }
-      }
+    .map-wrapper > .the-map {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
 
     .the-map {

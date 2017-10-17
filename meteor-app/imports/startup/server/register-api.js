@@ -5,9 +5,14 @@ import { HTTP } from 'meteor/http';
 // Register your apis here
 
 Meteor.methods({
-  'timeseries.get' ({ lat, lon }) {
+  'timeseries.get' ({
+    lat,
+    lon,
+    requestId,
+  }) {
     check(lat, Number);
     check(lon, Number);
+    check(requestId, String);
 
     const url = `http://demo.envirecon.org/browse/skope-rasterdata-service/api/v1/timeseries?long=${lon}&lat=${lat}`;
     const {
@@ -17,6 +22,9 @@ Meteor.methods({
       // headers,
     } = HTTP.get(url);
 
-    return data;
+    return {
+      requestId,
+      data,
+    };
   },
 });

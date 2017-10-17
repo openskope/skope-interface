@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Slider from 'rc-slider/lib/Slider';
 import _ from 'lodash';
-import Charts from '/imports/ui/components/charts';
+import Charts from '/imports/ui/components/workspace-charts-popup-wrapper';
 import {
   clampFilterValue,
 } from '/imports/ui/helpers';

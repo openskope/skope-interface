@@ -27,7 +27,8 @@
     "react-mounter": "^1.2.0",
     "react-redux": "^5.0.4",
     "redux": "^3.6.0",
-    "searchkit": "^2.0.0-11"
+    "searchkit": "^2.2.0",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
     "@meteorjs/eslint-config-meteor": "^1.0.5",

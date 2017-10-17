@@ -8,6 +8,7 @@ import {
 import {
   SearchkitManager,
 } from 'searchkit';
+import 'searchkit/release/theme.css';
 import { Meteor } from 'meteor/meteor';
 
 import Component from './component';

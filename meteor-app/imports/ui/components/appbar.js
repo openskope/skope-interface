@@ -27,6 +27,14 @@ import {
 
 const Component = ({
   /**
+   * @type {*}
+   */
+  title = null,
+  /**
+   * @type {*}
+   */
+  children = null,
+  /**
    * @type {String}
    */
   currentRouterPath = '',
@@ -55,7 +63,12 @@ const Component = ({
   <MuiThemeProvider muiTheme={customTheme}>
     <div className="appbar">
       <AppBar
-        title="SKOPE"
+        title={
+          <div>
+            <span style={{marginRight: 30}}>SKOPE</span>
+            {title}
+          </div>
+        }
         iconElementLeft={
           <IconButton
             tooltip="Menu"
@@ -80,6 +93,7 @@ const Component = ({
               iconButtonElement={
                 <IconButton
                   tooltip="Boring Stuff"
+                  tooltipPosition="bottom-left"
                 ><CodeIcon color={customTheme.palette.alternateTextColor} /></IconButton>
               }
               targetOrigin={{
@@ -97,7 +111,8 @@ const Component = ({
             </IconMenu>
           </span>
         }
-      />
+      >{children}</AppBar>
+
       <Drawer
         docked={false}
         width={appSettings.drawerWidth}

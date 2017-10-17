@@ -12,23 +12,23 @@ import {
 import * as actions from '/imports/ui/actions';
 
 import Component from './component';
-import './style.css';
 
 export default connect(
   // mapStateToProps
   (state) => {
     const {
       charts: {
-        inspectPointLoading,
         inspectPointData,
+        inspectPointDataRequest,
         filterMin,
         filterMax,
       },
     } = state;
 
     return {
-      inspectPointLoading,
-      inspectPointData: Object.keys(inspectPointData ? inspectPointData.data : {}).map((sourceName) => ({
+      dataIsLoading: inspectPointDataRequest !== null,
+      hasLoadedData: inspectPointData !== null,
+      sources: Object.keys(inspectPointData ? inspectPointData.data : {}).map((sourceName) => ({
         label: sourceName,
         data: inspectPointData.data[sourceName]
               .filter((value, valueIndex) => (valueIndex >= filterMin && valueIndex <= filterMax))
