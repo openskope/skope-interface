@@ -5,15 +5,12 @@ import customTheme from '/imports/ui/styling/muiTheme';
 import {
   Toolbar,
   ToolbarGroup,
-  ToolbarSeparator,
-  ToolbarTitle,
 } from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
 import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
 import CircularProgress from 'material-ui/CircularProgress';
-import RefreshIndicator from 'material-ui/RefreshIndicator';
 import { Line } from 'react-chartjs-2';
 import Range from 'rc-slider/lib/Range';
 import 'rc-slider/assets/index.css';
@@ -145,14 +142,16 @@ export default class ChartsPage extends React.Component {
     this._rangeFilterOnChange([filterMin, filterMax + 1]);
   }
 
-  _render_hasData ({
-    dataSectionClassName,
-    sources,
-    filterMin,
-    filterMax,
-    rangeMin,
-    rangeMax,
-  }) {
+  _renderChartsWithData () {
+    const {
+      dataSectionClassName,
+      sources,
+      filterMin,
+      filterMax,
+      rangeMin,
+      rangeMax,
+    } = this.props;
+
     return (
       <div className="section_charts">
 
@@ -291,9 +290,11 @@ export default class ChartsPage extends React.Component {
     );
   }
 
-  _render_noData ({
-    dataSectionClassName,
-  }) {
+  _renderViewWithoutData () {
+    const {
+      dataSectionClassName,
+    } = this.props;
+
     return (
       <div
         className={getClassName(
@@ -305,9 +306,11 @@ export default class ChartsPage extends React.Component {
     );
   }
 
-  _render_loading ({
-    dataSectionClassName,
-  }) {
+  _renderLoadingSign () {
+    const {
+      dataSectionClassName,
+    } = this.props;
+
     return (
       <div
         className={getClassName(
@@ -336,11 +339,11 @@ export default class ChartsPage extends React.Component {
         <div className="workspace-charts">
           {
             dataIsLoading
-            ? this._render_loading(this.props)
+            ? this._renderLoadingSign()
             : (
               !hasLoadedData
-              ? this._render_noData(this.props)
-              : this._render_hasData(this.props)
+              ? this._renderViewWithoutData()
+              : this._renderChartsWithData()
             )
           }
         </div>

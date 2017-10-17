@@ -6,7 +6,6 @@ import {
   Tabs,
   Tab,
 } from 'material-ui/Tabs';
-import Slider from 'material-ui/Slider';
 import {
   Toolbar,
   ToolbarGroup,
@@ -16,7 +15,7 @@ import {
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
-import PauseIcon from 'material-ui/svg-icons/av/pause';
+// import PauseIcon from 'material-ui/svg-icons/av/pause';
 import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
 import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
 import LayerList from '/imports/ui/components/layerlist';
