@@ -80,6 +80,7 @@ const Component = ({
               iconButtonElement={
                 <IconButton
                   tooltip="Boring Stuff"
+                  tooltipPosition="bottom-left"
                 ><CodeIcon color={customTheme.palette.alternateTextColor} /></IconButton>
               }
               targetOrigin={{
