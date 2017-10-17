@@ -19,6 +19,7 @@ import Charts from '/imports/ui/components/workspace-charts';
 import PaleoCarModelPage from '/imports/ui/pages/model-paleocar';
 import NotFoundPage from '/imports/ui/pages/not-found';
 import AppbarHeader from '/imports/ui/components/appbar';
+import WorkspaceTitle from '/imports/ui/components/workspace-title';
 
 import {
   clampFilterValue,
@@ -103,6 +104,7 @@ FlowRouter.route('/workspace', {
     mountWithStore(store, FullWindowLayout, {
       header: (
         <AppbarHeader
+          title={<WorkspaceTitle />}
           onClickHelpButton={() => alert('Show help for workspace page.')}
         />
       ),
