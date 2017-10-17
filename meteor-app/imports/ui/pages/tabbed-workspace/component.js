@@ -167,7 +167,9 @@ export default class WorkspacePage extends React.Component {
                 label="Graphs"
                 data-slug="graphs"
               >
-                <Charts />
+                <Charts
+                  dataSectionClassName="side-panel__section"
+                />
               </Tab>
 
               <Tab

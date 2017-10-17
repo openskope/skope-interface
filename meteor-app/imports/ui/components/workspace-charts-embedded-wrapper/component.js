@@ -57,10 +57,10 @@ export default class ChartsWrapper extends React.Component {
       nextProps.clearLoadedData();
     }
 
-    return false;
+    return true;
   }
 
   render () {
-    return <Charts />;
+    return <Charts {...this.props} />;
   }
 }

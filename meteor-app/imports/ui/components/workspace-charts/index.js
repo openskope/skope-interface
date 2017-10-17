@@ -12,7 +12,6 @@ import {
 import * as actions from '/imports/ui/actions';
 
 import Component from './component';
-import './style.css';
 
 export default connect(
   // mapStateToProps

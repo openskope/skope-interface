@@ -2,6 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import customTheme from '/imports/ui/styling/muiTheme';
+import {
+  Toolbar,
+  ToolbarGroup,
+  ToolbarSeparator,
+  ToolbarTitle,
+} from 'material-ui/Toolbar';
+import IconButton from 'material-ui/IconButton';
+import TextField from 'material-ui/TextField';
+import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
+import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
 import CircularProgress from 'material-ui/CircularProgress';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 import { Line } from 'react-chartjs-2';
@@ -9,11 +19,14 @@ import Range from 'rc-slider/lib/Range';
 import 'rc-slider/assets/index.css';
 import {
   clampFilterValue,
+  getClassName,
 } from '/imports/ui/helpers';
 
 export default class ChartsPage extends React.Component {
 
   static propTypes = {
+    dataSectionClassName: PropTypes.string.isRequired,
+
     // Indicate if the data is being loaded for the point.
     dataIsLoading: PropTypes.bool.isRequired,
     // Indicate if any data is loaded.
@@ -31,6 +44,27 @@ export default class ChartsPage extends React.Component {
 
     // Callback function for updating filter values
     updateFilter: PropTypes.func.isRequired,
+  };
+
+  static styles = {
+    toolbarStyle: {
+      height: 38,
+      overflow: 'hidden',
+    },
+    toolbarButtonStyle: {
+      height: 30,
+      width: 30,
+      padding: 30 / 6,
+    },
+    toolbarButtonIconStyle: {
+      height: 30 * (2 / 3),
+      width: 30 * (2 / 3),
+    },
+    toolbarSliderStyle: {
+      marginLeft: 10,
+      marginRight: 10,
+      flex: '1 1 0',
+    },
   };
 
   constructor (props) {
@@ -111,16 +145,190 @@ export default class ChartsPage extends React.Component {
     this._rangeFilterOnChange([filterMin, filterMax + 1]);
   }
 
+  _render_hasData ({
+    dataSectionClassName,
+    sources,
+    filterMin,
+    filterMax,
+    rangeMin,
+    rangeMax,
+  }) {
+    return (
+      <div className="section_charts">
+
+        <Toolbar
+          style={this.constructor.styles.toolbarStyle}
+        >
+          <ToolbarGroup
+            firstChild
+            lastChild
+            style={{
+              flex: '1 1 0',
+            }}
+          >
+            <IconButton
+              style={this.constructor.styles.toolbarButtonStyle}
+              iconStyle={this.constructor.styles.toolbarButtonIconStyle}
+              onClick={this._bound_yearMinStepBackButtonOnClick}
+            ><LeftArrowIcon /></IconButton>
+
+            <TextField
+              hintText="FilterMin"
+              type="text"
+              style={{
+                width: 40,
+                flex: '0 0 auto',
+              }}
+              inputStyle={{
+                textAlign: 'center',
+              }}
+              value={filterMin}
+              onChange={this._bound_rangeFilterMinOnChange}
+            />
+
+            <IconButton
+              style={this.constructor.styles.toolbarButtonStyle}
+              iconStyle={this.constructor.styles.toolbarButtonIconStyle}
+              onClick={this._bound_yearMinStepForwardButtonOnClick}
+            ><RightArrowIcon /></IconButton>
+
+            <Range
+              min={rangeMin}
+              max={rangeMax}
+              value={[filterMin, filterMax]}
+              onChange={this._bound_rangeFilterOnChange}
+              style={this.constructor.styles.toolbarSliderStyle}
+            />
+
+            <IconButton
+              style={this.constructor.styles.toolbarButtonStyle}
+              iconStyle={this.constructor.styles.toolbarButtonIconStyle}
+              onClick={this._bound_yearMaxStepBackButtonOnClick}
+            ><LeftArrowIcon /></IconButton>
+
+            <TextField
+              hintText="FilterMax"
+              type="text"
+              style={{
+                width: 40,
+                flex: '0 0 auto',
+              }}
+              inputStyle={{
+                textAlign: 'center',
+              }}
+              value={filterMax}
+              onChange={this._bound_rangeFilterMaxOnChange}
+            />
+
+            <IconButton
+              style={this.constructor.styles.toolbarButtonStyle}
+              iconStyle={this.constructor.styles.toolbarButtonIconStyle}
+              onClick={this._bound_yearMaxStepForwardButtonOnClick}
+            ><RightArrowIcon /></IconButton>
+          </ToolbarGroup>
+        </Toolbar>
+
+        <div
+          className={getClassName(
+            'section_data',
+            dataSectionClassName,
+          )}
+        >
+          { sources.map(({ label, data }, dataIndex) => (
+            <div
+              key={dataIndex}
+              style={{ height: '200px' }}
+            >
+              <Line
+                data={{
+                  datasets: [
+                    {
+                      label,
+                      lineTension: 0,
+                      pointRadius: 0,
+                      backgroundColor: 'rgba(255,99,132,0.2)',
+                      borderColor: 'rgba(255,99,132,1)',
+                      borderWidth: 1,
+                      hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                      hoverBorderColor: 'rgba(255,99,132,1)',
+                      data,
+                    },
+                  ],
+                }}
+                options={{
+                  animation: {
+                    duration: 0,
+                  },
+                  maintainAspectRatio: false,
+                  tooltips: {
+                    enabled: true,
+                    mode: 'nearest',
+                    intersect: false,
+                  },
+                  hover: {
+                    mode: 'nearest',
+                    intersect: false,
+                    animationDuration: 0,
+                  },
+                  scales: {
+                    xAxes: [
+                      {
+                        type: 'linear',
+                        position: 'bottom',
+                        ticks: {
+                          autoSkip: true,
+                          autoSkipPadding: 8,
+                        },
+                      },
+                    ],
+                  },
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  _render_noData ({
+    dataSectionClassName,
+  }) {
+    return (
+      <div
+        className={getClassName(
+          dataSectionClassName,
+        )}
+      >
+        <p>Select a point on the map to view the data.</p>
+      </div>
+    );
+  }
+
+  _render_loading ({
+    dataSectionClassName,
+  }) {
+    return (
+      <div
+        className={getClassName(
+          dataSectionClassName,
+        )}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: 100,
+        }}
+      >
+        <CircularProgress color="blue" />
+      </div>
+    );
+  }
+
   render () {
     const {
       dataIsLoading,
       hasLoadedData,
-      sources,
-
-      filterMin,
-      filterMax,
-      rangeMin,
-      rangeMax,
     } = this.props;
 
     return (
@@ -128,85 +336,11 @@ export default class ChartsPage extends React.Component {
         <div className="workspace-charts">
           {
             dataIsLoading
-            ? <CircularProgress color="blue" />
+            ? this._render_loading(this.props)
             : (
               !hasLoadedData
-              ? null
-              : (
-                <div className="section_charts">
-
-                  <div className="section_range">
-                    <button onClick={this._bound_yearMinStepBackButtonOnClick}>&lt;</button>
-                    <input className="text-field" type="text" value={filterMin} onChange={this._bound_rangeFilterMinOnChange} />
-                    <button onClick={this._bound_yearMinStepForwardButtonOnClick}>&gt;</button>
-                    <Range
-                      className="filter"
-                      min={rangeMin}
-                      max={rangeMax}
-                      value={[filterMin, filterMax]}
-                      onChange={this._bound_rangeFilterOnChange}
-                    />
-                    <button onClick={this._bound_yearMaxStepBackButtonOnClick}>&lt;</button>
-                    <input className="text-field" type="text" value={filterMax} onChange={this._bound_rangeFilterMaxOnChange} />
-                    <button onClick={this._bound_yearMaxStepForwardButtonOnClick}>&gt;</button>
-                  </div>
-
-                  <div className="section_data">
-                    { sources.map(({ label, data }, dataIndex) => (
-                      <div
-                        key={dataIndex}
-                        style={{ height: '200px' }}
-                      >
-                        <Line
-                          data={{
-                            datasets: [
-                              {
-                                label,
-                                lineTension: 0,
-                                pointRadius: 0,
-                                backgroundColor: 'rgba(255,99,132,0.2)',
-                                borderColor: 'rgba(255,99,132,1)',
-                                borderWidth: 1,
-                                hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-                                hoverBorderColor: 'rgba(255,99,132,1)',
-                                data,
-                              },
-                            ],
-                          }}
-                          options={{
-                            animation: {
-                              duration: 0,
-                            },
-                            maintainAspectRatio: false,
-                            tooltips: {
-                              enabled: true,
-                              mode: 'nearest',
-                              intersect: false,
-                            },
-                            hover: {
-                              mode: 'nearest',
-                              intersect: false,
-                              animationDuration: 0,
-                            },
-                            scales: {
-                              xAxes: [
-                                {
-                                  type: 'linear',
-                                  position: 'bottom',
-                                  ticks: {
-                                    autoSkip: true,
-                                    autoSkipPadding: 8,
-                                  },
-                                },
-                              ],
-                            },
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )
+              ? this._render_noData(this.props)
+              : this._render_hasData(this.props)
             )
           }
         </div>
