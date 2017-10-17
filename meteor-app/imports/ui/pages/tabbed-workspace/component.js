@@ -136,56 +136,53 @@ export default class WorkspacePage extends React.Component {
 
           <div className="section-map">
 
-            <div className="side-panel">
+            <Tabs
+              className="side-panel"
+              contentContainerClassName="side-panel__content"
+              //! Make this a controlled tab.
+            >
 
-              <Tabs
-                contentContainerClassName="side-panel__content"
-                //! Make this a controlled tab.
+              <Tab
+                label="Info"
+                data-slug="info"
               >
+                <div className="side-panel__section">
+                  <p>Status</p>
+                  <p>Description: general description about this dataset. For environmental data this description is provided by domain experts, for model results it is provide by model configuration time.</p>
+                  <p>Download link(s)</p>
+                </div>
+              </Tab>
 
-                <Tab
-                  label="Info"
-                  data-slug="info"
-                >
-                  <div className="side-panel__section">
-                    <p>Status</p>
-                    <p>Description: general description about this dataset. For environmental data this description is provided by domain experts, for model results it is provide by model configuration time.</p>
-                    <p>Download link(s)</p>
-                  </div>
-                </Tab>
+              <Tab
+                label="Layers"
+                data-slug="layers"
+              >
+                <LayerList
+                  className="side-panel__section"
+                  layers={layers}
+                />
+              </Tab>
 
-                <Tab
-                  label="Layers"
-                  data-slug="layers"
-                >
-                  <LayerList
-                    className="side-panel__section"
-                    layers={layers}
-                  />
-                </Tab>
+              <Tab
+                label="Graphs"
+                data-slug="graphs"
+              >
+                <Charts />
+              </Tab>
 
-                <Tab
-                  label="Graphs"
-                  data-slug="graphs"
-                >
-                  <Charts />
-                </Tab>
+              <Tab
+                label="Metadata"
+                data-slug="metadata"
+              >
+                <div>
+                  <h2>Metadata</h2>
+                  <p>
+                    This is the metadata tab.
+                  </p>
+                </div>
+              </Tab>
 
-                <Tab
-                  label="Metadata"
-                  data-slug="metadata"
-                >
-                  <div>
-                    <h2>Metadata</h2>
-                    <p>
-                      This is the metadata tab.
-                    </p>
-                  </div>
-                </Tab>
-
-              </Tabs>
-
-            </div>
+            </Tabs>
 
             <div className="map-panel">
 

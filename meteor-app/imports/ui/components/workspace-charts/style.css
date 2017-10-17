@@ -1,7 +1,5 @@
 .workspace-charts .section_range {
   height: 30px;
-  padding: 10px;
-  background-color: white;
 
   display: flex;
   flex-direction: row;
@@ -26,15 +24,4 @@
 
 .workspace-charts .section_range .text-field {
   width: 35px;
-}
-
-.workspace-charts .section_data {
-  position: absolute;
-  left: 0;
-  top: 40px;
-  right: 0;
-  background-color: white;
-  z-index: 5;
-  padding: 10px;
-  min-width: 300px;
 }

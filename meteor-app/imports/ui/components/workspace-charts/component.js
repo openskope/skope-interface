@@ -6,6 +6,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 import { Line } from 'react-chartjs-2';
 import Range from 'rc-slider/lib/Range';
+import 'rc-slider/assets/index.css';
 import {
   clampFilterValue,
 } from '/imports/ui/helpers';
