@@ -176,7 +176,7 @@ export default class WorkspacePage extends React.Component {
                 label="Metadata"
                 data-slug="metadata"
               >
-                <div>
+                <div className="side-panel__section">
                   <h2>Metadata</h2>
                   <p>
                     This is the metadata tab.
@@ -207,7 +207,7 @@ export default class WorkspacePage extends React.Component {
                     hintText="Year"
                     type="text"
                     style={{
-                      width: 70,
+                      width: 50,
                     }}
                     inputStyle={{
                       textAlign: 'center',
