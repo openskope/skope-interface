@@ -8,7 +8,7 @@ export default () => (
     </div>
     <div className="not-found-title">
       <h1>Sorry, that page doesn’t exist</h1>
-      <a href={FlowRouter.url('/')} className="gotohomepage">Go to home</a>
+      <a href={FlowRouter.path('/')} className="gotohomepage">Go to home</a>
     </div>
   </div>
 );
