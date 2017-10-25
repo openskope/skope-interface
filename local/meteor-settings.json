@@ -1,0 +1,5 @@
+{
+    "public": {
+        "elasticEndpoint": "//skope-dev.roger.ncsa.illinois.edu/elastic"
+    }
+}

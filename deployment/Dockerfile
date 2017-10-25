@@ -5,11 +5,11 @@ FROM ubuntu:14.04
 MAINTAINER Xingchen Hong <hello@xc-h.net>
 
 # Do not use apt-get upgrade or dist-upgrade. See: https://github.com/lukasmartinelli/hadolint/wiki/DL3005
+# Delete the apt-get lists after installing something. See: https://github.com/lukasmartinelli/hadolint/wiki/DL3009
 RUN apt-get update \
     && apt-get install -y -q build-essential \
                              libssl-dev curl \
                              python-dev \
-    # Delete the apt-get lists after installing something. See: https://github.com/lukasmartinelli/hadolint/wiki/DL3009
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
