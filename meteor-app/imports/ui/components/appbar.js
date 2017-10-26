@@ -25,6 +25,9 @@ import {
   appSettings,
 } from '/package.json';
 
+const APPBAR_BACKGROUNDCOLOR = '#f7f5e7';
+const APPBAR_COLOR = 'black';
+
 const Component = ({
   /**
    * @type {*}
@@ -63,8 +66,15 @@ const Component = ({
   <MuiThemeProvider muiTheme={customTheme}>
     <div className="appbar">
       <AppBar
+        style={{
+          backgroundColor: APPBAR_BACKGROUNDCOLOR,
+        }}
         title={
-          <div>
+          <div
+            style={{
+              color: APPBAR_COLOR,
+            }}
+          >
             <span style={{marginRight: 30}}>SKOPE</span>
             {title}
           </div>
@@ -73,28 +83,28 @@ const Component = ({
           <IconButton
             tooltip="Menu"
             onClick={onClickHamburgerButton}
-          ><MenuIcon /></IconButton>
+          ><MenuIcon color={APPBAR_COLOR} /></IconButton>
         }
         iconElementRight={
           <span>
             <IconButton
               tooltip="Notifications"
-            ><NoNotificationIcon color={customTheme.palette.alternateTextColor} /></IconButton>
+            ><NoNotificationIcon color={APPBAR_COLOR} /></IconButton>
 
             <IconButton
               tooltip="Account"
-            ><AccountIcon color={customTheme.palette.alternateTextColor} /></IconButton>
+            ><AccountIcon color={APPBAR_COLOR} /></IconButton>
             <IconButton
               tooltip="Help"
               onClick={onClickHelpButton}
-            ><HelpIcon color={customTheme.palette.alternateTextColor} /></IconButton>
+            ><HelpIcon color={APPBAR_COLOR} /></IconButton>
 
             <IconMenu
               iconButtonElement={
                 <IconButton
                   tooltip="Boring Stuff"
                   tooltipPosition="bottom-left"
-                ><CodeIcon color={customTheme.palette.alternateTextColor} /></IconButton>
+                ><CodeIcon color={APPBAR_COLOR} /></IconButton>
               }
               targetOrigin={{
                 horizontal: 'right',
