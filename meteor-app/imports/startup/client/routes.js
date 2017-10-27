@@ -16,7 +16,7 @@ import HomePage from '/imports/ui/pages/home';
 import SearchPage from '/imports/ui/pages/search';
 import WorkspacePage from '/imports/ui/pages/tabbed-workspace';
 import Charts from '/imports/ui/components/workspace-charts';
-import PaleoCarModelPage from '/imports/ui/pages/model-paleocar';
+import PaleoCarModelPage from '/imports/ui/pages/model-paleocar--stepper';
 import NotFoundPage from '/imports/ui/pages/not-found';
 import AppbarHeader from '/imports/ui/components/appbar';
 import WorkspaceTitle from '/imports/ui/components/workspace-title';
