@@ -16,8 +16,7 @@ import AccountIcon from 'material-ui/svg-icons/action/account-circle';
 import NoNotificationIcon from 'material-ui/svg-icons/social/notifications-none';
 import CodeIcon from 'material-ui/svg-icons/action/code';
 
-// Import actions for the redux store.
-import * as actions from '/imports/ui/actions';
+import { actions } from '/imports/ui/redux-store';
 
 import {
   demoRepository,

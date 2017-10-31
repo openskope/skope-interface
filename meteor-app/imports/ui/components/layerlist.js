@@ -12,8 +12,7 @@ import {
 import Checkbox from 'material-ui/Checkbox';
 import Slider from 'material-ui/Slider';
 
-// Import actions for the redux store.
-import * as actions from '/imports/ui/actions';
+import { actions } from '/imports/ui/redux-store';
 
 import {
   getClassName,

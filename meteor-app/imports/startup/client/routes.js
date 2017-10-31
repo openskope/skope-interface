@@ -1,13 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import React from 'react';
-
-import { createStore } from 'meteor/zodiase:reactive-redux-store';
-
-// Import actions for the redux store.
-import * as actions from '/imports/ui/actions';
-// Import reducers for the redux store.
-import reducers from '/imports/ui/reducers';
+import store, { actions } from '/imports/ui/redux-store';
 
 // Import needed templates
 import FixedWidthLayout from '/imports/ui/layouts/fixed-width';
@@ -34,8 +28,6 @@ import {
 import {
   appSettings,
 } from '/package.json';
-
-const store = createStore(reducers);
 
 if (appSettings.exposeStoreToGlobal) {
   window.store = store;
