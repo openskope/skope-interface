@@ -10,7 +10,7 @@ import {
   rangeMin,
   rangeMax,
 } from '/imports/ui/consts';
-import * as actions from '/imports/ui/actions';
+import { actions } from '/imports/ui/redux-store';
 
 import Component from './component';
 

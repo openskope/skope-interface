@@ -1,289 +1,110 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import customTheme from '/imports/ui/styling/muiTheme';
 import {
-  Step,
-  Stepper,
-  StepButton,
-  StepLabel,
-  StepContent,
-} from 'material-ui/Stepper';
+  TextField,
+  SelectField,
+} from '/imports/ui/components/redux-form-controls';
 import {
-  Card,
-  CardActions,
-  CardHeader,
-  CardMedia,
-  CardTitle,
-  CardText,
-} from 'material-ui/Card';
-import Paper from 'material-ui/Paper';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
-import TextField from 'material-ui/TextField';
-import SelectField from 'material-ui/SelectField';
+  required,
+  maxLength15,
+  minLength2,
+} from '/imports/ui/components/redux-form-validators';
 import MenuItem from 'material-ui/MenuItem';
-import WarningIcon from 'material-ui/svg-icons/alert/warning';
-import {red500} from 'material-ui/styles/colors';
-import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import StepperForm from '/imports/ui/components/stepper-form';
 
 export default class ModelPage extends React.Component {
 
-  static propTypes = {
-    // Indicate if a point is selected for inspection.
-    inspectPointSelected: PropTypes.bool.isRequired,
-    // The coordinate of the point being inspected.
-    inspectPointCoordinate: PropTypes.arrayOf(PropTypes.number).isRequired,
-    // Callback function for selecting a point to inspect.
-    selectInspectPoint: PropTypes.func.isRequired,
-
-    // Callback function for the map modal.
-    toggleMap: PropTypes.func.isRequired,
-
-    // Callback function for the form.
-    updateForm: PropTypes.func.isRequired,
-
-    // Values in the form.
-    predictionYears: PropTypes.number.isRequired,
-    meanVar: PropTypes.string.isRequired,
-    minWidth: PropTypes.number.isRequired,
-
+  static _testingDefaultValues = {
+    'sample-a': {
+      boundary: 'boundary-a',
+      'prediction-years': '1000',
+    },
+    'sample-b': {
+      boundary: 'boundary-b',
+      'prediction-years': '1500',
+    },
+    'sample-c': {
+      boundary: 'boundary-c',
+      'prediction-years': '2000',
+    },
   };
 
   constructor (props) {
     super(props);
 
     this.state = {
-      stepIndex: 0,
-      finished: false,
+      defaultValues: {},
     };
-
-    this._bound_mapOnClick = this._mapOnClick.bind(this);
-    this._bound_toggleMap = this._toggleMap.bind(this);
-    this._bound_updateLatitude = this._updateLatitude.bind(this);
-    this._bound_updateLongitude = this._updateLongitude.bind(this);
-    this._bound_updatePredictionYears = this._updatePredictionYears.bind(this);
-    this._bound_updateMeanVar = this._updateMeanVar.bind(this);
-    this._bound_updateMinWidth = this._updateMinWidth.bind(this);
   }
 
-  componentDidMount () {
-    if (this._mapview) {
-      this._mapview.addEventListener('click:view', this._bound_mapOnClick);
-    }
-  }
-
-  _mapOnClick (event) {
-    const {
-      selectInspectPoint,
-    } = this.props;
-
-    selectInspectPoint(event.latLongCoordinate);
-  }
-
-  _toggleMap(/* event */) {
-    const {
-      toggleMap,
-    } = this.props;
-
-    toggleMap();
-  }
-
-  _updateLatitude(event) {
-    const target = event.currentTarget;
-    const {
-      updateForm,
-      inspectPointCoordinate,
-      predictionYears,
-      meanVar,
-      minWidth,
-    } = this.props;
-
-    updateForm({
-      latitude: parseFloat(target.value),
-      longitude: inspectPointCoordinate[0],
-      predictionYears,
-      meanVar,
-      minWidth,
-    });
-  }
-
-  _updateLongitude(event) {
-    const target = event.currentTarget;
-    const {
-      updateForm,
-      inspectPointCoordinate,
-      predictionYears,
-      meanVar,
-      minWidth,
-    } = this.props;
-
-    updateForm({
-      latitude: inspectPointCoordinate[1],
-      longitude: parseFloat(target.value),
-      predictionYears,
-      meanVar,
-      minWidth,
-    });
-  }
-
-  _updatePredictionYears(event) {
-    const target = event.currentTarget;
-    const {
-      updateForm,
-      inspectPointCoordinate,
-      meanVar,
-      minWidth,
-    } = this.props;
-
-    updateForm({
-      latitude: inspectPointCoordinate[1],
-      longitude: inspectPointCoordinate[0],
-      predictionYears: parseInt(target.value, 10),
-      meanVar,
-      minWidth,
-    });
-  }
-
-  _updateMeanVar(event, index, value) {
-    const {
-      updateForm,
-      inspectPointCoordinate,
-      predictionYears,
-      minWidth,
-    } = this.props;
-
-    updateForm({
-      latitude: inspectPointCoordinate[1],
-      longitude: inspectPointCoordinate[0],
-      predictionYears,
-      meanVar: value,
-      minWidth,
-    });
-  }
-
-  _updateMinWidth(event) {
-    const target = event.currentTarget;
-    const {
-      updateForm,
-      inspectPointCoordinate,
-      predictionYears,
-      meanVar,
-    } = this.props;
-
-    updateForm({
-      latitude: inspectPointCoordinate[1],
-      longitude: inspectPointCoordinate[0],
-      predictionYears,
-      meanVar,
-      minWidth: parseInt(target.value, 10),
-    });
-  }
-
-  handleNext = () => {
-    const {stepIndex} = this.state;
+  _defaultValueSourceOnChange = (event, newSourceName) => {
     this.setState({
-      stepIndex: stepIndex + 1,
-      finished: stepIndex >= 2,
+      defaultValues: this.constructor._testingDefaultValues[newSourceName],
     });
-  };
-
-  handlePrev = () => {
-    const {stepIndex} = this.state;
-    if (stepIndex > 0) {
-      this.setState({stepIndex: stepIndex - 1});
-    }
-  };
-
-  renderStepActions = (step) => {
-    const {
-      stepIndex,
-    } = this.state;
-
-    return (
-      <div style={{margin: '12px 0'}}>
-        <RaisedButton
-          label={stepIndex >= 3 ? 'Finish' : 'Next'}
-          disableTouchRipple={true}
-          disableFocusRipple={true}
-          primary={true}
-          onClick={this.handleNext}
-          style={{marginRight: 12}}
-        />
-        {step > 0 && (
-          <FlatButton
-            label="Back"
-            disabled={stepIndex === 0}
-            disableTouchRipple={true}
-            disableFocusRipple={true}
-            onClick={this.handlePrev}
-          />
-        )}
-      </div>
-    );
-  };
-
-  stepCardStyles = {
-    marginTop: 20,
-    width: 500,
-    // Some gap to let the shadow be visible.
-    marginBottom: 20,
   };
 
   render () {
     const {
-      inspectPointSelected,
-      inspectPointCoordinate,
-
-      predictionYears,
-      meanVar,
-      minWidth,
-    } = this.props;
-
-    const {
-      stepIndex,
+      defaultValues,
     } = this.state;
 
     return (
       <MuiThemeProvider muiTheme={customTheme}>
         <div className="page-paleocar">
           <StepperForm
+            name="model"
+            defaultValues={defaultValues}
             steps={[
               {
                 name: 'primary',
                 title: 'Primary',
-                fields: [
-                  {
-                    type: 'text',
-                    label: 'Title',
-                    name: 'title',
-                  },
-                  {
-                    type: 'text',
-                    label: 'Description',
-                    multiLine: true,
-                    rows: 2,
-                    rowsMax: 4,
-                  },
-                ],
-                validation: (fields, allFields) => {
-                  return false;
+                //! This function should be able to return some error message.
+                //! This validation error should automatically block advancing.
+                validation: (fields) => {
+                  const errors = {};
+
+                  if (fields.title !== 'secret') {
+                    errors.title = 'Please type in "secret"';
+                  }
+
+                  return errors;
                 },
                 content: (
                   <div className="form-fields">
                     <TextField
+                      name="title"
+                      label="Title"
                       className="form-fields__item"
-                      floatingLabelText="Title"
+                      autoComplete="off"
+                      validate={[
+                        required,
+                        maxLength15,
+                        minLength2,
+                      ]}
                     />
                     <TextField
+                      name="description"
+                      label="Description"
                       className="form-fields__item"
-                      floatingLabelText="Description"
-                      multiLine={true}
+                      autoComplete="off"
+                      multiLine
                       rows={2}
                       rowsMax={4}
                     />
-                    <p>Derived From</p>
+                    <SelectField
+                      name="derived-from"
+                      label="Derived From"
+                      className="form-fields__item"
+                      validate={[
+                        required,
+                      ]}
+                      onChange={this._defaultValueSourceOnChange}
+                    >
+                      <MenuItem value="sample-a" primaryText="Sample A" />
+                      <MenuItem value="sample-b" primaryText="Sample B" />
+                      <MenuItem value="sample-c" primaryText="Sample C" />
+                    </SelectField>
                   </div>
                 ),
               },
@@ -291,7 +112,20 @@ export default class ModelPage extends React.Component {
                 name: 'boundary',
                 title: 'Boundary',
                 content: (
-                  <p>An ad group contains one or more ads which target a shared set of keywords.</p>
+                  <div className="form-fields">
+                    <SelectField
+                      name="boundary"
+                      label="Available Boundaries"
+                      className="form-fields__item"
+                      validate={[
+                        required,
+                      ]}
+                    >
+                      <MenuItem value="boundary-a" primaryText="Some Boundary A" />
+                      <MenuItem value="boundary-b" primaryText="Some Boundary B" />
+                      <MenuItem value="boundary-c" primaryText="Some Boundary C" />
+                    </SelectField>
+                  </div>
                 ),
               },
               {
@@ -300,17 +134,30 @@ export default class ModelPage extends React.Component {
                 content: (
                   <div className="form-fields">
                     <TextField
+                      name="prediction-years"
+                      label="Prediction Years"
                       className="form-fields__item"
-                      floatingLabelText="Prediction Years"
+                      autoComplete="off"
+                      validate={[
+                        required,
+                      ]}
                     />
                     <TextField
+                      name="min-width"
+                      label="Minimum Width"
                       className="form-fields__item"
-                      floatingLabelText="Minimum Width"
+                      autoComplete="off"
+                      validate={[
+                        required,
+                      ]}
                     />
                     <SelectField
-                      floatingLabelText="Mean Variance"
-                      value={meanVar}
-                      onChange={this._bound_updateMeanVar}
+                      name="mean-variance"
+                      label="Mean Variance"
+                      className="form-fields__item"
+                      validate={[
+                        required,
+                      ]}
                     >
                       <MenuItem value="none" primaryText="None" />
                       <MenuItem value="calibration" primaryText="Calibration" />
@@ -321,104 +168,6 @@ export default class ModelPage extends React.Component {
               },
             ]}
           />
-          <Stepper
-            style={{
-              display: 'none',
-            }}
-            activeStep={stepIndex}
-            linear={false}
-            orientation="vertical"
-          >
-            <Step>
-              <StepButton
-                onClick={() => this.setState({stepIndex: 0})}
-              >Primary</StepButton>
-              <StepContent>
-                <Card
-                  style={this.stepCardStyles}
-                >
-                  <CardText
-                    className="form-fields"
-                  >
-                    <TextField
-                      className="form-fields__item"
-                      floatingLabelText="Title"
-                    />
-                    <TextField
-                      className="form-fields__item"
-                      floatingLabelText="Description"
-                      multiLine={true}
-                      rows={2}
-                      rowsMax={4}
-                    />
-                    <p>Derived From</p>
-                  </CardText>
-                  <CardActions>
-                    {this.renderStepActions(0)}
-                  </CardActions>
-                </Card>
-              </StepContent>
-            </Step>
-
-            <Step>
-              <StepButton
-                icon={<WarningIcon color={red500} />}
-                onClick={() => this.setState({stepIndex: 1})}
-              >Boundary</StepButton>
-              <StepContent>
-                <p>An ad group contains one or more ads which target a shared set of keywords.</p>
-                {this.renderStepActions(1)}
-              </StepContent>
-            </Step>
-
-            <Step>
-              <StepButton
-                onClick={() => this.setState({stepIndex: 2})}
-              >Inputs</StepButton>
-              <StepContent>
-                <Card
-                  style={this.stepCardStyles}
-                >
-                  <CardText
-                    className="form-fields"
-                  >
-                    <TextField
-                      className="form-fields__item"
-                      floatingLabelText="Prediction Years"
-                    />
-                    <TextField
-                      className="form-fields__item"
-                      floatingLabelText="Minimum Width"
-                    />
-                    <SelectField
-                      floatingLabelText="Mean Variance"
-                      value={meanVar}
-                      onChange={this._bound_updateMeanVar}
-                    >
-                      <MenuItem value="none" primaryText="None" />
-                      <MenuItem value="calibration" primaryText="Calibration" />
-                      <MenuItem value="chained" primaryText="Chained" />
-                    </SelectField>
-                  </CardText>
-                  <CardActions>
-                    {this.renderStepActions(2)}
-                  </CardActions>
-                </Card>
-              </StepContent>
-            </Step>
-
-            <Step>
-              <StepButton
-                onClick={() => this.setState({stepIndex: 3})}
-              >Review</StepButton>
-              <StepContent>
-                <p>
-                  Show validation results of each step here.
-                </p>
-                {this.renderStepActions(3)}
-              </StepContent>
-            </Step>
-          </Stepper>
         </div>
       </MuiThemeProvider>
     );

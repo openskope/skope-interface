@@ -5,7 +5,7 @@
 import {
   connect,
 } from 'react-redux';
-import * as actions from '/imports/ui/actions';
+import { actions } from '/imports/ui/redux-store';
 
 import Component from './component';
 

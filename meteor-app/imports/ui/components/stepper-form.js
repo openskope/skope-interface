@@ -1,20 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {
+  reduxForm,
+  SubmissionError,
+} from 'redux-form';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import customTheme from '/imports/ui/styling/muiTheme';
 import {
   Step,
   Stepper,
   StepButton,
-  StepLabel,
   StepContent,
 } from 'material-ui/Stepper';
 import {
   Card,
   CardActions,
-  CardHeader,
-  CardMedia,
-  CardTitle,
   CardText,
 } from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -28,17 +28,19 @@ import {
 
 export default class StepperForm extends React.Component {
   static propTypes = {
+    // Name of the form.
+    name: PropTypes.string.isRequired,
+    defaultValues: PropTypes.object,
+    // Steps.
     steps: PropTypes.arrayOf(PropTypes.shape({
       name: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
       fields: PropTypes.arrayOf(PropTypes.object),
+      content: PropTypes.any,
       validation: PropTypes.func,
-      // Used to block transition when validation fails.
-      validationBlocksAdvancing: PropTypes.bool,
       // Used to block transition when validation fails.
       validationBlocksRetreating: PropTypes.bool,
     })).isRequired,
-    //!
   };
 
   static stepCardStyles = {
@@ -48,68 +50,131 @@ export default class StepperForm extends React.Component {
     marginBottom: 20,
   };
 
-  static packageStep = (step, index) => ({
-    ...step,
-    index,
-    //!
-  });
-
   constructor (props) {
     super(props);
+
+    this._createReduxForm = reduxForm({
+      form: props.name,
+      destroyOnUnmount: false,
+      forceUnregisterOnUnmount: true,
+      enableReinitialize: true,
+      keepDirtyOnReinitialize: true,
+      onSubmitSuccess: (next, dispatch) => next(dispatch),
+      onSubmitFail: (errors, dispatch, submitError) => console.error(errors, submitError),
+      // validate
+    });
+
+    this._packageStep = (step, stepIndex) => ({
+      ...step,
+      index: stepIndex,
+      ContentForm: this._createReduxForm(({
+        handleSubmit,
+
+        onReset,
+      }) => (
+        <form onSubmit={handleSubmit} onReset={onReset}>
+          <Card
+            style={this.constructor.stepCardStyles}
+          >
+            <CardText>{step.content}</CardText>
+            <CardActions>
+              <div
+                style={{
+                  margin: '12px 0',
+                }}
+              >
+                <RaisedButton
+                  type="submit"
+                  label={stepIndex >= this.stepCount ? 'Finish' : 'Next'}
+                  disableTouchRipple
+                  disableFocusRipple
+                  primary
+                />
+                {stepIndex > 0 && (
+                  <FlatButton
+                    type="reset"
+                    label="Back"
+                    disabled={stepIndex === 0}
+                    disableTouchRipple
+                    disableFocusRipple
+                    style={{
+                      marginLeft: 12,
+                    }}
+                  />
+                )}
+              </div>
+            </CardActions>
+          </Card>
+        </form>
+      )),
+      // Stores the reference to the form.
+      contentForm: null,
+    });
+
+    // Array of packaged steps.
+    this._steps = props.steps.map(this._packageStep);
+
+    // Map of steps by name.
+    this._stepsMap = this._steps.reduce((acc, step) => ({
+      ...acc,
+      [step.name]: step,
+    }), {});
 
     this.state = {
       stepIndex: 0,
       finished: false,
-      // Array of packaged steps.
-      steps: props.steps.map(this.constructor.packageStep),
       // Stores validation results.
       validations: {},
     };
-
-    // Map of steps by name.
-    this.state.stepsMap = this.state.steps.reduce((acc, step) => ({
-      ...acc,
-      [step.name]: step,
-    }), {});
   }
 
   get stepCount () {
-    return this.state.steps.length;
+    return this._steps.length;
   }
 
-  getStepByIndex = (stepIndex) => this.state.steps[stepIndex];
+  getStepByIndex = (stepIndex) => this._steps[stepIndex];
 
-  getStepByName = (stepName) => this.state.stepsMap[stepName];
+  getStepByName = (stepName) => this._stepsMap[stepName];
 
-  isStepValidated = (stepName) => stepName in this.state.validations;
-
-  isStepValid = (stepName) => Boolean(this.state.validations[stepName]);
-
-  validateStep (stepName) {
-    //!
-    let isValid = false;
-
-    const step = this.getStepByName(stepName);
-
-    if (step.validation) {
-      //! Collect all fields.
-      const fields = {};
-      const allFields = {};
-
-      isValid = step.validation(fields, allFields);
-    } else {
-      isValid = true;
-    }
-
+  setStepValid = (stepName, isValid) => {
     this.setState({
       validations: {
         ...this.state.validations,
         [stepName]: isValid,
       },
     });
+  };
 
-    return isValid;
-  }
+  /**
+   * Any field-level validations will happen before this function.
+   * This function returns another function for handling the step form submission.
+   * @param  {Object} step
+   * @param  {Number} stepIndex
+   * @param  {Array.<Object>} steps
+   * @return {Function}
+   */
+  getStepSubmissionHandler = (step, stepIndex) =>
+  (values) => new Promise((resolve) => {
+    if (step.validation) {
+      const validationErrors = step.validation(values);
+
+      if (Object.keys(validationErrors).length > 0) {
+        throw new SubmissionError(validationErrors);
+      }
+    }
+
+    resolve(() => this.goToStepByIndex(stepIndex + 1));
+  });
+
+  /**
+   * This function returns another function for handling the step form retraction.
+   * @param  {Object} step
+   * @param  {Number} stepIndex
+   * @param  {Array.<Object>} steps
+   * @return {Function}
+   */
+  getStepRetractionHandler = (step, stepIndex) =>
+  () => this.goToStepByIndex(stepIndex - 1);
 
   goToStepByIndex (nextStepIndex) {
     const currSectionIndex = this.state.stepIndex;
@@ -117,12 +182,9 @@ export default class StepperForm extends React.Component {
 
     if (!isReviewStep) {
       const currStep = this.getStepByIndex(currSectionIndex);
-      const stepIsValid = this.validateStep(currStep.name);
+      const stepIsValid = this.updateStepValidity(currStep.name);
 
-      if (currStep.validationBlocksAdvancing && (nextStepIndex > currSectionIndex)) {
-        return;
-      }
-      if (currStep.validationBlocksRetreating && (nextStepIndex < currSectionIndex)) {
+      if (!stepIsValid && currStep.validationBlocksRetreating && (nextStepIndex < currSectionIndex)) {
         return;
       }
     }
@@ -132,61 +194,56 @@ export default class StepperForm extends React.Component {
     });
   }
 
-  renderStepActions = (stepIndex, stepCount) =>
-  <div
-    style={{
-      margin: '12px 0',
-    }}
-  >
-    <RaisedButton
-      label={stepIndex >= stepCount ? 'Finish' : 'Next'}
-      disableTouchRipple={true}
-      disableFocusRipple={true}
-      primary={true}
-      onClick={() => this.goToStepByIndex(stepIndex + 1)}
-    />
-    {stepIndex > 0 && (
-      <FlatButton
-        label="Back"
-        disabled={stepIndex === 0}
-        disableTouchRipple={true}
-        disableFocusRipple={true}
-        onClick={() => this.goToStepByIndex(stepIndex - 1)}
-        style={{
-          marginLeft: 12,
-        }}
-      />
-    )}
-  </div>;
+  updateStepValidity (stepName) {
+    const step = this.getStepByName(stepName);
+    const contentForm = step.contentForm;
+    let isValid = !contentForm.invalid;
 
-  renderStep = (step, stepIndex, steps) =>
-  <Step key={`form-section-${stepIndex}`}>
-    <StepButton
-      icon={
-        !this.isStepValidated(step.name)
-        ? (stepIndex + 1)
-        : (
-          this.isStepValid(step.name)
-          ? <CheckIcon color={green500} />
-          : <WarningIcon color={red500} />
-        )
+    if (isValid && step.validation) {
+      const validationErrors = step.validation(contentForm.values);
+
+      if (Object.keys(validationErrors).length > 0) {
+        isValid = false;
       }
-      onClick={() => this.goToStepByIndex(stepIndex)}
-    >{step.title}</StepButton>
-    <StepContent>
-      <Card
-        style={this.constructor.stepCardStyles}
-      >
-        <CardText>{step.content}</CardText>
-        <CardActions>{this.renderStepActions(stepIndex, steps.length)}</CardActions>
-      </Card>
-    </StepContent>
-  </Step>;
+    }
+
+    this.setStepValid(stepName, isValid);
+
+    return isValid;
+  }
+
+  isStepValid = (stepName) => Boolean(this.state.validations[stepName]);
+
+  isStepValidated = (stepName) => stepName in this.state.validations;
+
+  renderStep = (step, stepIndex, steps) => (
+    <Step key={`form-section-${stepIndex}`}>
+      <StepButton
+        icon={
+          this.state.stepIndex === stepIndex || !this.isStepValidated(step.name)
+          ? (stepIndex + 1)
+          : (
+            this.isStepValid(step.name)
+            ? <CheckIcon color={green500} />
+            : <WarningIcon color={red500} />
+          )
+        }
+        onClick={() => this.goToStepByIndex(stepIndex)}
+      >{step.title}</StepButton>
+      <StepContent>
+        <step.ContentForm
+          ref={(ref) => step.contentForm = ref}
+          onReset={this.getStepRetractionHandler(step, stepIndex, steps)}
+          onSubmit={this.getStepSubmissionHandler(step, stepIndex, steps)}
+          initialValues={this.props.defaultValues}
+        />
+      </StepContent>
+    </Step>
+  );
 
   render () {
     const {
       stepIndex,
-      steps,
     } = this.state;
 
     return (
@@ -196,9 +253,9 @@ export default class StepperForm extends React.Component {
           linear={false}
           orientation="vertical"
         >
-          {steps.map(this.renderStep)}
+          {this._steps.map(this.renderStep)}
 
-          <Step key={`step-review`}>
+          <Step key={'step-review'}>
             <StepButton>Review</StepButton>
             <StepContent>
               <Card
@@ -208,6 +265,12 @@ export default class StepperForm extends React.Component {
                   <p>
                     Show validation results of each step here.
                   </p>
+                  <RaisedButton
+                    label="Submit"
+                    disableTouchRipple
+                    disableFocusRipple
+                    primary
+                  />
                 </CardText>
                 <CardActions>Actions</CardActions>
               </Card>
