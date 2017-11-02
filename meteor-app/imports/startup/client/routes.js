@@ -13,6 +13,7 @@ import reducers from '/imports/ui/reducers';
 import FixedWidthLayout from '/imports/ui/layouts/fixed-width';
 import FullWindowLayout from '/imports/ui/layouts/full-window';
 import HomePage from '/imports/ui/pages/home';
+import {IndexHeader} from '/imports/ui/pages/home/index-header';
 import SearchPage from '/imports/ui/pages/search';
 import WorkspacePage from '/imports/ui/pages/tabbed-workspace';
 import Charts from '/imports/ui/components/workspace-charts';
@@ -58,9 +59,12 @@ FlowRouter.route('/', {
 
     mountWithStore(store, FixedWidthLayout, {
       header: (
-        <AppbarHeader
-          onClickHelpButton={() => alert('Show help for home page.')}
-        />
+        <div>
+          <AppbarHeader
+            onClickHelpButton={() => alert('Show help for home page.')}
+          />
+          <IndexHeader />
+        </div>
       ),
       body: <HomePage />,
       footer: null,
