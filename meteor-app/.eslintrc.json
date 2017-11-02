@@ -9,6 +9,7 @@
     "react/no-multi-comp": "warn",
     "react/no-array-index-key": "warn",
     "react/prop-types": "warn",
+    "react/forbid-prop-types": "off",
     "arrow-body-style": "off",
     "arrow-parens": [
       "error",

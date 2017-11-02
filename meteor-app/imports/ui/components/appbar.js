@@ -16,8 +16,7 @@ import AccountIcon from 'material-ui/svg-icons/action/account-circle';
 import NoNotificationIcon from 'material-ui/svg-icons/social/notifications-none';
 import CodeIcon from 'material-ui/svg-icons/action/code';
 
-// Import actions for the redux store.
-import * as actions from '/imports/ui/actions';
+import { actions } from '/imports/ui/redux-store';
 
 import {
   demoRepository,
@@ -75,7 +74,7 @@ const Component = ({
               color: APPBAR_COLOR,
             }}
           >
-            <span style={{marginRight: 30}}>SKOPE</span>
+            <span style={{ marginRight: 30 }}>SKOPE</span>
             {title}
           </div>
         }
@@ -129,15 +128,12 @@ const Component = ({
         open={drawerIsOpen}
         onRequestChange={setDrawerOpenState}
       >
-        {appSettings.drawerItems.map(({
-          title,
-          url,
-        }) => (
+        {appSettings.drawerItems.map((item) => (
           <MenuItem
-            key={title}
-            onClick={() => navigateTo(url)}
-            leftIcon={currentRouterPath === url ? <ArrowRightIcon /> : null}
-          >{title}</MenuItem>
+            key={item.title}
+            onClick={() => navigateTo(item.url)}
+            leftIcon={currentRouterPath === item.url ? <ArrowRightIcon /> : null}
+          >{item.title}</MenuItem>
         ))}
       </Drawer>
     </div>

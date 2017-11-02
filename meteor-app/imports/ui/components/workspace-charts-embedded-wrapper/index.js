@@ -4,7 +4,7 @@ import {
 } from 'react-redux';
 import uuidv4 from 'uuid/v4';
 
-import * as actions from '/imports/ui/actions';
+import { actions } from '/imports/ui/redux-store';
 
 import Component from './component';
 
