@@ -1,6 +1,6 @@
 {
   "name": "skope",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "private": true,
   "demoRepository": "https://github.com/openskope/skope-interface.git",
   "scripts": {
