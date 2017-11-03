@@ -12,6 +12,7 @@ export default class TextMenu extends React.Component {
 
     this.state = { open: [] };
     this.data = this.props.data;
+    this.style = this.props.style;
     for (let i = 0; i < this.data.length; i += 1) {
       this.state.open.push(false);
     }
@@ -29,7 +30,6 @@ export default class TextMenu extends React.Component {
   }
 
   handleRequestClose(id) {
-    console.log("asdasd");
     this.setState({
       open: this.state.open.map((value, i) => (i === id ? false : value)),
     });
@@ -86,10 +86,11 @@ export default class TextMenu extends React.Component {
         </Popover>
        );
     } // for
+    let textMenuStyle = this.style.textMenuStyle;
 
     return (
       <MuiThemeProvider>
-        <div>
+        <div style={textMenuStyle}>
           {reactComponents}
         </div>
       </MuiThemeProvider>

@@ -48,7 +48,43 @@ export function IndexHeader(props) {
   ];
   dataVar.push({type:'menu', label:'Products', items:itemsArr5});
   dataVar.push({type:'menu', label:'SKOPE Team'});
-  return (<TextMenu data={dataVar}/>);
+
+  let styleVar = {textMenuStyle: {margin: '0px', border: '0px', backgroundColor: 'rgb(247, 245, 231)', textAlign: 'center'}};
+  
+  let imageStyle = {
+      background:'url(https://www.openskope.org/wp-content/uploads/2015/03/cropped-grissno2ce4.jpg) no-repeat scroll top',
+      height: '230px',
+      border: '0px',
+      margin: '0px',
+      padding: '0px 0px 0px 0px'
+    };
+
+  let h1Style = {
+    fontFamily: 'Bitter, Georgia, serif',
+    color: '#ac0404',
+    fontWeight: 'bold',
+    fontSize: '60px',
+    lineHeight: '1',
+    margin: '0px',
+    padding: '58px 40px 10px'
+  };
+
+  let h2Style = {
+    font: '300 italic 24px "Source Sans Pro", Helvetica, sans-serif',
+    color: '#960028',
+    margin: '0',
+    padding: '0px 40px'
+  };
+
+  return (
+    <div>
+      <div style={imageStyle}>
+        <h1 style={h1Style}>SKOPE</h1>
+        <h2 style={h2Style}>Synthesizing Knowledge of Past Environments</h2>
+      </div>
+      <TextMenu style={styleVar} data={dataVar}/>
+    </div>
+  );
 
 /*  return (
   <MuiThemeProvider>
