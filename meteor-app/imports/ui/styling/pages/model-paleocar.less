@@ -8,8 +8,23 @@
   .form-fields {
     .flex-col;
 
+    position: relative;
+
     & > .form-fields__item {
       width: auto !important;
+    }
+
+    .form-widget {
+      position: absolute;
+      top: 0;
+      left: 100%;
+      margin-left: 50px;
+
+    }
+
+    .mapview {
+      width: 300px;
+      height: 200px;
     }
   }
 
