@@ -7,7 +7,7 @@ import store, { actions } from '/imports/ui/redux-store';
 import FixedWidthLayout from '/imports/ui/layouts/fixed-width';
 import FullWindowLayout from '/imports/ui/layouts/full-window';
 import HomePage from '/imports/ui/pages/home';
-import SearchPage from '/imports/ui/pages/search';
+import SearchPage from '/imports/ui/pages/search-by-map';
 import WorkspacePage from '/imports/ui/pages/tabbed-workspace';
 import Charts from '/imports/ui/components/workspace-charts';
 import PaleoCarModelPage from '/imports/ui/pages/model-paleocar--stepper';
@@ -68,7 +68,7 @@ FlowRouter.route('/search', {
       path: this.pathDef,
     });
 
-    mountWithStore(store, FixedWidthLayout, {
+    mountWithStore(store, FullWindowLayout, {
       header: (
         <AppbarHeader
           onClickHelpButton={() => alert('Show help for search page.')}
