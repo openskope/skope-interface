@@ -5,12 +5,14 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import customTheme from '/imports/ui/styling/muiTheme';
 import Paper from 'material-ui/Paper';
 import SpatialFilter from '/imports/ui/components/searchkit-spatial-filter';
+import moment from 'moment';
 
 import {
   SearchkitManager,
   SearchkitProvider,
   Pagination,
   RefinementListFilter,
+  DynamicRangeFilter,
   LayoutResults,
   ActionBar,
   ActionBarRow,
@@ -178,7 +180,12 @@ export default class SearchPage extends React.Component {
 
                 <SpatialFilter className="spatial-filter" />
 
-                <div className="temporal-filter">Temporal Filter</div>
+                <DynamicRangeFilter
+                  id="creationdate-range"
+                  field="CreationDate"
+                  title="Temporal Filter"
+                  rangeFormatter={(timestamp) => moment(timestamp).format('YYYY')}
+                />
               </div>
             </Paper>
             <div className="page-search__result">
