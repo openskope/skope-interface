@@ -9,15 +9,14 @@ import MapView from '/imports/ui/components/mapview';
 export default class SpatialFilter extends SearchkitComponent {
 
   static defaultProps = {
-    id: 'q',
-    mod: 'sk-search-box',
+    id: 'coord',
+    mod: 'sk-spatial-filter',
   };
 
   static propTypes = {
     ...SearchkitComponent.propTypes,
 
     id: PropTypes.string,
-    queryBuilder: PropTypes.func,
     queryFields: PropTypes.arrayOf(PropTypes.string),
     queryOptions: PropTypes.object,
     prefixQueryFields: PropTypes.arrayOf(PropTypes.string),
@@ -42,7 +41,6 @@ export default class SpatialFilter extends SearchkitComponent {
       id,
       prefixQueryFields,
       queryFields,
-      queryBuilder,
       queryOptions,
       prefixQueryOptions,
     } = this.props;
@@ -58,7 +56,26 @@ export default class SpatialFilter extends SearchkitComponent {
         queryOptions: {
           ...queryOptions,
         },
-        queryBuilder,
+        queryBuilder: (query, queryOptions) => {
+          return {
+            bool: {
+              must: {
+                match_all: {},
+              },
+              filter: {
+                geo_shape: {
+                  location: {
+                    shape: {
+                      type: 'Point',
+                      coordinates: query,
+                    },
+                    relation: 'contains',
+                  },
+                },
+              },
+            },
+          };
+        },
         onQueryStateChange: () => {
           if (!this.unmounted && this.state.selectedPoint) {
             this.setState({
