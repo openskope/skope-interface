@@ -13,6 +13,7 @@ import {
 import MenuItem from 'material-ui/MenuItem';
 import FlatButton from 'material-ui/FlatButton';
 import StepperForm from '/imports/ui/components/stepper-form';
+import MapView from '/imports/ui/components/mapview';
 import geojsonExtent from 'geojson-extent';
 
 export default ({
@@ -109,15 +110,15 @@ export default ({
                     disableFocusRipple
                   />
                   <div className="form-widget">
-                    <map-view
-                      class="mapview"
+                    <MapView
+                      className="mapview"
                       basemap="osm"
                       projection="EPSG:4326"
                       extent={mapPreviewExtent}
                       ref={(ref) => this._mapview = ref}
                     >{!selectedBoundaryData ? null : (
                       <map-layer-geojson src-json={selectedBoundaryData} />
-                    )}</map-view>
+                    )}</MapView>
                   </div>
                 </div>
               ),
