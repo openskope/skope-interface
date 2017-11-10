@@ -29,8 +29,7 @@ export default class SpatialFilter extends SearchkitComponent {
     super(props);
 
     this.state = {
-      inspectPointSelected: false,
-      inspectPointCoordinate: [0, 0],
+      selectedPoint: null,
     };
   }
 
@@ -61,15 +60,22 @@ export default class SpatialFilter extends SearchkitComponent {
         },
         queryBuilder,
         onQueryStateChange: () => {
-          if (!this.unmounted && this.state.inspectPointSelected) {
+          if (!this.unmounted && this.state.selectedPoint) {
             this.setState({
-              inspectPointSelected: false,
-              inspectPointCoordinate: [0, 0],
+              selectedPoint: null,
             });
           }
         },
       },
     );
+  }
+
+  getValue () {
+    return this.state.selectedPoint || this.getAccessorValue();
+  }
+
+  getAccessorValue () {
+    return this.accessor.state.getValue() || null;
   }
 
   searchQuery (query) {
@@ -81,41 +87,37 @@ export default class SpatialFilter extends SearchkitComponent {
   }
 
   _mapOnClick = (event) => {
-    let inspectPointSelected = false;
-    let inspectPointCoordinate = [0, 0];
+    event.preventDefault();
 
-    if (event.latLongCoordinate) {
-      inspectPointSelected = true;
-      inspectPointCoordinate = event.latLongCoordinate;
-    }
+    const selectedPoint = event.latLongCoordinate || null;
 
     this.setState({
-      inspectPointSelected,
-      inspectPointCoordinate,
+      selectedPoint,
     });
 
-    this.searchQuery(inspectPointCoordinate);
+    this.searchQuery(selectedPoint);
   }
 
   render () {
+    const selectedPoint = this.getValue();
     const {
-      inspectPointSelected,
-      inspectPointCoordinate,
-    } = this.state;
+      className,
+    } = this.props;
 
     return (
       <MapView
-        className="map-wrapper"
+        className={className}
         basemap="osm"
         center="-12107625, 4495720"
         zoom="5"
         onClick={this._mapOnClick}
+        onContextMenu={this._mapOnClick}
         ref={(ref) => this._mapview = ref}
       >
         <map-layer-singlepoint
-          invisible={!inspectPointSelected ? 'invisible' : null}
-          latitude={inspectPointCoordinate[1]}
-          longitude={inspectPointCoordinate[0]}
+          invisible={!selectedPoint ? 'invisible' : null}
+          latitude={selectedPoint ? selectedPoint[1] : 0}
+          longitude={selectedPoint ? selectedPoint[0] : 0}
         />
 
         <map-control-defaults />
