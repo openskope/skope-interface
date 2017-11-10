@@ -6,8 +6,7 @@ import React from 'react';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import TextMenu from '/imports/ui/components/textmenu';
 
-export function IndexHeader(props) {
-  super(props);
+export function IndexHeader() {
   const dataVar = [];
   const itemsArr = [{ type: 'menuitem', label: 'SKOPE NSF Proposal' },
                   { type: 'menuitem', label: 'SKOPE Prototype' },

@@ -18,6 +18,9 @@ export default class TextMenu extends React.Component {
       this.state.open.push(false);
     }
     this.numberOfElements = 0;
+
+    this.handleTouchTap = this.handleTouchTap.bind(this);
+    this.handleRequestClose = this.handleRequestClose.bind(this);
   }
 
   handleTouchTap(id, event) {
