@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import customTheme from '/imports/ui/styling/muiTheme';
+import Paper from 'material-ui/Paper';
+import SpatialFilter from '/imports/ui/components/searchkit-spatial-filter';
 
 import {
   SearchkitManager,
   SearchkitProvider,
   Pagination,
-  SearchBox,
   RefinementListFilter,
   LayoutResults,
   ActionBar,
@@ -157,13 +160,49 @@ export default class SearchPage extends React.Component {
 
     return (
       <SearchkitProvider searchkit={searchkit}>
-        <div className="page-search">
-          <div className="page-search__search" style={{backgroundColor: 'red'}}>
-            
+        <MuiThemeProvider muiTheme={customTheme}>
+          <div className="page-search">
+            <Paper className="page-search__search">
+              <div className="page-search__search__inner">
+                <RefinementListFilter
+                  id="resultTypes-list"
+                  title="Result Types"
+                  field="ResultTypes"
+                  operator="OR"
+                  orderKey="_term"
+                  orderDirection="asc"
+                  size={5}
+                />
+
+                <SpatialFilter />
+
+                <div className="temporal-filter">Temporal Filter</div>
+              </div>
+            </Paper>
+            <div className="page-search__result">
+              <LayoutResults>
+                <ActionBar>
+
+                  <ActionBarRow>
+                    <HitsStats />
+                  </ActionBarRow>
+
+                  <ActionBarRow>
+                    <SelectedFilters />
+                    <ResetFilters />
+                  </ActionBarRow>
+
+                </ActionBar>
+                <Hits mod="sk-hits-grid" hitsPerPage={3} itemComponent={SearchResultItem} />
+                <NoHits />
+
+                <Pagination
+                  showNumbers
+                />
+              </LayoutResults>
+            </div>
           </div>
-          <div className="page-search__result" style={{backgroundColor: 'blue'}}>
-          </div>
-        </div>
+        </MuiThemeProvider>
       </SearchkitProvider>
     );
   }

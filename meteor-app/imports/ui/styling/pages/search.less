@@ -162,11 +162,40 @@
 .page-search {
   .flex-row;
 
+  // Set the side-to-side ratio here.
   & > &__search {
-    .flex-layout-fill;
+    flex: 1 1 0;
   }
 
   & > &__result {
-    .flex-layout-fill;
+    flex: 2 2 0;
+  }
+
+  &__search {
+    padding: @global-layout-padding;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  &__search__inner {
+    .flex-col;
+
+    & > .map-wrapper {
+      .flex-layout-fill;
+    }
+
+    & > * {
+      margin-bottom: @global-layout-margin;
+    }
+
+    height: 100%;
+    width: 100%;
+    max-height: 600px;
+    min-height: 300px;
+  }
+
+  &__result {
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }

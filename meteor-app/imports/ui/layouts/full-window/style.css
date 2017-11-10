@@ -20,4 +20,5 @@
 
 .layout-fullWindow > .layout__body {
   flex: 1 1 0;
+  overflow: hidden;
 }
