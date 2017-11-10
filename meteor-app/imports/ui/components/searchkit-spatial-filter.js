@@ -139,7 +139,6 @@ export default class SpatialFilter extends SearchkitComponent {
 
         <map-control-defaults />
         <map-interaction-defaults />
-        <map-control-simple-layer-list />
       </MapView>
     );
   }
