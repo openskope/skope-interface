@@ -174,7 +174,9 @@ export default class SearchPage extends React.Component {
                   size={5}
                 />
 
-                <SpatialFilter />
+                <div className="layout-filler" />
+
+                <SpatialFilter className="spatial-filter" />
 
                 <div className="temporal-filter">Temporal Filter</div>
               </div>
