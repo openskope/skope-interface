@@ -1,10 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import customTheme from '/imports/ui/styling/muiTheme';
+import {
+  Card,
+  CardActions,
+  CardHeader,
+  CardText,
+} from 'material-ui/Card';
 import Paper from 'material-ui/Paper';
 import SpatialFilter from '/imports/ui/components/searchkit-spatial-filter';
+import TextField from 'material-ui/TextField';
+import FlatButton from 'material-ui/FlatButton';
 import moment from 'moment';
 
 import {
@@ -24,6 +31,17 @@ import {
 } from 'searchkit';
 
 class SearchResultItem extends React.Component {
+
+  static getDateRange (start, end) {
+    if (!start && !end) {
+      return '';
+    }
+
+    return [start, end]
+    .map((s) => (s && moment(s).format('YYYY-MM-DD')) || '')
+    .join(' - ');
+  }
+
   render () {
     const {
       result: {
@@ -31,119 +49,66 @@ class SearchResultItem extends React.Component {
           Title,
           Creator,
           CreationDate,
-          Status,
+          // Status,
           Rating,
-          ResultTypes,
+          // ResultTypes,
           StartDate,
           EndDate,
-          Inputs,
-          Info,
-          Reference,
+          // Inputs,
+          // Info,
+          // Reference,
         },
       },
     } = this.props;
 
     return (
-      <div className="container">
-        <div className="result-container">
-          <div className="app-bar">
-            <div className="header"><a href={FlowRouter.url('/workspace')}>{Title}</a></div>
-            <div className="date">Creation Date: {CreationDate.substring(0, 10)}</div>
+      <Card className="search-result-item">
+        <CardHeader
+          title={Title}
+          subtitle={this.constructor.getDateRange(StartDate, EndDate)}
+        />
+        <CardText className="search-result-item__content">
+          <div
+            className="search-result-item__thumbnail"
+            style={{
+              backgroundImage: 'url(//www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp)',
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat',
+            }}
+          />
+          <div className="search-result-item__metadata">
+            <TextField
+              className="search-result-item__metadata__major"
+              floatingLabelText="Creator"
+              value={Creator}
+              style={{
+                width: 'auto',
+              }}
+            />
+            <TextField
+              className="search-result-item__metadata__major"
+              floatingLabelText="Date"
+              value={moment(CreationDate).format('YYYY-MM-DD')}
+              style={{
+                width: 'auto',
+              }}
+            />
+            <TextField
+              className="search-result-item__metadata__major"
+              floatingLabelText="Rating"
+              value={Rating}
+              style={{
+                width: 'auto',
+              }}
+            />
+            <p className="search-result-item__metadata__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mattis pretium massa. Aliquam erat volutpat. Nulla facilisi. Donec vulputate interdum sollicitudin. Nunc lacinia auctor quam sed pellentesque. Aliquam dui mauris, mattis quis lacus id, pellentesque lobortis odio.</p>
           </div>
-
-          <div className="mdc-layout-grid">
-            <div className="mdc-layout-grid__inner">
-              <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
-                <img src="http://www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp" alt="" />
-              </div>
-              <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
-                <div className="content-row-1">
-                  <div className="mdc-layout-grid__inner">
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><b>Creator</b></div>
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><b>Rating</b></div>
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><b>Status</b></div>
-                  </div>
-                  <div className="mdc-layout-grid__inner">
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><span>{Creator}</span></div>
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><span>{Rating}</span></div>
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-4"><span>{Status}</span></div>
-                  </div>
-                </div>
-
-                <div className="content-row-2">
-                  <div className="mdc-layout-grid__inner">
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"><b>Input types</b></div>
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"><b>Result types</b></div>
-                  </div>
-                  <div className="mdc-layout-grid__inner">
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-                      {
-                        Inputs !== null && Inputs.length > 0
-                        ? Inputs.map((input, index) => (
-                          <span key={index}>
-                            <span>{Inputs[index]}</span>
-                            {
-                              index < Inputs.length - 1
-                              ? <span className="vertical-divider">&#44;&#32;</span>
-                              : null
-                            }
-                          </span>
-                        ))
-                        : 'N/A'
-                      }
-                    </div>
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-                      {
-                        ResultTypes !== null && ResultTypes.length > 0
-                        ? ResultTypes.map((type, index) => (
-                          <span key={index}>
-                            <span>{ResultTypes[index]}</span>
-                            {
-                              index < ResultTypes.length - 1
-                              ? <span className="vertical-divider">&#44;&#32;</span>
-                              : null
-                            }
-                          </span>
-                        ))
-                        : 'N/A'
-                      }
-                    </div>
-                  </div>
-                </div>
-
-                <div className="content-row-3">
-                  <div className="mdc-layout-grid__inner">
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"><b>Start date</b></div>
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"><b>End date</b></div>
-                  </div>
-                  <div className="mdc-layout-grid__inner">
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-                      <span>{StartDate !== null && StartDate.length > 0 ? StartDate.substring(0, 10) : 'N/A'}</span></div>
-                    <div className="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-                      <span>{EndDate !== null && EndDate.length > 0 ? EndDate.substring(0, 10) : 'N/A'}</span></div>
-                  </div>
-                </div>
-
-              </div>
-
-
-            </div>
-          </div>
-
-          <div className="mdc-layout-grid">
-            <div className="mdc-layout-grid__inner">
-              <a className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3" href={Info}>
-                <button className="mdc-button">Information</button></a>
-              <a className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3" href={Reference}>
-                <button className="mdc-button">Reference</button></a>
-              <a className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3" download="data.json">
-                <button className="mdc-button">Download</button></a>
-              <a className="mdc-layout-grid__cell mdc-layout-grid__cell--span-3" href={FlowRouter.url('/model')}>
-                <button className="mdc-button">Create<span>Form</span></button></a>
-            </div>
-          </div>
-        </div>
-      </div>
+        </CardText>
+        <CardActions>
+          <FlatButton label="Examine" />
+          <FlatButton label="Download" />
+        </CardActions>
+      </Card>
     );
   }
 }

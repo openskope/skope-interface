@@ -58,7 +58,7 @@ export default class SpatialFilter extends SearchkitComponent {
         queryOptions: {
           ...queryOptions,
         },
-        queryBuilder: (query, queryOptions) => {
+        queryBuilder: (query/* , queryOptions */) => {
           return {
             bool: {
               must: {
