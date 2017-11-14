@@ -178,13 +178,22 @@ export default class SearchPage extends React.Component {
 
                 <div className="layout-filler" />
 
-                <SpatialFilter className="spatial-filter" />
+                <SpatialFilter
+                  className="spatial-filter"
+                  title="Point of Interest"
+                />
 
                 <DynamicRangeFilter
-                  id="creationdate-range"
-                  field="CreationDate"
-                  title="Temporal Filter"
-                  rangeFormatter={(timestamp) => moment(timestamp).format('YYYY')}
+                  id="startdate-range"
+                  field="StartDate"
+                  title="Start Date"
+                  rangeFormatter={(timestamp) => moment(timestamp).format('YYYY-MM-DD')}
+                />
+                <DynamicRangeFilter
+                  id="enddate-range"
+                  field="EndDate"
+                  title="End Date"
+                  rangeFormatter={(timestamp) => moment(timestamp).format('YYYY-MM-DD')}
                 />
               </div>
             </Paper>

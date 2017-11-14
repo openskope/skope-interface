@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {
   SearchkitComponent,
   QueryAccessor,
+  Panel,
 } from 'searchkit';
 import MapView from '/imports/ui/components/mapview';
 
@@ -16,6 +17,7 @@ export default class SpatialFilter extends SearchkitComponent {
   static propTypes = {
     ...SearchkitComponent.propTypes,
 
+    title: PropTypes.string.isRequired,
     id: PropTypes.string,
     queryFields: PropTypes.arrayOf(PropTypes.string),
     queryOptions: PropTypes.object,
@@ -118,28 +120,33 @@ export default class SpatialFilter extends SearchkitComponent {
   render () {
     const selectedPoint = this.getValue();
     const {
+      title,
       className,
     } = this.props;
 
     return (
-      <MapView
-        className={className}
-        basemap="osm"
-        center="-12107625, 4495720"
-        zoom="5"
-        onClick={this._mapOnClick}
-        onContextMenu={this._mapOnClick}
-        ref={(ref) => this._mapview = ref}
+      <Panel
+        title={title}
       >
-        <map-layer-singlepoint
-          invisible={!selectedPoint ? 'invisible' : null}
-          latitude={selectedPoint ? selectedPoint[1] : 0}
-          longitude={selectedPoint ? selectedPoint[0] : 0}
-        />
+        <MapView
+          className={className}
+          basemap="osm"
+          center="-12107625, 4495720"
+          zoom="5"
+          onClick={this._mapOnClick}
+          onContextMenu={this._mapOnClick}
+          ref={(ref) => this._mapview = ref}
+        >
+          <map-layer-singlepoint
+            invisible={!selectedPoint ? 'invisible' : null}
+            latitude={selectedPoint ? selectedPoint[1] : 0}
+            longitude={selectedPoint ? selectedPoint[0] : 0}
+          />
 
-        <map-control-defaults />
-        <map-interaction-defaults />
-      </MapView>
+          <map-control-defaults />
+          <map-interaction-defaults />
+        </MapView>
+      </Panel>
     );
   }
 }
