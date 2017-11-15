@@ -114,6 +114,13 @@ class SearchResultItem extends React.PureComponent {
   }
 }
 
+/**
+ * Expect the value input to be in the form of `<min> - <max>`.
+ * `min` and `max` are both timestamps in milliseconds.
+ * @type   {Function}
+ * @param  {String} labelValue
+ * @return {String}
+ */
 const DynamicDateRangeFormatter =
 (labelValue) => labelValue
 .split(' - ')
