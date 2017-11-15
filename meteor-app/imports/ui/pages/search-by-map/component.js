@@ -231,25 +231,26 @@ export default class SearchPage extends React.Component {
               </div>
             </Paper>
             <div className="page-search__result">
-              <LayoutResults>
-                <ActionBar>
-                  <ActionBarRow>
-                    <HitsStats />
-                  </ActionBarRow>
+              <ActionBar>
+                <ActionBarRow>
+                  <HitsStats />
+                </ActionBarRow>
 
-                  <ActionBarRow>
-                    <SelectedFilters itemComponent={FilterItem} />
-                    <ResetFilters />
-                  </ActionBarRow>
-                </ActionBar>
+                <ActionBarRow>
+                  <SelectedFilters
+                    mod="selected-filters"
+                    itemComponent={FilterItem}
+                  />
+                  <ResetFilters />
+                </ActionBarRow>
+              </ActionBar>
 
-                <Hits mod="sk-hits-grid" hitsPerPage={3} itemComponent={SearchResultItem} />
-                <NoHits />
+              <Hits mod="sk-hits-grid" hitsPerPage={3} itemComponent={SearchResultItem} />
+              <NoHits />
 
-                <Pagination
-                  showNumbers
-                />
-              </LayoutResults>
+              <Pagination
+                showNumbers
+              />
             </div>
           </div>
         </MuiThemeProvider>

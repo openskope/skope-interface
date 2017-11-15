@@ -55,6 +55,8 @@
   &__result {
     overflow-y: auto;
     overflow-x: hidden;
+
+    padding: @global-layout-padding;
   }
 
   .search-result-item {
@@ -89,6 +91,16 @@
     &__description {
       grid-column: span 3;
       grid-row: 2;
+    }
+  }
+
+  .selected-filters {
+    .flex-row;
+    flex-wrap: wrap;
+
+    &__item {
+      margin-right: 10px;
+      margin-bottom: 10px;
     }
   }
 
