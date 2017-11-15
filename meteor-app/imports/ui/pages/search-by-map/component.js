@@ -188,6 +188,18 @@ class FilterItem extends React.PureComponent {
   }
 }
 
+const ResetFilterButton = ({
+  hasFilters,
+  resetFilters,
+}) => (
+  <FlatButton
+    label="Reset Filter"
+    secondary
+    onClick={resetFilters}
+    disabled={!hasFilters}
+  />
+);
+
 export default class SearchPage extends React.Component {
 
   static propTypes = {
@@ -248,7 +260,7 @@ export default class SearchPage extends React.Component {
                     mod="selected-filters"
                     itemComponent={FilterItem}
                   />
-                  <ResetFilters />
+                  <ResetFilters component={ResetFilterButton} />
                 </ActionBarRow>
               </ActionBar>
 
