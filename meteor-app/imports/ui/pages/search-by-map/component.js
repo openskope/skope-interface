@@ -21,7 +21,6 @@ import {
   Pagination,
   RefinementListFilter,
   DynamicRangeFilter,
-  LayoutResults,
   ActionBar,
   ActionBarRow,
   HitsStats,
