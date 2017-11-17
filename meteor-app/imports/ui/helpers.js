@@ -48,3 +48,9 @@ export const mountWithStore = (store, ComponentClass, props) => mount(Provider, 
   store,
   children: <ComponentClass {...props} />,
 });
+
+/**
+ * This is a utility component for debugging purposes.
+ * It prints all the props passed to it.
+ */
+export const PropPrinter = (props) => <pre>{JSON.stringify(props, null, 2)}</pre>;

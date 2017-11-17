@@ -19,6 +19,7 @@ import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
 import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
 import LayerList from '/imports/ui/components/layerlist';
+import MapView from '/imports/ui/components/mapview';
 import Charts from '/imports/ui/components/workspace-charts-embedded-wrapper';
 import {
   clampFilterValue,
@@ -55,19 +56,6 @@ export default class WorkspacePage extends React.Component {
     this._bound_rangeFilterOnChangeInput = this._rangeFilterOnChangeInput.bind(this);
     this._bound_yearStepBackButtonOnClick = this._yearStepBackButtonOnClick.bind(this);
     this._bound_yearStepForwardButtonOnClick = this._yearStepForwardButtonOnClick.bind(this);
-    this._bound_mapOnClick = this._mapOnClick.bind(this);
-  }
-
-  componentDidMount () {
-    if (this._mapview) {
-      this._mapview.addEventListener('click:view', this._bound_mapOnClick);
-    }
-  }
-
-  componentWillUnmount () {
-    if (this._mapview) {
-      this._mapview.removeEventListener('click:view', this._bound_mapOnClick);
-    }
   }
 
   _updateFilterValue (value) {
@@ -111,13 +99,7 @@ export default class WorkspacePage extends React.Component {
     this._updateFilterValue(Math.min(rangeMax, filterValue + 1));
   }
 
-  _mapOnClick (event) {
-    const {
-      selectInspectPoint,
-    } = this.props;
-
-    selectInspectPoint(event.latLongCoordinate);
-  }
+  _mapOnClick = (event) => this.props.selectInspectPoint && this.props.selectInspectPoint(event.latLongCoordinate)
 
   render () {
     const {
@@ -230,29 +212,28 @@ export default class WorkspacePage extends React.Component {
                 </ToolbarGroup>
               </Toolbar>
 
-              <div className="map-wrapper">
-                <map-view
-                  class="the-map"
-                  basemap="osm"
-                  center="-12107625, 4495720"
-                  zoom="5"
-                  ref={(ref) => this._mapview = ref}
-                >
+              <MapView
+                className="map-wrapper"
+                basemap="osm"
+                center="-12107625, 4495720"
+                zoom="5"
+                onClick={this._mapOnClick}
+                ref={(ref) => this._mapview = ref}
+              >
 
-                  {layers.map((o) => o.element)}
+                {layers.map((o) => o.element)}
 
-                  <map-layer-singlepoint
-                    invisible={!inspectPointSelected ? 'invisible' : null}
-                    latitude={inspectPointCoordinate[1]}
-                    longitude={inspectPointCoordinate[0]}
-                  />
+                <map-layer-singlepoint
+                  invisible={!inspectPointSelected ? 'invisible' : null}
+                  latitude={inspectPointCoordinate[1]}
+                  longitude={inspectPointCoordinate[0]}
+                />
 
-                  <map-control-defaults />
-                  <map-interaction-defaults />
-                  <map-control-simple-layer-list />
+                <map-control-defaults />
+                <map-interaction-defaults />
+                <map-control-simple-layer-list />
 
-                </map-view>
-              </div>
+              </MapView>
 
             </div>
 
