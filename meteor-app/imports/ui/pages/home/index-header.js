@@ -3,42 +3,42 @@
  */
 
 import React from 'react';
-import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import TextMenu from '/imports/ui/components/textmenu';
 
 export function IndexHeader() {
-  const dataVar = [];
-  const itemsArr = [{ type: 'menuitem', label: 'SKOPE NSF Proposal' },
-                  { type: 'menuitem', label: 'SKOPE Prototype' },
-                  { type: 'menuitem', label: 'Stories' }];
-  dataVar.push({ type: 'menu', label: 'What is SKOPE?', items: itemsArr });
-
+  const itemsArr = [{ type: 'menuitem', label: 'SKOPE NSF Proposal', onClick: () => { window.location.href = 'https://www.openskope.org/skope-nsf-proposal'; }, id: '1' },
+                  { type: 'menuitem', label: 'SKOPE Prototype', onClick: () => { window.location.href = 'https://www.openskope.org/skope-prototype'; }, id: '2' },
+                  { type: 'menuitem', label: 'Stories', onClick: () => { window.location.href = 'https://www.openskope.org/sample-questions-of-the-sort-skope-plans-to-address'; }, id: '3' }];
   const itemsArr2 = [
-    { type: 'menuitem', label: 'FedData', onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
-    { type: 'menuitem', label: 'PaleoCAR', onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
-    { type: 'menuitem', label: 'Risk Landscapes', onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
-    { type: 'menuitem', label: 'SKOPE Prototype', onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
-    { type: 'menuitem', label: 'Web Resources', onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
+    { type: 'menuitem', label: 'FedData', onClick: () => { window.location.href = 'https://www.openskope.org/feddata'; }, id: '4' },
+    { type: 'menuitem', label: 'PaleoCAR', onClick: () => { window.location.href = 'https://www.openskope.org/paleoenvironmental-reconstruction-paleocar'; }, id: '5' },
+    { type: 'menuitem', label: 'Risk Landscapes', onClick: () => { window.location.href = 'https://www.openskope.org/risk-landscapes'; }, id: '6' },
+    { type: 'menuitem', label: 'SKOPE Prototype', onClick: () => { window.location.href = 'https://www.openskope.org/skope-prototype'; }, id: '7' },
+    { type: 'menuitem', label: 'Web Resources', onClick: () => { window.location.href = 'https://www.openskope.org/skope-prototype'; }, id: '8' },
   ];
-  dataVar.push({ type: 'menu', label: 'Environmental Data', items: itemsArr2 });
   const itemsArr3 = [
-    { type: 'menuitem', label: 'YesWorkflow', onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
+    { type: 'menuitem', label: 'YesWorkflow', onClick: () => { window.location.href = 'https://www.openskope.org/yesworkflow'; }, id: '9' },
   ];
-  dataVar.push({ type: 'menu', label: 'Provenance', items: itemsArr3 });
-  dataVar.push({ type: 'menu', label: 'Data Integration' });
   const itemsArr4 = [
-    { type: 'menuitem', label: "Prototype User's Guide", onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
-    { type: 'menuitem', label: 'Run SKOPE Prototype', onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
+    { type: 'menuitem', label: "Prototype User's Guide", onClick: () => { window.location.href = 'https://www.openskope.org/skope-prototype-users-guide'; }, id: '10' },
+    { type: 'menuitem', label: 'Run SKOPE Prototype', onClick: () => { window.location.href = 'http://demo.openskope.org/browse/'; }, id: '11' },
   ];
-  dataVar.push({ type: 'menu', label: 'SKOPE Prototype', items: itemsArr4 });
   const itemsArr5 = [
-    { type: 'menuitem', label: 'Publications', onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
-    { type: 'menuitem', label: 'Presentations', onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
-    { type: 'menuitem', label: 'SKOPE Prototype', onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
-    { type: 'menuitem', label: 'YesWorkflow', onClick: () => { FlowRouter.go('/imports/ui/components/hahahahaha'); } },
+    { type: 'menuitem', label: 'Publications', onClick: () => { window.location.href = 'http://demo.openskope.org/browse/'; }, id: '12' },
+    { type: 'menuitem', label: 'Presentations', onClick: () => { window.location.href = 'https://www.openskope.org/presentations'; }, id: '13' },
+    { type: 'menuitem', label: 'SKOPE Prototype', onClick: () => { window.location.href = 'https://www.openskope.org/presentations'; }, id: '14' },
+    { type: 'menuitem', label: 'YesWorkflow', onClick: () => { window.location.href = 'https://www.openskope.org/yesworkflow'; }, id: '15' },
   ];
-  dataVar.push({ type: 'menu', label: 'Products', items: itemsArr5 });
-  dataVar.push({ type: 'menu', label: 'SKOPE Team' });
+
+  const dataVar = [
+    { type: 'menu', label: 'What is SKOPE?', items: itemsArr },
+    { type: 'menu', label: 'Environmental Data', items: itemsArr2 },
+    { type: 'menu', label: 'Provenance', items: itemsArr3 },
+    { type: 'menu', label: 'Data Integration', onClick: () => { window.location.href = 'https://www.openskope.org/data-integration'; } },
+    { type: 'menu', label: 'SKOPE Prototype', items: itemsArr4 },
+    { type: 'menu', label: 'Products', items: itemsArr5 },
+    { type: 'menu', label: 'SKOPE Team', onClick: () => { window.location.href = 'https://www.openskope.org/data-integration'; } },
+  ];
 
   const styleVar = { textMenuStyle: { margin: '0px', border: '0px', backgroundColor: 'rgb(247, 245, 231)', textAlign: 'center' } };
 

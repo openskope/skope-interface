@@ -12,9 +12,7 @@ export default class TextMenu extends React.Component {
     super(props);
 
     this.state = { open: [] };
-    this.data = this.props.data;
-    this.style = this.props.style;
-    for (let i = 0; i < this.data.length; i += 1) {
+    for (let i = 0; i < this.props.data.length; i += 1) {
       this.state.open.push(false);
     }
     this.numberOfElements = 0;
@@ -48,12 +46,12 @@ export default class TextMenu extends React.Component {
       (o) => {
         let element = null;
         if (o.type === 'menuitem') {
-          element = (<MenuItem primaryText={o.label} key={`menuitem ${this.numberOfElements}`} onClick={o.onClick} />);
+          element = (<MenuItem primaryText={o.label} key={`menuitem${o.id}`} onClick={o.onClick} />);
         } else if (o.type === 'menuitem-group') {
           const children = this.convertRecursiveMenuItems(o.items, level + 1);
-          element = (<MenuItem primaryText={o.label} key={`menuitem' ${this.numberOfElements}`} menuItems={children} />);
+          element = (<MenuItem primaryText={o.label} key={`menuitem${o.id}`} menuItems={children} />);
         } else if (o.type === 'separator') {
-          element = (<Divider key={`divider' ${this.numberOfElements}`} />);
+          element = (<Divider key={`divider${o.id}`} />);
         }
         this.numberOfElements += 1;
         return element;
@@ -64,14 +62,15 @@ export default class TextMenu extends React.Component {
   render() {
     const reactComponents = [];
 
-    for (let i = 0; i < this.data.length; i += 1) {
+    for (let i = 0; i < this.props.data.length; i += 1) {
       reactComponents.push(
         <FlatButton
-          onClick={_.partial(this.handleTouchTap, i)}
-          label={this.data[i].label}
-          key={`button ${i}`}
+          onClick={(this.props.data[i].onClick == null) ? _.partial(this.handleTouchTap, i) : this.props.data[i].onClick}
+          label={this.props.data[i].label}
+          key={`button${i}`}
           backgroundColor={'#f7f5e7'}
-        />);
+        />,
+      );
       this.numberOfElements += 1;
       reactComponents.push(
         <Popover
@@ -81,17 +80,17 @@ export default class TextMenu extends React.Component {
           targetOrigin={{ horizontal: 'left', vertical: 'top' }}
           onRequestClose={_.partial(this.handleRequestClose, i)}
           onMouseLeave={_.partial(this.handleRequestClose, i)}
-          key={`popover ${(this.numberOfElements += 1)}`}
+          key={`popover${i}`}
         >
           <Menu>
             {
-              this.convertRecursiveMenuItems(this.data[i].items, 0)
+              this.convertRecursiveMenuItems(this.props.data[i].items, 0)
             }
           </Menu>
         </Popover>,
        );
     } // for
-    const textMenuStyle = this.style.textMenuStyle;
+    const textMenuStyle = this.props.style.textMenuStyle;
 
     return (
       <MuiThemeProvider>
