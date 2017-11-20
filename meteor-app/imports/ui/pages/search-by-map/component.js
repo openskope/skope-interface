@@ -13,6 +13,8 @@ import SpatialFilter from '/imports/ui/components/searchkit-spatial-filter';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 import Chip from 'material-ui/Chip';
+import MapView from '/imports/ui/components/mapview';
+import geojsonExtent from 'geojson-extent';
 import moment from 'moment';
 
 import {
@@ -42,6 +44,19 @@ class SearchResultItem extends React.PureComponent {
     .join(' - ');
   }
 
+  static buildGeoJsonWithGeometry (geometry) {
+    return {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: {},
+          geometry,
+        },
+      ],
+    };
+  }
+
   render () {
     const {
       result: {
@@ -57,9 +72,14 @@ class SearchResultItem extends React.PureComponent {
           // Inputs,
           // Info,
           // Reference,
+          location,
         },
       },
     } = this.props;
+
+    const boundaryGeoJson = location && this.constructor.buildGeoJsonWithGeometry(location);
+    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
+    const boundaryExtent = geojsonExtent(boundaryGeoJson);
 
     return (
       <Card className="search-result-item">
@@ -75,7 +95,17 @@ class SearchResultItem extends React.PureComponent {
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat',
             }}
-          />
+          >{boundaryGeoJson && (
+            <MapView
+              basemap="osm"
+              projection="EPSG:4326"
+              extent={boundaryExtent}
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+            ><map-layer-geojson src-json={boundaryGeoJsonString} /></MapView>
+          )}</div>
           <div className="search-result-item__metadata">
             <TextField
               className="search-result-item__metadata__major"

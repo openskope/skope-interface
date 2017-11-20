@@ -35,6 +35,7 @@ export default class MapView extends React.Component {
   render () {
     const {
       className,
+      style,
       children,
       ...custom
     } = this.props;
@@ -46,6 +47,7 @@ export default class MapView extends React.Component {
       <div
         className={className}
         style={{
+          ...style,
           position: 'relative',
           overflow: 'hidden',
         }}
