@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import customTheme from '/imports/ui/styling/muiTheme';
 import {
@@ -60,6 +61,7 @@ class SearchResultItem extends React.PureComponent {
   render () {
     const {
       result: {
+        _id,
         _source: {
           Title,
           Creator,
@@ -135,7 +137,7 @@ class SearchResultItem extends React.PureComponent {
           </div>
         </CardText>
         <CardActions>
-          <FlatButton label="Examine" />
+          <FlatButton label="Examine" href={FlowRouter.path('/workspace/:_id', { _id })} target="_blank" />
           <FlatButton label="Download" />
         </CardActions>
       </Card>

@@ -84,7 +84,7 @@ FlowRouter.route('/search', {
   },
 });
 
-FlowRouter.route('/workspace', {
+FlowRouter.route('/workspace/:datasetId?', {
   name: 'App.workspace',
   action(params, queryParams) {
     store.dispatch({
