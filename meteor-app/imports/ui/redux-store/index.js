@@ -7,6 +7,10 @@ import * as reducers from './reducers';
 import * as actions from './actions';
 import initialState from './initial-state';
 
+import {
+  appSettings,
+} from '/package.json';
+
 const reducer = (state = initialState, action) => {
   console.log('run reducer', action.type, { state, action });
 
@@ -32,6 +36,10 @@ const store = createStore(
   undefined,
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
 );
+
+if (appSettings.exposeStoreToGlobal) {
+  window.store = store;
+}
 
 export default store;
 export * as actions from './actions';

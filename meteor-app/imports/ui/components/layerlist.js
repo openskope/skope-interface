@@ -2,8 +2,6 @@ import React from 'react';
 import {
   connect,
 } from 'react-redux';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import customTheme from '/imports/ui/styling/muiTheme';
 import {
   Card,
   CardHeader,
@@ -32,49 +30,47 @@ const Component = ({
    */
   onChangeLayerOpacity,
 }) => (
-  <MuiThemeProvider muiTheme={customTheme}>
-    <div className={getClassName('layer-list', className)}>
-      {layers.map((layer, layerIndex) => (
-        <Card
-          key={layerIndex}
-          className="layer-list__item"
+  <div className={getClassName('layer-list', className)}>
+    {layers.map((layer, layerIndex) => (
+      <Card
+        key={layerIndex}
+        className="layer-list__item"
+      >
+        <CardHeader
+          title={
+            <Checkbox
+              label={layer.name}
+              checked={!layer.invisible}
+              onCheck={(event, isInputChecked) => onChangeLayerVisibility(layerIndex, isInputChecked)}
+              style={{
+                whiteSpace: 'nowrap',
+              }}
+            />
+          }
+          showExpandableButton
+        />
+        <CardText
+          expandable
         >
-          <CardHeader
-            title={
-              <Checkbox
-                label={layer.name}
-                checked={!layer.invisible}
-                onCheck={(event, isInputChecked) => onChangeLayerVisibility(layerIndex, isInputChecked)}
-                style={{
-                  whiteSpace: 'nowrap',
-                }}
-              />
-            }
-            showExpandableButton
-          />
-          <CardText
-            expandable
-          >
-            <div className="layer-opacity-row">
-              <label>Opacity: </label>
-              <Slider
-                className="input-slider--layer-opacity"
-                min={0}
-                max={255}
-                value={layer.opacity * 255}
-                onChange={(event, newValue) => onChangeLayerOpacity(layerIndex, newValue / 255)}
-                sliderStyle={{
-                  marginTop: 0,
-                  marginBottom: 0,
-                }}
-              />
-              <label>{layer.opacity.toFixed(2)}</label>
-            </div>
-          </CardText>
-        </Card>
-      ))}
-    </div>
-  </MuiThemeProvider>
+          <div className="layer-opacity-row">
+            <label>Opacity: </label>
+            <Slider
+              className="input-slider--layer-opacity"
+              min={0}
+              max={255}
+              value={layer.opacity * 255}
+              onChange={(event, newValue) => onChangeLayerOpacity(layerIndex, newValue / 255)}
+              sliderStyle={{
+                marginTop: 0,
+                marginBottom: 0,
+              }}
+            />
+            <label>{layer.opacity.toFixed(2)}</label>
+          </div>
+        </CardText>
+      </Card>
+    ))}
+  </div>
 );
 
 export default connect(
