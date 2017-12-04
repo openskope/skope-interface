@@ -55,6 +55,8 @@
   },
   "appSettings": {
     "exposeStoreToGlobal": true,
+    "logSearchKitQueries": false,
+    "logSearchKitQueryResults": false,
     "drawerWidth": 250,
     "drawerItems": [
       {
