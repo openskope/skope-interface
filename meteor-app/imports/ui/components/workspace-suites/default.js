@@ -113,6 +113,9 @@ export default class Component extends React.Component {
           tracking: false,
         },
       });
+
+      // Make sure all the other components are properly resized as well.
+      window.dispatchEvent(new CustomEvent('resize'));
     }
   };
 
