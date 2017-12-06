@@ -119,7 +119,9 @@ export default class Component extends React.Component {
     }
   };
 
-  render = () => (
+  render = ({
+    dataExtent = [-118.67431640625, 33.91208674157048, -109.88525390625, 42.92087580407048],
+  } = this.props) => (
     <div
       className="main-section"
       ref={(ref) => this._rootElement = ref}
@@ -193,7 +195,18 @@ export default class Component extends React.Component {
           backgroundColor: 'white',
         }}
       >
-        Hello
+        {this.state.activeTab === 'info' && (
+          <MapView
+            basemap="osm"
+            projection="EPSG:4326"
+            extent={dataExtent}
+            style={{
+              height: '100%',
+              width: '100%',
+            }}
+          >
+          </MapView>
+        )}
       </main>
     </div>
   );
