@@ -238,7 +238,7 @@ export default class SearchPage extends React.Component {
 
   static propTypes = {
     // SearchKit Manager instance.
-    searchkit: PropTypes.instanceOf(SearchkitManager),
+    searchkit: PropTypes.instanceOf(SearchkitManager).isRequired,
   };
 
   renderHeader = () => (
@@ -307,13 +307,11 @@ export default class SearchPage extends React.Component {
     </div>
   );
 
-  render = ({
-    searchkit,
-  } = this.props) => (
+  render = () => (
     <FullWindowLayout
       header={this.renderHeader()}
       body={
-        <SearchkitProvider searchkit={searchkit}>
+        <SearchkitProvider searchkit={this.props.searchkit}>
           {this.renderBody()}
         </SearchkitProvider>
       }

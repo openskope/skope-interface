@@ -11,11 +11,11 @@ import {
 import 'searchkit/release/theme.css';
 import { Meteor } from 'meteor/meteor';
 
-import Component from './component';
-
 import {
   appSettings,
 } from '/package.json';
+
+import Component from './component';
 
 const elasticEndpoint = (Meteor.settings && Meteor.settings.public && Meteor.settings.public.elasticEndpoint) || 'http://localhost:9200/';
 const searchkit = new SearchkitManager(elasticEndpoint);

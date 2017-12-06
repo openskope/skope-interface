@@ -1,11 +1,9 @@
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
-import React from 'react';
 
 // Import needed templates
 import HomePage from '/imports/ui/pages/home';
 import SearchPage from '/imports/ui/pages/search-by-map';
-import WorkspacePage from '/imports/ui/pages/tabbed-workspace';
-import Charts from '/imports/ui/components/workspace-charts';
+import WorkspacePage from '/imports/ui/pages/dynamic-workspace';
 import PaleoCarModelPage from '/imports/ui/pages/model-paleocar--stepper';
 import NotFoundPage from '/imports/ui/pages/not-found';
 

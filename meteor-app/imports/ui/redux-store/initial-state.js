@@ -27,6 +27,15 @@ export default {
   },
 
   workspace: {
+    // The ID of the dataset currently loaded or is being loaded.
+    datasetId: '',
+    // If a request is pending, this will be an object with at least a unique request ID.
+    configDataRequest: null,
+    // Stores any error encountered during requesting the config data.
+    configDataRequestError: null,
+    // Stores the config data.
+    configData: null,
+
     //! For testing only. Should be empty on start.
     layers: [
       {

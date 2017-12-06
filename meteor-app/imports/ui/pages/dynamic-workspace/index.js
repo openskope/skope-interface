@@ -47,9 +47,14 @@ const buildLayerElement = (layer, layerIndex, temporalIndex) => (
 
 export default connect(
   // mapStateToProps
-  (state) => {
+  (state, ownProps) => {
     const {
       workspace: {
+        datasetId: currentDatasetId,
+        configDataRequest,
+        configDataRequestError,
+        configData,
+
         layers,
         inspectPointSelected,
         inspectPointCoordinate,
@@ -59,8 +64,23 @@ export default connect(
         titleName,
       },
     } = state;
+    const {
+      // route,
+      // params,
+      queryParams: {
+        dataset: requestDatasetId = '',
+      },
+    } = ownProps;
+
+    const loadingConfigData = !!(currentDatasetId && configDataRequest);
 
     return {
+      currentDatasetId,
+      requestDatasetId,
+      loadingConfigData,
+      configDataRequestError,
+      configData,
+
       layers: layers.map((layer, layerIndex) => ({
         ...layer,
 
@@ -78,6 +98,10 @@ export default connect(
   },
   // mapDispatchToProps
   (dispatch) => ({
+    loadNewDataset: (datasetId) => dispatch({
+      type: 'WORKSPACE_LOAD_DATASET',
+      datasetId,
+    }),
     selectInspectPoint: (coordinate) => dispatch({
       type: actions.WORKSPACE_INSPECT_POINT.type,
       selected: true,

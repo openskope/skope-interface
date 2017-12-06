@@ -3,17 +3,15 @@ import PropTypes from 'prop-types';
 import { createStore } from 'redux';
 import { reducer as reduxFormReducer } from 'redux-form';
 
-import * as reducers from './reducers';
-import * as actions from './actions';
-import initialState from './initial-state';
-
 import {
   appSettings,
 } from '/package.json';
 
-const reducer = (state = initialState, action) => {
-  console.log('run reducer', action.type, { state, action });
+import * as reducers from './reducers';
+import * as actions from './actions';
+import initialState from './initial-state';
 
+const reducer = (state = initialState, action) => {
   let nextState = {
     ...state,
     // Insert reducer from `redux-form`.
@@ -25,8 +23,6 @@ const reducer = (state = initialState, action) => {
 
     nextState = reducers[action.type](nextState, action);
   }
-
-  console.log('next state', nextState);
 
   return nextState;
 };
