@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 import {
   Tabs,
@@ -29,201 +30,168 @@ import {
 export default class Component extends React.Component {
 
   static propTypes = {
-    // // List of layers to display.
-    // layers: PropTypes.arrayOf(PropTypes.object).isRequired,
 
-    // // Indicate if a point is selected for inspection.
-    // inspectPointSelected: PropTypes.bool.isRequired,
-    // // The coordinate of the point being inspected.
-    // inspectPointCoordinate: PropTypes.arrayOf(PropTypes.number).isRequired,
-    // // Callback function for selecting a point to inspect.
-    // selectInspectPoint: PropTypes.func.isRequired,
-
-    // // Current value of the filter slider.
-    // filterValue: PropTypes.number.isRequired,
-
-    // // The range of the filter.
-    // rangeMin: PropTypes.number.isRequired,
-    // rangeMax: PropTypes.number.isRequired,
-
-    // // Callback function for updating filter value.
-    // updateFilterValue: PropTypes.func.isRequired,
-    // putFilterValueInUrl: PropTypes.func.isRequired,
   };
 
-  _updateFilterValue = (value) => {
+  constructor (props) {
+    super(props);
+
+    //! Move these state to Redux store.
+    this.state = {
+      activeTab: 'info',
+      sidebarWidth: 400,
+      sidebarMinWidth: 400,
+      contentMinWidth: 400,
+      resizeData: {},
+    };
+  }
+
+  get resizeData () {
+    return this.state.resizeData;
+  }
+
+  onTabChange = (nextTabValue) => this.setState({
+    activeTab: nextTabValue,
+  });
+
+  onResizeHandleMouseDown = (event) => {
+    if (event.button !== 0 || this.resizeData.tracking) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const handleElement = event.currentTarget;
+
+    window.addEventListener('mousemove', this.onWindowMouseMove);
+    window.addEventListener('mouseup', this.onWindowMouseUp);
+
+    this.setState({
+      resizeData: {
+        startWidth: this._sidebarElement.clientWidth,
+        startCursorScreenX: event.screenX,
+        maxWidth: this._rootElement.clientWidth - handleElement.offsetWidth - this.state.contentMinWidth,
+        tracking: true,
+      },
+    });
+  };
+
+  onWindowMouseMove = (event) => {
     const {
-      updateFilterValue,
-      putFilterValueInUrl,
-    } = this.props;
+      tracking,
+      startCursorScreenX,
+      startWidth,
+      maxWidth,
+    } = this.resizeData;
 
-    updateFilterValue(value);
-    putFilterValueInUrl(value);
+    if (tracking) {
+      const cursorScreenXDelta = event.screenX - startCursorScreenX;
+      const newWidth = Math.max(
+        Math.min(startWidth + cursorScreenXDelta, maxWidth),
+        0
+      );
+
+      this.setState({
+        sidebarWidth: newWidth,
+      });
+    }
   };
 
-  _rangeFilterOnChange = (value) => {
+  onWindowMouseUp = (event) => {
     const {
-      rangeMin,
-      rangeMax,
-    } = this.props;
+      tracking,
+    } = this.resizeData;
 
-    this._updateFilterValue(clampFilterValue(value, rangeMin, rangeMax));
+    window.removeEventListener('mousemove', this.onWindowMouseMove);
+    window.removeEventListener('mouseup', this.onWindowMouseUp);
+
+    if (tracking) {
+      this.setState({
+        sidebarWidth: this._sidebarElement.clientWidth,
+        resizeData: {
+          tracking: false,
+        },
+      });
+    }
   };
 
-  _rangeFilterOnChangeInput = (event) => {
-    this._rangeFilterOnChange(event.target.value);
-  };
-
-  _yearStepBackButtonOnClick = (/* event */) => {
-    const {
-      rangeMin,
-      filterValue,
-    } = this.props;
-
-    this._updateFilterValue(Math.max(rangeMin, filterValue - 1));
-  };
-
-  _yearStepForwardButtonOnClick = (/* event */) => {
-    const {
-      rangeMax,
-      filterValue,
-    } = this.props;
-
-    this._updateFilterValue(Math.min(rangeMax, filterValue + 1));
-  };
-
-  _mapOnClick = (event) => this.props.selectInspectPoint && this.props.selectInspectPoint(event.latLongCoordinate);
-
-  render = ({
-    layers = [],
-
-    inspectPointSelected = false,
-    inspectPointCoordinate = [],
-
-    filterValue,
-  } = this.props) => (
-    <div className="section-map">
-
-      <Tabs
+  render = () => (
+    <div
+      className="main-section"
+      ref={(ref) => this._rootElement = ref}
+    >
+      <aside
         className="side-panel"
-        contentContainerClassName="side-panel__content"
-        //! Make this a controlled tab.
+        ref={(ref) => this._sidebarElement = ref}
+        style={{
+          width: this.state.sidebarWidth,
+          minWidth: this.state.sidebarMinWidth,
+        }}
       >
-
-        <Tab
-          label="Info"
-          data-slug="info"
+        <Tabs
+          contentContainerClassName="side-panel__content"
+          value={this.state.activeTab}
+          onChange={this.onTabChange}
         >
-          <div className="side-panel__section">
-            <p>Status</p>
-            <p>Description: general description about this dataset. For environmental data this description is provided by domain experts, for model results it is provide by model configuration time.</p>
-            <p>Download link(s)</p>
-          </div>
-        </Tab>
+          <Tab
+            label="Info"
+            value="info"
+          >
+            <div className="side-panel__section">
+              <p>Status</p>
+              <p>Description: general description about this dataset. For environmental data this description is provided by domain experts, for model results it is provide by model configuration time.</p>
+              <p>Download link(s)</p>
+            </div>
+          </Tab>
 
-        <Tab
-          label="Layers"
-          data-slug="layers"
-        >
-          <LayerList
-            className="side-panel__section"
-            layers={layers}
-          />
-        </Tab>
-
-        <Tab
-          label="Graphs"
-          data-slug="graphs"
-        >
-          <Charts
-            dataSectionClassName="side-panel__section"
-          />
-        </Tab>
-
-        <Tab
-          label="Metadata"
-          data-slug="metadata"
-        >
-          <div className="side-panel__section">
-            <h2>Metadata</h2>
-            <p>
-              This is the metadata tab.
-            </p>
-          </div>
-        </Tab>
-
-      </Tabs>
-
-      <div className="map-panel">
-
-        <Toolbar
-          style={{
-            height: 48,
-          }}
-        >
-          <ToolbarGroup>
-            <ToolbarTitle text="Time" />
-
-            <IconButton
-              tooltip="Step back"
-              onClick={this._yearStepBackButtonOnClick}
-            >
-              <LeftArrowIcon />
-            </IconButton>
-
-            <TextField
-              hintText="Year"
-              type="text"
-              style={{
-                width: 50,
-              }}
-              inputStyle={{
-                textAlign: 'center',
-              }}
-              value={filterValue}
-              onChange={this._rangeFilterOnChangeInput}
+          <Tab
+            label="Layers"
+            value="layers"
+          >
+            <LayerList
+              className="side-panel__section"
+              layers={[]}
             />
+          </Tab>
 
-            <IconButton
-              tooltip="Step forward"
-              onClick={this._yearStepForwardButtonOnClick}
-            >
-              <RightArrowIcon />
-            </IconButton>
+          <Tab
+            label="Graphs"
+            value="graphs"
+          >
+            <Charts
+              dataSectionClassName="side-panel__section"
+            />
+          </Tab>
 
-            <ToolbarSeparator />
+          <Tab
+            label="Metadata"
+            value="metadata"
+          >
+            <div className="side-panel__section">
+              <h2>Metadata</h2>
+              <p>
+                This is the metadata tab.
+              </p>
+            </div>
+          </Tab>
+        </Tabs>
+      </aside>
 
-            <IconButton tooltip="Play/Pause">
-              <PlayIcon />
-            </IconButton>
-          </ToolbarGroup>
-        </Toolbar>
+      <div
+        className="resize-handle--x"
+        data-target="aside"
+        onMouseDown={this.onResizeHandleMouseDown}
+      ></div>
 
-        <MapView
-          className="map-wrapper"
-          basemap="osm"
-          center="-12107625, 4495720"
-          zoom="5"
-          onClick={this._mapOnClick}
-          ref={(ref) => this._mapview = ref}
-        >
-
-          {layers.map((o) => o.element)}
-
-          <map-layer-singlepoint
-            invisible={!inspectPointSelected ? 'invisible' : null}
-            latitude={inspectPointCoordinate[1]}
-            longitude={inspectPointCoordinate[0]}
-          />
-
-          <map-control-defaults />
-          <map-interaction-defaults />
-          <map-control-simple-layer-list />
-
-        </MapView>
-
-      </div>
-
+      <main
+        className="main-content"
+        style={{
+          backgroundColor: 'white',
+        }}
+      >
+        Hello
+      </main>
     </div>
   );
 }

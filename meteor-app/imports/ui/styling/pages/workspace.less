@@ -5,11 +5,11 @@
   width: 100%;
   height: 100%;
 
-  & > .section-map {
+  & > .main-section {
     .layout-fill;
   }
 
-  .section-map {
+  .main-section {
 
     //=================================================================
     // Parent-child positioning styling.
@@ -17,7 +17,7 @@
 
     .flex-row;
 
-    & > .map-panel {
+    & > .main-content {
       .layout-fill;
     }
 
@@ -26,7 +26,6 @@
     //=================================================================
 
     .side-panel {
-      width: 400px;
       box-sizing: content-box;
 
       .flex-col;
@@ -58,6 +57,56 @@
           margin-left: 10px;
           margin-right: 10px;
         }
+      }
+    }
+
+    .resize-handle--x {
+      @handleColor: rgba(0, 0, 0, 0.3);
+      @handleSize: 18px;
+      @handleThickness: 1px;
+      @handleDistance: 2px;
+
+      flex: 0 0 auto;
+
+      position: relative;
+      box-sizing: border-box;
+      width: 3px;
+      height: 100%;
+      border-left-width: 1px;
+      border-left-style: solid;
+      border-left-color: @handleColor;
+      border-right-width: 1px;
+      border-right-style: solid;
+      border-right-color: @handleColor;
+      cursor: ew-resize;
+
+      user-select: none;
+
+      &:before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        right: 100%;
+        height: @handleSize;
+        width: @handleDistance;
+        margin-top: -@handleSize/2;
+        border-left-color: @handleColor;
+        border-left-width: @handleThickness;
+        border-left-style: solid;
+      }
+      &:after {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        left: 100%;
+        height: @handleSize;
+        width: @handleDistance;
+        margin-top: -@handleSize/2;
+        border-right-color: @handleColor;
+        border-right-width: @handleThickness;
+        border-right-style: solid;
       }
     }
 
