@@ -21,6 +21,9 @@ import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right'
 import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 // import PauseIcon from 'material-ui/svg-icons/av/pause';
 
+import {
+  HorizontalResizer,
+} from '/imports/ui/components/resizer';
 import MapView from '/imports/ui/components/mapview';
 
 import {
@@ -42,82 +45,18 @@ export default class Component extends React.Component {
       sidebarWidth: 400,
       sidebarMinWidth: 400,
       contentMinWidth: 400,
-      resizeData: {},
     };
   }
 
-  get resizeData () {
-    return this.state.resizeData;
-  }
+  setSidebarWidth = (newWidth) => {
+    this.setState({
+      sidebarWidth: newWidth,
+    });
+  };
 
   onTabChange = (nextTabValue) => this.setState({
     activeTab: nextTabValue,
   });
-
-  onResizeHandleMouseDown = (event) => {
-    if (event.button !== 0 || this.resizeData.tracking) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    const handleElement = event.currentTarget;
-
-    window.addEventListener('mousemove', this.onWindowMouseMove);
-    window.addEventListener('mouseup', this.onWindowMouseUp);
-
-    this.setState({
-      resizeData: {
-        startWidth: this._sidebarElement.clientWidth,
-        startCursorScreenX: event.screenX,
-        maxWidth: this._rootElement.clientWidth - handleElement.offsetWidth - this.state.contentMinWidth,
-        tracking: true,
-      },
-    });
-  };
-
-  onWindowMouseMove = (event) => {
-    const {
-      tracking,
-      startCursorScreenX,
-      startWidth,
-      maxWidth,
-    } = this.resizeData;
-
-    if (tracking) {
-      const cursorScreenXDelta = event.screenX - startCursorScreenX;
-      const newWidth = Math.max(
-        Math.min(startWidth + cursorScreenXDelta, maxWidth),
-        0
-      );
-
-      this.setState({
-        sidebarWidth: newWidth,
-      });
-    }
-  };
-
-  onWindowMouseUp = (event) => {
-    const {
-      tracking,
-    } = this.resizeData;
-
-    window.removeEventListener('mousemove', this.onWindowMouseMove);
-    window.removeEventListener('mouseup', this.onWindowMouseUp);
-
-    if (tracking) {
-      this.setState({
-        sidebarWidth: this._sidebarElement.clientWidth,
-        resizeData: {
-          tracking: false,
-        },
-      });
-
-      // Make sure all the other components are properly resized as well.
-      window.dispatchEvent(new CustomEvent('resize'));
-    }
-  };
 
   render = ({
     dataExtent = [-118.67431640625, 33.91208674157048, -109.88525390625, 42.92087580407048],
@@ -131,7 +70,6 @@ export default class Component extends React.Component {
         ref={(ref) => this._sidebarElement = ref}
         style={{
           width: this.state.sidebarWidth,
-          minWidth: this.state.sidebarMinWidth,
         }}
       >
         <Tabs
@@ -183,11 +121,12 @@ export default class Component extends React.Component {
         </Tabs>
       </aside>
 
-      <div
-        className="resize-handle--x"
-        data-target="aside"
-        onMouseDown={this.onResizeHandleMouseDown}
-      ></div>
+      <HorizontalResizer
+        targetCurrentWidth={() => this.state.sidebarWidth}
+        targetMinWidth={() => this.state.sidebarMinWidth}
+        targetMaxWidth={() => this._rootElement.clientWidth - this.state.contentMinWidth}
+        targetWidthOnChange={this.setSidebarWidth}
+      />
 
       <main
         className="main-content"
