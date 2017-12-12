@@ -61,7 +61,6 @@ export default connect(
         filterValue,
         welcomeWindowClosed,
         toolbarMenuClosed,
-        titleName,
       },
     } = state;
     const {
@@ -93,7 +92,6 @@ export default connect(
       rangeMax,
       welcomeWindowClosed,
       toolbarMenuClosed,
-      titleName,
     };
   },
   // mapDispatchToProps

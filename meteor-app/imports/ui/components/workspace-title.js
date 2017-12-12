@@ -15,7 +15,7 @@ const Component = ({
 export default connect(
   // mapStateToProps
   (state) => ({
-    title: state.workspace.titleName,
+    title: state.workspace.configData && state.workspace.configData.title || '',
   }),
   // mapDispatchToProps
   null,

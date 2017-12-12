@@ -33,9 +33,10 @@ Meteor.methods({
     //! Request data from real backend.
     const fakeDelay = 3000;
     const fakeData = {
+      // Title to be displayed in the workspace.
+      title: 'National Elevation Data (NED)',
       type: 'default',
       data: {
-        title: 'National Elevation Data (NED)',
         // ...
       },
     };
