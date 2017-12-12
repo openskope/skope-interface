@@ -37,6 +37,34 @@ export class HorizontalResizer extends React.Component {
     this._handleElement = null;
   }
 
+  componentWillUnmount () {
+    this.stopTracking();
+  }
+
+  onResizeHandleMouseDown = (event) => {
+    if (event.button !== 0) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.startTracking(event);
+  };
+
+  onWindowMouseMove = (event) => {
+    if (this.tracking) {
+      const newWidth = this.getTrackedTargetWidth(event);
+
+      this.updateTargetWidth(newWidth);
+    }
+  };
+
+  onWindowMouseUp = (event) => {
+    this.onWindowMouseMove(event);
+    this.stopTracking();
+  };
+
   get resizeData () {
     return this.state.resizeData;
   }
@@ -69,8 +97,36 @@ export class HorizontalResizer extends React.Component {
            : this.props.targetMaxWidth;
   }
 
-  updateTargetWidth = (newWidth) => {
-    this.props.targetWidthOnChange(newWidth);
+  getTrackedTargetWidth = (event) => {
+    const {
+      tracking,
+      startCursorScreenX,
+      startWidth,
+      minWidth,
+      minWidthSpecified,
+      maxWidth,
+      maxWidthSpecified,
+    } = this.resizeData;
+
+    if (tracking) {
+      const cursorScreenXDelta = event.screenX - startCursorScreenX;
+      let newWidth = startWidth + cursorScreenXDelta;
+
+      if (maxWidthSpecified) {
+        const maxWidthConsideringHandle = Math.max(maxWidth - this.handleWidth, 0);
+        newWidth = Math.min(newWidth, maxWidthConsideringHandle);
+      }
+
+      if (minWidthSpecified) {
+        newWidth = Math.max(newWidth, minWidth);
+      }
+
+      newWidth = Math.max(newWidth, 0);
+
+      return newWidth;
+    }
+
+    return -1;
   };
 
   startTracking = (event) => {
@@ -117,67 +173,16 @@ export class HorizontalResizer extends React.Component {
     window.dispatchEvent(new CustomEvent('resize'));
   };
 
-  getTrackedTargetWidth = (event) => {
-    const {
-      tracking,
-      startCursorScreenX,
-      startWidth,
-      minWidth,
-      minWidthSpecified,
-      maxWidth,
-      maxWidthSpecified,
-    } = this.resizeData;
-
-    if (tracking) {
-      const cursorScreenXDelta = event.screenX - startCursorScreenX;
-      let newWidth = startWidth + cursorScreenXDelta;
-
-      if (maxWidthSpecified) {
-        const maxWidthConsideringHandle = Math.max(maxWidth - this.handleWidth, 0);
-        newWidth = Math.min(newWidth, maxWidthConsideringHandle);
-      }
-
-      if (minWidthSpecified) {
-        newWidth = Math.max(newWidth, minWidth);
-      }
-
-      newWidth = Math.max(newWidth, 0);
-
-      return newWidth;
-    }
-
-    return -1;
-  };
-
-  onResizeHandleMouseDown = (event) => {
-    if (event.button !== 0) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.startTracking(event);
-  };
-
-  onWindowMouseMove = (event) => {
-    if (this.tracking) {
-      const newWidth = this.getTrackedTargetWidth(event);
-
-      this.updateTargetWidth(newWidth);
-    }
-  };
-
-  onWindowMouseUp = (event) => {
-    this.onWindowMouseMove(event);
-    this.stopTracking();
+  updateTargetWidth = (newWidth) => {
+    this.props.targetWidthOnChange(newWidth);
   };
 
   render = () => (
     <div
       className="resize-handle--x"
+      role="none"
       onMouseDown={this.onResizeHandleMouseDown}
       ref={(ref) => this._handleElement = ref}
-    ></div>
+    />
   );
 }
