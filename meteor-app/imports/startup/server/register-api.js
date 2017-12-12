@@ -27,4 +27,21 @@ Meteor.methods({
       data,
     };
   },
+  'datasetManifest.get' ({
+    datasetId,
+  }) {
+    //! Request data from real backend.
+    const fakeDelay = 3000;
+    const fakeData = {
+      type: 'default',
+      data: {
+        title: 'National Elevation Data (NED)',
+        // ...
+      },
+    };
+
+    Meteor._sleepForMs(fakeDelay);
+
+    return fakeData;
+  },
 });

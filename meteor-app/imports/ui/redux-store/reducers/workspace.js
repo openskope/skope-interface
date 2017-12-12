@@ -1,3 +1,6 @@
+import {
+  Meteor,
+} from 'meteor/meteor';
 import uuidv4 from 'uuid/v4';
 import store, { actions } from '/imports/ui/redux-store';
 import {
@@ -220,24 +223,21 @@ export const WORKSPACE_LOAD_DATASET = scopedReducer((workspace, action) => {
     configDataRequestError = null;
     configData = null;
 
-    //! Request new data here. Use real logic to perform a Meteor.call and use server as a proxy to access the service endpoint.
-    const fakeDelay = 3000;
-    const fakeData = {
-      type: 'default',
-      data: {
-        title: 'National Elevation Data (NED)',
-        // ...
-      },
-    };
-    setTimeout(() => {
-      store.dispatch({
-        type: actions.WORKSPACE_RESOLVE_DATASET_DATA.type,
+    Meteor.call(
+      'datasetManifest.get',
+      {
         datasetId,
-        requestId,
-        error: null,
-        data: fakeData,
-      });
-    }, fakeDelay);
+      },
+      (error, data) => {
+        store.dispatch({
+          type: actions.WORKSPACE_RESOLVE_DATASET_DATA.type,
+          datasetId,
+          requestId,
+          error,
+          data,
+        });
+      },
+    );
   } else {
     // Unload data.
     datasetId = '';
