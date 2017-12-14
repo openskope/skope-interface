@@ -35,8 +35,25 @@ Meteor.methods({
     const fakeData = {
       // Title to be displayed in the workspace.
       title: 'National Elevation Data (NED)',
+      // This affects how the consumer interprets the `data` field.
       type: 'default',
       data: {
+        status: 'to be determined',
+        description: 'general description about this dataset. For environmental data this description is provided by domain experts, for model results it is provide by model configuration time.',
+        extent: [0, 0, 0, 0],
+        yearStart: 1010,
+        yearEnd: 2020,
+        layers: [
+          {
+            title: 'Example layer 1',
+            type: 'undefined',
+            url: 'a/b/c/{x}/{y}/{z}/f',
+          },
+        ],
+        dataUrl: 'a/b/c/{x}/{y}/{z}/f',
+        metadata: {
+          foobar: 'I have no idea what is here.',
+        },
         // ...
       },
     };
