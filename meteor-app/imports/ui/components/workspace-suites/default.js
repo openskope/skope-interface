@@ -6,6 +6,7 @@ import {
   Tabs,
   Tab,
 } from 'material-ui/Tabs';
+import Paper from 'material-ui/Paper';
 import LayerList from '/imports/ui/components/layerlist';
 import Charts from '/imports/ui/components/workspace-charts-embedded-wrapper';
 import {
@@ -65,7 +66,8 @@ export default class Component extends React.Component {
       className="main-section"
       ref={(ref) => this._rootElement = ref}
     >
-      <aside
+      <Paper
+        transitionEnabled={false}
         className="side-panel"
         ref={(ref) => this._sidebarElement = ref}
         style={{
@@ -119,7 +121,7 @@ export default class Component extends React.Component {
             </div>
           </Tab>
         </Tabs>
-      </aside>
+      </Paper>
 
       <HorizontalResizer
         targetCurrentWidth={() => this.state.sidebarWidth}
@@ -128,7 +130,8 @@ export default class Component extends React.Component {
         targetWidthOnChange={this.setSidebarWidth}
       />
 
-      <main
+      <Paper
+        transitionEnabled={false}
         className="main-content"
         style={{
           backgroundColor: 'white',
@@ -146,7 +149,7 @@ export default class Component extends React.Component {
           >
           </MapView>
         )}
-      </main>
+      </Paper>
     </div>
   );
 }

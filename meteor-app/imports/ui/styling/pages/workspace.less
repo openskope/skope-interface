@@ -27,6 +27,8 @@
 
     .side-panel {
       box-sizing: content-box;
+      background-color: #EAEAEA;
+      z-index: 2;
 
       .flex-col;
 
@@ -67,6 +69,7 @@
       @handleDistance: 2px;
 
       flex: 0 0 auto;
+      z-index: 3;
 
       position: relative;
       box-sizing: border-box;
@@ -111,6 +114,8 @@
     }
 
     .map-panel {
+      z-index: 1;
+
       .flex-col;
 
       & > .map-wrapper {
