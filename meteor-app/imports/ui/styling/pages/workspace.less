@@ -63,24 +63,16 @@
     }
 
     .resize-handle--x {
-      @handleColor: rgba(0, 0, 0, 0.3);
-      @handleSize: 18px;
-      @handleThickness: 1px;
-      @handleDistance: 2px;
+      @handleThickness: 5px;
 
-      flex: 0 0 auto;
       z-index: 3;
+      flex: 0 0 0;
 
       position: relative;
       box-sizing: border-box;
-      width: 3px;
+      width: 0;
       height: 100%;
-      border-left-width: 1px;
-      border-left-style: solid;
-      border-left-color: @handleColor;
-      border-right-width: 1px;
-      border-right-style: solid;
-      border-right-color: @handleColor;
+      overflow: visible;
       cursor: ew-resize;
 
       user-select: none;
@@ -88,28 +80,12 @@
       &:before {
         content: "";
         position: absolute;
-        z-index: 1;
-        top: 50%;
-        right: 100%;
-        height: @handleSize;
-        width: @handleDistance;
-        margin-top: -@handleSize/2;
-        border-left-color: @handleColor;
-        border-left-width: @handleThickness;
-        border-left-style: solid;
-      }
-      &:after {
-        content: "";
-        position: absolute;
-        z-index: 1;
-        top: 50%;
-        left: 100%;
-        height: @handleSize;
-        width: @handleDistance;
-        margin-top: -@handleSize/2;
-        border-right-color: @handleColor;
-        border-right-width: @handleThickness;
-        border-right-style: solid;
+        top: 0;
+        right: auto;
+        bottom: 0;
+        left: -(@handleThickness * 0.4);
+        height: auto;
+        width: @handleThickness;
       }
     }
 
