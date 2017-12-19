@@ -126,6 +126,9 @@ export default class Component extends React.Component {
           <Tab
             label="Graphs"
             value="graphs"
+            style={{
+              display: 'none',
+            }}
           >
             <Charts
               dataSectionClassName="side-panel__section"
