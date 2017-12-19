@@ -173,6 +173,18 @@ export default class Component extends React.Component {
           >
           </MapView>
         )}
+        {this.state.activeTab === 'layers' && (
+          <MapView
+            basemap="osm"
+            projection="EPSG:4326"
+            extent={dataExtent}
+            style={{
+              height: '100%',
+              width: '100%',
+            }}
+          >
+          </MapView>
+        )}
       </Paper>
     </div>
   );
