@@ -1,4 +1,4 @@
-# This Dockerfile is used to build the production image for TopoLens.
+# This Dockerfile is used to build the production image for SKOPE.
 # It expects an app bundle file located at `app.tar.gz`.
 
 FROM ubuntu:14.04
@@ -21,7 +21,8 @@ RUN apt-get install locales \
 ENV USER="meteor"
 RUN useradd -m -s /bin/bash "${USER}"
 ENV HOME="/home/${USER}"
-WORKDIR "${HOME}"
+ENV APP_DIR="/usr/share/skope-web-app"
+WORKDIR "${APP_DIR}"
 
 # Install NodeJS with NVM
 ARG nvm_version="0.33.8"
@@ -35,19 +36,21 @@ RUN curl -o- "https://raw.githubusercontent.com/creationix/nvm/v${nvm_version}/i
 ENV NVM_DIR="${HOME}/.nvm"
 ENV PATH="${NVM_DIR}/versions/node/v${node_version}/bin:${PATH}" \
     NODE_PATH="${NVM_DIR}/versions/node/v${node_version}/lib/node_modules:${NODE_PATH}"
-RUN chown -R "${USER}":"${USER}" "${NVM_DIR}"
 
+# Fix permission issues.
+RUN chown -R "${USER}":"${USER}" "${HOME}"
 
-# Copy app bundle and extract it
-ADD ./meteor-app.tar.gz "${HOME}"
+# Copy app bundle and extract it.
 # Extracting the app bundle will create a folder named "bundle".
-ENV APP_DIR="${HOME}/bundle"
+ADD ./meteor-app.tar.gz "${APP_DIR}"
+# Copy app settings.
+ADD ./app-settings.json "${APP_DIR}"
 
 # Setup app.
-RUN chown -R "${USER}":"${USER}" "${APP_DIR}" \
-    && cd "${APP_DIR}" \
-    && (cd programs/server && npm install --unsafe-perm)
-RUN printf '#!/bin/bash\nnode "%s/main.js"\n' "${APP_DIR}" >> start.sh
+RUN printf '#!/bin/bash\nnode "%s/main.js"\n' "${APP_DIR}/bundle" >> start.sh
+RUN cd "${APP_DIR}/bundle" \
+    && (cd programs/server && npm install --unsafe-perm) \
+    && chown -R "${USER}":"${USER}" "${APP_DIR}"
 
 # Meteor Port Config
 ENV ROOT_URL="http://localhost" \
