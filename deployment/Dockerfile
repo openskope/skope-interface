@@ -24,8 +24,8 @@ ENV HOME="/home/${USER}"
 WORKDIR "${HOME}"
 
 # Install NodeJS with NVM
-ARG nvm_version="0.33.0"
-ARG node_version="4.7.2"
+ARG nvm_version="0.33.8"
+ARG node_version="8.9.3"
 RUN curl -o- "https://raw.githubusercontent.com/creationix/nvm/v${nvm_version}/install.sh" | bash \
     && export NVM_DIR="${HOME}/.nvm" \
     && [ -s "${NVM_DIR}/nvm.sh" ] && . "${NVM_DIR}/nvm.sh" \
