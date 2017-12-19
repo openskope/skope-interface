@@ -40,12 +40,27 @@ Meteor.methods({
       data: {
         status: 'to be determined',
         description: 'general description about this dataset. For environmental data this description is provided by domain experts, for model results it is provide by model configuration time.',
-        extent: [0, 0, 0, 0],
+        dataExtent: [-118.67431640625, 33.91208674157048, -109.88525390625, 42.92087580407048],
         yearStart: 1010,
         yearEnd: 2020,
         layers: [
           {
             title: 'Example layer 1',
+            type: 'undefined',
+            url: 'a/b/c/{x}/{y}/{z}/f',
+          },
+          {
+            title: 'Example layer 2',
+            type: 'undefined',
+            url: 'a/b/c/{x}/{y}/{z}/f',
+          },
+          {
+            title: 'Example layer 3',
+            type: 'undefined',
+            url: 'a/b/c/{x}/{y}/{z}/f',
+          },
+          {
+            title: 'Example layer 4',
             type: 'undefined',
             url: 'a/b/c/{x}/{y}/{z}/f',
           },

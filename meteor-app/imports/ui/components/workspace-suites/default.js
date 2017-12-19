@@ -7,7 +7,9 @@ import {
   Tab,
 } from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
-import LayerList from '/imports/ui/components/layerlist';
+import {
+  LayerList,
+} from '/imports/ui/components/layerlist';
 import Charts from '/imports/ui/components/workspace-charts-embedded-wrapper';
 import {
   Toolbar,
@@ -29,12 +31,26 @@ import MapView from '/imports/ui/components/mapview';
 
 import {
   clampFilterValue,
+  PropPrinter,
 } from '/imports/ui/helpers';
 
 export default class Component extends React.Component {
 
   static propTypes = {
+    status: PropTypes.string,
+    description: PropTypes.string,
+    dataExtent: PropTypes.arrayOf(PropTypes.number).isRequired,
+    yearStart: PropTypes.number.isRequired,
+    yearEnd: PropTypes.number.isRequired,
+    dataUrl: PropTypes.string.isRequired,
+    layers: PropTypes.array.isRequired,
+    metadata: PropTypes.object,
+  };
 
+  static defaultProps = {
+    status: 'undefined',
+    description: '',
+    metadata: {},
   };
 
   constructor (props) {
@@ -60,7 +76,14 @@ export default class Component extends React.Component {
   });
 
   render = ({
-    dataExtent = [-118.67431640625, 33.91208674157048, -109.88525390625, 42.92087580407048],
+    status,
+    description,
+    dataExtent,
+    yearStart,
+    yearEnd,
+    dataUrl,
+    layers,
+    metadata,
   } = this.props) => (
     <div
       className="main-section"
@@ -84,8 +107,8 @@ export default class Component extends React.Component {
             value="info"
           >
             <div className="side-panel__section">
-              <p>Status</p>
-              <p>Description: general description about this dataset. For environmental data this description is provided by domain experts, for model results it is provide by model configuration time.</p>
+              <p>Status: {status}</p>
+              <p>Description: {description}</p>
               <p>Download link(s)</p>
             </div>
           </Tab>
@@ -96,7 +119,7 @@ export default class Component extends React.Component {
           >
             <LayerList
               className="side-panel__section"
-              layers={[]}
+              layers={layers}
             />
           </Tab>
 
@@ -115,9 +138,7 @@ export default class Component extends React.Component {
           >
             <div className="side-panel__section">
               <h2>Metadata</h2>
-              <p>
-                This is the metadata tab.
-              </p>
+              <PropPrinter {...metadata} />
             </div>
           </Tab>
         </Tabs>
