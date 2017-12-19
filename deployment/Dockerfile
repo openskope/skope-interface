@@ -47,7 +47,7 @@ ADD ./meteor-app.tar.gz "${APP_DIR}"
 ADD ./app-settings.json "${APP_DIR}"
 
 # Setup app.
-RUN printf '#!/bin/bash\nnode "%s/main.js"\n' "${APP_DIR}/bundle" >> start.sh
+RUN printf '#!/bin/bash\nMETEOR_SETTINGS="$(<./app-settings.json)"\nnode "%s/main.js"\n' "${APP_DIR}/bundle" >> start.sh
 RUN cd "${APP_DIR}/bundle" \
     && (cd programs/server && npm install --unsafe-perm) \
     && chown -R "${USER}":"${USER}" "${APP_DIR}"
