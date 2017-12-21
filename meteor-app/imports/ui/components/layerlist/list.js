@@ -50,8 +50,6 @@ export default class Component extends React.Component {
     }
   }
 
-  getItemExpandState = (layerId) => this.state.itemExpandStatus[layerId];
-
   onLayerItemExpandChange = (layerId, expanded) => this.setState({
     itemExpandStatus: {
       ...this.state.itemExpandStatus,
@@ -59,25 +57,31 @@ export default class Component extends React.Component {
     },
   });
 
-  render = ({
-    className,
-    itemClassName,
-    layers,
-    onChangeLayerVisibility,
-    onChangeLayerOpacity,
-  } = this.props) => (
-    <div className={getClassName('layer-list', className)}>
-      {layers.map((layer) => (
-        <LayerListItem
-          key={layer.id}
-          className={getClassName('layer-list__item', itemClassName)}
-          expanded={this.getItemExpandState(layer.id)}
-          layer={layer}
-          onItemExpandChange={(expanded) => this.onLayerItemExpandChange(layer.id, expanded)}
-          onChangeLayerVisibility={(isVisible) => onChangeLayerVisibility(layer.id, isVisible)}
-          onChangeLayerOpacity={(opacity) => onChangeLayerOpacity(layer.id, opacity)}
-        />
-      ))}
-    </div>
-  );
+  getItemExpandState = (layerId) => this.state.itemExpandStatus[layerId];
+
+  render () {
+    const {
+      className,
+      itemClassName,
+      layers,
+      onChangeLayerVisibility,
+      onChangeLayerOpacity,
+    } = this.props;
+
+    return (
+      <div className={getClassName('layer-list', className)}>
+        {layers.map((layer) => (
+          <LayerListItem
+            key={layer.id}
+            className={getClassName('layer-list__item', itemClassName)}
+            expanded={this.getItemExpandState(layer.id)}
+            layer={layer}
+            onItemExpandChange={(expanded) => this.onLayerItemExpandChange(layer.id, expanded)}
+            onChangeLayerVisibility={(isVisible) => onChangeLayerVisibility(layer.id, isVisible)}
+            onChangeLayerOpacity={(opacity) => onChangeLayerOpacity(layer.id, opacity)}
+          />
+        ))}
+      </div>
+    );
+  }
 }

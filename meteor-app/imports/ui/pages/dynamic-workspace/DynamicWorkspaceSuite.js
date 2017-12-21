@@ -67,7 +67,7 @@ class DynamicWorkspaceSuite extends React.PureComponent {
 
 export default connect(
   // mapStateToProps
-  (state, ownProps) => ({
+  (state) => ({
     suiteState: state.workspace.DynamicSuiteNS,
   }),
   // mapDispatchToProps

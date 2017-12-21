@@ -45,59 +45,63 @@ export default class LayerItem extends React.PureComponent {
   static opacitySliderMin = 0;
   static opacitySliderMax = 255;
 
-  static getSliderValueFromOpacity = (opacity) => opacity * (LayerItem.opacitySliderMax - LayerItem.opacitySliderMin) + LayerItem.opacitySliderMin;
+  static getSliderValueFromOpacity = (opacity) => (opacity * (LayerItem.opacitySliderMax - LayerItem.opacitySliderMin)) + LayerItem.opacitySliderMin;
   static getOpacityFromSliderValue = (value) => (value - LayerItem.opacitySliderMin) / (LayerItem.opacitySliderMax - LayerItem.opacitySliderMin);
   static getDisplayTextForOpacity = (opacity) => opacity.toFixed(2);
 
-  render = ({
-    className,
-    expanded,
-    layer: {
-      title = '',
-      invisible = false,
-      opacity = 1,
-    },
-    onItemExpandChange,
-    onChangeLayerVisibility,
-    onChangeLayerOpacity,
-  } = this.props) => (
-    <Card
-      className={className}
-      expanded={expanded}
-      onExpandChange={onItemExpandChange}
-    >
-      <CardHeader
-        title={
-          <Checkbox
-            label={title}
-            checked={!invisible}
-            onCheck={(event, isInputChecked) => onChangeLayerVisibility(isInputChecked)}
-            style={{
-              whiteSpace: 'nowrap',
-            }}
-          />
-        }
-        showExpandableButton
-      />
-      <CardText
-        expandable
+  render () {
+    const {
+      className,
+      expanded,
+      layer: {
+        title = '',
+        invisible = false,
+        opacity = 1,
+      },
+      onItemExpandChange,
+      onChangeLayerVisibility,
+      onChangeLayerOpacity,
+    } = this.props;
+
+    return (
+      <Card
+        className={className}
+        expanded={expanded}
+        onExpandChange={onItemExpandChange}
       >
-        <div className="layer-opacity-row">
-          <label>Opacity: </label>
-          <Slider
-            className="input-slider--layer-opacity"
-            min={LayerItem.opacitySliderMin}
-            max={LayerItem.opacitySliderMax}
-            value={LayerItem.getSliderValueFromOpacity(opacity)}
-            onChange={(event, newValue) => onChangeLayerOpacity(LayerItem.getOpacityFromSliderValue(newValue))}
-            sliderStyle={{
-              marginTop: 0,
-              marginBottom: 0,
-            }}
-          />
-          <label>{LayerItem.getDisplayTextForOpacity(opacity)}</label>
-        </div>
-      </CardText>
-    </Card>
-  );
+        <CardHeader
+          title={
+            <Checkbox
+              label={title}
+              checked={!invisible}
+              onCheck={(event, isInputChecked) => onChangeLayerVisibility(isInputChecked)}
+              style={{
+                whiteSpace: 'nowrap',
+              }}
+            />
+          }
+          showExpandableButton
+        />
+        <CardText
+          expandable
+        >
+          <div className="layer-opacity-row">
+            <label>Opacity: </label>
+            <Slider
+              className="input-slider--layer-opacity"
+              min={LayerItem.opacitySliderMin}
+              max={LayerItem.opacitySliderMax}
+              value={LayerItem.getSliderValueFromOpacity(opacity)}
+              onChange={(event, newValue) => onChangeLayerOpacity(LayerItem.getOpacityFromSliderValue(newValue))}
+              sliderStyle={{
+                marginTop: 0,
+                marginBottom: 0,
+              }}
+            />
+            <label>{LayerItem.getDisplayTextForOpacity(opacity)}</label>
+          </div>
+        </CardText>
+      </Card>
+    );
+  }
 }

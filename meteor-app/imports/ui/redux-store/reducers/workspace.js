@@ -280,7 +280,7 @@ export const WORKSPACE_SET_SUITE_STATE = scopedReducer((workspace, action) => {
   // which is merging states.
   return {
     ...workspace,
-    
+
     DynamicSuiteNS: {
       ...workspace.DynamicSuiteNS,
 

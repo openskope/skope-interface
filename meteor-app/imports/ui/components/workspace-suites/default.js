@@ -77,14 +77,22 @@ export default class Component extends SuiteBaseClass {
     activeTab: nextTabValue,
   });
 
-  getLayerVisibility = (layerId) => layerId in this.state.layerVisibility ? this.state.layerVisibility[layerId] : true;
+  getLayerVisibility = (layerId) => (
+    layerId in this.state.layerVisibility
+    ? this.state.layerVisibility[layerId]
+    : true
+  );
   setLayerVisibility = (layerId, isVisible) => this.setState({
     layerVisibility: {
       ...this.state.layerVisibility,
       [layerId]: isVisible,
     },
   });
-  getLayerOpacity = (layerId) => layerId in this.state.layerOpacity ? this.state.layerOpacity[layerId] : 1;
+  getLayerOpacity = (layerId) => (
+    layerId in this.state.layerOpacity
+    ? this.state.layerOpacity[layerId]
+    : 1
+  );
   setLayerOpacity = (layerId, opacity) => this.setState({
     layerOpacity: {
       ...this.state.layerOpacity,
@@ -129,7 +137,9 @@ export default class Component extends SuiteBaseClass {
               <div className="side-panel__section">
                 <p>Status: {status}</p>
                 <p>Description: {description}</p>
+                <p>Year: {yearStart} ~ {yearEnd}</p>
                 <p>Download link(s)</p>
+                <p>{dataUrl}</p>
               </div>
             </Tab>
 
@@ -204,8 +214,7 @@ export default class Component extends SuiteBaseClass {
                 height: '100%',
                 width: '100%',
               }}
-            >
-            </MapView>
+            />
           )}
           {this.state.activeTab === 'layers' && (
             <MapView
@@ -216,8 +225,7 @@ export default class Component extends SuiteBaseClass {
                 height: '100%',
                 width: '100%',
               }}
-            >
-            </MapView>
+            />
           )}
         </Paper>
       </div>

@@ -33,6 +33,7 @@ Meteor.methods({
     //! Request data from real backend.
     const fakeDelay = 3000;
     const fakeData = {
+      datasetId,
       // Title to be displayed in the workspace.
       title: 'National Elevation Data (NED)',
       // This affects how the consumer interprets the `data` field.
