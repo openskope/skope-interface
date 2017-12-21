@@ -61,3 +61,13 @@ export const WORKSPACE_LOAD_DATASET = {
     datasetId: PropTypes.string.isRequired,
   },
 };
+
+export const WORKSPACE_SET_SUITE_STATE = {
+  type: 'WORKSPACE_SET_SUITE_STATE',
+  payloadSchema: {
+    state: PropTypes.object.isRequired,
+    options: PropTypes.shape({
+      reset: PropTypes.bool,
+    }),
+  },
+};

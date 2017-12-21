@@ -35,6 +35,9 @@ export default {
     configDataRequestError: null,
     // Stores the config data.
     configData: null,
+    // Namespace for any state the dynamic suite needs to store.
+    // This should be reset whenever a new suite is used.
+    DynamicSuiteNS: null,
 
     //! For testing only. Should be empty on start.
     layers: [

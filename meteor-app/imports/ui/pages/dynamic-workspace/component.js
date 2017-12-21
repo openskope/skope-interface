@@ -5,10 +5,11 @@ import FullWindowLayout from '/imports/ui/layouts/full-window';
 import AppbarHeader from '/imports/ui/components/appbar';
 import WorkspaceTitle from '/imports/ui/components/workspace-title';
 
-import * as Suites from '/imports/ui/components/workspace-suites';
 import {
   PropPrinter,
 } from '/imports/ui/helpers';
+
+import DynamicWorkspaceSuite from './DynamicWorkspaceSuite';
 
 export default class WorkspacePage extends React.Component {
 
@@ -120,25 +121,14 @@ export default class WorkspacePage extends React.Component {
 
   renderLoadedView = ({
     configData,
-  } = this.props) => {
-    const suiteType = `WORKSPACE_SUITE__${String(configData.type).toUpperCase()}`;
-
-    if (suiteType in Suites) {
-      const WorkspaceSuite = Suites[suiteType];
-      return (
-        <this.constructor.RootElement>
-          <WorkspaceSuite {...configData.data} />
-        </this.constructor.RootElement>
-      );
-    }
-
-    return (
-      <this.constructor.RootElement>
-        <h1>Invalid Suite Type</h1>
-        <PropPrinter {...configData} />
-      </this.constructor.RootElement>
-    );
-  };
+  } = this.props) => (
+    <this.constructor.RootElement>
+      <DynamicWorkspaceSuite
+        suiteType={`WORKSPACE_SUITE__${String(configData.type).toUpperCase()}`}
+        suiteProps={configData.data}
+      />
+    </this.constructor.RootElement>
+  );
 
   render = () => (
     <FullWindowLayout

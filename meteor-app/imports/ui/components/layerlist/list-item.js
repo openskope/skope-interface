@@ -12,9 +12,15 @@ export default class LayerItem extends React.PureComponent {
   static propTypes = {
     className: PropTypes.string,
     expanded: PropTypes.bool,
-    title: PropTypes.string.isRequired,
-    invisible: PropTypes.bool,
-    opacity: PropTypes.number,
+    layer: PropTypes.shape({
+      id: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number,
+      ]),
+      title: PropTypes.string,
+      invisible: PropTypes.bool,
+      opacity: PropTypes.number,
+    }).isRequired,
     onItemExpandChange: PropTypes.func,
     /**
      * Callback function for changing the visibility of this layer.
@@ -31,8 +37,6 @@ export default class LayerItem extends React.PureComponent {
   static defaultProps = {
     className: '',
     expanded: false,
-    invisible: false,
-    opacity: 1,
     onItemExpandChange: () => {},
     onChangeLayerVisibility: () => {},
     onChangeLayerOpacity: () => {},
@@ -48,9 +52,11 @@ export default class LayerItem extends React.PureComponent {
   render = ({
     className,
     expanded,
-    title,
-    invisible,
-    opacity,
+    layer: {
+      title = '',
+      invisible = false,
+      opacity = 1,
+    },
     onItemExpandChange,
     onChangeLayerVisibility,
     onChangeLayerOpacity,
