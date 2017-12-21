@@ -67,9 +67,23 @@ class Component extends React.Component {
 
   renderToolbar = () => (
     <span>
-      <IconButton
-        tooltip="Notifications"
-      ><NoNotificationIcon color={appSettings.appBarTextColor} /></IconButton>
+      <IconMenu
+        iconButtonElement={
+          <IconButton
+            tooltip="Notifications"
+          ><NoNotificationIcon color={appSettings.appBarTextColor} /></IconButton>
+        }
+        targetOrigin={{
+          horizontal: 'middle',
+          vertical: 'top',
+        }}
+        anchorOrigin={{
+          horizontal: 'middle',
+          vertical: 'bottom',
+        }}
+      >
+        <MenuItem>You are all caught up</MenuItem>
+      </IconMenu>
 
       <IconMenu
         iconButtonElement={
