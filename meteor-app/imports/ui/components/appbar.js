@@ -24,9 +24,6 @@ import {
   appSettings,
 } from '/package.json';
 
-const APPBAR_BACKGROUNDCOLOR = '#f7f5e7';
-const APPBAR_COLOR = 'black';
-
 class Component extends React.Component {
   static propTypes = {
     title: PropTypes.any,
@@ -53,7 +50,7 @@ class Component extends React.Component {
   renderTitle = () => (
     <div
       style={{
-        color: APPBAR_COLOR,
+        color: appSettings.appBarTextColor,
       }}
     >
       <span style={{ marginRight: 30 }}>SKOPE</span>
@@ -65,20 +62,20 @@ class Component extends React.Component {
     <IconButton
       tooltip="Menu"
       onClick={this.props.onClickHamburgerButton}
-    ><MenuIcon color={APPBAR_COLOR} /></IconButton>
+    ><MenuIcon color={appSettings.appBarTextColor} /></IconButton>
   );
 
   renderToolbar = () => (
     <span>
       <IconButton
         tooltip="Notifications"
-      ><NoNotificationIcon color={APPBAR_COLOR} /></IconButton>
+      ><NoNotificationIcon color={appSettings.appBarTextColor} /></IconButton>
 
       <IconMenu
         iconButtonElement={
           <IconButton
             tooltip="Account"
-          ><AccountIcon color={APPBAR_COLOR} /></IconButton>
+          ><AccountIcon color={appSettings.appBarTextColor} /></IconButton>
         }
         targetOrigin={{
           horizontal: 'middle',
@@ -97,14 +94,14 @@ class Component extends React.Component {
       <IconButton
         tooltip="Help"
         onClick={this.props.onClickHelpButton}
-      ><HelpIcon color={APPBAR_COLOR} /></IconButton>
+      ><HelpIcon color={appSettings.appBarTextColor} /></IconButton>
 
       <IconMenu
         iconButtonElement={
           <IconButton
             tooltip="Boring Stuff"
             tooltipPosition="bottom-left"
-          ><CodeIcon color={APPBAR_COLOR} /></IconButton>
+          ><CodeIcon color={appSettings.appBarTextColor} /></IconButton>
         }
         targetOrigin={{
           horizontal: 'right',
@@ -126,7 +123,7 @@ class Component extends React.Component {
     <div className="appbar">
       <AppBar
         style={{
-          backgroundColor: APPBAR_BACKGROUNDCOLOR,
+          backgroundColor: appSettings.appBarBackgroundColor,
         }}
         title={this.renderTitle()}
         iconElementLeft={this.renderLeftIcon()}
