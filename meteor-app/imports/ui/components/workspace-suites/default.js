@@ -10,7 +10,6 @@ import Paper from 'material-ui/Paper';
 import {
   LayerList,
 } from '/imports/ui/components/layerlist';
-import Charts from '/imports/ui/components/workspace-charts-embedded-wrapper';
 // import {
 //   Toolbar,
 //   ToolbarGroup,
@@ -164,18 +163,6 @@ export default class Component extends SuiteBaseClass {
                 }
                 onChangeLayerVisibility={this.setLayerVisibility}
                 onChangeLayerOpacity={_.debounce(this.setLayerOpacity)}
-              />
-            </Tab>
-
-            <Tab
-              label="Graphs"
-              value="graphs"
-              style={{
-                display: 'none',
-              }}
-            >
-              <Charts
-                dataSectionClassName="side-panel__section"
               />
             </Tab>
 
