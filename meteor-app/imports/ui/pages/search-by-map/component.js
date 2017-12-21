@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import customTheme from '/imports/ui/styling/muiTheme';
 import {
   Card,
   CardActions,
@@ -9,6 +7,8 @@ import {
   CardText,
 } from 'material-ui/Card';
 import Paper from 'material-ui/Paper';
+import FullWindowLayout from '/imports/ui/layouts/full-window';
+import AppbarHeader from '/imports/ui/components/appbar';
 import SpatialFilter from '/imports/ui/components/searchkit-spatial-filter';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
@@ -16,6 +16,10 @@ import Chip from 'material-ui/Chip';
 import MapView from '/imports/ui/components/mapview';
 import geojsonExtent from 'geojson-extent';
 import moment from 'moment';
+
+import {
+  absoluteUrl,
+} from '/imports/ui/helpers';
 
 import {
   SearchkitManager,
@@ -60,6 +64,7 @@ class SearchResultItem extends React.PureComponent {
   render () {
     const {
       result: {
+        _id,
         _source: {
           Title,
           Creator,
@@ -135,7 +140,7 @@ class SearchResultItem extends React.PureComponent {
           </div>
         </CardText>
         <CardActions>
-          <FlatButton label="Examine" />
+          <FlatButton label="Examine" href={absoluteUrl('/workspace', null, { dataset: _id })} target="_blank" />
           <FlatButton label="Download" />
         </CardActions>
       </Card>
@@ -233,76 +238,83 @@ export default class SearchPage extends React.Component {
 
   static propTypes = {
     // SearchKit Manager instance.
-    searchkit: PropTypes.instanceOf(SearchkitManager),
+    searchkit: PropTypes.instanceOf(SearchkitManager).isRequired,
   };
 
-  render () {
-    const {
-      searchkit,
-    } = this.props;
+  renderHeader = () => (
+    <AppbarHeader
+      onClickHelpButton={() => alert('Show help for search page.')}
+    />
+  );
 
-    return (
-      <SearchkitProvider searchkit={searchkit}>
-        <MuiThemeProvider muiTheme={customTheme}>
-          <div className="page-search">
-            <Paper className="page-search__search">
-              <div className="page-search__search__inner">
-                <RefinementListFilter
-                  id="resultTypes-list"
-                  title="Result Types"
-                  field="ResultTypes"
-                  operator="OR"
-                  orderKey="_term"
-                  orderDirection="asc"
-                  size={5}
-                />
+  renderBody = () => (
+    <div className="page-search">
+      <Paper className="page-search__search">
+        <div className="page-search__search__inner">
+          <RefinementListFilter
+            id="resultTypes-list"
+            title="Result Types"
+            field="ResultTypes"
+            operator="OR"
+            orderKey="_term"
+            orderDirection="asc"
+            size={5}
+          />
 
-                <div className="layout-filler" />
+          <div className="layout-filler" />
 
-                <SpatialFilter
-                  className="spatial-filter"
-                  title="Point of Interest"
-                />
+          <SpatialFilter
+            className="spatial-filter"
+            title="Point of Interest"
+          />
 
-                <DynamicRangeFilter
-                  id="startdate-range"
-                  field="StartDate"
-                  title="Start Date"
-                  rangeFormatter={(timestamp) => moment(timestamp).format('YYYY-MM-DD')}
-                />
-                <DynamicRangeFilter
-                  id="enddate-range"
-                  field="EndDate"
-                  title="End Date"
-                  rangeFormatter={(timestamp) => moment(timestamp).format('YYYY-MM-DD')}
-                />
-              </div>
-            </Paper>
-            <div className="page-search__result">
-              <ActionBar>
-                <ActionBarRow>
-                  <HitsStats />
-                </ActionBarRow>
+          <DynamicRangeFilter
+            id="startdate-range"
+            field="StartDate"
+            title="Start Date"
+            rangeFormatter={(timestamp) => moment(timestamp).format('YYYY-MM-DD')}
+          />
+          <DynamicRangeFilter
+            id="enddate-range"
+            field="EndDate"
+            title="End Date"
+            rangeFormatter={(timestamp) => moment(timestamp).format('YYYY-MM-DD')}
+          />
+        </div>
+      </Paper>
+      <div className="page-search__result">
+        <ActionBar>
+          <ActionBarRow>
+            <HitsStats />
+          </ActionBarRow>
 
-                <ActionBarRow>
-                  <SelectedFilters
-                    mod="selected-filters"
-                    itemComponent={FilterItem}
-                  />
-                  <ResetFilters component={ResetFilterButton} />
-                </ActionBarRow>
-              </ActionBar>
+          <ActionBarRow>
+            <SelectedFilters
+              mod="selected-filters"
+              itemComponent={FilterItem}
+            />
+            <ResetFilters component={ResetFilterButton} />
+          </ActionBarRow>
+        </ActionBar>
 
-              <Hits mod="sk-hits-grid" hitsPerPage={3} itemComponent={SearchResultItem} />
-              <NoHits />
+        <Hits mod="sk-hits-grid" hitsPerPage={3} itemComponent={SearchResultItem} />
+        <NoHits />
 
-              <Pagination
-                showNumbers
-              />
-            </div>
-          </div>
-        </MuiThemeProvider>
-      </SearchkitProvider>
-    );
-  }
+        <Pagination
+          showNumbers
+        />
+      </div>
+    </div>
+  );
+
+  render = () => (
+    <FullWindowLayout
+      header={this.renderHeader()}
+      body={
+        <SearchkitProvider searchkit={this.props.searchkit}>
+          {this.renderBody()}
+        </SearchkitProvider>
+      }
+    />
+  );
 }

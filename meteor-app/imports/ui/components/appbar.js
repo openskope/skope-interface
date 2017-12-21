@@ -2,8 +2,6 @@ import React from 'react';
 import {
   connect,
 } from 'react-redux';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import customTheme from '/imports/ui/styling/muiTheme';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import Drawer from 'material-ui/Drawer';
@@ -62,82 +60,80 @@ const Component = ({
    */
   onClickHelpButton,
 }) => (
-  <MuiThemeProvider muiTheme={customTheme}>
-    <div className="appbar">
-      <AppBar
-        style={{
-          backgroundColor: APPBAR_BACKGROUNDCOLOR,
-        }}
-        title={
-          <div
-            style={{
-              color: APPBAR_COLOR,
+  <div className="appbar">
+    <AppBar
+      style={{
+        backgroundColor: APPBAR_BACKGROUNDCOLOR,
+      }}
+      title={
+        <div
+          style={{
+            color: APPBAR_COLOR,
+          }}
+        >
+          <span style={{ marginRight: 30 }}>SKOPE</span>
+          {title}
+        </div>
+      }
+      iconElementLeft={
+        <IconButton
+          tooltip="Menu"
+          onClick={onClickHamburgerButton}
+        ><MenuIcon color={APPBAR_COLOR} /></IconButton>
+      }
+      iconElementRight={
+        <span>
+          <IconButton
+            tooltip="Notifications"
+          ><NoNotificationIcon color={APPBAR_COLOR} /></IconButton>
+
+          <IconButton
+            tooltip="Account"
+          ><AccountIcon color={APPBAR_COLOR} /></IconButton>
+          <IconButton
+            tooltip="Help"
+            onClick={onClickHelpButton}
+          ><HelpIcon color={APPBAR_COLOR} /></IconButton>
+
+          <IconMenu
+            iconButtonElement={
+              <IconButton
+                tooltip="Boring Stuff"
+                tooltipPosition="bottom-left"
+              ><CodeIcon color={APPBAR_COLOR} /></IconButton>
+            }
+            targetOrigin={{
+              horizontal: 'right',
+              vertical: 'top',
+            }}
+            anchorOrigin={{
+              horizontal: 'right',
+              vertical: 'bottom',
             }}
           >
-            <span style={{ marginRight: 30 }}>SKOPE</span>
-            {title}
-          </div>
-        }
-        iconElementLeft={
-          <IconButton
-            tooltip="Menu"
-            onClick={onClickHamburgerButton}
-          ><MenuIcon color={APPBAR_COLOR} /></IconButton>
-        }
-        iconElementRight={
-          <span>
-            <IconButton
-              tooltip="Notifications"
-            ><NoNotificationIcon color={APPBAR_COLOR} /></IconButton>
+            <MenuItem>
+              <a href={demoRepository} target="_blank" rel="noopener noreferrer">{`ver ${version}`}</a>
+            </MenuItem>
+          </IconMenu>
+        </span>
+      }
+    >{children}</AppBar>
 
-            <IconButton
-              tooltip="Account"
-            ><AccountIcon color={APPBAR_COLOR} /></IconButton>
-            <IconButton
-              tooltip="Help"
-              onClick={onClickHelpButton}
-            ><HelpIcon color={APPBAR_COLOR} /></IconButton>
-
-            <IconMenu
-              iconButtonElement={
-                <IconButton
-                  tooltip="Boring Stuff"
-                  tooltipPosition="bottom-left"
-                ><CodeIcon color={APPBAR_COLOR} /></IconButton>
-              }
-              targetOrigin={{
-                horizontal: 'right',
-                vertical: 'top',
-              }}
-              anchorOrigin={{
-                horizontal: 'right',
-                vertical: 'bottom',
-              }}
-            >
-              <MenuItem>
-                <a href={demoRepository} target="_blank" rel="noopener noreferrer">{`ver ${version}`}</a>
-              </MenuItem>
-            </IconMenu>
-          </span>
-        }
-      >{children}</AppBar>
-
-      <Drawer
-        docked={false}
-        width={appSettings.drawerWidth}
-        open={drawerIsOpen}
-        onRequestChange={setDrawerOpenState}
-      >
-        {appSettings.drawerItems.map((item) => (
-          <MenuItem
-            key={item.title}
-            onClick={() => navigateTo(item.url)}
-            leftIcon={currentRouterPath === item.url ? <ArrowRightIcon /> : null}
-          >{item.title}</MenuItem>
-        ))}
-      </Drawer>
-    </div>
-  </MuiThemeProvider>
+    <Drawer
+      docked={false}
+      width={appSettings.drawerWidth}
+      open={drawerIsOpen}
+      onRequestChange={setDrawerOpenState}
+    >
+      {appSettings.drawerItems.map((item) => (
+        <MenuItem
+          key={item.title}
+          onClick={() => navigateTo(item.url)}
+          leftIcon={currentRouterPath === item.url ? <ArrowRightIcon /> : null}
+        >{item.title}</MenuItem>
+      ))}
+    </Drawer>
+  </div>
 );
 
 export default connect(

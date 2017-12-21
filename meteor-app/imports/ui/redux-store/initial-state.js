@@ -27,6 +27,18 @@ export default {
   },
 
   workspace: {
+    // The ID of the dataset currently loaded or is being loaded.
+    datasetId: '',
+    // If a request is pending, this will be an object with at least a unique request ID.
+    configDataRequest: null,
+    // Stores any error encountered during requesting the config data.
+    configDataRequestError: null,
+    // Stores the config data.
+    configData: null,
+    // Namespace for any state the dynamic suite needs to store.
+    // This should be reset whenever a new suite is used.
+    DynamicSuiteNS: null,
+
     //! For testing only. Should be empty on start.
     layers: [
       {
@@ -84,9 +96,6 @@ export default {
 
     welcomeWindowClosed: true,
     toolbarMenuClosed: true,
-
-    // title name from user click search tile in search page, and this ia one of example.
-    titleName: 'National Elevation Data (NED)',
   },
 
   model: {

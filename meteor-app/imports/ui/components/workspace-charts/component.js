@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import customTheme from '/imports/ui/styling/muiTheme';
 import {
   Toolbar,
   ToolbarGroup,
@@ -335,19 +333,17 @@ export default class ChartsPage extends React.Component {
     } = this.props;
 
     return (
-      <MuiThemeProvider muiTheme={customTheme}>
-        <div className="workspace-charts">
-          {
-            dataIsLoading
-            ? this._renderLoadingSign()
-            : (
-              !hasLoadedData
-              ? this._renderViewWithoutData()
-              : this._renderChartsWithData()
-            )
-          }
-        </div>
-      </MuiThemeProvider>
+      <div className="workspace-charts">
+        {
+          dataIsLoading
+          ? this._renderLoadingSign()
+          : (
+            !hasLoadedData
+            ? this._renderViewWithoutData()
+            : this._renderChartsWithData()
+          )
+        }
+      </div>
     );
   }
 }

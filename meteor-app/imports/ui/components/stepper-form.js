@@ -4,8 +4,6 @@ import {
   reduxForm,
   SubmissionError,
 } from 'redux-form';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import customTheme from '/imports/ui/styling/muiTheme';
 import {
   Step,
   Stepper,
@@ -247,37 +245,35 @@ export default class StepperForm extends React.Component {
     } = this.state;
 
     return (
-      <MuiThemeProvider muiTheme={customTheme}>
-        <Stepper
-          activeStep={stepIndex}
-          linear={false}
-          orientation="vertical"
-        >
-          {this.renderSteps()}
+      <Stepper
+        activeStep={stepIndex}
+        linear={false}
+        orientation="vertical"
+      >
+        {this.renderSteps()}
 
-          <Step key={'step-review'}>
-            <StepButton>Review</StepButton>
-            <StepContent>
-              <Card
-                style={this.constructor.stepCardStyles}
-              >
-                <CardText>
-                  <p>
-                    Show validation results of each step here.
-                  </p>
-                  <RaisedButton
-                    label="Submit"
-                    disableTouchRipple
-                    disableFocusRipple
-                    primary
-                  />
-                </CardText>
-                <CardActions>Actions</CardActions>
-              </Card>
-            </StepContent>
-          </Step>
-        </Stepper>
-      </MuiThemeProvider>
+        <Step key={'step-review'}>
+          <StepButton>Review</StepButton>
+          <StepContent>
+            <Card
+              style={this.constructor.stepCardStyles}
+            >
+              <CardText>
+                <p>
+                  Show validation results of each step here.
+                </p>
+                <RaisedButton
+                  label="Submit"
+                  disableTouchRipple
+                  disableFocusRipple
+                  primary
+                />
+              </CardText>
+              <CardActions>Actions</CardActions>
+            </Card>
+          </StepContent>
+        </Step>
+      </Stepper>
     );
   }
 }

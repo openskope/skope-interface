@@ -3,8 +3,20 @@
  */
 
 import React from 'react';
+import FixedWidthLayout from '/imports/ui/layouts/fixed-width';
+import AppbarHeader from '/imports/ui/components/appbar';
+import { IndexHeader } from './index-header';
 
-export default () => (
+const renderHeader = () => (
+  <div>
+    <AppbarHeader
+      onClickHelpButton={() => alert('Show help for home page.')}
+    />
+    <IndexHeader />
+  </div>
+);
+
+const renderBody = () => (
   <div className="page--home">
     <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.</p>
 
@@ -22,4 +34,11 @@ export default () => (
 
     <p>Phasellus consectetuer vestibulum elit. Aenean tellus metus, bibendum sed, posuere ac, mattis non, nunc. Vestibulum fringilla pede sit amet augue. In turpis. Pellentesque posuere. Praesent turpis. Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc, eu sollicitudin urna dolor sagittis lacus. Donec elit libero, sodales nec, volutpat a, suscipit non, turpis. Nullam sagittis. Suspendisse pulvinar, augue ac venenatis condimentum, sem libero volutpat nibh, nec pellentesque velit pede quis nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce id purus. Ut varius tincidunt libero. Phasellus dolor. Maecenas vestibulum mollis</p>
   </div>
+);
+
+export default () => (
+  <FixedWidthLayout
+    header={renderHeader()}
+    body={renderBody()}
+  />
 );

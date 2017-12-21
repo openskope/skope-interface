@@ -5,11 +5,11 @@
   width: 100%;
   height: 100%;
 
-  & > .section-map {
+  & > .main-section {
     .layout-fill;
   }
 
-  .section-map {
+  .main-section {
 
     //=================================================================
     // Parent-child positioning styling.
@@ -17,7 +17,7 @@
 
     .flex-row;
 
-    & > .map-panel {
+    & > .main-content {
       .layout-fill;
     }
 
@@ -26,8 +26,9 @@
     //=================================================================
 
     .side-panel {
-      width: 400px;
       box-sizing: content-box;
+      background-color: #EAEAEA;
+      z-index: 2;
 
       .flex-col;
 
@@ -61,7 +62,36 @@
       }
     }
 
+    .resize-handle--x {
+      @handleThickness: 5px;
+
+      z-index: 3;
+      flex: 0 0 0;
+
+      position: relative;
+      box-sizing: border-box;
+      width: 0;
+      height: 100%;
+      overflow: visible;
+      cursor: ew-resize;
+
+      user-select: none;
+
+      &:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: auto;
+        bottom: 0;
+        left: -(@handleThickness * 0.4);
+        height: auto;
+        width: @handleThickness;
+      }
+    }
+
     .map-panel {
+      z-index: 1;
+
       .flex-col;
 
       & > .map-wrapper {

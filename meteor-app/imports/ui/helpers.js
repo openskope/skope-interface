@@ -3,8 +3,14 @@ import {
   Provider,
 } from 'react-redux';
 import {
-  mount,
+  mount as reactMount,
 } from 'react-mounter';
+import {
+  FlowRouter,
+} from 'meteor/ostrio:flow-router-extra';
+import globalStore, { actions } from '/imports/ui/redux-store';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import globalTheme from '/imports/ui/styling/muiTheme';
 
 /**
  * Make sure the filter value is correct.
@@ -44,8 +50,28 @@ export const getClassName = (...items) =>
  * @param  {Object} props - Same as the second argument to `mount`.
  * @return {*}
  */
-export const mountWithStore = (store, ComponentClass, props) => mount(Provider, {
+export const mountWithStore = (store, ComponentClass, props) => reactMount(Provider, {
   store,
+  children: <ComponentClass {...props} />,
+});
+
+/**
+ * A even more simplified version of `mountWithStore` that by default uses the global store.
+ * It also applies the default Material UI theme.
+ * @param  {React.Component} ComponentClass - Same as the first argument to `mount`.
+ * @param  {Object} props - Same as the second argument to `mount`.
+ * @return {*}
+ */
+export const mount =
+(
+  ComponentClass,
+  {
+    store = globalStore,
+    muiTheme = globalTheme,
+    ...props
+  },
+) => mountWithStore(store, MuiThemeProvider, {
+  muiTheme,
   children: <ComponentClass {...props} />,
 });
 
@@ -54,3 +80,39 @@ export const mountWithStore = (store, ComponentClass, props) => mount(Provider, 
  * It prints all the props passed to it.
  */
 export const PropPrinter = (props) => <pre>{JSON.stringify(props, null, 2)}</pre>;
+
+/**
+ * Generates absolute urls within the app.
+ * @param  {String} pathDef
+ * @param  {Object} params
+ * @param  {Object} queryParams
+ * @return {String}
+ */
+export const absoluteUrl = (pathDef, params = {}, queryParams = {}) => FlowRouter.path(pathDef, params, queryParams);
+
+/**
+ * Helper for generating simple route actions.
+ * @param  {React.Component} ComponentClass - Same as the first argument to `mount`.
+ * @param  {Object} props - Same as the second argument to `mount`.
+ * @return {Function}
+ */
+export const simpleMountAction = (ComponentClass, props) =>
+function (params, queryParams) {
+  // These are available properties on the context.
+  // - this.group
+  // - this.name
+  // - this.path
+  // - this.pathDef
+
+  globalStore.dispatch({
+    type: actions.PAGE_ENTRY.type,
+    path: this.pathDef,
+  });
+
+  mount(ComponentClass, {
+    ...props,
+    route: this,
+    params,
+    queryParams,
+  });
+};

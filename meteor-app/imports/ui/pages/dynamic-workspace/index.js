@@ -47,20 +47,39 @@ const buildLayerElement = (layer, layerIndex, temporalIndex) => (
 
 export default connect(
   // mapStateToProps
-  (state) => {
+  (state, ownProps) => {
     const {
       workspace: {
+        datasetId: currentDatasetId,
+        configDataRequest,
+        configDataRequestError,
+        configData,
+
         layers,
         inspectPointSelected,
         inspectPointCoordinate,
         filterValue,
         welcomeWindowClosed,
         toolbarMenuClosed,
-        titleName,
       },
     } = state;
+    const {
+      // route,
+      // params,
+      queryParams: {
+        dataset: requestDatasetId = '',
+      },
+    } = ownProps;
+
+    const loadingConfigData = !!(currentDatasetId && configDataRequest);
 
     return {
+      currentDatasetId,
+      requestDatasetId,
+      loadingConfigData,
+      configDataRequestError,
+      configData,
+
       layers: layers.map((layer, layerIndex) => ({
         ...layer,
 
@@ -73,20 +92,13 @@ export default connect(
       rangeMax,
       welcomeWindowClosed,
       toolbarMenuClosed,
-      titleName,
     };
   },
   // mapDispatchToProps
   (dispatch) => ({
-    toggleLayer: (layerIndex, visible) => dispatch({
-      type: actions.WORKSPACE_TOGGLE_LAYER_VISIBILITY.type,
-      index: layerIndex,
-      visible,
-    }),
-    updateLayerOpacity: (layerIndex, opacity) => dispatch({
-      type: actions.WORKSPACE_CHANGE_LAYER_OPACITY.type,
-      index: layerIndex,
-      opacity,
+    loadNewDataset: (datasetId) => dispatch({
+      type: 'WORKSPACE_LOAD_DATASET',
+      datasetId,
     }),
     selectInspectPoint: (coordinate) => dispatch({
       type: actions.WORKSPACE_INSPECT_POINT.type,
@@ -96,17 +108,6 @@ export default connect(
     updateFilterValue: (value) => dispatch({
       type: actions.WORKSPACE_SET_FILTER.type,
       value,
-    }),
-    toggleWelcomeWindow: () => dispatch({
-      type: actions.WORKSPACE_TOGGLE_WELCOME_WINDOW.type,
-    }),
-    toggleSideMenu: (layerIndex, invisible) => dispatch({
-      type: actions.WORKSPACE_TOGGLE_PANEL_MENU.type,
-      index: layerIndex,
-      invisible,
-    }),
-    toggleToolbarMenu: () => dispatch({
-      type: actions.WORKSPACE_TOGGLE_TOOLBAR_MENU.type,
     }),
   }),
 )(Component);

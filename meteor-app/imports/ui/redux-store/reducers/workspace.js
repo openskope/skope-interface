@@ -1,4 +1,9 @@
 import {
+  Meteor,
+} from 'meteor/meteor';
+import uuidv4 from 'uuid/v4';
+import store, { actions } from '/imports/ui/redux-store';
+import {
   scopedReducerCreator,
 } from '/imports/ui/redux-store/helpers';
 import {
@@ -157,5 +162,129 @@ export const WORKSPACE_TOGGLE_WELCOME_WINDOW = scopedReducer((workspace) => {
     ...workspace,
 
     welcomeWindowClosed: !workspace.welcomeWindowClosed,
+  };
+});
+
+export const WORKSPACE_RESOLVE_DATASET_DATA = scopedReducer((workspace, action) => {
+  let {
+    configDataRequest,
+    configDataRequestError,
+    configData,
+  } = workspace;
+
+  if (
+    configDataRequest
+    && configDataRequest.requestId === action.requestId
+    && configDataRequest.datasetId === action.datasetId
+  ) {
+    if (action.error) {
+      //! handle error?
+
+      configDataRequest = null;
+      configDataRequestError = action.error;
+      configData = null;
+    } else {
+      configDataRequest = null;
+      configDataRequestError = null;
+      configData = action.data;
+    }
+  }
+
+  return {
+    ...workspace,
+
+    configDataRequest,
+    configDataRequestError,
+    configData,
+  };
+});
+
+export const WORKSPACE_LOAD_DATASET = scopedReducer((workspace, action) => {
+  const {
+    datasetId: newDatasetId,
+  } = action;
+  let {
+    datasetId,
+    configDataRequest,
+    configDataRequestError,
+    configData,
+  } = workspace;
+
+  // Dataset ID could be empty, which means unloading dataset.
+  if (newDatasetId) {
+    // Load new dataset.
+    const requestId = uuidv4();
+
+    datasetId = newDatasetId;
+    configDataRequest = {
+      datasetId: newDatasetId,
+      requestId,
+    };
+    configDataRequestError = null;
+    configData = null;
+
+    Meteor.call(
+      'datasetManifest.get',
+      {
+        datasetId,
+      },
+      (error, data) => {
+        store.dispatch({
+          type: actions.WORKSPACE_RESOLVE_DATASET_DATA.type,
+          datasetId,
+          requestId,
+          error,
+          data,
+        });
+      },
+    );
+  } else {
+    // Unload data.
+    datasetId = '';
+    configDataRequest = null;
+    configDataRequestError = null;
+    configData = null;
+  }
+
+  return {
+    ...workspace,
+
+    datasetId,
+    configDataRequest,
+    configDataRequestError,
+    configData,
+
+    // Reset state for the dynamic suite.
+    DynamicSuiteNS: null,
+  };
+});
+
+export const WORKSPACE_SET_SUITE_STATE = scopedReducer((workspace, action) => {
+  const {
+    state: newState,
+    options = {},
+  } = action;
+
+  if (options.reset) {
+    return {
+      ...workspace,
+
+      // Reset removes the existing states.
+      DynamicSuiteNS: {
+        ...newState,
+      },
+    };
+  }
+
+  // Mimic the same behavior of `React.Component.prototype.setState`,
+  // which is merging states.
+  return {
+    ...workspace,
+
+    DynamicSuiteNS: {
+      ...workspace.DynamicSuiteNS,
+
+      ...newState,
+    },
   };
 });

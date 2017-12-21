@@ -1,4 +1,3 @@
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import MenuItem from 'material-ui/MenuItem';
 import FlatButton from 'material-ui/FlatButton';
 import Menu from 'material-ui/Menu';
@@ -93,11 +92,9 @@ export default class TextMenu extends React.Component {
     const textMenuStyle = this.props.style.textMenuStyle;
 
     return (
-      <MuiThemeProvider>
-        <div style={textMenuStyle}>
-          {reactComponents}
-        </div>
-      </MuiThemeProvider>
+      <div style={textMenuStyle}>
+        {reactComponents}
+      </div>
     );
   }
 }
