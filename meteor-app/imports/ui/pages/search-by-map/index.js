@@ -9,6 +9,8 @@ import {
 import {
   SearchkitManager,
   SearchkitProvider,
+  MinMetric,
+  MaxMetric,
 } from 'searchkit';
 import 'searchkit/release/theme.css';
 import { Meteor } from 'meteor/meteor';
@@ -29,52 +31,28 @@ const searchkit = new SearchkitManager(elasticEndpoint);
 //   basicAuth: "elastic:changeme",
 // });
 
+searchkit.addDefaultQuery((query) => {
+  return query
+  .setAggs(MinMetric('startdate-min', 'StartDate'))
+  .setAggs(MaxMetric('startdate-max', 'StartDate'))
+  .setAggs(MinMetric('enddate-min', 'EndDate'))
+  .setAggs(MaxMetric('enddate-max', 'EndDate'));
+});
+
+// Update state with search result.
+searchkit.addResultsListener((result) => globalStore.dispatch({
+  type: actions.SEARCH_UPDATE_RESULT.type,
+  result,
+}));
+
 if (appSettings.logSearchKitQueries) {
   // Monitor query object.
-  searchkit.setQueryProcessor((queryObject) => {
-    console.info('queryObject', queryObject);
-
-    return {
-      ...queryObject,
-
-      aggs: {
-        ...(queryObject.aggs || {}),
-
-        'data-temporal-min-start': {
-          min: {
-            field: 'StartDate',
-          },
-        },
-        'data-temporal-min-end': {
-          min: {
-            field: 'EndDate',
-          },
-        },
-        'data-temporal-max-start': {
-          max: {
-            field: 'StartDate',
-          },
-        },
-        'data-temporal-max-end': {
-          max: {
-            field: 'EndDate',
-          },
-        },
-      },
-    };
-  });
+  searchkit.setQueryProcessor((queryObject) => console.info('queryObject', queryObject) || queryObject);
 }
 
 if (appSettings.logSearchKitQueryResults) {
   // Monitor search results.
-  searchkit.addResultsListener((result) => {
-    console.info('queryResult', result);
-
-    globalStore.dispatch({
-      type: actions.SEARCH_UPDATE_RESULT.type,
-      result,
-    });
-  });
+  searchkit.addResultsListener((result) => console.info('queryResult', result));
 }
 
 export default connect(

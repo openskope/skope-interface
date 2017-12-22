@@ -23,6 +23,8 @@ import {
   NoHits,
 } from 'searchkit';
 
+import DataTemporalRangeFilter from '/imports/ui/components/searchpage-filters/data-temporal-range-filter';
+
 import {
   PropPrinter,
 } from '/imports/ui/helpers';
@@ -66,6 +68,32 @@ export default class SearchPage extends React.Component {
       <div className="page-search">
         <Paper className="page-search__search">
           <div className="page-search__search__inner">
+            <SpatialFilter
+              className="spatial-filter"
+              title="Point of Interest"
+            />
+
+            <DataTemporalRangeFilter
+              id="data-temporal-range--start"
+              mod="foobar"
+              field="StartDate"
+              title="Start Date"
+              min={this.props.searchResult && this.props.searchResult.aggregations['startdate-min'].value || -1}
+              max={this.props.searchResult && this.props.searchResult.aggregations['startdate-max'].value || -1}
+              rangeFormatter={(timestamp) => moment(parseInt(timestamp, 10)).format('YYYY-MM-DD')}
+              showHistogram
+            />
+
+            <DataTemporalRangeFilter
+              id="data-temporal-range--end"
+              field="EndDate"
+              title="End Date"
+              min={this.props.searchResult && this.props.searchResult.aggregations['enddate-min'].value || -1}
+              max={this.props.searchResult && this.props.searchResult.aggregations['enddate-max'].value || -1}
+              rangeFormatter={(timestamp) => moment(parseInt(timestamp, 10)).format('YYYY-MM-DD')}
+              showHistogram
+            />
+
             <RefinementListFilter
               id="resultTypes-list"
               title="Result Types"
@@ -77,34 +105,6 @@ export default class SearchPage extends React.Component {
             />
 
             <div className="layout-filler" />
-
-            <SpatialFilter
-              className="spatial-filter"
-              title="Point of Interest"
-            />
-
-            {
-              this.props.searchResult
-              ? (
-                <RangeFilter
-                  id="data-temporal-range"
-                  field="StartDate"
-                  title="Start Date"
-                  min={this.props.searchResult.aggregations['data-temporal-min-start'].value}
-                  max={this.props.searchResult.aggregations['data-temporal-max-start'].value}
-                  rangeFormatter={(timestamp) => moment(parseInt(timestamp, 10)).format('YYYY-MM-DD')}
-                  showHistogram
-                />
-              )
-              : null
-            }
-
-            <DynamicRangeFilter
-              id="enddate-range"
-              field="EndDate"
-              title="End Date"
-              rangeFormatter={(timestamp) => moment(parseInt(timestamp, 10)).format('YYYY-MM-DD')}
-            />
           </div>
         </Paper>
         <div className="page-search__result">
