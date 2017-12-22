@@ -19,3 +19,10 @@ export const SEARCH_RESOLVE_DATA = {
     result: PropTypes.object.isRequired,
   },
 };
+
+export const SEARCH_UPDATE_RESULT = {
+  type: 'SEARCH_UPDATE_RESULT',
+  payloadSchema: {
+    result: PropTypes.object.isRequired,
+  },
+};

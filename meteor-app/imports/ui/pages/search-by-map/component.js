@@ -1,31 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  Card,
-  CardActions,
-  CardHeader,
-  CardText,
-} from 'material-ui/Card';
 import Paper from 'material-ui/Paper';
 import FullWindowLayout from '/imports/ui/layouts/full-window';
 import AppbarHeader from '/imports/ui/components/appbar';
 import SpatialFilter from '/imports/ui/components/searchkit-spatial-filter';
-import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
-import Chip from 'material-ui/Chip';
-import MapView from '/imports/ui/components/mapview';
-import geojsonExtent from 'geojson-extent';
 import moment from 'moment';
-
-import {
-  absoluteUrl,
-} from '/imports/ui/helpers';
 
 import {
   SearchkitManager,
   SearchkitProvider,
   Pagination,
   RefinementListFilter,
+  RangeFilter,
   DynamicRangeFilter,
   ActionBar,
   ActionBarRow,
@@ -36,191 +23,12 @@ import {
   NoHits,
 } from 'searchkit';
 
-class SearchResultItem extends React.PureComponent {
+import {
+  PropPrinter,
+} from '/imports/ui/helpers';
 
-  static getDateRange (start, end) {
-    if (!start && !end) {
-      return '';
-    }
-
-    return [start, end]
-    .map((s) => (s && moment(s).format('YYYY-MM-DD')) || '')
-    .join(' - ');
-  }
-
-  static buildGeoJsonWithGeometry (geometry) {
-    return {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          properties: {},
-          geometry,
-        },
-      ],
-    };
-  }
-
-  render () {
-    const {
-      result: {
-        _id,
-        _source: {
-          Title,
-          Creator,
-          CreationDate,
-          // Status,
-          Rating,
-          // ResultTypes,
-          StartDate,
-          EndDate,
-          // Inputs,
-          // Info,
-          // Reference,
-          location,
-        },
-      },
-    } = this.props;
-
-    const boundaryGeoJson = location && this.constructor.buildGeoJsonWithGeometry(location);
-    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
-    const boundaryExtent = geojsonExtent(boundaryGeoJson);
-
-    return (
-      <Card className="search-result-item">
-        <CardHeader
-          title={Title}
-          subtitle={this.constructor.getDateRange(StartDate, EndDate)}
-        />
-        <CardText className="search-result-item__content">
-          <div
-            className="search-result-item__thumbnail"
-            style={{
-              backgroundImage: 'url(//www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp)',
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
-            }}
-          >{boundaryGeoJson && (
-            <MapView
-              basemap="osm"
-              projection="EPSG:4326"
-              extent={boundaryExtent}
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-            ><map-layer-geojson src-json={boundaryGeoJsonString} /></MapView>
-          )}</div>
-          <div className="search-result-item__metadata">
-            <TextField
-              className="search-result-item__metadata__major"
-              floatingLabelText="Creator"
-              value={Creator}
-              style={{
-                width: 'auto',
-              }}
-            />
-            <TextField
-              className="search-result-item__metadata__major"
-              floatingLabelText="Date"
-              value={moment(CreationDate).format('YYYY-MM-DD')}
-              style={{
-                width: 'auto',
-              }}
-            />
-            <TextField
-              className="search-result-item__metadata__major"
-              floatingLabelText="Rating"
-              value={Rating}
-              style={{
-                width: 'auto',
-              }}
-            />
-            <p className="search-result-item__metadata__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mattis pretium massa. Aliquam erat volutpat. Nulla facilisi. Donec vulputate interdum sollicitudin. Nunc lacinia auctor quam sed pellentesque. Aliquam dui mauris, mattis quis lacus id, pellentesque lobortis odio.</p>
-          </div>
-        </CardText>
-        <CardActions>
-          <FlatButton label="Examine" href={absoluteUrl('/workspace', null, { dataset: _id })} target="_blank" />
-          <FlatButton label="Download" />
-        </CardActions>
-      </Card>
-    );
-  }
-}
-
-/**
- * Expect the value input to be in the form of `<min> - <max>`.
- * `min` and `max` are both timestamps in milliseconds.
- * @type   {Function}
- * @param  {String} labelValue
- * @return {String}
- */
-const DynamicDateRangeFormatter =
-(labelValue) => labelValue
-.split(' - ')
-.map((timeString) => parseInt(timeString, 10))
-.map((timestamp) => moment(timestamp).format('YYYY-MM-DD'))
-.join(' - ');
-
-const LabelValueFormatters = {
-  'Start Date': DynamicDateRangeFormatter,
-  'End Date': DynamicDateRangeFormatter,
-};
-
-class FilterItem extends React.PureComponent {
-  static propTypes = {
-    bemBlocks: PropTypes.object.isRequired,
-    filterId: PropTypes.string.isRequired,
-    labelKey: PropTypes.string.isRequired,
-    labelValue: PropTypes.string.isRequired,
-    removeFilter: PropTypes.func.isRequired,
-  };
-
-  static formatLabel = (labelKey, labelValue) => {
-    if (!(labelKey in LabelValueFormatters)) {
-      return labelValue;
-    }
-
-    const formattedLabelValue = LabelValueFormatters[labelKey](labelValue);
-
-    return formattedLabelValue
-    ? `${labelKey}: ${formattedLabelValue}`
-    : labelKey;
-  };
-
-  render () {
-    const {
-      bemBlocks,
-      filterId,
-      labelKey,
-      labelValue,
-      removeFilter,
-    } = this.props;
-
-    const containerClassName =
-    bemBlocks.option()
-    .mix(bemBlocks.container('item'))
-    .mix(`selected-filter--${filterId}`)
-    .toString();
-    const formattedLabel = this.constructor.formatLabel(labelKey, labelValue);
-
-    return (
-      <div
-        className={containerClassName}
-        style={{
-          background: 'transparent',
-          padding: 0,
-        }}
-      >
-        <Chip
-          onRequestDelete={removeFilter}
-        >
-          <div className={bemBlocks.option('name')}>{formattedLabel}</div>
-        </Chip>
-      </div>
-    );
-  }
-}
+import SelectedFilterItem from './SelectedFilterItem';
+import SearchResultItem from './SearchResultItem';
 
 const ResetFilterButton = ({
   hasFilters,
@@ -237,9 +45,14 @@ const ResetFilterButton = ({
 export default class SearchPage extends React.Component {
 
   static propTypes = {
-    // SearchKit Manager instance.
-    searchkit: PropTypes.instanceOf(SearchkitManager).isRequired,
+    //!
   };
+
+  constructor (props) {
+    super(props);
+
+    console.log('props', props);
+  }
 
   renderHeader = () => (
     <AppbarHeader
@@ -247,74 +60,84 @@ export default class SearchPage extends React.Component {
     />
   );
 
-  renderBody = () => (
-    <div className="page-search">
-      <Paper className="page-search__search">
-        <div className="page-search__search__inner">
-          <RefinementListFilter
-            id="resultTypes-list"
-            title="Result Types"
-            field="ResultTypes"
-            operator="OR"
-            orderKey="_term"
-            orderDirection="asc"
-            size={5}
-          />
+  renderBody = () => {
+    console.log('renderBody', this.props.searchResult);
+    return (
+      <div className="page-search">
+        <Paper className="page-search__search">
+          <div className="page-search__search__inner">
+            <RefinementListFilter
+              id="resultTypes-list"
+              title="Result Types"
+              field="ResultTypes"
+              operator="OR"
+              orderKey="_term"
+              orderDirection="asc"
+              size={5}
+            />
 
-          <div className="layout-filler" />
+            <div className="layout-filler" />
 
-          <SpatialFilter
-            className="spatial-filter"
-            title="Point of Interest"
-          />
+            <SpatialFilter
+              className="spatial-filter"
+              title="Point of Interest"
+            />
 
-          <DynamicRangeFilter
-            id="startdate-range"
-            field="StartDate"
-            title="Start Date"
-            rangeFormatter={(timestamp) => moment(timestamp).format('YYYY-MM-DD')}
-          />
-          <DynamicRangeFilter
-            id="enddate-range"
-            field="EndDate"
-            title="End Date"
-            rangeFormatter={(timestamp) => moment(timestamp).format('YYYY-MM-DD')}
+            {
+              this.props.searchResult
+              ? (
+                <RangeFilter
+                  id="data-temporal-range"
+                  field="StartDate"
+                  title="Start Date"
+                  min={this.props.searchResult.aggregations['data-temporal-min-start'].value}
+                  max={this.props.searchResult.aggregations['data-temporal-max-start'].value}
+                  rangeFormatter={(timestamp) => moment(parseInt(timestamp, 10)).format('YYYY-MM-DD')}
+                  showHistogram
+                />
+              )
+              : null
+            }
+
+            <DynamicRangeFilter
+              id="enddate-range"
+              field="EndDate"
+              title="End Date"
+              rangeFormatter={(timestamp) => moment(parseInt(timestamp, 10)).format('YYYY-MM-DD')}
+            />
+          </div>
+        </Paper>
+        <div className="page-search__result">
+          <PropPrinter results={this.props.searchResult} />
+          <ActionBar>
+            <ActionBarRow>
+              <HitsStats />
+            </ActionBarRow>
+
+            <ActionBarRow>
+              <SelectedFilters
+                mod="selected-filters"
+                itemComponent={SelectedFilterItem}
+              />
+              <ResetFilters component={ResetFilterButton} />
+            </ActionBarRow>
+          </ActionBar>
+
+          <Hits mod="sk-hits-grid" hitsPerPage={3} itemComponent={SearchResultItem} />
+          <NoHits />
+
+          <Pagination
+            showNumbers
           />
         </div>
-      </Paper>
-      <div className="page-search__result">
-        <ActionBar>
-          <ActionBarRow>
-            <HitsStats />
-          </ActionBarRow>
-
-          <ActionBarRow>
-            <SelectedFilters
-              mod="selected-filters"
-              itemComponent={FilterItem}
-            />
-            <ResetFilters component={ResetFilterButton} />
-          </ActionBarRow>
-        </ActionBar>
-
-        <Hits mod="sk-hits-grid" hitsPerPage={3} itemComponent={SearchResultItem} />
-        <NoHits />
-
-        <Pagination
-          showNumbers
-        />
       </div>
-    </div>
-  );
+    );
+  };
 
   render = () => (
     <FullWindowLayout
       header={this.renderHeader()}
-      body={
-        <SearchkitProvider searchkit={this.props.searchkit}>
-          {this.renderBody()}
-        </SearchkitProvider>
-      }
+      body={this.renderBody()}
     />
   );
 }
