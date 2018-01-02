@@ -1,15 +1,10 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  SearchkitManager,
+  RangeInput,
   RangeFilter,
   RangeAccessor,
   FieldContextFactory,
   RangeQuery,
-  BoolMust,
-  HistogramBucket,
-  FilterBucket,
-  CardinalityMetric,
   renderComponent,
 } from 'searchkit';
 import get from 'lodash/get';
@@ -18,12 +13,25 @@ import get from 'lodash/get';
  * An extended version of RangeAccessor to support multi-field range filtering
  * and aggregation.
  */
-class MultiFieldRangeAccessor extends RangeAccessor {
+class DataTemporalRangeAccessor extends RangeAccessor {
+  /**
+   * Convert year to Unix timestamp.
+   * @param {number} year
+   * @return {number}
+   */
+  static getUnixTimestampFromYear (year) {
+    // This initializes the date object to have all 0s in hour, minute, second. Regardless of timezone.
+    const date = new Date(0);
+
+    date.setFullYear(year);
+
+    return date.valueOf();
+  }
+
   /**
    * @param {string} key
    * @param {Object} options
    * @param {Array.<string>} options.fields - An array of field names to be considered.
-   * @param {bool} options.dynamicHistogram - Set to `true` to only show histogram between min and max.
    */
   constructor (key, options) {
     super(key, options);
@@ -39,7 +47,6 @@ class MultiFieldRangeAccessor extends RangeAccessor {
   }
 
   /**
-   * This is modifying the global aggregation to add the aggregations needed by the histogram.
    * @param {ImmutableQuery} query
    * @returns {ImmutableQuery}
    */
@@ -55,10 +62,11 @@ class MultiFieldRangeAccessor extends RangeAccessor {
         },
       };
 
-      const newQuery = this.options.fields.reduce((q, field, fieldIndex) => {
+      const newQuery = this.options.fields
+      .reduce((q, field, fieldIndex) => {
         const rangeFilter = this.fieldContexts[fieldIndex].wrapFilter(RangeQuery(field, {
-          gte: this.options.dynamicHistogram ? val.min : this.options.min,
-          lte: this.options.dynamicHistogram ? val.max : this.options.max,
+          gte: DataTemporalRangeAccessor.getUnixTimestampFromYear(val.min),
+          lte: DataTemporalRangeAccessor.getUnixTimestampFromYear(val.max),
         }));
 
         return q.addFilter(`${this.uuid}__${field}`, rangeFilter);
@@ -74,63 +82,10 @@ class MultiFieldRangeAccessor extends RangeAccessor {
   }
 
   /**
+   * ! This disables the bucketing.
    * @returns {Array.<{key, doc_count : number}>}
    */
-  getAllBuckets () {
-    return this.options.fields.reduce((acc, field, fieldIndex) => {
-      const uuid = `${this.uuid}__${field}`;
-      const result = this.getAggregations([
-        uuid,
-        this.fieldContexts[fieldIndex].getAggregationPath(),
-        this.key,
-        'buckets',
-      ], []);
-
-      if (acc === null) {
-        return result;
-      }
-
-      return acc.map(({
-        key,
-        doc_count,
-      }, bucketIndex) => ({
-        key,
-        doc_count: doc_count + result[bucketIndex].doc_count,
-      }));
-    }, null);
-  }
-
-  /**
-   * @returns {Array.<{key, doc_count : number}>}
-   */
-  getBuckets () {
-    const allBuckets = this.getAllBuckets();
-    const trimmedBuckets = allBuckets
-    .reduce((acc, bucket) => {
-      if (acc.length === 0 && bucket.doc_count === 0) {
-        return acc;
-      }
-
-      return [
-        ...acc,
-        bucket,
-      ];
-    }, [])
-    .reduceRight((acc, bucket) => {
-      if (acc.length === 0 && bucket.doc_count === 0) {
-        return acc;
-      }
-
-      return [
-        bucket,
-        ...acc,
-      ];
-    }, []);
-
-    console.log('trimmedBuckets', trimmedBuckets.length);
-
-    return trimmedBuckets;
-  }
+  getBuckets = () => [];
 
   /**
    * @returns {bool}
@@ -138,64 +93,28 @@ class MultiFieldRangeAccessor extends RangeAccessor {
   isDisabled = () => false;
 
   /**
-   * Build the query used to filter the results.
-   * @param {ImmutableQuery} query 
+   * ! Disabled on purpose.
+   * @param {ImmutableQuery} query
    * @returns {ImmutableQuery}
    */
-  buildOwnQuery (query) {
-    const trimmedBuckets = this.getBuckets();
-    const hasNonEmptyBucket = trimmedBuckets.length > 0;
-    const lowBucket = trimmedBuckets[0];
-    const highBucket = trimmedBuckets[trimmedBuckets.length - 1];
-
-    const min = hasNonEmptyBucket ? lowBucket.key : this.options.min;
-    const max = hasNonEmptyBucket ? highBucket.key : this.options.max;
-
-    return this.options.fields.reduce((q, field, fieldIndex) => {
-      const uuid = `${this.uuid}__${field}`;
-      const otherFilters = q.getFiltersWithoutKeys(uuid);
-      const filters = BoolMust([
-        otherFilters,
-        this.fieldContexts[fieldIndex].wrapFilter(
-          RangeQuery(field, {
-            gte: min,
-            lte: max,
-          }),
-        ),
-      ]);
-
-      let metric;
-      if (this.options.loadHistogram) {
-        metric = HistogramBucket(this.key, field, {
-          interval: this.getInterval(),
-          min_doc_count: 0,
-          extended_bounds: {
-            min: this.options.min,
-            max: this.options.max,
-          },
-        });
-      } else {
-        metric = CardinalityMetric(this.key, field);
-      }
-
-      return q.setAggs(FilterBucket(
-        uuid,
-        filters,
-        ...this.fieldContexts[fieldIndex].wrapAggregations(metric),
-      ));
-    }, query);
-  }
+  buildOwnQuery = (query) => query;
 }
 
 /**
  * An extended version of RangeFilter to support multi-field range filtering
  * and aggregation.
  */
-export default class MultiFieldRangeFilter extends RangeFilter {
+export default class DataTemporalRangeFilter extends RangeFilter {
   static propTypes = {
     ...RangeFilter.propTypes,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     field: PropTypes.string,
+  };
+
+  static defaultProps = {
+    ...RangeFilter.defaultProps,
+    rangeComponent: RangeInput,
+    showHistogram: false,
   };
 
   defineAccessor () {
@@ -212,7 +131,7 @@ export default class MultiFieldRangeFilter extends RangeFilter {
       translations,
     } = this.props;
 
-    return new MultiFieldRangeAccessor(id, {
+    return new DataTemporalRangeAccessor(id, {
       id,
       min,
       max,

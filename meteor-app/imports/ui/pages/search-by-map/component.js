@@ -10,7 +10,6 @@ import moment from 'moment';
 import {
   Pagination,
   RefinementListFilter,
-  RangeFilter,
   ActionBar,
   ActionBarRow,
   HitsStats,
@@ -68,12 +67,9 @@ export default class SearchPage extends React.Component {
               'StartDate',
               'EndDate',
             ]}
-            title="Date Range"
-            min={1000 * 60 * 60 * 24 * (365 * 30 + 8)}
-            max={Date.now()}
-            interval={1000 * 60 * 60 * 24}
-            rangeFormatter={(timestamp) => moment(parseInt(timestamp, 10)).format('YYYY-MM-DD')}
-            showHistogram
+            title="Year Range"
+            min={0}
+            max={(new Date()).getUTCFullYear()}
           />
 
           <RefinementListFilter

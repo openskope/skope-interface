@@ -34,14 +34,6 @@ const searchkit = new SearchkitManager(elasticEndpoint);
 //   basicAuth: "elastic:changeme",
 // });
 
-searchkit.addDefaultQuery((query) => {
-  return query
-  .setAggs(MinMetric('startdate-min', 'StartDate'))
-  .setAggs(MaxMetric('startdate-max', 'StartDate'))
-  .setAggs(MinMetric('enddate-min', 'EndDate'))
-  .setAggs(MaxMetric('enddate-max', 'EndDate'));
-});
-
 // Update state with search result.
 searchkit.addResultsListener((result) => globalStore.dispatch({
   type: actions.SEARCH_UPDATE_RESULT.type,
