@@ -13,6 +13,6 @@
   "devDependencies": {
     "async": "^2.5.0",
     "csv-parse": "^1.2.1",
-    "elasticsearch": "^13.2.0"
+    "elasticsearch": "^14.0.0"
   }
 }

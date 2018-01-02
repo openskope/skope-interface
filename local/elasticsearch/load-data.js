@@ -80,7 +80,7 @@ dataItems = dataItems.map(function (item) {
 
 var esClient = new elastic.Client({
   host: elasticHost,
-  apiVersion: '2.4',
+  apiVersion: '6.x',
   httpAuth: httpAuth,
   log: 'trace',
 });
