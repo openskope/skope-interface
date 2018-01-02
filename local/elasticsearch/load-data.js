@@ -67,7 +67,7 @@ dataItems = dataItems.map(function (item) {
     ResultTypes: Nullable(item.ResultTypes, Str2Ary),
     StartDate: Nullable(item.StartDate, Str2ISODateStr),
     EndDate: Nullable(item.EndDate, Str2ISODateStr),
-    Area: String(item.Area),
+    Area: null,
     Inputs: Nullable(item.Inputs, Str2Ary),
     Description: String(item.Description),
     Info: Nullable(item.Info, String),
