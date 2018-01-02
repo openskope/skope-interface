@@ -89,8 +89,8 @@ var bulkBody = [];
 dataItems.forEach(function (item, index) {
   bulkBody.push({
     index: {
-      _index: 'skope',
-      _type: 'scenario',
+      _index: 'model-run',
+      _type: 'type',
     },
   });
   bulkBody.push(item);
