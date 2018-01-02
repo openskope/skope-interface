@@ -1,6 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { HTTP } from 'meteor/http';
+import { WebApp } from 'meteor/webapp';
+import httpProxy from 'http-proxy';
+import path from 'path';
 
 // Register your apis here
 
@@ -79,3 +82,17 @@ Meteor.methods({
     return fakeData;
   },
 });
+
+// Proxy to Elastic Search.
+(() => {
+  const proxy = httpProxy.createProxyServer({});
+  const proxyEndpoint = path.resolve('/', Meteor.settings.public.elasticEndpoint);
+  const proxyTarget = Meteor.settings.server.elasticEndpoint;
+
+  // Listen to incoming HTTP requests.
+  WebApp.connectHandlers.use(proxyEndpoint, (req, res /* , next */) => {
+    proxy.web(req, res, {
+      target: proxyTarget,
+    });
+  });
+})();
