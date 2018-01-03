@@ -11,8 +11,6 @@ import objectPath from 'object-path';
 import {
   SearchkitManager,
   SearchkitProvider,
-  MinMetric,
-  MaxMetric,
 } from 'searchkit';
 import 'searchkit/release/theme.css';
 import { Meteor } from 'meteor/meteor';

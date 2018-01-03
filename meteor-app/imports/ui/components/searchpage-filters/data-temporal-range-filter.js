@@ -36,8 +36,10 @@ class DataTemporalRangeAccessor extends RangeAccessor {
   constructor (key, options) {
     super(key, options);
 
+    // Discard the properties created by `RangeAccessor` for its single field.
     delete this.options.fieldOptions.field;
     delete this.fieldContext;
+    // And create the corresponding ones for our multi-fields.
     this.options.fieldOptions.fields = this.options.fields;
 
     this.fieldContexts = this.options.fields.map((field) => FieldContextFactory({
@@ -72,8 +74,6 @@ class DataTemporalRangeAccessor extends RangeAccessor {
         return q.addFilter(`${this.uuid}__${field}`, rangeFilter);
       }, query)
       .addSelectedFilter(selectedFilter);
-
-      console.log('buildSharedQuery', newQuery);
 
       return newQuery;
     }

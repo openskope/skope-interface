@@ -1,11 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Paper from 'material-ui/Paper';
 import FullWindowLayout from '/imports/ui/layouts/full-window';
 import AppbarHeader from '/imports/ui/components/appbar';
 import SpatialFilter from '/imports/ui/components/searchkit-spatial-filter';
 import FlatButton from 'material-ui/FlatButton';
-import moment from 'moment';
 
 import {
   Pagination,
@@ -20,11 +18,6 @@ import {
 } from 'searchkit';
 
 import DataTemporalRangeFilter from '/imports/ui/components/searchpage-filters/data-temporal-range-filter';
-
-import {
-  PropPrinter,
-} from '/imports/ui/helpers';
-
 import SelectedFilterItem from './SelectedFilterItem';
 import SearchResultItem from './SearchResultItem';
 
@@ -43,7 +36,7 @@ const ResetFilterButton = ({
 export default class SearchPage extends React.Component {
 
   static propTypes = {
-    //!
+    //! Add prop types here.
   };
 
   renderHeader = () => (
@@ -86,7 +79,6 @@ export default class SearchPage extends React.Component {
         </div>
       </Paper>
       <div className="page-search__result">
-        <PropPrinter results={this.props.searchResult && this.props.searchResult.aggregations} />
         <ActionBar>
           <ActionBarRow>
             <HitsStats />

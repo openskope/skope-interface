@@ -1,25 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Chip from 'material-ui/Chip';
-import moment from 'moment';
-
-/**
- * Expect the value input to be in the form of `<min> - <max>`.
- * `min` and `max` are both timestamps in milliseconds.
- * @type   {Function}
- * @param  {String} labelValue
- * @return {String}
- */
-const DynamicDateRangeFormatter =
-(labelValue) => labelValue
-.split(' - ')
-.map((timeString) => parseInt(timeString, 10))
-.map((timestamp) => moment(timestamp).format('YYYY-MM-DD'))
-.join(' - ');
 
 const LabelValueFormatters = {
-  // 'Start Date': DynamicDateRangeFormatter,
-  // 'End Date': DynamicDateRangeFormatter,
+  //! Add formatters here.
 };
 
 export default class FilterItem extends React.PureComponent {
@@ -37,12 +21,6 @@ export default class FilterItem extends React.PureComponent {
     }
 
     const formattedLabelValue = LabelValueFormatters[labelKey](labelValue);
-
-    console.info('LabelValueFormatters', {
-      labelKey,
-      labelValue,
-      formattedLabelValue,
-    });
 
     return formattedLabelValue
     ? `${labelKey}: ${formattedLabelValue}`
