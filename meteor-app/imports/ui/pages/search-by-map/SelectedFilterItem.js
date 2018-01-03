@@ -17,7 +17,7 @@ export default class FilterItem extends React.PureComponent {
 
   static formatLabel = (labelKey, labelValue) => {
     if (!(labelKey in LabelValueFormatters)) {
-      return `${labelKey}: ${labelValue}`;
+      return labelValue ? `${labelKey}: ${labelValue}` : labelKey;
     }
 
     const formattedLabelValue = LabelValueFormatters[labelKey](labelValue);
