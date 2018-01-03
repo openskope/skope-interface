@@ -18,6 +18,13 @@ import {
 
 export default class SearchResultItem extends React.PureComponent {
 
+  static propTypes = {
+    result: PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      _source: PropTypes.object.isRequired,
+    }).isRequired,
+  };
+
   static getDateRange (start, end) {
     if (!start && !end) {
       return '';
