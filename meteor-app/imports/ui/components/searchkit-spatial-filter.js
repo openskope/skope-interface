@@ -2,15 +2,123 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {
   SearchkitComponent,
-  QueryAccessor,
+  FilterBasedAccessor,
+  ObjectState,
   Panel,
 } from 'searchkit';
 import MapView from '/imports/ui/components/mapview';
 
+/**
+ * The `SpatialAccessor` is only responsible for wrapping the query value in a `geo_shape` filter.
+ * It is up to whatever using this accessor to build a proper shape query (like a point or a polygon).
+ * This accessor also supports filtering on multiple fields.
+ */
+class SpatialAccessor extends FilterBasedAccessor {
+  /**
+   * @param {Object} shapeAndRelation
+   * @param {Object} queryOptions
+   * @param {Array.<string>} queryOptions.fields
+   * @return {Object}
+   */
+  static shapeQueryBuilder = (shapeAndRelation, queryOptions) => {
+    return {
+      bool: {
+        filter: queryOptions.fields.map((fieldName) => ({
+          geo_shape: {
+            [fieldName]: shapeAndRelation,
+          },
+        })),
+      },
+    };
+  };
+
+  constructor (key, options) {
+    super(key, options.id);
+
+    this.state = new ObjectState();
+    this.options = options;
+    this.options.fields = this.options.fields || [];
+  }
+
+  fromQueryObject (ob) {
+    super.fromQueryObject(ob);
+
+    if (this.options.onQueryStateChange) {
+      this.options.onQueryStateChange();
+    }
+  }
+
+  /**
+   * @param {Object} oldState - This for some reason is the entire state in SearchKit.
+   */
+  onStateChange (oldState) {
+    const ownOldState = oldState[this.key];
+    const ownState = this.state.getValue();
+    const ownStateChanged = ownOldState !== ownState;
+
+    if (ownStateChanged && this.options.onQueryStateChange) {
+      this.options.onQueryStateChange();
+    }
+  }
+
+  buildSharedQuery (query) {
+    const shapeAndRelation = this.getQueryShape();
+
+    if (shapeAndRelation) {
+      let newQuery = query;
+
+      const shapeQuery = SpatialAccessor.shapeQueryBuilder(
+        shapeAndRelation,
+        {
+          fields: this.options.fields,
+        },
+      );
+
+      newQuery = newQuery.addQuery(shapeQuery);
+
+      newQuery = newQuery.addSelectedFilter({
+        name: this.options.title,
+        value: '',
+        id: this.key,
+        remove: () => this.clearQueryShape(),
+      });
+
+      return newQuery;
+    }
+
+    return query;
+  }
+
+  setQueryShape ({
+    shape,
+    relation,
+  }) {
+    this.state = this.state.setValue({
+      shape,
+      relation,
+    });
+  }
+
+  /**
+   * @return {{shape: Object, relation: string}|null}
+   */
+  getQueryShape () {
+    if (!this.state.hasValue()) {
+      return null;
+    }
+
+    return this.state.getValue();
+  }
+
+  clearQueryShape () {
+    this.state = this.state.clear();
+  }
+}
+
 export default class SpatialFilter extends SearchkitComponent {
 
   static defaultProps = {
-    id: 'coord',
+    id: 'poi',
     mod: 'sk-spatial-filter',
   };
 
@@ -21,30 +129,6 @@ export default class SpatialFilter extends SearchkitComponent {
     id: PropTypes.string,
     fields: PropTypes.arrayOf(PropTypes.string),
     mod: PropTypes.string,
-  };
-
-  /**
-   * @param {*} query - The value returned by `#getValue`.
-   * @param {Object} queryOptions
-   * @param {Array.<string>} queryOptions.fields
-   * @return {Object}
-   */
-  static queryBuilder = (query, queryOptions) => {
-    return {
-      bool: {
-        filter: queryOptions.fields.map((fieldName) => ({
-          geo_shape: {
-            [fieldName]: {
-              shape: {
-                type: 'Point',
-                coordinates: query,
-              },
-              relation: 'contains',
-            },
-          },
-        })),
-      },
-    };
   };
 
   constructor (props) {
@@ -62,19 +146,19 @@ export default class SpatialFilter extends SearchkitComponent {
   defineAccessor () {
     const {
       id,
+      title,
       fields,
     } = this.props;
 
-    return new QueryAccessor(
+    return new SpatialAccessor(
       id,
       {
-        queryFields: fields,
-        queryOptions: {},
-        queryBuilder: SpatialFilter.queryBuilder,
+        title,
+        fields,
         onQueryStateChange: () => {
-          if (!this.unmounted && this.state.selectedPoint) {
+          if (!this.unmounted) {
             this.setState({
-              selectedPoint: null,
+              selectedPoint: this.getSelectedPoint(),
             });
           }
         },
@@ -82,27 +166,45 @@ export default class SpatialFilter extends SearchkitComponent {
     );
   }
 
-  getValue () {
-    return this.state.selectedPoint || this.getAccessorValue();
-  }
+  /**
+   * This function needs to build a proper point query.
+   * The query should search for all items containing the given point.
+   * @param {Array.<number>} pointCoords
+   */
+  buildPointQuery = (pointCoords) => ({
+    shape: {
+      type: 'Point',
+      coordinates: pointCoords,
+    },
+    relation: 'contains',
+  });
 
-  getAccessorValue () {
-    const rawValueFromAccessor = this.accessor.state.getValue();
+  /**
+   * @return {Array.<number>|null}
+   */
+  getSelectedPoint () {
+    const shapeAndRelation = this.accessor.getQueryShape();
 
-    if (!rawValueFromAccessor) {
+    if (!shapeAndRelation) {
       return null;
     }
 
-    // `rawValueFromAccessor` should have type {Array.<string>}
-    // The items are string because they are parsed from url.
-    // But they really should be numbers.
-    return rawValueFromAccessor.map((s) => parseFloat(s));
+    if (shapeAndRelation.shape.type === 'Point') {
+      return shapeAndRelation.shape.coordinates;
+    }
+
+    return null;
   }
 
-  searchQuery (query) {
-    const shouldResetOtherState = false;
-
-    this.accessor.setQueryString(query, shouldResetOtherState);
+  /**
+   * @param {Array.<number>|null} pointCoords
+   */
+  setPointQuery (pointCoords) {
+    if (!pointCoords) {
+      this.accessor.clearQueryShape();
+    } else {
+      this.accessor.setQueryShape(this.buildPointQuery(pointCoords));
+    }
 
     this.searchkit.performSearch();
   }
@@ -112,19 +214,17 @@ export default class SpatialFilter extends SearchkitComponent {
 
     const selectedPoint = event.latLongCoordinate || null;
 
-    this.setState({
-      selectedPoint,
-    });
-
-    this.searchQuery(selectedPoint);
+    this.setPointQuery(selectedPoint);
   }
 
   render () {
-    const selectedPoint = this.getValue();
     const {
       title,
       className,
     } = this.props;
+    const {
+      selectedPoint,
+     } = this.state;
 
     return (
       <Panel
