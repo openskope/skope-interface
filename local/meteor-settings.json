@@ -1,5 +1,8 @@
 {
     "public": {
-        "elasticEndpoint": "//skope-dev.roger.ncsa.illinois.edu/elastic"
+        "elasticEndpoint": "elastic"
+    },
+    "server": {
+        "elasticEndpoint": "http://localhost:9200"
     }
 }

@@ -2,11 +2,15 @@
  * Search page.
  */
 
+import React from 'react';
 import {
   connect,
 } from 'react-redux';
+import url from 'url';
+import objectPath from 'object-path';
 import {
   SearchkitManager,
+  SearchkitProvider,
 } from 'searchkit';
 import 'searchkit/release/theme.css';
 import { Meteor } from 'meteor/meteor';
@@ -15,9 +19,12 @@ import {
   appSettings,
 } from '/package.json';
 
+import globalStore, { actions } from '/imports/ui/redux-store';
+
 import Component from './component';
 
-const elasticEndpoint = (Meteor.settings && Meteor.settings.public && Meteor.settings.public.elasticEndpoint) || 'http://localhost:9200/';
+// If endpoint is not found in settings, use default localhost elastic.
+const elasticEndpoint = url.resolve(Meteor.absoluteUrl(), objectPath.get(Meteor.settings, 'public.elasticEndpoint', 'http://localhost:9200/'));
 const searchkit = new SearchkitManager(elasticEndpoint);
 
 //! This does not work
@@ -25,26 +32,32 @@ const searchkit = new SearchkitManager(elasticEndpoint);
 //   basicAuth: "elastic:changeme",
 // });
 
+// Update state with search result.
+searchkit.addResultsListener((result) => globalStore.dispatch({
+  type: actions.SEARCH_UPDATE_RESULT.type,
+  result,
+}));
+
 if (appSettings.logSearchKitQueries) {
   // Monitor query object.
-  searchkit.setQueryProcessor((queryObject) => {
-    console.info('queryObject', queryObject);
-    return queryObject;
-  });
+  searchkit.setQueryProcessor((queryObject) => console.info('queryObject', queryObject) || queryObject);
 }
 
 if (appSettings.logSearchKitQueryResults) {
   // Monitor search results.
-  searchkit.addResultsListener((results) => {
-    console.info('queryResult', results);
-  });
+  searchkit.addResultsListener((result) => console.info('queryResult', result));
 }
 
 export default connect(
   // mapStateToProps
-  () => ({
+  (state) => ({
     searchkit,
+    searchResult: state.search.searchResult,
   }),
   // mapDispatchToProps
   null,
-)(Component);
+)((props) => (
+  <SearchkitProvider searchkit={searchkit}>
+    <Component {...props} />
+  </SearchkitProvider>
+));

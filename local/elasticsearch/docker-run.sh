@@ -2,8 +2,7 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# VERSION=docker.elastic.co/elasticsearch/elasticsearch:5.5.0
-VERSION=elasticsearch:2
+VERSION=docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.1
 
 docker run \
     --rm \

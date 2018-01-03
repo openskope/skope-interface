@@ -67,7 +67,7 @@ dataItems = dataItems.map(function (item) {
     ResultTypes: Nullable(item.ResultTypes, Str2Ary),
     StartDate: Nullable(item.StartDate, Str2ISODateStr),
     EndDate: Nullable(item.EndDate, Str2ISODateStr),
-    Area: String(item.Area),
+    Area: null,
     Inputs: Nullable(item.Inputs, Str2Ary),
     Description: String(item.Description),
     Info: Nullable(item.Info, String),
@@ -80,7 +80,7 @@ dataItems = dataItems.map(function (item) {
 
 var esClient = new elastic.Client({
   host: elasticHost,
-  apiVersion: '2.4',
+  apiVersion: '6.x',
   httpAuth: httpAuth,
   log: 'trace',
 });
@@ -89,8 +89,8 @@ var bulkBody = [];
 dataItems.forEach(function (item, index) {
   bulkBody.push({
     index: {
-      _index: 'skope',
-      _type: 'scenario',
+      _index: 'model-run',
+      _type: 'type',
     },
   });
   bulkBody.push(item);

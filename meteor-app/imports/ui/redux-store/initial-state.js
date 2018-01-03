@@ -23,6 +23,8 @@ export default {
   helpUrl: '',
 
   search: {
+    // Store a copy of the search result from SearchKit to be used by other components.
+    searchResult: null,
     // Put states specific to search page here.
   },
 
