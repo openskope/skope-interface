@@ -64,12 +64,12 @@ export default class SearchResultItem extends React.PureComponent {
           // Inputs,
           // Info,
           // Reference,
-          location,
+          Area,
         },
       },
     } = this.props;
 
-    const boundaryGeoJson = location && this.constructor.buildGeoJsonWithGeometry(location);
+    const boundaryGeoJson = Area && this.constructor.buildGeoJsonWithGeometry(Area);
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
     const boundaryExtent = geojsonExtent(boundaryGeoJson);
 

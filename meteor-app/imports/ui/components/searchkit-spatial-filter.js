@@ -19,11 +19,32 @@ export default class SpatialFilter extends SearchkitComponent {
 
     title: PropTypes.string.isRequired,
     id: PropTypes.string,
-    queryFields: PropTypes.arrayOf(PropTypes.string),
-    queryOptions: PropTypes.object,
-    prefixQueryFields: PropTypes.arrayOf(PropTypes.string),
-    prefixQueryOptions: PropTypes.object,
+    fields: PropTypes.arrayOf(PropTypes.string),
     mod: PropTypes.string,
+  };
+
+  /**
+   * @param {*} query - The value returned by `#getValue`.
+   * @param {Object} queryOptions
+   * @param {Array.<string>} queryOptions.fields
+   * @return {Object}
+   */
+  static queryBuilder = (query, queryOptions) => {
+    return {
+      bool: {
+        filter: queryOptions.fields.map((fieldName) => ({
+          geo_shape: {
+            [fieldName]: {
+              shape: {
+                type: 'Point',
+                coordinates: query,
+              },
+              relation: 'contains',
+            },
+          },
+        })),
+      },
+    };
   };
 
   constructor (props) {
@@ -41,43 +62,15 @@ export default class SpatialFilter extends SearchkitComponent {
   defineAccessor () {
     const {
       id,
-      prefixQueryFields,
-      queryFields,
-      queryOptions,
-      prefixQueryOptions,
+      fields,
     } = this.props;
 
     return new QueryAccessor(
       id,
       {
-        prefixQueryFields,
-        prefixQueryOptions: {
-          ...prefixQueryOptions,
-        },
-        queryFields: queryFields || ['_all'],
-        queryOptions: {
-          ...queryOptions,
-        },
-        queryBuilder: (query/* , queryOptions */) => {
-          return {
-            bool: {
-              must: {
-                match_all: {},
-              },
-              filter: {
-                geo_shape: {
-                  location: {
-                    shape: {
-                      type: 'Point',
-                      coordinates: query,
-                    },
-                    relation: 'contains',
-                  },
-                },
-              },
-            },
-          };
-        },
+        queryFields: fields,
+        queryOptions: {},
+        queryBuilder: SpatialFilter.queryBuilder,
         onQueryStateChange: () => {
           if (!this.unmounted && this.state.selectedPoint) {
             this.setState({
@@ -94,7 +87,16 @@ export default class SpatialFilter extends SearchkitComponent {
   }
 
   getAccessorValue () {
-    return this.accessor.state.getValue() || null;
+    const rawValueFromAccessor = this.accessor.state.getValue();
+
+    if (!rawValueFromAccessor) {
+      return null;
+    }
+
+    // `rawValueFromAccessor` should have type {Array.<string>}
+    // The items are string because they are parsed from url.
+    // But they really should be numbers.
+    return rawValueFromAccessor.map((s) => parseFloat(s));
   }
 
   searchQuery (query) {

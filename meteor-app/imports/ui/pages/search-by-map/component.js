@@ -52,6 +52,7 @@ export default class SearchPage extends React.Component {
           <SpatialFilter
             className="spatial-filter"
             title="Point of Interest"
+            fields={['Area']}
           />
 
           <DataTemporalRangeFilter
