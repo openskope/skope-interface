@@ -4,10 +4,17 @@ import FullWindowLayout from '/imports/ui/layouts/full-window';
 import AppbarHeader from '/imports/ui/components/appbar';
 import SpatialFilter from '/imports/ui/components/searchkit-spatial-filter';
 import FlatButton from 'material-ui/FlatButton';
+import {
+  Toolbar,
+  ToolbarGroup,
+  ToolbarSeparator,
+  ToolbarTitle,
+} from 'material-ui/Toolbar';
 
 import {
   Pagination,
   RefinementListFilter,
+  SortingSelector,
   ActionBar,
   ActionBarRow,
   HitsStats,
@@ -80,6 +87,20 @@ export default class SearchPage extends React.Component {
         </div>
       </Paper>
       <div className="page-search__result">
+        <Toolbar>
+          <ToolbarGroup></ToolbarGroup>
+          <ToolbarGroup>
+            <ToolbarTitle text="Sort By" />
+            <SortingSelector
+              options={[
+                // { label: 'Relevance', field: '_score', order: 'desc', defaultOption: true },
+                { label: 'Latest Releases', field: 'CreationDate', order: 'desc', defaultOption: true },
+                { label: 'Earliest Releases', field: 'CreationDate', order: 'asc' },
+              ]}
+            />
+          </ToolbarGroup>
+        </Toolbar>
+
         <ActionBar>
           <ActionBarRow>
             <HitsStats />
