@@ -37,6 +37,7 @@ Note that per Meteor design, only `public` field is exposed to client-side.
         - If a UI component is designed to be reusable and generic, put it under `/imports/ui/components`.
         - Otherwise, stick it close to the parent component that's using it.
             - For example, if we are splitting a small component out of a page, and that component would only make sense in the context of that page (a.k.a not generic), then that component is better located right inside the folder for that page.
+        - Components (in general but more specifically for those under `/imports/ui/components`) should not be aware of the state of the app. When possible they should also be stateless. Use a container (with `connect` from `react-redux` for example) to connect the state to the components.
     - Redux actions/reducers
         - Actions and reducers should stay inside their corresponding folders under `/imports/ui/redux-store`.
         - Multiple actions or reducers could be defined within single files if they belong to the same scope and are naive enough.

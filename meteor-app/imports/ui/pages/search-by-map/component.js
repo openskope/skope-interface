@@ -8,6 +8,7 @@ import FlatButton from 'material-ui/FlatButton';
 import {
   Pagination,
   RefinementListFilter,
+  SortingSelector,
   ActionBar,
   ActionBarRow,
   HitsStats,
@@ -83,6 +84,13 @@ export default class SearchPage extends React.Component {
         <ActionBar>
           <ActionBarRow>
             <HitsStats />
+            <SortingSelector
+              options={[
+                // { label: 'Relevance', field: '_score', order: 'desc', defaultOption: true },
+                { label: 'Latest Releases', field: 'CreationDate', order: 'desc', defaultOption: true },
+                { label: 'Earliest Releases', field: 'CreationDate', order: 'asc' },
+              ]}
+            />
           </ActionBarRow>
 
           <ActionBarRow>
