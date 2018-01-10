@@ -99,6 +99,34 @@ export default class Component extends SuiteBaseClass {
     },
   });
 
+  mapLayerRenderers = {
+    wms (layer) {
+      return (
+        <map-layer-twms
+          key={layer.id}
+          name={layer.title}
+          projection="EPSG:4326"
+          extent={this.props.dataExtent}
+          invisible={this.getLayerVisibility(layer.id) ? null : 'invisible'}
+          opacity={this.getLayerOpacity(layer.id)}
+          url={layer.endpoint}
+          params={`LAYERS=${layer.layer}`}
+          server-type="geoserver"
+        />
+      );
+    },
+  };
+
+  renderMapLayer = (layer) => {
+    if (!(layer.type in this.mapLayerRenderers)) {
+      return null;
+    }
+
+    const mapLayerRenderer = this.mapLayerRenderers[layer.type];
+
+    return mapLayerRenderer.call(this, layer);
+  };
+
   render () {
     const {
       status,
@@ -212,7 +240,11 @@ export default class Component extends SuiteBaseClass {
                 height: '100%',
                 width: '100%',
               }}
-            />
+            >
+              {layers.map((layer) => this.renderMapLayer(layer, this.props, this.state))}
+              <map-interaction-defaults />
+              <map-control-defaults />
+            </MapView>
           )}
         </Paper>
       </div>
