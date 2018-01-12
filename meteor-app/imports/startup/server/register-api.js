@@ -34,7 +34,7 @@ Meteor.methods({
     datasetId,
   }) {
     //! Request data from real backend.
-    const fakeDelay = 3000;
+    const fakeDelay = 100;
     const fakeData = {
       datasetId,
       // Title to be displayed in the workspace.
@@ -44,26 +44,33 @@ Meteor.methods({
       data: {
         status: 'to be determined',
         description: 'general description about this dataset. For environmental data this description is provided by domain experts, for model results it is provide by model configuration time.',
-        dataExtent: [-118.67431640625, 33.91208674157048, -109.88525390625, 42.92087580407048],
-        yearStart: 1010,
-        yearEnd: 2020,
+        dataExtent: [-114.995833333, 30.995833333999997, -101.995833333, 42.995833334],
+        yearStart: 1,
+        yearEnd: 2000,
         layers: [
           {
-            title: 'Example layer 1',
-            type: 'undefined',
-            url: 'a/b/c/{x}/{y}/{z}/f',
+            id: 'gdd',
+            title: 'Example layer (GDD)',
+            type: 'wms',
+            endpoint: 'http://141.142.211.232/geoserver/SKOPE/wms',
+            layer: 'SKOPE:paleocar_1_GDD_{fullyear}0101',
           },
           {
-            title: 'Example layer 2',
-            type: 'undefined',
-            url: 'a/b/c/{x}/{y}/{z}/f',
+            id: 'pttannual',
+            title: 'PPT Annual',
+            type: 'wms',
+            endpoint: 'http://141.142.211.232/geoserver/SKOPE/wms',
+            layer: 'SKOPE:paleocar_1_PPTannual_{fullyear}0101',
           },
           {
-            title: 'Example layer 3',
-            type: 'undefined',
-            url: 'a/b/c/{x}/{y}/{z}/f',
+            id: 'pptmaysep',
+            title: 'PPT May Sep.',
+            type: 'wms',
+            endpoint: 'http://141.142.211.232/geoserver/SKOPE/wms',
+            layer: 'SKOPE:paleocar_1_PPTmaysep_{fullyear}0101',
           },
           {
+            id: 'example-4',
             title: 'Example layer 4',
             type: 'undefined',
             url: 'a/b/c/{x}/{y}/{z}/f',
