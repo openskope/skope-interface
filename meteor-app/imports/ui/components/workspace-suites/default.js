@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import moment from 'moment';
 
 import {
   Tabs,
@@ -10,17 +11,17 @@ import Paper from 'material-ui/Paper';
 import {
   LayerList,
 } from '/imports/ui/components/layerlist';
-// import {
-//   Toolbar,
-//   ToolbarGroup,
-//   ToolbarSeparator,
-//   ToolbarTitle,
-// } from 'material-ui/Toolbar';
-// import TextField from 'material-ui/TextField';
-// import IconButton from 'material-ui/IconButton';
-// import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
-// import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
-// import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
+import {
+  Toolbar,
+  ToolbarGroup,
+  ToolbarSeparator,
+  ToolbarTitle,
+} from 'material-ui/Toolbar';
+import TextField from 'material-ui/TextField';
+import IconButton from 'material-ui/IconButton';
+import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
+import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
+import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 // import PauseIcon from 'material-ui/svg-icons/av/pause';
 
 import {
@@ -53,16 +54,57 @@ export default class Component extends SuiteBaseClass {
     metadata: {},
   };
 
+  /**
+   * @param {string} urlTemplate
+   * @param {Object.<placeHolder: string, value: *} values
+   * @return {string}
+   */
+  static composeLayerId = (urlTemplate, values) => {
+    return Object.keys(values)
+      .reduce((urlStr, placeHolder) => {
+        const value = values[placeHolder];
+        const placeHolderStr = `{${placeHolder}}`;
+
+        return urlStr.replace(placeHolderStr, value);
+      }, urlTemplate);
+  };
+
+  static mapLayerRenderers = {
+    wms (layer) {
+      return (
+        <map-layer-twms
+          key={layer.id}
+          name={layer.title}
+          projection="EPSG:4326"
+          extent={this.props.dataExtent}
+          invisible={this.getLayerVisibility(layer.id) ? null : 'invisible'}
+          opacity={this.getLayerOpacity(layer.id)}
+          url={layer.endpoint}
+          params={`LAYERS=${Component.composeLayerId(layer.layer, {
+            //! Maybe `moment` can fill this in a single step?
+            fullyear: moment(this.state.currentLoadedYear.toFixed(0), 'YYYY').format('YYYY'),
+          })}`}
+          server-type="geoserver"
+        />
+      );
+    },
+  };
+
   constructor (props) {
     super(props);
 
     this.state = {
+      // @type {string}
       activeTab: 'info',
       sidebarWidth: 400,
       sidebarMinWidth: 400,
       contentMinWidth: 400,
+      // @type {Object.<layerId: string, visible: boolean>}
       layerVisibility: {},
+      // @type {Object.<layerId: string, opacity: number>}
       layerOpacity: {},
+      // @type {number}
+      currentLoadedYear: props.yearEnd,
     };
   }
 
@@ -99,30 +141,45 @@ export default class Component extends SuiteBaseClass {
     },
   });
 
-  mapLayerRenderers = {
-    wms (layer) {
-      return (
-        <map-layer-twms
-          key={layer.id}
-          name={layer.title}
-          projection="EPSG:4326"
-          extent={this.props.dataExtent}
-          invisible={this.getLayerVisibility(layer.id) ? null : 'invisible'}
-          opacity={this.getLayerOpacity(layer.id)}
-          url={layer.endpoint}
-          params={`LAYERS=${layer.layer}`}
-          server-type="geoserver"
-        />
-      );
-    },
+  _changeLoadedYear (nextYear) {
+    let nextLoadedYear = nextYear;
+    nextLoadedYear = Math.max(this.props.yearStart, nextLoadedYear);
+    nextLoadedYear = Math.min(this.props.yearEnd, nextLoadedYear);
+
+    if (nextLoadedYear === this.state.currentLoadedYear) {
+      return;
+    }
+
+    this.setState({
+      currentLoadedYear: nextLoadedYear,
+    });
+  }
+
+  _yearStepBackButtonOnClick = (/* event */) => {
+    this._changeLoadedYear(this.state.currentLoadedYear - 1);
+  };
+
+  _yearStepForwardButtonOnClick = (/* event */) => {
+    this._changeLoadedYear(this.state.currentLoadedYear + 1);
+  };
+
+  /**
+   * @param {string} value
+   */
+  _yearInputOnChange = (event, value) => {
+    if (isNaN(value)) {
+      return;
+    }
+
+    this._changeLoadedYear(parseInt(value, 10));
   };
 
   renderMapLayer = (layer) => {
-    if (!(layer.type in this.mapLayerRenderers)) {
+    if (!(layer.type in Component.mapLayerRenderers)) {
       return null;
     }
 
-    const mapLayerRenderer = this.mapLayerRenderers[layer.type];
+    const mapLayerRenderer = Component.mapLayerRenderers[layer.type];
 
     return mapLayerRenderer.call(this, layer);
   };
@@ -153,7 +210,8 @@ export default class Component extends SuiteBaseClass {
           }}
         >
           <Tabs
-            contentContainerClassName="side-panel__content"
+            className="side-panel__tabs-panel"
+            contentContainerClassName="side-panel__tab-content"
             value={this.state.activeTab}
             onChange={this.onTabChange}
           >
@@ -175,7 +233,7 @@ export default class Component extends SuiteBaseClass {
               value="layers"
             >
               <LayerList
-                className="side-panel__section"
+                className="side-panel__section side-panel__section--flexible"
                 layers={
                   layers
                   // Add `id` property to the layers if not present.
@@ -192,6 +250,51 @@ export default class Component extends SuiteBaseClass {
                 onChangeLayerVisibility={this.setLayerVisibility}
                 onChangeLayerOpacity={_.debounce(this.setLayerOpacity)}
               />
+
+              <Toolbar
+                style={{
+                  height: 48,
+                }}
+              >
+                <ToolbarGroup>
+                  <ToolbarTitle text="Time" />
+
+                  <IconButton
+                    tooltip="Step back"
+                    disabled={this.state.currentLoadedYear <= yearStart}
+                    onClick={this._yearStepBackButtonOnClick}
+                  >
+                    <LeftArrowIcon />
+                  </IconButton>
+
+                  <TextField
+                    hintText="Year"
+                    type="text"
+                    style={{
+                      width: 50,
+                    }}
+                    inputStyle={{
+                      textAlign: 'center',
+                    }}
+                    value={this.state.currentLoadedYear}
+                    onChange={this._yearInputOnChange}
+                  />
+
+                  <IconButton
+                    tooltip="Step forward"
+                    disabled={this.state.currentLoadedYear >= yearEnd}
+                    onClick={this._yearStepForwardButtonOnClick}
+                  >
+                    <RightArrowIcon />
+                  </IconButton>
+
+                  <ToolbarSeparator />
+
+                  <IconButton tooltip="Play/Pause">
+                    <PlayIcon />
+                  </IconButton>
+                </ToolbarGroup>
+              </Toolbar>
             </Tab>
 
             <Tab

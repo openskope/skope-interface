@@ -26,20 +26,41 @@
     //=================================================================
 
     .side-panel {
+      .flex-col;
+
       box-sizing: content-box;
       background-color: #EAEAEA;
       z-index: 2;
+    }
 
+    .side-panel > .side-panel__tabs-panel {
+      .layout-fill;
+    }
+
+    .side-panel__tabs-panel {
+      .flex-col;
+    }
+
+    .side-panel__tabs-panel > .side-panel__tab-content {
+      .layout-fill;
+    }
+
+    // This is the extra wrapper for each tab content.
+    .side-panel__tab-content > div {
       .flex-col;
 
-      &__content {
+      height: 100%;
+      width: 100%;
+    }
+
+    .side-panel__tab-content > div > .side-panel__section {
+      padding: 10px;
+
+      // A flexible section will fill available space.
+      &--flexible {
         .layout-fill;
 
         overflow: auto;
-      }
-
-      &__section {
-        padding: 10px;
       }
     }
 
