@@ -184,16 +184,139 @@ export default class Component extends SuiteBaseClass {
     return mapLayerRenderer.call(this, layer);
   };
 
-  render () {
+  renderInfoTab = () => {
     const {
       status,
       description,
-      dataExtent,
       yearStart,
       yearEnd,
       dataUrl,
+    } = this.props;
+
+    return (
+      <Tab
+        label="Info"
+        value="info"
+      >
+        <div className="side-panel__section">
+          <p>Status: {status}</p>
+          <p>Description: {description}</p>
+          <p>Year: {yearStart} ~ {yearEnd}</p>
+          <p>Download link(s)</p>
+          <p>{dataUrl}</p>
+        </div>
+      </Tab>
+    );
+  };
+
+  renderLayersTab = () => {
+    const {
+      yearStart,
+      yearEnd,
       layers,
+    } = this.props;
+
+    const toolbarTooltipPosition = 'top-center';
+
+    return (
+      <Tab
+        label="Layers"
+        value="layers"
+      >
+        <LayerList
+          className="side-panel__section side-panel__section--flexible"
+          layers={
+            layers
+            // Add `id` property to the layers if not present.
+            .map((layer, index) => ({
+              id: index,
+              ...layer,
+            }))
+            .map((layer) => ({
+              ...layer,
+              invisible: !this.getLayerVisibility(layer.id),
+              opacity: this.getLayerOpacity(layer.id),
+            }))
+          }
+          onChangeLayerVisibility={this.setLayerVisibility}
+          onChangeLayerOpacity={_.debounce(this.setLayerOpacity)}
+        />
+
+        <Toolbar
+          style={{
+            height: 48,
+          }}
+        >
+          <ToolbarGroup>
+            <ToolbarTitle text="Time" />
+
+            <IconButton
+              tooltip="Step back"
+              tooltipPosition={toolbarTooltipPosition}
+              disabled={this.state.currentLoadedYear <= yearStart}
+              onClick={this._yearStepBackButtonOnClick}
+            >
+              <LeftArrowIcon />
+            </IconButton>
+
+            <TextField
+              hintText="Year"
+              type="text"
+              style={{
+                width: 50,
+              }}
+              inputStyle={{
+                textAlign: 'center',
+              }}
+              value={this.state.currentLoadedYear}
+              onChange={this._yearInputOnChange}
+            />
+
+            <IconButton
+              tooltip="Step forward"
+              tooltipPosition={toolbarTooltipPosition}
+              disabled={this.state.currentLoadedYear >= yearEnd}
+              onClick={this._yearStepForwardButtonOnClick}
+            >
+              <RightArrowIcon />
+            </IconButton>
+
+            <ToolbarSeparator />
+
+            <IconButton
+              tooltip="Play/Pause"
+              tooltipPosition={toolbarTooltipPosition}
+            >
+              <PlayIcon />
+            </IconButton>
+          </ToolbarGroup>
+        </Toolbar>
+      </Tab>
+    );
+  };
+
+  renderMetadataTab = () => {
+    const {
       metadata,
+    } = this.props;
+
+    return (
+      <Tab
+        label="Metadata"
+        value="metadata"
+      >
+        <div className="side-panel__section">
+          <h2>Metadata</h2>
+          <PropPrinter {...metadata} />
+        </div>
+      </Tab>
+    );
+  };
+
+  render () {
+    const {
+      dataExtent,
+      layers,
     } = this.props;
 
     return (
@@ -215,97 +338,9 @@ export default class Component extends SuiteBaseClass {
             value={this.state.activeTab}
             onChange={this.onTabChange}
           >
-            <Tab
-              label="Info"
-              value="info"
-            >
-              <div className="side-panel__section">
-                <p>Status: {status}</p>
-                <p>Description: {description}</p>
-                <p>Year: {yearStart} ~ {yearEnd}</p>
-                <p>Download link(s)</p>
-                <p>{dataUrl}</p>
-              </div>
-            </Tab>
-
-            <Tab
-              label="Layers"
-              value="layers"
-            >
-              <LayerList
-                className="side-panel__section side-panel__section--flexible"
-                layers={
-                  layers
-                  // Add `id` property to the layers if not present.
-                  .map((layer, index) => ({
-                    id: index,
-                    ...layer,
-                  }))
-                  .map((layer) => ({
-                    ...layer,
-                    invisible: !this.getLayerVisibility(layer.id),
-                    opacity: this.getLayerOpacity(layer.id),
-                  }))
-                }
-                onChangeLayerVisibility={this.setLayerVisibility}
-                onChangeLayerOpacity={_.debounce(this.setLayerOpacity)}
-              />
-
-              <Toolbar
-                style={{
-                  height: 48,
-                }}
-              >
-                <ToolbarGroup>
-                  <ToolbarTitle text="Time" />
-
-                  <IconButton
-                    tooltip="Step back"
-                    disabled={this.state.currentLoadedYear <= yearStart}
-                    onClick={this._yearStepBackButtonOnClick}
-                  >
-                    <LeftArrowIcon />
-                  </IconButton>
-
-                  <TextField
-                    hintText="Year"
-                    type="text"
-                    style={{
-                      width: 50,
-                    }}
-                    inputStyle={{
-                      textAlign: 'center',
-                    }}
-                    value={this.state.currentLoadedYear}
-                    onChange={this._yearInputOnChange}
-                  />
-
-                  <IconButton
-                    tooltip="Step forward"
-                    disabled={this.state.currentLoadedYear >= yearEnd}
-                    onClick={this._yearStepForwardButtonOnClick}
-                  >
-                    <RightArrowIcon />
-                  </IconButton>
-
-                  <ToolbarSeparator />
-
-                  <IconButton tooltip="Play/Pause">
-                    <PlayIcon />
-                  </IconButton>
-                </ToolbarGroup>
-              </Toolbar>
-            </Tab>
-
-            <Tab
-              label="Metadata"
-              value="metadata"
-            >
-              <div className="side-panel__section">
-                <h2>Metadata</h2>
-                <PropPrinter {...metadata} />
-              </div>
-            </Tab>
+            {this.renderInfoTab()}
+            {this.renderLayersTab()}
+            {this.renderMetadataTab()}
           </Tabs>
         </Paper>
 
