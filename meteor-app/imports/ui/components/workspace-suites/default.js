@@ -373,11 +373,11 @@ export default class Component extends SuiteBaseClass {
             <MapView
               basemap="osm"
               projection="EPSG:4326"
-              extent={dataExtent}
               style={{
                 height: '100%',
                 width: '100%',
               }}
+              onViewLoad={(event) => event.target.extent = dataExtent}
             >
               {layers.map((layer) => this.renderMapLayer(layer, this.props, this.state)).reverse()}
               <map-interaction-defaults />

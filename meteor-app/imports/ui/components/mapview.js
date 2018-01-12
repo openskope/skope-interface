@@ -1,6 +1,20 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default class MapView extends React.Component {
+
+  static propTypes = {
+    // Class name for the root element.
+    className: PropTypes.string,
+    // Style for the root element.
+    style: PropTypes.object,
+    // Children for the map view element.
+    children: PropTypes.any,
+
+    onViewLoad: PropTypes.func,
+    onViewUnLoad: PropTypes.func,
+    onClick: PropTypes.func,
+  };
 
   componentDidMount () {
     this._addEventListeners();
@@ -20,17 +34,23 @@ export default class MapView extends React.Component {
 
   _addEventListeners () {
     if (this.map) {
+      this.map.addEventListener('load:view', this._mapViewOnLoad);
+      this.map.addEventListener('unload:view', this._mapViewOnUnLoad);
       this.map.addEventListener('click:view', this._mapOnClick);
     }
   }
 
   _removeEventListeners () {
     if (this.map) {
+      this.map.removeEventListener('load:view', this._mapViewOnLoad);
+      this.map.removeEventListener('unload:view', this._mapViewOnUnLoad);
       this.map.removeEventListener('click:view', this._mapOnClick);
     }
   }
 
-  _mapOnClick = (event) => this.props.onClick && this.props.onClick(event)
+  _mapViewOnLoad = (event) => this.props.onViewLoad && this.props.onViewLoad(event);
+  _mapViewOnUnLoad = (event) => this.props.onViewUnLoad && this.props.onViewUnLoad(event);
+  _mapOnClick = (event) => this.props.onClick && this.props.onClick(event);
 
   render () {
     const {
@@ -42,6 +62,8 @@ export default class MapView extends React.Component {
 
     // Remove props that should not appear on `map-view`.
     delete custom.onClick;
+    delete custom.onViewLoad;
+    delete custom.onViewUnLoad;
 
     return (
       <div
