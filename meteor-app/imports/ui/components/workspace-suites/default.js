@@ -379,7 +379,7 @@ export default class Component extends SuiteBaseClass {
                 width: '100%',
               }}
             >
-              {layers.map((layer) => this.renderMapLayer(layer, this.props, this.state))}
+              {layers.map((layer) => this.renderMapLayer(layer, this.props, this.state)).reverse()}
               <map-interaction-defaults />
               <map-control-defaults />
             </MapView>
