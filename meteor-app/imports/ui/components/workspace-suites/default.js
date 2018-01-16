@@ -21,8 +21,6 @@ import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
 import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
-import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
-// import PauseIcon from 'material-ui/svg-icons/av/pause';
 
 import {
   HorizontalResizer,
@@ -279,15 +277,6 @@ export default class Component extends SuiteBaseClass {
               onClick={this._yearStepForwardButtonOnClick}
             >
               <RightArrowIcon />
-            </IconButton>
-
-            <ToolbarSeparator />
-
-            <IconButton
-              tooltip="Play/Pause"
-              tooltipPosition={toolbarTooltipPosition}
-            >
-              <PlayIcon />
             </IconButton>
           </ToolbarGroup>
         </Toolbar>
