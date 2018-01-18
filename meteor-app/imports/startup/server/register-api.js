@@ -4,6 +4,7 @@ import { HTTP } from 'meteor/http';
 import { WebApp } from 'meteor/webapp';
 import httpProxy from 'http-proxy';
 import path from 'path';
+import objectPath from 'object-path';
 
 // Register your apis here
 
@@ -92,9 +93,16 @@ Meteor.methods({
 
 // Proxy to Elastic Search.
 (() => {
+  const proxyTarget = objectPath.get(Meteor.settings, 'server.elasticEndpoint');
+
+  // If proxy target is not specified, do not start proxy server.
+  if (!proxyTarget) {
+    return;
+  }
+
+  //! What if `public.elasticEndpoint` contains an url?
+  const proxyEndpoint = path.resolve('/', objectPath.get(Meteor.settings, 'public.elasticEndpoint'));
   const proxy = httpProxy.createProxyServer({});
-  const proxyEndpoint = path.resolve('/', Meteor.settings.public.elasticEndpoint);
-  const proxyTarget = Meteor.settings.server.elasticEndpoint;
 
   // Listen to incoming HTTP requests.
   WebApp.connectHandlers.use(proxyEndpoint, (req, res /* , next */) => {
