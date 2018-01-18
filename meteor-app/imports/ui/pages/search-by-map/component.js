@@ -20,7 +20,7 @@ import {
 
 import DataTemporalRangeFilter from '/imports/ui/components/searchpage-filters/data-temporal-range-filter';
 import SelectedFilterItem from './SelectedFilterItem';
-import SearchResultItem from './SearchResultItem';
+import RenderSearchResultItemByType from './RenderSearchResultItemByType';
 
 const ResetFilterButton = ({
   hasFilters,
@@ -102,7 +102,7 @@ export default class SearchPage extends React.Component {
           </ActionBarRow>
         </ActionBar>
 
-        <Hits mod="sk-hits-grid" hitsPerPage={3} itemComponent={SearchResultItem} />
+        <Hits mod="sk-hits-grid" hitsPerPage={3} itemComponent={RenderSearchResultItemByType} />
         <NoHits />
 
         <Pagination
