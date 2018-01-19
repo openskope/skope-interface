@@ -25,7 +25,7 @@ export default (props) => {
     return null;
   }
 
-  const rendererName = `SEARCH_RESULT_ITEM__${resultItemType.toUppercase()}`;
+  const rendererName = `SEARCH_RESULT_ITEM__${resultItemType.toUpperCase()}`;
 
   if (!(rendererName in searchResultItemRenderers)) {
     if (renderSearchResultItemsWithUnknownType) {
