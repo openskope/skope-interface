@@ -76,20 +76,11 @@
   }
 
   .search-result-item__metadata {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 5px;
+    //!
+  }
 
-    padding: 10px;
-
-    &__major {
-      grid-row: 1;
-    }
-
-    &__description {
-      grid-column: span 3;
-      grid-row: 2;
-    }
+  .search-result-item__thumbnail + .search-result-item__metadata {
+    padding-left: 15px;
   }
 
   .selected-filters {
