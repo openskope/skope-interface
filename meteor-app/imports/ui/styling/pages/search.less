@@ -4,6 +4,8 @@
 }
 
 .page-search {
+  @gapBetweenSearchResultItems: 5px;
+
   .flex-row;
 
   // Set the side-to-side ratio here.
@@ -58,13 +60,114 @@
   }
 
   .search-result-item {
-    margin-bottom: 20px;
+    display: block;
+    height: 108px;
+    width: 100%;
+    box-sizing: content-box;
+    // Leave some padding for the card shadow inside.
+    @paddingForCardShadow: 3px;
+    padding: @paddingForCardShadow;
+    margin-bottom: @gapBetweenSearchResultItems - (@paddingForCardShadow * 2);
+  }
+
+  @keyframes moveToCenter {
+    to {
+      top: 50%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);
+    }
+  }
+
+  @keyframes expandWidth {
+    to {
+      width: 90vw;
+    }
+  }
+
+  @keyframes expandHeight {
+    to {
+      height: 90vh;
+    }
+  }
+
+  @keyframes hideContent {
+    from {
+      opacity: 0;
+      max-height: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    to {
+      opacity: 0;
+      max-height: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  @keyframes showContent {
+    from {
+      opacity: 0;
+      max-height: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    to {
+      opacity: 1;
+      max-height: 100vh;
+    }
+  }
+
+  .search-result-item__modal-mask {
+    display: none;
+  }
+
+  .search-result-item--expanded {
+    @centeringTime: 350ms;
+    @centeringEasing: cubic-bezier(0.6, -0.28, 0.735, 0.045);
+    @expandingTime: 400ms;
+    @animationEffect: 1 normal both running;
+
+    background: rgba(0, 0, 0, 0.1);
+
+    .search-result-item__modal-mask {
+      display: block;
+      position: fixed;
+      .zIndexAboveAll(1);
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: rgba(100, 100, 100, 0.6);
+    }
+
+    .search-result-item__card {
+      position: absolute !important;
+      .zIndexAboveAll(2);
+      max-width: 1000px;
+      max-height: 800px;
+
+      animation: @centeringTime @centeringEasing 0ms            @animationEffect moveToCenter,
+                 @centeringTime ease             0ms            @animationEffect expandWidth,
+                 @expandingTime ease             @centeringTime @animationEffect expandHeight;
+    }
+
+    .search-result-item__content {
+      animation: @centeringTime         linear 0ms            @animationEffect hideContent,
+                 (@expandingTime * 0.3) linear @centeringTime @animationEffect showContent;
+    }
   }
 
   .search-result-item__content {
     .flex-row;
 
-    min-height: 200px;
+    overflow: hidden;
   }
 
   .search-result-item__content > .search-result-item__metadata {

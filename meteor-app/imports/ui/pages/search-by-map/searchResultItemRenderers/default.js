@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ReactDOM from 'react-dom';
+import $ from 'jquery';
 import moment from 'moment';
 import marked from 'marked';
 import geojsonExtent from 'geojson-extent';
@@ -9,6 +11,7 @@ import {
   CardHeader,
   CardText,
 } from 'material-ui/Card';
+import Avatar from 'material-ui/Avatar';
 import {
   Toolbar,
   ToolbarGroup,
@@ -24,12 +27,13 @@ import CheckIcon from 'material-ui/svg-icons/navigation/check';
 import DownloadIcon from 'material-ui/svg-icons/file/cloud-download';
 import MapIcon from 'material-ui/svg-icons/maps/map';
 import ChartIcon from 'material-ui/svg-icons/editor/multiline-chart';
+import PlaceholderIcon from 'material-ui/svg-icons/editor/insert-emoticon';
 
 import {
   absoluteUrl,
+  getClassName,
   getDateAtPrecision,
 } from '/imports/ui/helpers';
-
 
 const toolbarItemMargins = {
   margin: '0 8px 0 0',
@@ -40,6 +44,7 @@ const toolbarItemReverseMargins = {
 };
 
 const actionButtonStyles = {
+  secondary: true,
   style: {
     ...toolbarItemReverseMargins,
   },
@@ -48,13 +53,15 @@ const actionButtonStyles = {
   },
 };
 
-const SimpleToolbar = (props) => (
+const SlimToolbar = (props) => (
   <Toolbar
     noGutter
     {...props}
     style={{
       background: 'transparent',
-      ...props.style,
+      height: '36px',
+      padding: 0,
+      margin: 0,
     }}
   >{props.children}</Toolbar>
 );
@@ -79,7 +86,8 @@ const GreenTickmarkBadge = (props) => (
   >{props.children}</Badge>
 );
 
-export default class SearchResultItem extends React.PureComponent {
+export default
+class SearchResultItem extends React.Component {
 
   static propTypes = {
     result: PropTypes.shape({
@@ -111,22 +119,52 @@ export default class SearchResultItem extends React.PureComponent {
     };
   }
 
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      positionBeforeExpanding: {
+        top: 0,
+        left: 0,
+      },
+      dimensionBeforeExpanding: {
+        width: 0,
+        height: 0,
+      },
+      expanded: false,
+    };
+  }
+
+  onExpandChange = (expanded) => {
+    if (expanded && this._rootElement) {
+      // Expanding, store initial position.
+
+      const $rootElement = $(this._rootElement);      
+      const positionBeforeExpanding = $rootElement.offset();
+      const dimensionBeforeExpanding = {
+        width: $rootElement.width(),
+        height: $rootElement.height(),
+      };
+
+      this.setState({
+        positionBeforeExpanding,
+        dimensionBeforeExpanding,
+        expanded,
+      });
+    } else {
+      this.setState({
+        expanded,
+      });
+    }
+  };
+
+  collapse = () => this.onExpandChange(false);
+
   render () {
     const {
       result: {
         _id,
         _source: {
-          // Title: title,
-          // Creator,
-          // CreationDate,
-          // Status,
-          // Rating,
-          // ResultTypes,
-          // StartDate,
-          // EndDate,
-          // Inputs,
-          // Info,
-          // Reference,
           Area,
         },
       },
@@ -149,7 +187,6 @@ export default class SearchResultItem extends React.PureComponent {
         gte: new Date(5, 1, 1),
         lt: new Date(2010, 6, 3),
       },
-      // 0: year, 1: month, 2: day, 3: hour, 4: minute, 5: second, 6: millisecond
       dataTemporalRangePrecision: 0,
       fullDescription: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ac viverra ipsum. Maecenas efficitur sodales massa id vulputate. Ut non eros sodales neque elementum suscipit in vel sapien. Vivamus ut enim neque. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aenean mauris est, luctus vehicula turpis non, rhoncus aliquam neque. Ut quis auctor purus. Morbi pellentesque id diam in viverra. Phasellus vel accumsan erat. Nunc mollis accumsan arcu vitae laoreet. Mauris aliquam lectus arcu, nec efficitur magna fermentum vitae. Suspendisse quis erat est. Proin non ante nisi.
 
@@ -192,6 +229,14 @@ Nullam velit erat, accumsan sollicitudin congue vel, iaculis vitae odio. Sed non
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
     const boundaryExtent = geojsonExtent(boundaryGeoJson);
 
+    const workspacePageUrl = absoluteUrl('/workspace', null, { dataset: _id });
+    const titleLink = (
+      <a
+        href={workspacePageUrl}
+        target="_blank"
+      >{title}</a>
+    );
+
     // const subtitle = this.constructor.getDateRange(StartDate, EndDate);
     const revisionDateString = moment(revisionDate).format('YYYY-MM-DD');
     const subtitle = `Revised: ${revisionDateString}`;
@@ -200,27 +245,16 @@ Nullam velit erat, accumsan sollicitudin congue vel, iaculis vitae odio. Sed non
     const fullDescriptionHTML = marked(fullDescription);
     //! dangerouslySetInnerHTML={{ __html: fullDescriptionHTML }}
 
-    const blockTextFieldZoomFactor = 0.8;
     const blockTextFieldStyles = {
       root: {
         display: 'block',
         width: 'auto',
         marginTop: -10,
         //! Should not set height. It needs to be calculated automatically.
-        // height: 72 * blockTextFieldZoomFactor,
-        // fontSize: `${1 * blockTextFieldZoomFactor}em`,
       },
-      label: {
-        // top: 38 * blockTextFieldZoomFactor,
-      },
-      input: {
-        // marginTop: 14 * blockTextFieldZoomFactor,
-        // This seems to only affect the textarea.
-        // lineHeight: `${24 * blockTextFieldZoomFactor}px`,
-      },
-      underline: {
-        //
-      },
+      label: {},
+      input: {},
+      underline: {},
     };
 
     // List of available features to be displayed as small feature icons.
@@ -240,133 +274,166 @@ Nullam velit erat, accumsan sollicitudin congue vel, iaculis vitae odio. Sed non
     ];
 
     return (
-      <Card
-        className="search-result-item"
-        style={{
-          width: '100%',
-        }}
+      <div
+        className={getClassName(
+          'search-result-item',
+          {
+            'search-result-item--expanded': this.state.expanded,
+          },
+        )}
       >
-        <CardHeader
-          textStyle={{
-            display: 'block',
-          }}
-          title={title}
-          titleStyle={{
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-          subtitle={subtitle}
-          showExpandableButton
+        <div
+          className="search-result-item__modal-mask"
+          onClick={this.collapse}
         />
-
-        <CardText
-          className="search-result-item__content"
+        <Card
+          className="search-result-item__card"
+          expanded={this.state.expanded}
+          onExpandChange={this.onExpandChange}
           style={{
-            paddingTop: 0,
-            paddingBottom: 0,
+            // Eliminate `z-index: 1` to resolve the issue of tooltips being covered.
+            zIndex: false,
+            ...this.state.positionBeforeExpanding,
+            ...(this.state.expanded && this.state.dimensionBeforeExpanding),
           }}
+          containerStyle={{
+            display: 'flex',
+            height: '100%',
+            width: '100%',
+            flexDirection: 'column',
+            justifyContent: 'stretch',
+          }}
+          ref={(ref) => this._rootElement = ref && ReactDOM.findDOMNode(ref)}
         >
-          <div
-            className="search-result-item__thumbnail"
-            style={{
-              backgroundImage: 'url(//www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp)',
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
+          <CardHeader
+            avatar={<Avatar icon={<PlaceholderIcon />} />}
+            textStyle={{
+              width: '100%',
             }}
-          >{boundaryGeoJson && (
-            <MapView
-              basemap="osm"
-              projection="EPSG:4326"
-              extent={boundaryExtent}
+            title={titleLink}
+            titleStyle={{
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+            subtitle={subtitle}
+            showExpandableButton
+            style={{
+              paddingBottom: 0,
+            }}
+          />
+
+          <CardText
+            expandable
+            className="search-result-item__content"
+            style={{
+              flex: '1 1 0',
+              paddingBottom: 0,
+            }}
+          >
+            <div
+              className="search-result-item__thumbnail"
               style={{
-                width: '100%',
-                height: '100%',
+                backgroundImage: 'url(//www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp)',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
               }}
-            ><map-layer-geojson src-json={boundaryGeoJsonString} /></MapView>
-          )}</div>
+            >{boundaryGeoJson && (
+              <MapView
+                basemap="osm"
+                projection="EPSG:4326"
+                extent={boundaryExtent}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+              ><map-layer-geojson src-json={boundaryGeoJsonString} /></MapView>
+            )}</div>
 
-          <div className="search-result-item__metadata">
-            <TextField
-              floatingLabelText="Authors"
-              value={authors.join(', ')}
-              style={blockTextFieldStyles.root}
-              floatingLabelStyle={blockTextFieldStyles.label}
-              inputStyle={blockTextFieldStyles.input}
-              underlineStyle={blockTextFieldStyles.underline}
-            />
+            <div className="search-result-item__metadata">
+              <TextField
+                floatingLabelText="Authors"
+                value={authors.join(', ')}
+                style={blockTextFieldStyles.root}
+                floatingLabelStyle={blockTextFieldStyles.label}
+                inputStyle={blockTextFieldStyles.input}
+                underlineStyle={blockTextFieldStyles.underline}
+              />
 
-            <TextField
-              floatingLabelText="Description"
-              value={fullDescription}
-              multiLine
-              rows={3}
-              rowsMax={3}
-              style={blockTextFieldStyles.root}
-              floatingLabelStyle={blockTextFieldStyles.label}
-              inputStyle={blockTextFieldStyles.input}
-              underlineStyle={blockTextFieldStyles.underline}
-            />
+              <TextField
+                floatingLabelText="Description"
+                value={fullDescription}
+                multiLine
+                rows={3}
+                rowsMax={3}
+                style={blockTextFieldStyles.root}
+                floatingLabelStyle={blockTextFieldStyles.label}
+                inputStyle={blockTextFieldStyles.input}
+                underlineStyle={blockTextFieldStyles.underline}
+              />
 
-            <TextField
-              floatingLabelText="Datatypes"
-              value={dataTypes.join(', ')}
-              style={blockTextFieldStyles.root}
-              floatingLabelStyle={blockTextFieldStyles.label}
-              inputStyle={blockTextFieldStyles.input}
-              underlineStyle={blockTextFieldStyles.underline}
-            />
+              <TextField
+                floatingLabelText="Datatypes"
+                value={dataTypes.join(', ')}
+                style={blockTextFieldStyles.root}
+                floatingLabelStyle={blockTextFieldStyles.label}
+                inputStyle={blockTextFieldStyles.input}
+                underlineStyle={blockTextFieldStyles.underline}
+              />
 
-            <TextField
-              floatingLabelText="Keywords"
-              value={keywords.join(', ')}
-              style={blockTextFieldStyles.root}
-              floatingLabelStyle={blockTextFieldStyles.label}
-              inputStyle={blockTextFieldStyles.input}
-              underlineStyle={blockTextFieldStyles.underline}
-            />
-          </div>
-        </CardText>
+              <TextField
+                floatingLabelText="Keywords"
+                value={keywords.join(', ')}
+                style={blockTextFieldStyles.root}
+                floatingLabelStyle={blockTextFieldStyles.label}
+                inputStyle={blockTextFieldStyles.input}
+                underlineStyle={blockTextFieldStyles.underline}
+              />
+            </div>
+          </CardText>
 
-        <CardActions>
-          <SimpleToolbar>
-            <ToolbarGroup>
-              {availableFeatures.map(({
-                featureName,
-                IconComponent,
-              }, index) => (
-                <GreenTickmarkBadge
-                  key={`feature__${index}`}
-                  style={{
-                    ...toolbarItemMargins,
-                  }}
-                >
-                  <IconButton
-                    tooltip={`${featureName} available`}
-                    disableTouchRipple
+          <CardActions>
+            <SlimToolbar
+              className="search-result-item__toolbar"
+            >
+              <ToolbarGroup>
+                {availableFeatures.map(({
+                  featureName,
+                  IconComponent,
+                }, index) => (
+                  <GreenTickmarkBadge
+                    key={`feature__${index}`}
                     style={{
-                      cursor: 'normal',
+                      ...toolbarItemMargins,
                     }}
                   >
-                    <IconComponent
-                      color="rgba(180, 180, 180, 0.8)"
-                    />
-                  </IconButton>
-                </GreenTickmarkBadge>
-              ))}
-            </ToolbarGroup>
+                    <IconButton
+                      tooltip={`${featureName} available`}
+                      disableTouchRipple
+                      style={{
+                        cursor: 'normal',
+                      }}
+                    >
+                      <IconComponent
+                        color="rgba(180, 180, 180, 0.8)"
+                      />
+                    </IconButton>
+                  </GreenTickmarkBadge>
+                ))}
+              </ToolbarGroup>
 
-            <ToolbarGroup>
-              <FlatButton
-                label="Examine"
-                href={absoluteUrl('/workspace', null, { dataset: _id })}
-                target="_blank"
-                {...actionButtonStyles}
-              />
-            </ToolbarGroup>
-          </SimpleToolbar>
-        </CardActions>
-      </Card>
+              <ToolbarGroup>
+                <FlatButton
+                  label="Examine"
+                  href={workspacePageUrl}
+                  target="_blank"
+                  {...actionButtonStyles}
+                />
+              </ToolbarGroup>
+            </SlimToolbar>
+          </CardActions>
+        </Card>
+      </div>
     );
   }
 }
