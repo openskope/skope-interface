@@ -27,59 +27,9 @@ import ChartIcon from 'material-ui/svg-icons/editor/multiline-chart';
 
 import {
   absoluteUrl,
+  getDateAtPrecision,
 } from '/imports/ui/helpers';
 
-/**
- * This function resets all the temporal unit fields outside of the precision to their corresponding zero points.
- * @param {Date} date
- * @param {number} precision
- * @return {Date}
- */
-const getDateAtPrecision = (
-  (precisions) =>
-    (date, precision) =>
-      precisions.reduce((acc, { handler, zeroPoint }, index) => {
-        // Only need to run precision handlers larger than precision.
-        if (index <= precision) {
-          return acc;
-        }
-
-        const newDate = new Date(date);
-
-        handler.call(newDate, zeroPoint);
-
-        return newDate;
-      }, date)
-)([
-  {
-    handler: Date.prototype.setFullYear,
-    zeroPoint: 0,
-  },
-  {
-    handler: Date.prototype.setMonth,
-    zeroPoint: 0,
-  },
-  {
-    handler: Date.prototype.setDate,
-    zeroPoint: 1,
-  },
-  {
-    handler: Date.prototype.setHours,
-    zeroPoint: 0,
-  },
-  {
-    handler: Date.prototype.setMinutes,
-    zeroPoint: 0,
-  },
-  {
-    handler: Date.prototype.setSeconds,
-    zeroPoint: 0,
-  },
-  {
-    handler: Date.prototype.setMilliseconds,
-    zeroPoint: 0,
-  },
-]);
 
 const toolbarItemMargins = {
   margin: '0 8px 0 0',

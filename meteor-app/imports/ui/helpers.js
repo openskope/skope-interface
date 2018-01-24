@@ -15,7 +15,8 @@ import globalTheme from '/imports/ui/styling/muiTheme';
 /**
  * Make sure the filter value is correct.
  */
-export const clampFilterValue = (value, min, max) => {
+export
+const clampFilterValue = (value, min, max) => {
   let newValue = parseInt(value, 10);
   newValue = isNaN(newValue) ? min : newValue;
   newValue = Math.max(min, newValue);
@@ -28,7 +29,8 @@ export const clampFilterValue = (value, min, max) => {
  * @param  {Array.<string|Object>} ...items
  * @return {string}
  */
-export const getClassName = (...items) =>
+export
+const getClassName = (...items) =>
   items
   // If the item is a map, include all class names specified by the property name when the value is truthy.
   // For example, {a: true, b: false, c: true} => 'a c'.
@@ -50,7 +52,8 @@ export const getClassName = (...items) =>
  * @param  {Object} props - Same as the second argument to `mount`.
  * @return {*}
  */
-export const mountWithStore = (store, ComponentClass, props) => reactMount(Provider, {
+export
+const mountWithStore = (store, ComponentClass, props) => reactMount(Provider, {
   store,
   children: <ComponentClass {...props} />,
 });
@@ -62,7 +65,8 @@ export const mountWithStore = (store, ComponentClass, props) => reactMount(Provi
  * @param  {Object} props - Same as the second argument to `mount`.
  * @return {*}
  */
-export const mount =
+export
+const mount =
 (
   ComponentClass,
   {
@@ -79,7 +83,8 @@ export const mount =
  * This is a utility component for debugging purposes.
  * It prints all the props passed to it.
  */
-export const PropPrinter = (props) => <pre>{JSON.stringify(props, null, 2)}</pre>;
+export
+const PropPrinter = (props) => <pre>{JSON.stringify(props, null, 2)}</pre>;
 
 /**
  * Generates absolute urls within the app.
@@ -88,7 +93,8 @@ export const PropPrinter = (props) => <pre>{JSON.stringify(props, null, 2)}</pre
  * @param  {Object} queryParams
  * @return {String}
  */
-export const absoluteUrl = (pathDef, params = {}, queryParams = {}) => FlowRouter.path(pathDef, params, queryParams);
+export
+const absoluteUrl = (pathDef, params = {}, queryParams = {}) => FlowRouter.path(pathDef, params, queryParams);
 
 /**
  * Helper for generating simple route actions.
@@ -96,7 +102,8 @@ export const absoluteUrl = (pathDef, params = {}, queryParams = {}) => FlowRoute
  * @param  {Object} props - Same as the second argument to `mount`.
  * @return {Function}
  */
-export const simpleMountAction = (ComponentClass, props) =>
+export
+const simpleMountAction = (ComponentClass, props) =>
 function (params, queryParams) {
   // These are available properties on the context.
   // - this.group
@@ -116,3 +123,57 @@ function (params, queryParams) {
     queryParams,
   });
 };
+
+/**
+ * This function resets all the temporal unit fields outside of the precision to their corresponding zero points.
+ * This function returns a new Date object and does not modify the inputs.
+ * @param {Date} date
+ * @param {number} precision
+ * @return {Date}
+ */
+export
+const getDateAtPrecision = (
+  (precisions) =>
+    (date, precision) =>
+      precisions.reduce((acc, { handler, zeroPoint }, index) => {
+        // Only need to run precision handlers larger than precision.
+        if (index <= precision) {
+          return acc;
+        }
+
+        const newDate = new Date(date);
+
+        handler.call(newDate, zeroPoint);
+
+        return newDate;
+      }, date)
+)([
+  {
+    handler: Date.prototype.setFullYear,
+    zeroPoint: 0,
+  },
+  {
+    handler: Date.prototype.setMonth,
+    zeroPoint: 0,
+  },
+  {
+    handler: Date.prototype.setDate,
+    zeroPoint: 1,
+  },
+  {
+    handler: Date.prototype.setHours,
+    zeroPoint: 0,
+  },
+  {
+    handler: Date.prototype.setMinutes,
+    zeroPoint: 0,
+  },
+  {
+    handler: Date.prototype.setSeconds,
+    zeroPoint: 0,
+  },
+  {
+    handler: Date.prototype.setMilliseconds,
+    zeroPoint: 0,
+  },
+]);
