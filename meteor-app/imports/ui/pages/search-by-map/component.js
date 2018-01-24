@@ -1,4 +1,6 @@
+import { Meteor } from 'meteor/meteor';
 import React from 'react';
+import objectPath from 'object-path';
 import Paper from 'material-ui/Paper';
 import FullWindowLayout from '/imports/ui/layouts/full-window';
 import AppbarHeader from '/imports/ui/components/appbar';
@@ -33,6 +35,8 @@ const ResetFilterButton = ({
     disabled={!hasFilters}
   />
 );
+
+const resultsPerPage = objectPath.get(Meteor.settings, 'public.searchpage.resultsPerPage', 3);
 
 export default class SearchPage extends React.Component {
 
@@ -102,7 +106,11 @@ export default class SearchPage extends React.Component {
           </ActionBarRow>
         </ActionBar>
 
-        <Hits mod="sk-hits-grid" hitsPerPage={3} itemComponent={RenderSearchResultItemByType} />
+        <Hits
+          mod="sk-hits-grid"
+          hitsPerPage={resultsPerPage}
+          itemComponent={RenderSearchResultItemByType}
+        />
         <NoHits />
 
         <Pagination
