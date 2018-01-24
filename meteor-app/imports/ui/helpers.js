@@ -128,7 +128,7 @@ function (params, queryParams) {
  * This function resets all the temporal unit fields outside of the precision to their corresponding zero points.
  * This function returns a new Date object and does not modify the inputs.
  * @param {Date} date
- * @param {number} precision
+ * @param {number} precision - 0: year, 1: month, 2: day, 3: hour, 4: minute, 5: second, 6: millisecond
  * @return {Date}
  */
 export
