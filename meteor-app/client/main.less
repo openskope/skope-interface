@@ -47,6 +47,13 @@ a {
   z-index: 5;
 }
 
+.zIndexAboveAll(@value) {
+  // Appbar from 'material-ui' is at 1100.
+  // Drawer from 'material-ui' is at 1300.
+
+  z-index: (2000 + @value);
+}
+
 @import '{}/imports/ui/styling/flexbox-mixins';
 @import '{}/imports/ui/styling/mdc-extra';
 
