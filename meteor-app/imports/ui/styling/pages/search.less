@@ -166,23 +166,29 @@
 
   .search-result-item__content {
     .flex-row;
+    align-items: flex-start;
 
-    overflow: hidden;
+    overflow: auto;
   }
 
-  .search-result-item__content > .search-result-item__metadata {
+  .search-result-item__content > .search-result-item__right-column {
     .flex-layout-fill;
   }
 
   .search-result-item__thumbnail {
     width: 200px;
+    height: 200px;
   }
 
-  .search-result-item__metadata {
+  .search-result-item__left-column {
     //!
   }
 
-  .search-result-item__thumbnail + .search-result-item__metadata {
+  .search-result-item__right-column {
+    //!
+  }
+
+  .search-result-item__left-column + .search-result-item__right-column {
     padding-left: 15px;
   }
 

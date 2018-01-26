@@ -100,7 +100,7 @@ const fakeData = {
   thumbnailUrl: '',
   spatialBoundary: null,
   dataTemporalRange: {
-    gte: new Date(5, 1, 1),
+    gte: new Date(105, 5, 8),
     lt: new Date(2010, 6, 3),
   },
   dataTemporalRangePrecision: 0,
@@ -142,13 +142,31 @@ class SearchResultItem extends React.Component {
     }).isRequired,
   };
 
-  static getDateRange (start, end) {
+  static dateFormatForPrecisions = [
+    'YYYY',
+    'MMM YYYY',
+    'MMM Do YYYY',
+    'MMM Do YYYY, h a',
+    'MMM Do YYYY, h:m a',
+    'MMM Do YYYY, h:m:s a',
+  ];
+
+  static getDateRange (precision, start, end) {
     if (!start && !end) {
       return '';
     }
 
     return [start, end]
-    .map((s) => (s && moment(s).format('YYYY-MM-DD')) || '')
+    .map((s) => {
+      if (!s) {
+        return '';
+      }
+
+      const dateAtPrecision = getDateAtPrecision(s, precision);
+      const dateTemplateAtPrecision = SearchResultItem.dateFormatForPrecisions[precision];
+
+      return moment(dateAtPrecision).format(dateTemplateAtPrecision);
+    })
     .join(' - ');
   }
 
@@ -219,13 +237,15 @@ class SearchResultItem extends React.Component {
       },
     } = this.props;
 
-    const boundaryGeoJson = Area && this.constructor.buildGeoJsonWithGeometry(Area);
+    const boundaryGeoJson = Area && SearchResultItem.buildGeoJsonWithGeometry(Area);
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
     const boundaryExtent = geojsonExtent(boundaryGeoJson);
 
     const {
       title,
       revisionDate,
+      dataTemporalRange,
+      dataTemporalRangePrecision,
       authors,
       fullDescription,
       dataTypes,
@@ -240,9 +260,14 @@ class SearchResultItem extends React.Component {
       >{title}</a>
     );
 
-    // const subtitle = this.constructor.getDateRange(StartDate, EndDate);
     const revisionDateString = moment(revisionDate).format('YYYY-MM-DD');
     const subtitle = `Revised: ${revisionDateString}`;
+
+    const dateRangeString = SearchResultItem.getDateRange(
+      dataTemporalRangePrecision,
+      dataTemporalRange.gte,
+      dataTemporalRange.lt,
+    );
 
     //! Make sure all the dangerous tags are sanitized.
     const fullDescriptionHTML = marked(fullDescription);
@@ -323,25 +348,33 @@ class SearchResultItem extends React.Component {
           }}
         >
           <div
-            className="search-result-item__thumbnail"
-            style={{
-              backgroundImage: 'url(//www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp)',
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
-            }}
-          >{boundaryGeoJson && (
-            <MapView
-              basemap="osm"
-              projection="EPSG:4326"
-              extent={boundaryExtent}
+            className="search-result-item__left-column"
+          >
+            <div
+              className="search-result-item__thumbnail"
               style={{
-                width: '100%',
-                height: '100%',
+                backgroundImage: 'url(//www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp)',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
               }}
-            ><map-layer-geojson src-json={boundaryGeoJsonString} /></MapView>
-          )}</div>
+            >{boundaryGeoJson && (
+              <MapView
+                basemap="osm"
+                projection="EPSG:4326"
+                extent={boundaryExtent}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+              ><map-layer-geojson src-json={boundaryGeoJsonString} /></MapView>
+            )}</div>
 
-          <div className="search-result-item__metadata">
+            <p
+              className="search-result-item__date-range"
+            >{dateRangeString}</p>
+          </div>
+
+          <div className="search-result-item__right-column">
             <TextField
               floatingLabelText="Authors"
               value={authors.join(', ')}
