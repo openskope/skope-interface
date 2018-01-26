@@ -15,76 +15,26 @@ import Avatar from 'material-ui/Avatar';
 import {
   Toolbar,
   ToolbarGroup,
-  ToolbarSeparator,
-  ToolbarTitle,
 } from 'material-ui/Toolbar';
-import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
 import MapView from '/imports/ui/components/mapview';
 import Badge from 'material-ui/Badge';
+import Chip from 'material-ui/Chip';
 import CheckIcon from 'material-ui/svg-icons/navigation/check';
 import DownloadIcon from 'material-ui/svg-icons/file/cloud-download';
 import MapIcon from 'material-ui/svg-icons/maps/map';
 import ChartIcon from 'material-ui/svg-icons/editor/multiline-chart';
 import PlaceholderIcon from 'material-ui/svg-icons/editor/insert-emoticon';
+import FaceIcon from 'material-ui/svg-icons/action/face';
+import PieceIcon from 'material-ui/svg-icons/action/extension';
+import TagIcon from 'material-ui/svg-icons/action/label';
 
 import {
   absoluteUrl,
   getClassName,
   getDateAtPrecision,
 } from '/imports/ui/helpers';
-
-const toolbarItemMargins = {
-  margin: '0 8px 0 0',
-};
-
-const toolbarItemReverseMargins = {
-  margin: '0 0 0 8px',
-};
-
-const actionButtonStyles = {
-  secondary: true,
-  style: {
-    ...toolbarItemReverseMargins,
-  },
-  labelStyle: {
-    textTransform: 'none',
-  },
-};
-
-const SlimToolbar = (props) => (
-  <Toolbar
-    noGutter
-    {...props}
-    style={{
-      background: 'transparent',
-      height: '36px',
-      padding: 0,
-      margin: 0,
-    }}
-  >{props.children}</Toolbar>
-);
-
-const GreenTickmarkBadge = (props) => (
-  <Badge
-    badgeContent={<CheckIcon style={{ color: 'green' }} />}
-    {...props}
-    badgeStyle={{
-      top: '4px',
-      right: '4px',
-      width: '18px',
-      height: '18px',
-      background: 'transparent',
-      pointerEvents: 'none',
-      ...props.badgeStyle,
-    }}
-    style={{
-      padding: 0,
-      ...props.style,
-    }}
-  >{props.children}</Badge>
-);
 
 //! Fake data for implementing the view.
 const fakeData = {
@@ -170,6 +120,35 @@ class SearchResultItem extends React.Component {
     .join(' - ');
   }
 
+  static titleStyle = {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  };
+
+  static inlineListGapStyle = {
+    marginLeft: '3px',
+    marginRight: '3px',
+  };
+
+  static toolbarItemMargins = {
+    margin: '0 8px 0 0',
+  };
+
+  static toolbarItemReverseMargins = {
+    margin: '0 0 0 8px',
+  };
+
+  static actionButtonStyles = {
+    secondary: true,
+    style: {
+      ...SearchResultItem.toolbarItemReverseMargins,
+    },
+    labelStyle: {
+      textTransform: 'none',
+    },
+  };
+
   static buildGeoJsonWithGeometry (geometry) {
     return {
       type: 'FeatureCollection',
@@ -182,6 +161,54 @@ class SearchResultItem extends React.Component {
       ],
     };
   }
+
+  static DescriptionRenderer = ({
+    value,
+    ...props
+  }) => {
+    //! Make sure all the dangerous tags are sanitized.
+    const descriptionHtml = marked(value);
+  
+    return (
+      <div
+        {...props}
+        dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+      />
+    );
+  };
+
+  static SlimToolbar = (props) => (
+    <Toolbar
+      noGutter
+      {...props}
+      style={{
+        background: 'transparent',
+        height: '36px',
+        padding: 0,
+        margin: 0,
+      }}
+    >{props.children}</Toolbar>
+  );
+
+  static GreenTickmarkBadge = (props) => (
+    <Badge
+      badgeContent={<CheckIcon style={{ color: 'green' }} />}
+      {...props}
+      badgeStyle={{
+        top: '4px',
+        right: '4px',
+        width: '18px',
+        height: '18px',
+        background: 'transparent',
+        pointerEvents: 'none',
+        ...props.badgeStyle,
+      }}
+      style={{
+        padding: 0,
+        ...props.style,
+      }}
+    >{props.children}</Badge>
+  );
 
   constructor (props) {
     super(props);
@@ -269,22 +296,6 @@ class SearchResultItem extends React.Component {
       dataTemporalRange.lt,
     );
 
-    //! Make sure all the dangerous tags are sanitized.
-    const fullDescriptionHTML = marked(fullDescription);
-    //! dangerouslySetInnerHTML={{ __html: fullDescriptionHTML }}
-
-    const blockTextFieldStyles = {
-      root: {
-        display: 'block',
-        width: 'auto',
-        marginTop: -10,
-        //! Should not set height. It needs to be calculated automatically.
-      },
-      label: {},
-      input: {},
-      underline: {},
-    };
-
     // List of available features to be displayed as small feature icons.
     const availableFeatures = [
       {
@@ -327,14 +338,11 @@ class SearchResultItem extends React.Component {
             width: '100%',
           }}
           title={titleLink}
-          titleStyle={{
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
+          titleStyle={SearchResultItem.titleStyle}
           subtitle={subtitle}
           showExpandableButton
           style={{
+            // Eliminate the default bottom padding from `CardHeader`.
             paddingBottom: 0,
           }}
         />
@@ -344,15 +352,26 @@ class SearchResultItem extends React.Component {
           className="search-result-item__content"
           style={{
             flex: '1 1 0',
+            // Eliminate the default bottom padding from `CardText`.
             paddingBottom: 0,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            overflow: 'auto',
           }}
         >
           <div
             className="search-result-item__left-column"
+            style={{
+              flex: '0 0 auto',
+              paddingRight: '15px',
+            }}
           >
             <div
               className="search-result-item__thumbnail"
               style={{
+                width: '200px',
+                height: '200px',
                 backgroundImage: 'url(//www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp)',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
@@ -374,50 +393,107 @@ class SearchResultItem extends React.Component {
             >{dateRangeString}</p>
           </div>
 
-          <div className="search-result-item__right-column">
-            <TextField
-              floatingLabelText="Authors"
-              value={authors.join(', ')}
-              style={blockTextFieldStyles.root}
-              floatingLabelStyle={blockTextFieldStyles.label}
-              inputStyle={blockTextFieldStyles.input}
-              underlineStyle={blockTextFieldStyles.underline}
-            />
+          <div
+            className="search-result-item__right-column"
+            style={{
+              flex: '1 1 0',
+            }}
+          >
+            <div className="info-wrapper">
+              <label
+                className="info-wrapper__title"
+              >Authors</label>
+              <div
+                className="info-wrapper__content search-result-item__author-list"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {authors.map((str, i) => (
+                  <Chip
+                    key={i}
+                    className="search-result-item__author-item"
+                    style={{
+                      ...SearchResultItem.inlineListGapStyle,
+                    }}
+                  >
+                    <Avatar icon={<FaceIcon />} />
+                    {str}
+                  </Chip>
+                ))}
+              </div>
+            </div>
 
-            <TextField
-              floatingLabelText="Description"
-              value={fullDescription}
-              multiLine
-              rows={3}
-              rowsMax={3}
-              style={blockTextFieldStyles.root}
-              floatingLabelStyle={blockTextFieldStyles.label}
-              inputStyle={blockTextFieldStyles.input}
-              underlineStyle={blockTextFieldStyles.underline}
-            />
+            <div className="info-wrapper">
+              <label
+                className="info-wrapper__title"
+              >Description</label>
+              <SearchResultItem.DescriptionRenderer
+                className="info-wrapper__content search-result-item__description"
+                value={fullDescription}
+              />
+            </div>
 
-            <TextField
-              floatingLabelText="Datatypes"
-              value={dataTypes.join(', ')}
-              style={blockTextFieldStyles.root}
-              floatingLabelStyle={blockTextFieldStyles.label}
-              inputStyle={blockTextFieldStyles.input}
-              underlineStyle={blockTextFieldStyles.underline}
-            />
+            <div className="info-wrapper">
+              <label
+                className="info-wrapper__title"
+              >Datatypes</label>
+              <div
+                className="info-wrapper__content search-result-item__datatype-list"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {dataTypes.map((str, i) => (
+                  <Chip
+                    key={i}
+                    className="search-result-item__datatype-item"
+                    style={{
+                      ...SearchResultItem.inlineListGapStyle,
+                    }}
+                  >
+                    <Avatar icon={<PieceIcon />} />
+                    {str}
+                  </Chip>
+                ))}
+              </div>
+            </div>
 
-            <TextField
-              floatingLabelText="Keywords"
-              value={keywords.join(', ')}
-              style={blockTextFieldStyles.root}
-              floatingLabelStyle={blockTextFieldStyles.label}
-              inputStyle={blockTextFieldStyles.input}
-              underlineStyle={blockTextFieldStyles.underline}
-            />
+            <div className="info-wrapper">
+              <label
+                className="info-wrapper__title"
+              >Keywords</label>
+              <div
+                className="info-wrapper__content search-result-item__keyword-list"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {keywords.map((str, i) => (
+                  <Chip
+                    key={i}
+                    className="search-result-item__keyword-item"
+                    style={{
+                      ...SearchResultItem.inlineListGapStyle,
+                    }}
+                  >
+                    <Avatar icon={<TagIcon />} />
+                    {str}
+                  </Chip>
+                ))}
+              </div>
+            </div>
           </div>
         </CardText>
 
         <CardActions>
-          <SlimToolbar
+          <SearchResultItem.SlimToolbar
             className="search-result-item__toolbar"
           >
             <ToolbarGroup>
@@ -425,10 +501,10 @@ class SearchResultItem extends React.Component {
                 featureName,
                 IconComponent,
               }, index) => (
-                <GreenTickmarkBadge
+                <SearchResultItem.GreenTickmarkBadge
                   key={`feature__${index}`}
                   style={{
-                    ...toolbarItemMargins,
+                    ...SearchResultItem.toolbarItemMargins,
                   }}
                 >
                   <IconButton
@@ -442,7 +518,7 @@ class SearchResultItem extends React.Component {
                       color="rgba(180, 180, 180, 0.8)"
                     />
                   </IconButton>
-                </GreenTickmarkBadge>
+                </SearchResultItem.GreenTickmarkBadge>
               ))}
             </ToolbarGroup>
 
@@ -451,10 +527,10 @@ class SearchResultItem extends React.Component {
                 label="Examine"
                 href={workspacePageUrl}
                 target="_blank"
-                {...actionButtonStyles}
+                {...SearchResultItem.actionButtonStyles}
               />
             </ToolbarGroup>
-          </SlimToolbar>
+          </SearchResultItem.SlimToolbar>
         </CardActions>
       </Card>
     );
