@@ -173,9 +173,23 @@
       color: rgba(0, 0, 0, 0.54);
       font-size: 1.1em;
       font-weight: 500;
-      padding-left: 16px;
+      padding-left: 1.2em;
       margin-top: 1em;
       margin-bottom: 1em;
+    }
+  }
+
+  .search-result-item__run-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 20em);
+    grid-gap: 0 2em;
+    justify-content: space-between;
+
+    .info-wrapper {
+      &__title,
+      &__content {
+        padding-left: 1.2em;
+      }
     }
   }
 

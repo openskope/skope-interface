@@ -4,3 +4,4 @@
  */
 
 export SEARCH_RESULT_ITEM__DEFAULT from './default';
+export SEARCH_RESULT_ITEM__PALEOCARRUN from './paleocar-run';

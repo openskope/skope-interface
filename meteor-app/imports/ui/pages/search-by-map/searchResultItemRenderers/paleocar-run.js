@@ -18,10 +18,9 @@ import Chip from 'material-ui/Chip';
 import DownloadIcon from 'material-ui/svg-icons/file/cloud-download';
 import MapIcon from 'material-ui/svg-icons/maps/map';
 import ChartIcon from 'material-ui/svg-icons/editor/multiline-chart';
-import PlaceholderIcon from 'material-ui/svg-icons/editor/insert-emoticon';
-import FaceIcon from 'material-ui/svg-icons/action/face';
 import PieceIcon from 'material-ui/svg-icons/action/extension';
 import TagIcon from 'material-ui/svg-icons/action/label';
+import UpdateIcon from 'material-ui/svg-icons/action/update';
 
 import {
   absoluteUrl,
@@ -32,8 +31,9 @@ import BaseClass from './base';
 //! Fake data for implementing the view.
 const fakeData = {
   datasetId: 'abcdefg',
-  title: 'Some Data Source - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ac viverra ipsum. Maecenas efficitur sodales massa id vulputate. Ut non eros sodales neque elementum suscipit in vel sapien. Vivamus ut enim neque. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aenean mauris est, luctus vehicula turpis non, rhoncus aliquam neque. Ut quis auctor purus. Morbi pellentesque id diam in viverra. Phasellus vel accumsan erat. Nunc mollis accumsan arcu vitae laoreet. Mauris aliquam lectus arcu, nec efficitur magna fermentum vitae. Suspendisse quis erat est. Proin non ante nisi.',
-  revisionDate: new Date(2010, 6, 3),
+  title: 'PaleoCar Model Run - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ac viverra ipsum. Maecenas efficitur sodales massa id vulputate. Ut non eros sodales neque elementum suscipit in vel sapien. Vivamus ut enim neque. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aenean mauris est, luctus vehicula turpis non, rhoncus aliquam neque. Ut quis auctor purus. Morbi pellentesque id diam in viverra. Phasellus vel accumsan erat. Nunc mollis accumsan arcu vitae laoreet. Mauris aliquam lectus arcu, nec efficitur magna fermentum vitae. Suspendisse quis erat est. Proin non ante nisi.',
+  status: 'unpublished',
+  runDate: new Date(2010, 6, 3),
   authors: [
     'Person A',
     'Person B',
@@ -93,10 +93,10 @@ class SearchResultItem extends BaseClass {
 
     const {
       title,
-      revisionDate,
+      status,
+      runDate,
       dataTemporalRange,
       dataTemporalRangePrecision,
-      authors,
       fullDescription,
       dataTypes,
       keywords,
@@ -110,14 +110,30 @@ class SearchResultItem extends BaseClass {
       >{title}</a>
     );
 
-    const revisionDateString = moment(revisionDate).format('YYYY-MM-DD');
-    const subtitle = `Revised: ${revisionDateString}`;
+    const subtitle = `Status: ${status}`;
 
-    const dateRangeString = SearchResultItem.getDateRangeStringAtPrecision(
-      dataTemporalRangePrecision,
-      dataTemporalRange.gte,
-      dataTemporalRange.lt,
-    );
+    const runInfos = [
+      {
+        title: 'Model',
+        value: 'PaleoCAR',
+      },
+      {
+        title: 'Version',
+        value: '1.1',
+      },
+      {
+        title: 'Run Date',
+        value: moment(runDate).format('MMM Do YYYY, h:m:s a'),
+      },
+      {
+        title: 'Start Date',
+        value: SearchResultItem.getDateStringAtPrecision(dataTemporalRange.gte, dataTemporalRangePrecision),
+      },
+      {
+        title: 'End Date',
+        value: SearchResultItem.getDateStringAtPrecision(dataTemporalRange.lt, dataTemporalRangePrecision),
+      },
+    ];
 
     // List of available features to be displayed as small feature icons.
     const availableFeatures = [
@@ -156,7 +172,7 @@ class SearchResultItem extends BaseClass {
         ref={(ref) => this._cardElement = ref && ReactDOM.findDOMNode(ref)}
       >
         <CardHeader
-          avatar={<Avatar icon={<PlaceholderIcon />} />}
+          avatar={<Avatar icon={<UpdateIcon />} />}
           textStyle={{
             width: '100%',
           }}
@@ -210,10 +226,6 @@ class SearchResultItem extends BaseClass {
                 }}
               ><map-layer-geojson src-json={boundaryGeoJsonString} /></MapView>
             )}</div>
-
-            <p
-              className="search-result-item__date-range"
-            >{dateRangeString}</p>
           </div>
 
           <div
@@ -222,33 +234,6 @@ class SearchResultItem extends BaseClass {
               flex: '1 1 0',
             }}
           >
-            <div className="info-wrapper">
-              <label
-                className="info-wrapper__title"
-              >Authors</label>
-              <div
-                className="info-wrapper__content search-result-item__author-list"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                }}
-              >
-                {authors.map((str, i) => (
-                  <Chip
-                    key={i}
-                    className="search-result-item__author-item"
-                    style={{
-                      ...SearchResultItem.inlineListGapStyle,
-                    }}
-                  >
-                    <Avatar icon={<FaceIcon />} />
-                    {str}
-                  </Chip>
-                ))}
-              </div>
-            </div>
-
             <div className="info-wrapper">
               <label
                 className="info-wrapper__title"
@@ -311,6 +296,22 @@ class SearchResultItem extends BaseClass {
                   </Chip>
                 ))}
               </div>
+            </div>
+
+            <div className="info-wrapper search-result-item__run-info">
+              {runInfos.map((item, index) => (
+                <div
+                  key={index}
+                  className="info-wrapper"
+                >
+                  <label
+                    className="info-wrapper__title"
+                  >{item.title}</label>
+                  <div
+                    className="info-wrapper__content"
+                  >{item.value}</div>
+                </div>
+              ))}
             </div>
           </div>
         </CardText>
