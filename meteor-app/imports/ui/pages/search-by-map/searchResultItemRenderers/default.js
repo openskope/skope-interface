@@ -122,6 +122,9 @@ class SearchResultItem extends React.Component {
   constructor (props) {
     super(props);
 
+    // This stores the reference to the card element.
+    this._cardElement = null;
+
     this.state = {
       positionBeforeExpanding: {
         top: 0,
@@ -136,14 +139,14 @@ class SearchResultItem extends React.Component {
   }
 
   onExpandChange = (expanded) => {
-    if (expanded && this._rootElement) {
+    if (expanded && this._cardElement) {
       // Expanding, store initial position.
 
-      const $rootElement = $(this._rootElement);      
-      const positionBeforeExpanding = $rootElement.offset();
+      const $cardElement = $(this._cardElement);
+      const positionBeforeExpanding = $cardElement.offset();
       const dimensionBeforeExpanding = {
-        width: $rootElement.width(),
-        height: $rootElement.height(),
+        width: $cardElement.width(),
+        height: $cardElement.height(),
       };
 
       this.setState({
@@ -303,7 +306,7 @@ Nullam velit erat, accumsan sollicitudin congue vel, iaculis vitae odio. Sed non
             flexDirection: 'column',
             justifyContent: 'stretch',
           }}
-          ref={(ref) => this._rootElement = ref && ReactDOM.findDOMNode(ref)}
+          ref={(ref) => this._cardElement = ref && ReactDOM.findDOMNode(ref)}
         >
           <CardHeader
             avatar={<Avatar icon={<PlaceholderIcon />} />}
