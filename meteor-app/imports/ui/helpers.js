@@ -141,7 +141,7 @@ const getDateAtPrecision = (
           return acc;
         }
 
-        const newDate = new Date(date);
+        const newDate = new Date(acc);
 
         handler.call(newDate, zeroPoint);
 
