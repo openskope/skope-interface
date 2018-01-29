@@ -14,9 +14,7 @@ const renderInvalidSearchResultItems = objectPath.get(Meteor.settings, 'public.r
 
 export default (props) => {
   //! Provide fallback value here?
-  // const resultItemType = objectPath.get(props, resultTypeFieldPath);
-  //! Temporary hard coded data for implementing the default item view.
-  const resultItemType = 'paleocarrun';
+  const resultItemType = objectPath.get(props, resultTypeFieldPath);
 
   if (!resultItemType) {
     if (renderInvalidSearchResultItems) {
