@@ -13,8 +13,7 @@ const renderSearchResultItemsWithUnknownType = objectPath.get(Meteor.settings, '
 const renderInvalidSearchResultItems = objectPath.get(Meteor.settings, 'public.renderInvalidSearchResultItems', false);
 
 export default (props) => {
-  //! Provide fallback value here?
-  const resultItemType = objectPath.get(props, resultTypeFieldPath);
+  const resultItemType = objectPath.get(props, resultTypeFieldPath, 'unknown');
 
   if (!resultItemType) {
     if (renderInvalidSearchResultItems) {
