@@ -146,51 +146,21 @@ class SearchResultItem extends React.Component {
     >{props.children}</Toolbar>
   );
 
-  static GreenTickmarkBadge = (props) => (
-    <Badge
-      badgeContent={<CheckIcon style={{ color: 'green' }} />}
-      {...props}
-      badgeStyle={{
-        top: '4px',
-        right: '4px',
-        width: '18px',
-        height: '18px',
-        background: 'transparent',
-        pointerEvents: 'none',
-        ...props.badgeStyle,
-      }}
-      style={{
-        padding: 0,
-        ...props.style,
-      }}
-    >{props.children}</Badge>
-  );
-
   static renderAvailableFeatures = (availableFeatures) =>
     availableFeatures.map(({
       featureName,
+      isAvailable,
       IconComponent,
     }, index) => (
-      <SearchResultItem.GreenTickmarkBadge
-        key={`feature__${index}`}
-        style={{
-          ...SearchResultItem.toolbarItemMargins,
-        }}
+      <IconButton
+        key={index}
+        disabled={!isAvailable}
+        tooltip={isAvailable ? `${featureName} available` : `${featureName} unavailable`}
       >
-        <IconButton
-          tooltip={`${featureName} available`}
-          // Make it look non-clickable.
-          disableTouchRipple
-          // Make it look non-clickable.
-          style={{
-            cursor: 'normal',
-          }}
-        >
-          <IconComponent
-            color="rgba(180, 180, 180, 0.8)"
-          />
-        </IconButton>
-      </SearchResultItem.GreenTickmarkBadge>
+        <IconComponent
+          color={isAvailable ? 'green' : 'rgba(180, 180, 180, 0.5)'}
+        />
+      </IconButton>
     ));
 
   constructor (props) {

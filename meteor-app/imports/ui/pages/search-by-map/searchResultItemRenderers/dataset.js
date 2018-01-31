@@ -19,6 +19,8 @@ import DownloadIcon from 'material-ui/svg-icons/file/cloud-download';
 import MapIcon from 'material-ui/svg-icons/maps/map';
 import ChartIcon from 'material-ui/svg-icons/editor/multiline-chart';
 import PlaceholderIcon from 'material-ui/svg-icons/editor/insert-emoticon';
+import InfoIcon from 'material-ui/svg-icons/action/info';
+import ModelIcon from 'material-ui/svg-icons/action/build';
 
 import {
   absoluteUrl,
@@ -37,6 +39,11 @@ class SearchResultItem extends BaseClass {
           descriptionMD: descriptionMarkDown,
           revised: revisionDate,
           timespan,
+          information: informationField,
+          overlayService,
+          downloadService,
+          analyticService,
+          modelService,
           Area,
         },
       },
@@ -77,16 +84,29 @@ class SearchResultItem extends BaseClass {
     // List of available features to be displayed as small feature icons.
     const availableFeatures = [
       {
+        featureName: 'Information',
+        isAvailable: Boolean(informationField),
+        IconComponent: InfoIcon,
+      },
+      {
         featureName: 'Download',
+        isAvailable: Boolean(downloadService),
         IconComponent: DownloadIcon,
       },
       {
         featureName: 'Map',
+        isAvailable: Boolean(overlayService),
         IconComponent: MapIcon,
       },
       {
         featureName: 'Charts',
+        isAvailable: Boolean(analyticService),
         IconComponent: ChartIcon,
+      },
+      {
+        featureName: 'Model',
+        isAvailable: Boolean(modelService),
+        IconComponent: ModelIcon,
       },
     ];
 
