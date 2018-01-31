@@ -25,6 +25,23 @@ class SearchResultItem extends React.Component {
     }).isRequired,
   };
 
+  static resolutionToPrecision = {
+    year: 0,
+    month: 1,
+    date: 2,
+    hour: 3,
+    minute: 4,
+    second: 5,
+    millisecond: 5,
+  };
+
+  /**
+   * @param {string} resolution
+   */
+  static getPrecisionByResolution (resolution) {
+    return SearchResultItem.resolutionToPrecision[resolution];
+  }
+
   static dateFormatForPrecisions = [
     'YYYY',
     'MMM YYYY',
@@ -34,6 +51,10 @@ class SearchResultItem extends React.Component {
     'MMM Do YYYY, h:m:s a',
   ];
 
+  /**
+   * @param {Date} date
+   * @param {number} precision
+   */
   static getDateStringAtPrecision (date, precision) {
     if (!date) {
       return '';
@@ -97,13 +118,13 @@ class SearchResultItem extends React.Component {
     };
   }
 
-  static DescriptionRenderer = ({
+  static MarkDownRenderer = ({
     value,
     ...props
   }) => {
     //! Make sure all the dangerous tags are sanitized.
     const descriptionHtml = marked(value);
-  
+
     return (
       <div
         {...props}
