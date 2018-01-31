@@ -1,5 +1,10 @@
 {
     "public": {
+        "searchpage": {
+            "resultsPerPage": 10,
+            "logSearchKitQueries": false,
+            "logSearchKitQueryResults": false
+        },
         "renderSearchResultItemsWithUnknownType": false,
         "renderInvalidSearchResultItems": false,
         "elasticEndpoint": "//localhost:9200"

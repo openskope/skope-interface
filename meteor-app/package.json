@@ -58,8 +58,6 @@
   },
   "appSettings": {
     "exposeStoreToGlobal": true,
-    "logSearchKitQueries": false,
-    "logSearchKitQueryResults": false,
     "appBarBackgroundColor": "#f7f5e7",
     "appBarTextColor": "black",
     "drawerWidth": 250,
