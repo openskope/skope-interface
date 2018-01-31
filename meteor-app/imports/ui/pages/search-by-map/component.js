@@ -73,8 +73,14 @@ export default class SearchPage extends React.Component {
 
           <RefinementListFilter
             id="resultTypes-list"
-            title="Result Types"
-            field="ResultTypes"
+            title="Variables"
+            field="variables.keywords"
+            fieldOptions={{
+              type: 'nested',
+              options: {
+                path: 'variables',
+              },
+            }}
             operator="OR"
             orderKey="_term"
             orderDirection="asc"
