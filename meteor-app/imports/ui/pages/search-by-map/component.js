@@ -91,8 +91,8 @@ export default class SearchPage extends React.Component {
             <SortingSelector
               options={[
                 // { label: 'Relevance', field: '_score', order: 'desc', defaultOption: true },
-                { label: 'Latest Releases', field: 'CreationDate', order: 'desc', defaultOption: true },
-                { label: 'Earliest Releases', field: 'CreationDate', order: 'asc' },
+                { label: 'Latest Releases', field: 'revised', order: 'desc', defaultOption: true },
+                { label: 'Earliest Releases', field: 'revised', order: 'asc' },
               ]}
             />
           </ActionBarRow>
