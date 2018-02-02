@@ -11,6 +11,7 @@
   // Set the side-to-side ratio here.
   & > .page-search__search {
     flex: 1 1 0;
+    max-width: 30em;
   }
 
   & > .page-search__result {
@@ -51,7 +52,7 @@
     }
 
     .spatial-filter {
-      height: 300px;
+      height: 20em;
     }
 
     .filter--startdate-range,
@@ -68,6 +69,13 @@
     overflow-x: hidden;
 
     padding: @global-layout-padding;
+  }
+
+  .page-search__result__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 40em);
+    grid-gap: 0 2em;
+    justify-content: space-around;
   }
 
   .search-result-item {
