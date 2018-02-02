@@ -11,10 +11,12 @@ const getClassName = (...items) =>
   .map((x) => (
     typeof x === 'object' && x !== null
     ? Object.keys(x)
-      .filter((key) => x[key])
+      .filter((key) => Boolean(x[key]))
       .join(' ')
-    : String(x)
+    : x
   ))
-  // All falsy entries will be removed.
+  .filter(Boolean)
+  // Convert to string form.
+  .map((x) => String(x))
   .filter(Boolean)
   .join(' ');
