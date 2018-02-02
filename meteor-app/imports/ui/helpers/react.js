@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 import {
   mount as reactMount,
 } from 'react-mounter';
@@ -43,3 +44,13 @@ const mount =
   muiTheme,
   children: <ComponentClass {...props} />,
 });
+
+/**
+ * Wrap `MuiThemeProvider` around `ReactDOMServer.renderToStaticMarkup`
+ * in case `reactElement` is a `material-ui` component. 
+ */
+export
+const renderToStaticMarkup =
+(reactElement) => ReactDOMServer.renderToStaticMarkup(
+  <MuiThemeProvider muiTheme={globalTheme}>{reactElement}</MuiThemeProvider>
+);

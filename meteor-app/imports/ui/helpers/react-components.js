@@ -1,10 +1,14 @@
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
 import marked from 'marked';
+
+import SafeLink from '/imports/ui/components/SafeLink';
 
 import {
   getClassName,
 } from './dom';
+import {
+  renderToStaticMarkup,
+} from './react';
 
 /**
  * This is a utility component for debugging purposes.
@@ -26,13 +30,12 @@ defaultMarkdownRenderer.link = (
   title,
   text,
 ) => {
-  return ReactDOMServer.renderToStaticMarkup(
-    <a
+  return renderToStaticMarkup(
+    <SafeLink
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
       title={title}
-    >{text}</a>
+      text={text}
+    />
   );
 };
 
