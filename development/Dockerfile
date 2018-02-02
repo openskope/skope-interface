@@ -52,7 +52,7 @@ RUN curl "https://install.meteor.com/?release=${meteor_version}" | sh
 ENV METEOR_PATH="${HOME}/.meteor"
 ENV PATH="$PATH:$METEOR_PATH"
 
-EXPOSE 1024-65535
+EXPOSE 3000
 
 # Download the entrypoint script.
 RUN curl -L -o ./entrypoint.sh https://gist.githubusercontent.com/Zodiase/648bf2a551f9723d8d4508f8cba058dd/raw/82b5a13ca24ab684b6311bcd6aa71090d8319ecf/entrypoint.sh \
