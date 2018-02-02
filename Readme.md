@@ -1,21 +1,10 @@
 # SKOPE Web App
 
-The app is deployed at http://skope-dev.roger.ncsa.illinois.edu/app.
+The app is deployed at http://staging.openskope.org/app.
 
 ## To develop the app locally
 
-- Make sure you have the latest `node` and `npm` installed. We also suggest installing `nvm` for fast node version switching.
-- Run a local Elastic Search instance (if needed).
-	- You would need to have Docker installed.
-    - Enter directory `local/elasticsearch`,
-    - Run `npm i && npm start`, this will use the current shell session to run the Elastic Search instance in a Docker container.
-	- While the container is running, use another shell session and run `npm run load-data -- <filename>` to load data to Elastic Search.
-		- Need documentation on the data file format.
-- Run the web app.
-	- You would need to have Meteor installed.
-	- Enter directory `local` directory.
-	- Run `bash run-app.sh` to start the app in the current shell session with configurations in the `local` directory.
-	- The running process will monitor any file changes in the directory and automatically re-build and restart the app. Typically there is no need to manually stop and restart the app.
+Checkout this repo instead: https://github.com/openskope/skope-development, and follow the instructions in its readme.
 
 ## To deploy the app
 
