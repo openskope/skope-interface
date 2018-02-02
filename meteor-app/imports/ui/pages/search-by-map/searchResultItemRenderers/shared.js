@@ -103,6 +103,8 @@ class DialogButton extends React.Component {
       >
         {buttonChildren}
         <Dialog
+          autoDetectWindowHeight
+          autoScrollBodyContent
           modal={false}
           actions={[
             <FlatButton
