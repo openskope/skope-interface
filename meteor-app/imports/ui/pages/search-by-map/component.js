@@ -68,7 +68,24 @@ export default class SearchPage extends React.Component {
         zDepth={0}
       >
         <div className="page-search__search__inner">
+          <RefinementListFilter
+            id="variables"
+            title="Variables"
+            field="variables.keywords"
+            fieldOptions={{
+              type: 'nested',
+              options: {
+                path: 'variables',
+              },
+            }}
+            operator="OR"
+            orderKey="_term"
+            orderDirection="asc"
+            size={5}
+          />
+
           <SpatialFilter
+            id="location"
             className="spatial-filter"
             title="Point of Interest"
             fields={['region.geometry']}
@@ -83,22 +100,6 @@ export default class SearchPage extends React.Component {
             title="Year Range"
             min={0}
             max={(new Date()).getUTCFullYear()}
-          />
-
-          <RefinementListFilter
-            id="resultTypes-list"
-            title="Variables"
-            field="variables.keywords"
-            fieldOptions={{
-              type: 'nested',
-              options: {
-                path: 'variables',
-              },
-            }}
-            operator="OR"
-            orderKey="_term"
-            orderDirection="asc"
-            size={5}
           />
 
           <div className="layout-filler" />
