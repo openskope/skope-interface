@@ -56,8 +56,6 @@ class SearchResultItem extends React.PureComponent {
         style={{
           // Eliminate `z-index: 1` to resolve the issue of tooltips being covered.
           zIndex: false,
-          ...this.state.positionBeforeExpanding,
-          ...(this.state.expanded && this.state.dimensionBeforeExpanding),
         }}
         containerStyle={{
           display: 'flex',
