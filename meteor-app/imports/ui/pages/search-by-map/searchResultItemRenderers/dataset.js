@@ -146,7 +146,8 @@ class SearchResultItem extends React.PureComponent {
       },
     } = this.props;
 
-    const boundaryGeoJson = region && buildGeoJsonWithGeometry(region.geometry);
+    const boundaryGeometry = objectPath.get(region, 'geojson');
+    const boundaryGeoJson = boundaryGeometry && buildGeoJsonWithGeometry(boundaryGeometry);
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
     const boundaryExtent = boundaryGeoJson && geojsonExtent(boundaryGeoJson);
 
