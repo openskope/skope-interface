@@ -12,12 +12,18 @@ import {
   absoluteUrl,
 } from '/imports/ui/helpers';
 
-import BaseClass from './base';
+import {
+  defaultPropTypes,
+  bemBlockName,
+  renderCardWithDivier,
+} from './shared';
 
 const elasticEndpoint = objectPath.get(Meteor.settings, 'public.elasticEndpoint');
 
 export default
-class SearchResultItem extends BaseClass {
+class SearchResultItem extends React.PureComponent {
+  static propTypes = defaultPropTypes;
+
   renderCard = () => {
     const {
       result: {
@@ -67,10 +73,19 @@ class SearchResultItem extends BaseClass {
             width: '100%',
           }}
           title={titleElement}
-          titleStyle={SearchResultItem.titleStyle}
+          titleStyle={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
           subtitle={subtitle}
         />
       </Card>
     );
   };
+
+  render = () => renderCardWithDivier({
+    className: bemBlockName,
+    cardRenderer: this.renderCard,
+  });
 }

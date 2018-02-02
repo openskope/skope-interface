@@ -9,23 +9,23 @@
   .flex-row;
 
   // Set the side-to-side ratio here.
-  & > &__search {
+  & > .page-search__search {
     flex: 1 1 0;
   }
 
-  & > &__result {
+  & > .page-search__result {
     flex: 2 2 0;
   }
 
   font-family: Roboto;
 
-  &__search {
+  .page-search__search {
     padding: @global-layout-padding;
     overflow-y: auto;
     overflow-x: hidden;
   }
 
-  &__search__inner {
+  .page-search__search__inner {
     .flex-col;
 
     & > .layout-filler {
@@ -52,7 +52,7 @@
     }
   }
 
-  &__result {
+  .page-search__result {
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -64,118 +64,40 @@
     width: 100%;
     box-sizing: content-box;
     // Leave some padding for the card shadow inside.
-    @paddingForCardShadow: 3px;
+    @paddingForCardShadow: 0;
     padding: @paddingForCardShadow;
     margin-bottom: @gapBetweenSearchResultItems - (@paddingForCardShadow * 2);
   }
 
-  @keyframes moveToCenter {
-    to {
-      top: 50%;
-      left: 50%;
-      transform: translateX(-50%) translateY(-50%);
+  .search-result-item__content {
+    display: grid;
+    grid-template-areas: "thumbnail title       openBtn"
+                         "thumbnail description description";
+    grid-template-rows: auto auto;
+    grid-template-columns: 150px 1fr auto;
+    grid-gap: 1em;
+
+    & > .search-result-item__title {
+      grid-area: title;
+    }
+
+    & > .search-result-item__thumbnail {
+      grid-area: thumbnail;
+    }
+
+    & > .search-result-item__description {
+      grid-area: description;
+    }
+
+    & > .search-result-item__open-button {
+      grid-area: openBtn;
     }
   }
 
-  @keyframes expandWidth {
-    to {
-      width: 90vw;
-    }
-  }
-
-  @keyframes expandHeight {
-    to {
-      height: 90vh;
-    }
-  }
-
-  @keyframes hideContent {
-    from {
-      opacity: 0;
-      max-height: 0;
-      margin-top: 0;
-      margin-bottom: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-    to {
-      opacity: 0;
-      max-height: 0;
-      margin-top: 0;
-      margin-bottom: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-  }
-
-  @keyframes showContent {
-    from {
-      opacity: 0;
-      max-height: 0;
-      margin-top: 0;
-      margin-bottom: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-    to {
-      opacity: 1;
-      max-height: 100vh;
-    }
-  }
-
-  .search-result-item__modal-mask {
-    display: none;
-  }
-
-  .search-result-item--expanded {
-    @centeringTime: 350ms;
-    @centeringEasing: cubic-bezier(0.6, -0.28, 0.735, 0.045);
-    @expandingTime: 400ms;
-    @animationEffect: 1 normal both running;
-
-    background: rgba(0, 0, 0, 0.1);
-
-    .search-result-item__modal-mask {
-      display: block;
-      position: fixed;
-      .zIndexAboveAll(1);
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      background-color: rgba(100, 100, 100, 0.6);
-    }
-
-    .search-result-item__card {
-      position: absolute !important;
-      .zIndexAboveAll(2);
-      max-width: 1000px;
-      max-height: 800px;
-
-      animation: @centeringTime @centeringEasing 0ms            @animationEffect moveToCenter,
-                 @centeringTime ease             0ms            @animationEffect expandWidth,
-                 @expandingTime ease             @centeringTime @animationEffect expandHeight;
-    }
-
-    .search-result-item__content {
-      animation: @centeringTime         linear 0ms            @animationEffect hideContent,
-                 (@expandingTime * 0.3) linear @centeringTime @animationEffect showContent;
-    }
-  }
-
-  .search-result-item .info-wrapper {
-    margin-top: 1em;
-    margin-bottom: 2em;
-
-    &__title {
-      display: block;
-      color: rgba(0, 0, 0, 0.54);
-      font-size: 1.1em;
-      font-weight: 500;
-      padding-left: 1.2em;
-      margin-top: 1em;
-      margin-bottom: 1em;
-    }
+  .search-result-item__title {
+    // This is needed for it to not expand with content.
+    // Which in turn makes `textOverflow` on childrens effective.
+    overflow: hidden;
   }
 
   .search-result-item__description {
@@ -190,43 +112,26 @@
     }
   }
 
-  .search-result-item__run-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 20em);
-    grid-gap: 0 2em;
-    justify-content: space-between;
-
-    .info-wrapper {
-      &__title,
-      &__content {
-        padding-left: 1.2em;
-      }
-    }
+  .page-search__action-bar {
+    margin: 0;
   }
 
   .selected-filters {
     .flex-row;
     flex-wrap: wrap;
 
-    &__item {
+    .selected-filters__item {
       margin-right: 10px;
       margin-bottom: 10px;
     }
   }
 
-  .sk-hits-grid {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .page-search__reset-button.is-disabled {
+    display: none;
   }
 
-  // Make sure pagination panel never overflows.
-  .sk-pagination-navigation,
-  .sk-pagination-navigation.is-numbered {
-    width: auto;
-  }
-
-  .sk-pagination-navigation {
-    margin: 0 30px 50px 30px;
+  .page-search__result__pagination {
+    margin-top: 30px;
+    margin-bottom: 50px;
   }
 }

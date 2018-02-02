@@ -4,4 +4,3 @@
  */
 
 export SEARCH_RESULT_ITEM__DATASET from './dataset';
-export SEARCH_RESULT_ITEM__PALEOCARRUN from './paleocar-run';
