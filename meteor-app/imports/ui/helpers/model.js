@@ -139,13 +139,19 @@ const getDateRangeStringAtPrecision = (
  * @param {Object} geometry
  */
 export
-const buildGeoJsonWithGeometry = (geometry) => ({
-  type: 'FeatureCollection',
-  features: [
-    {
-      type: 'Feature',
-      properties: {},
-      geometry,
-    },
-  ],
-});
+const buildGeoJsonWithGeometry = (geometry) => {
+  if (!geometry) {
+    return null;
+  }
+
+  return {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties: {},
+        geometry,
+      },
+    ],
+  };
+};
