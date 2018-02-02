@@ -1,6 +1,10 @@
 import React from 'react';
 import marked from 'marked';
 
+import {
+  getClassName,
+} from './dom';
+
 /**
  * This is a utility component for debugging purposes.
  * It prints all the props passed to it.
@@ -17,12 +21,17 @@ const PropPrinter = (props) => <pre>{JSON.stringify(props, null, 2)}</pre>;
  */
 export
 const MarkDownRenderer = ({
+  className: extraClassName,
   value,
   markedOptions = {},
   ...props
 }) => {
   //! Make sure all the dangerous tags are sanitized.
-  
+
+  const className = getClassName(
+    'markdown',
+    extraClassName,
+  );
   let markdownHtml = '';
 
   try {
@@ -31,6 +40,7 @@ const MarkDownRenderer = ({
     return (
       <div
         {...props}
+        className={className}
         data-marked-error={error.message}
       >
         <div>Error when rendering markdown content: <span>{error.message}</span></div>
@@ -42,6 +52,7 @@ const MarkDownRenderer = ({
   return (
     <div
       {...props}
+      className={className}
       dangerouslySetInnerHTML={{ __html: markdownHtml }}
     />
   );
