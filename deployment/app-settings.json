@@ -1,5 +1,12 @@
 {
     "public": {
-        "elasticEndpoint": "//skope-dev.roger.ncsa.illinois.edu/elastic"
+        "searchpage": {
+            "resultsPerPage": 10,
+            "logSearchKitQueries": false,
+            "logSearchKitQueryResults": false
+        },
+        "renderSearchResultItemsWithUnknownType": false,
+        "renderInvalidSearchResultItems": false,
+        "elasticEndpoint": "//localhost:9200"
     }
 }

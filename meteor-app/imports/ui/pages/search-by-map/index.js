@@ -15,10 +15,6 @@ import {
 import 'searchkit/release/theme.css';
 import { Meteor } from 'meteor/meteor';
 
-import {
-  appSettings,
-} from '/package.json';
-
 import globalStore, { actions } from '/imports/ui/redux-store';
 
 import Component from './component';
@@ -38,12 +34,12 @@ searchkit.addResultsListener((result) => globalStore.dispatch({
   result,
 }));
 
-if (appSettings.logSearchKitQueries) {
+if (objectPath.get(Meteor.settings, 'public.searchpage.logSearchKitQueries', false)) {
   // Monitor query object.
   searchkit.setQueryProcessor((queryObject) => console.info('queryObject', queryObject) || queryObject);
 }
 
-if (appSettings.logSearchKitQueryResults) {
+if (objectPath.get(Meteor.settings, 'public.searchpage.logSearchKitQueryResults', false)) {
   // Monitor search results.
   searchkit.addResultsListener((result) => console.info('queryResult', result));
 }

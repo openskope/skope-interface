@@ -4,26 +4,28 @@
 }
 
 .page-search {
+  @gapBetweenSearchResultItems: 10px;
+
   .flex-row;
 
   // Set the side-to-side ratio here.
-  & > &__search {
+  & > .page-search__search {
     flex: 1 1 0;
   }
 
-  & > &__result {
+  & > .page-search__result {
     flex: 2 2 0;
   }
 
   font-family: Roboto;
 
-  &__search {
+  .page-search__search {
     padding: @global-layout-padding;
     overflow-y: auto;
     overflow-x: hidden;
   }
 
-  &__search__inner {
+  .page-search__search__inner {
     .flex-col;
 
     & > .layout-filler {
@@ -50,7 +52,7 @@
     }
   }
 
-  &__result {
+  .page-search__result {
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -58,63 +60,78 @@
   }
 
   .search-result-item {
-    margin-bottom: 20px;
+    display: block;
+    width: 100%;
+    box-sizing: content-box;
+    // Leave some padding for the card shadow inside.
+    @paddingForCardShadow: 0;
+    padding: @paddingForCardShadow;
+    margin-bottom: @gapBetweenSearchResultItems - (@paddingForCardShadow * 2);
   }
 
   .search-result-item__content {
-    .flex-row;
-
-    min-height: 200px;
-  }
-
-  .search-result-item__content > .search-result-item__metadata {
-    .flex-layout-fill;
-  }
-
-  .search-result-item__thumbnail {
-    width: 200px;
-  }
-
-  .search-result-item__metadata {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 5px;
+    grid-template-areas: "thumbnail title       openBtn"
+                         "thumbnail description description";
+    grid-template-rows: auto auto;
+    grid-template-columns: 150px 1fr auto;
+    grid-gap: 1em;
 
-    padding: 10px;
-
-    &__major {
-      grid-row: 1;
+    & > .search-result-item__title {
+      grid-area: title;
     }
 
-    &__description {
-      grid-column: span 3;
-      grid-row: 2;
+    & > .search-result-item__thumbnail {
+      grid-area: thumbnail;
     }
+
+    & > .search-result-item__description {
+      grid-area: description;
+    }
+
+    & > .search-result-item__open-button {
+      grid-area: openBtn;
+    }
+  }
+
+  .search-result-item__title {
+    // This is needed for it to not expand with content.
+    // Which in turn makes `textOverflow` on childrens effective.
+    overflow: hidden;
+  }
+
+  .search-result-item__description {
+    font-size: 12px;
+    line-height: 125%;
+    & > p:first-child {
+      margin-top: 0;
+    }
+    p {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+  }
+
+  .page-search__action-bar {
+    margin: 0;
   }
 
   .selected-filters {
     .flex-row;
     flex-wrap: wrap;
 
-    &__item {
+    .selected-filters__item {
       margin-right: 10px;
       margin-bottom: 10px;
     }
   }
 
-  .sk-hits-grid {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .page-search__reset-button.is-disabled {
+    display: none;
   }
 
-  // Make sure pagination panel never overflows.
-  .sk-pagination-navigation,
-  .sk-pagination-navigation.is-numbered {
-    width: auto;
-  }
-
-  .sk-pagination-navigation {
-    margin: 0 30px 50px 30px;
+  .page-search__result__pagination {
+    margin-top: 30px;
+    margin-bottom: 50px;
   }
 }

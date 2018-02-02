@@ -6,10 +6,11 @@ The purpose of using this file is to easily use different sets of configurations
 
 Note that per Meteor design, only `public` field is exposed to client-side.
 
-- `public.elasticEndpoint` defines what endpoint the SearchKit should be using for querying.
-    Since we are using Meteor to proxy the request to the Elastic Search, this should point to the proxy endpoint.
+- `public.searchpage.resultsPerPage` is a positive integer that defines how many items to show per page in the search page.
+- `public.elasticEndpoint` is a string that defines what endpoint the SearchKit should be using for querying.
+    If we are using Meteor to proxy the request to the Elastic Search, this should point to the proxy endpoint.
     (The proxy code actually reads this value to setup the endpoint.)
-- `server.elasticEndpoint` defines where the elastic search server endpoint is. This is used by the proxy to forward search queries.
+- `server.elasticEndpoint` is a string that defines where the elastic search server endpoint is. This is used by the proxy to forward search queries. If this is not specified, the reverse proxy is not initialized.
 
 ### Conventions
 

@@ -1,4 +1,6 @@
+import { Meteor } from 'meteor/meteor';
 import React from 'react';
+import objectPath from 'object-path';
 import Paper from 'material-ui/Paper';
 import FullWindowLayout from '/imports/ui/layouts/full-window';
 import AppbarHeader from '/imports/ui/components/appbar';
@@ -20,19 +22,32 @@ import {
 
 import DataTemporalRangeFilter from '/imports/ui/components/searchpage-filters/data-temporal-range-filter';
 import SelectedFilterItem from './SelectedFilterItem';
-import SearchResultItem from './SearchResultItem';
+import RenderSearchResultItemByType from './RenderSearchResultItemByType';
 
 const ResetFilterButton = ({
+  bemBlock,
   hasFilters,
   resetFilters,
+  translate, // Not used. If included in `props` React will complain.
+  clearAllLabel, // Not used. If included in `props` React will complain.
+  ...props
 }) => (
-  <FlatButton
-    label="Reset Filter"
-    secondary
-    onClick={resetFilters}
-    disabled={!hasFilters}
-  />
+  <span
+    {...props}
+    className={bemBlock().state({
+      disabled: !hasFilters,
+    })}
+  >
+    <FlatButton
+      label="Reset Filter"
+      secondary
+      onClick={resetFilters}
+      disabled={!hasFilters}
+    />
+  </span>
 );
+
+const resultsPerPage = objectPath.get(Meteor.settings, 'public.searchpage.resultsPerPage', 3);
 
 export default class SearchPage extends React.Component {
 
@@ -48,19 +63,22 @@ export default class SearchPage extends React.Component {
 
   renderBody = () => (
     <div className="page-search">
-      <Paper className="page-search__search">
+      <Paper
+        className="page-search__search"
+        zDepth={0}
+      >
         <div className="page-search__search__inner">
           <SpatialFilter
             className="spatial-filter"
             title="Point of Interest"
-            fields={['Area']}
+            fields={['region.geometry']}
           />
 
           <DataTemporalRangeFilter
             id="temporal-range"
             fields={[
-              'StartDate',
-              'EndDate',
+              'timespan.period.gte',
+              'timespan.period.lte',
             ]}
             title="Year Range"
             min={0}
@@ -69,8 +87,14 @@ export default class SearchPage extends React.Component {
 
           <RefinementListFilter
             id="resultTypes-list"
-            title="Result Types"
-            field="ResultTypes"
+            title="Variables"
+            field="variables.keywords"
+            fieldOptions={{
+              type: 'nested',
+              options: {
+                path: 'variables',
+              },
+            }}
             operator="OR"
             orderKey="_term"
             orderDirection="asc"
@@ -80,15 +104,20 @@ export default class SearchPage extends React.Component {
           <div className="layout-filler" />
         </div>
       </Paper>
-      <div className="page-search__result">
-        <ActionBar>
+      <Paper
+        className="page-search__result"
+        zDepth={3}
+      >
+        <ActionBar
+          className="page-search__action-bar"
+        >
           <ActionBarRow>
             <HitsStats />
             <SortingSelector
               options={[
                 // { label: 'Relevance', field: '_score', order: 'desc', defaultOption: true },
-                { label: 'Latest Releases', field: 'CreationDate', order: 'desc', defaultOption: true },
-                { label: 'Earliest Releases', field: 'CreationDate', order: 'asc' },
+                { label: 'Latest Releases', field: 'revised', order: 'desc', defaultOption: true },
+                { label: 'Earliest Releases', field: 'revised', order: 'asc' },
               ]}
             />
           </ActionBarRow>
@@ -98,17 +127,31 @@ export default class SearchPage extends React.Component {
               mod="selected-filters"
               itemComponent={SelectedFilterItem}
             />
-            <ResetFilters component={ResetFilterButton} />
+            <ResetFilters
+              mod="page-search__reset-button"
+              component={ResetFilterButton}
+              options={{
+                query: true,
+                filter: true,
+                pagination: false,
+              }}
+            />
           </ActionBarRow>
         </ActionBar>
 
-        <Hits mod="sk-hits-grid" hitsPerPage={3} itemComponent={SearchResultItem} />
+        <Hits
+          mod="page-search__result__list"
+          hitsPerPage={resultsPerPage}
+          itemComponent={RenderSearchResultItemByType}
+          scrollTo=".page-search__result"
+        />
         <NoHits />
 
         <Pagination
+          mod="page-search__result__pagination"
           showNumbers
         />
-      </div>
+      </Paper>
     </div>
   );
 
