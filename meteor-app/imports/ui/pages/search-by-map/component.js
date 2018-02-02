@@ -84,6 +84,16 @@ export default class SearchPage extends React.Component {
             size={5}
           />
 
+          <RefinementListFilter
+            id="status"
+            title="Status"
+            field="status"
+            operator="OR"
+            orderKey="_term"
+            orderDirection="asc"
+            size={5}
+          />
+
           <SpatialFilter
             id="location"
             className="spatial-filter"
