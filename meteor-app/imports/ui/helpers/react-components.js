@@ -22,12 +22,27 @@ const MarkDownRenderer = ({
   ...props
 }) => {
   //! Make sure all the dangerous tags are sanitized.
-  const descriptionHtml = marked(value, markedOptions);
+  
+  let markdownHtml = '';
+
+  try {
+    markdownHtml = marked(value, markedOptions);
+  } catch (error) {
+    return (
+      <div
+        {...props}
+        data-marked-error={error.message}
+      >
+        <div>Error when rendering markdown content: <span>{error.message}</span></div>
+        <pre data-type={typeof value}>{value}</pre>
+      </div>
+    );
+  }
 
   return (
     <div
       {...props}
-      dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+      dangerouslySetInnerHTML={{ __html: markdownHtml }}
     />
   );
 };
