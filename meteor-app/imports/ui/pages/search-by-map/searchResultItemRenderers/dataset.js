@@ -138,7 +138,7 @@ class SearchResultItem extends React.PureComponent {
         _id,
         _source: {
           title,
-          descriptionMD: descriptionMarkDown,
+          description: descriptionMarkDown,
           revised: revisionDate,
           timespan,
           region,
