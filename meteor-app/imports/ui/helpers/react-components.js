@@ -48,6 +48,13 @@ const MarkDownRenderer = ({
   className: extraClassName,
   value,
   markedOptions = {
+    gfm: true,
+    tables: true,
+    breaks: true,
+    pedantic: false,
+    sanitize: true,
+    smartLists: true,
+    smartypants: true,
     renderer: defaultMarkdownRenderer,
   },
   ...props
