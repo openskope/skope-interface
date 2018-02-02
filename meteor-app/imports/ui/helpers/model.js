@@ -115,6 +115,11 @@ const getDateStringAtPrecision = (
   'MMM Do YYYY, h:m:s a',
 ]);
 
+/**
+ * @param {number} precision
+ * @param {Date} start
+ * @param {Date} end
+ */
 export
 const getDateRangeStringAtPrecision = (
   precision,
@@ -130,6 +135,9 @@ const getDateRangeStringAtPrecision = (
   .join(' - ');
 };
 
+/**
+ * @param {Object} geometry
+ */
 export
 const buildGeoJsonWithGeometry = (geometry) => ({
   type: 'FeatureCollection',
