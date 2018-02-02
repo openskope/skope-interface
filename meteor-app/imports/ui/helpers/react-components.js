@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 import marked from 'marked';
 
 import {
@@ -12,6 +13,29 @@ import {
 export
 const PropPrinter = (props) => <pre>{JSON.stringify(props, null, 2)}</pre>;
 
+const defaultMarkdownRenderer = new marked.Renderer();
+
+/**
+ * @param  {string} href
+ * @param  {string} title
+ * @param  {string} text
+ * @return {string}
+ */
+defaultMarkdownRenderer.link = (
+  href,
+  title,
+  text,
+) => {
+  return ReactDOMServer.renderToStaticMarkup(
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={title}
+    >{text}</a>
+  );
+};
+
 /**
  * @param {Object} props
  * @param {string} props.value
@@ -23,7 +47,9 @@ export
 const MarkDownRenderer = ({
   className: extraClassName,
   value,
-  markedOptions = {},
+  markedOptions = {
+    renderer: defaultMarkdownRenderer,
+  },
   ...props
 }) => {
   //! Make sure all the dangerous tags are sanitized.
