@@ -198,11 +198,16 @@ class SearchResultItem extends React.PureComponent {
             className="search-result-item__title"
             title={title}
             titleStyle={{
+              fontSize: '1.2em',
+              lineHeight: '1.45em',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}
             subtitle={subtitle}
+            subtitleStyle={{
+              fontSize: '1em',
+            }}
             style={{
               // Eliminate the default padding from `CardTitle`.
               padding: 0,

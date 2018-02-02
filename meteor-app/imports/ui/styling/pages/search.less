@@ -1,10 +1,14 @@
 .page-search {
   height: 100%;
   width: 100%;
+  overflow: auto;
 }
 
 .page-search {
-  @gapBetweenSearchResultItems: 10px;
+  @gapBetweenSearchResultItems: 1em;
+  @resultItemMaxWidth: 60em;
+  @resultItemMinWidth: 35em;
+  @resultItemThumbnailWidth: 15em;
 
   .flex-row;
 
@@ -12,10 +16,13 @@
   & > .page-search__search {
     flex: 1 1 0;
     max-width: 30em;
+    min-width: 20em;
   }
 
   & > .page-search__result {
     flex: 2 2 0;
+    // `2` is for the margins around the result items.
+    min-width: @resultItemMinWidth + 2;
   }
 
   font-family: Roboto;
@@ -73,8 +80,8 @@
 
   .page-search__result__list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 40em);
-    grid-gap: 0 2em;
+    grid-template-columns: repeat(auto-fill, minmax(@resultItemMinWidth, @resultItemMaxWidth));
+    grid-gap: @gapBetweenSearchResultItems;
     justify-content: space-around;
   }
 
@@ -85,7 +92,6 @@
     // Leave some padding for the card shadow inside.
     @paddingForCardShadow: 0;
     padding: @paddingForCardShadow;
-    margin-bottom: @gapBetweenSearchResultItems - (@paddingForCardShadow * 2);
   }
 
   .search-result-item__content {
@@ -93,8 +99,8 @@
     grid-template-areas: "thumbnail title       openBtn"
                          "thumbnail description description";
     grid-template-rows: auto auto;
-    grid-template-columns: 150px 1fr auto;
-    grid-gap: 1em;
+    grid-template-columns: @resultItemThumbnailWidth 1fr auto;
+    grid-gap: 0.5em 1em;
 
     & > .search-result-item__title {
       grid-area: title;
@@ -102,6 +108,7 @@
 
     & > .search-result-item__thumbnail {
       grid-area: thumbnail;
+      height: @resultItemThumbnailWidth;
     }
 
     & > .search-result-item__description {
