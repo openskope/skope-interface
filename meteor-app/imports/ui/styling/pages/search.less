@@ -39,6 +39,17 @@
     height: 100%;
     width: 100%;
 
+    // Default design in SearchKit is light on dark. Need to change color.
+    .sk-search-box {
+      @color: rgba(0, 0, 0, 0.7);
+
+      border: 1px solid @color;
+
+      input.sk-search-box__text {
+        color: @color;
+      }
+    }
+
     .spatial-filter {
       height: 300px;
     }

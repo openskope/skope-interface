@@ -9,6 +9,7 @@ import FlatButton from 'material-ui/FlatButton';
 
 import {
   Pagination,
+  SearchBox,
   RefinementListFilter,
   SortingSelector,
   ActionBar,
@@ -68,6 +69,15 @@ export default class SearchPage extends React.Component {
         zDepth={0}
       >
         <div className="page-search__search__inner">
+          <SearchBox
+            queryFields={[
+              'title^6',
+              'descriptionMD^3',
+              'dataTypes^2',
+              'information.markdown',
+            ]}
+          />
+
           <RefinementListFilter
             id="variables"
             title="Variables"
