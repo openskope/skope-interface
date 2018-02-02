@@ -141,14 +141,14 @@ class SearchResultItem extends React.PureComponent {
           descriptionMD: descriptionMarkDown,
           revised: revisionDate,
           timespan,
-          Area,
+          region,
         },
       },
     } = this.props;
 
-    const boundaryGeoJson = Area && buildGeoJsonWithGeometry(Area);
+    const boundaryGeoJson = region && buildGeoJsonWithGeometry(region.geometry);
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
-    const boundaryExtent = geojsonExtent(boundaryGeoJson);
+    const boundaryExtent = boundaryGeoJson && geojsonExtent(boundaryGeoJson);
 
     const workspacePageUrl = absoluteUrl('/workspace', null, { dataset: _id });
     const revisionDateString = moment(revisionDate).format('YYYY-MM-DD');
