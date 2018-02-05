@@ -149,7 +149,12 @@ class SearchResultItem extends React.PureComponent {
     const boundaryGeometry = objectPath.get(region, 'geometry');
     const boundaryGeoJson = boundaryGeometry && buildGeoJsonWithGeometry(boundaryGeometry);
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
-    const boundaryExtent = boundaryGeoJson && geojsonExtent(boundaryGeoJson);
+    // If `extents` is specified in source, trust that. Otherwise try to calculate from boundary shape.
+    const boundaryExtentFromDocument = objectPath.get(region, 'extents');
+    const boundaryExtent = boundaryExtentFromDocument
+                           // Extent coordinates stored in the document are strings instead of numbers.
+                           ? (boundaryExtentFromDocument.map((s) => parseFloat(s)))
+                           : (boundaryGeoJson && geojsonExtent(boundaryGeoJson));
 
     const workspacePageUrl = absoluteUrl('/workspace', null, { dataset: _id });
     const revisionDateString = moment(revisionDate).format('YYYY-MM-DD');
