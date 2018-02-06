@@ -73,6 +73,7 @@ const getDateAtPrecision = (
 
 /**
  * @param {string} resolution
+ * @returns {number}
  */
 export
 const getPrecisionByResolution = (
@@ -92,6 +93,7 @@ const getPrecisionByResolution = (
 /**
  * @param {Date} date
  * @param {number} precision
+ * @returns {string}
  */
 export
 const getDateStringAtPrecision = (
@@ -116,9 +118,39 @@ const getDateStringAtPrecision = (
 ]);
 
 /**
+ * @param {string} dateString
+ * @param {number} precision
+ * @returns {Date}
+ */
+export
+const parseDateStringWithPrecision = (
+  (dateStringFormatForPrecisions) =>
+    (dateString, precision) => {
+      if (!dateString) {
+        return null;
+      }
+
+      const format = dateStringFormatForPrecisions[precision];
+
+      if (!format) {
+        return null;
+      }
+
+      const date = moment(dateString, format).toDate();
+
+      return date;
+    }
+)([
+  'YYYY',
+  'YYYY-MM',
+  'YYYY-MM-DD',
+]);
+
+/**
  * @param {number} precision
  * @param {Date} start
  * @param {Date} end
+ * @returns {string}
  */
 export
 const getDateRangeStringAtPrecision = (
@@ -137,6 +169,7 @@ const getDateRangeStringAtPrecision = (
 
 /**
  * @param {Object} geometry
+ * @returns {Object}
  */
 export
 const buildGeoJsonWithGeometry = (geometry) => {
