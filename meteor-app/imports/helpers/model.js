@@ -93,18 +93,19 @@ const getPrecisionByResolution = (
 /**
  * @param {Date} date
  * @param {number} precision
+ * @param {Array<string>} customFormats
  * @returns {string}
  */
 export
 const getDateStringAtPrecision = (
   (dateFormatForPrecisions) =>
-    (date, precision) => {
+    (date, precision, customFormats) => {
       if (!date) {
         return '';
       }
 
       const dateAtPrecision = getDateAtPrecision(date, precision);
-      const dateTemplateAtPrecision = dateFormatForPrecisions[precision];
+      const dateTemplateAtPrecision = (customFormats || dateFormatForPrecisions)[precision];
 
       return moment(dateAtPrecision).format(dateTemplateAtPrecision);
     }
