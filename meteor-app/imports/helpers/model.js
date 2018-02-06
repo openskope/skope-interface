@@ -72,6 +72,67 @@ const getDateAtPrecision = (
 ]);
 
 /**
+ * @param {Date} date
+ * @param {number} precision - 0: year, 1: month, 2: day,
+ *                             3: hour, 4: minute, 5: second, 6: millisecond
+ * @param {number} offset
+ * @return {Date}
+ */
+export
+const offsetDateAtPrecision = (
+  (precisions) =>
+    (
+      date,
+      precision,
+      offset,
+    ) => {
+      const {
+        setter,
+        getter,
+      } = precisions[precision];
+
+      const newDate = new Date(date);
+
+      let value = getter.call(newDate);
+
+      value += offset;
+
+      setter.call(newDate, value);
+
+      return newDate;
+    }
+)([
+  {
+    setter: Date.prototype.setFullYear,
+    getter: Date.prototype.getFullYear,
+  },
+  {
+    setter: Date.prototype.setMonth,
+    getter: Date.prototype.getMonth,
+  },
+  {
+    setter: Date.prototype.setDate,
+    getter: Date.prototype.getDate,
+  },
+  {
+    setter: Date.prototype.setHours,
+    getter: Date.prototype.getHours,
+  },
+  {
+    setter: Date.prototype.setMinutes,
+    getter: Date.prototype.getMinutes,
+  },
+  {
+    setter: Date.prototype.setSeconds,
+    getter: Date.prototype.getSeconds,
+  },
+  {
+    setter: Date.prototype.setMilliseconds,
+    getter: Date.prototype.getMilliseconds,
+  },
+]);
+
+/**
  * @param {string} resolution
  * @returns {number}
  */
