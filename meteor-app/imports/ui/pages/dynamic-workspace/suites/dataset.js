@@ -527,13 +527,13 @@ export default class Component extends SuiteBaseClass {
                 <ToolbarTitle text="Time" />
 
                 <DatePicker
+                  openToYearSelection
                   hintText="Controlled Date Input"
                   minDate={this.state.timespanPeriod.gte}
                   maxDate={this.state.timespanPeriod.lte}
                   value={this.state.currentLoadedDate}
-                  onChange={this.loadedDateOnChange}
-                  openToYearSelection
                   formatDate={this.buildPreciseDateString}
+                  onChange={this.loadedDateOnChange}
                   textFieldStyle={{
                     width: '85px',
                   }}
