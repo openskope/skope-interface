@@ -24,10 +24,13 @@ import {
   ToolbarTitle,
 } from 'material-ui/Toolbar';
 import DatePicker from 'material-ui/DatePicker';
-import TextField from 'material-ui/TextField';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
 import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
+import Range from 'rc-slider/lib/Range';
+import 'rc-slider/assets/index.css';
 
 import MapView from '/imports/ui/components/mapview';
 
@@ -540,23 +543,87 @@ export default class Component extends SuiteBaseClass {
               <ListItem
                 key="layer-opacity"
                 disabled
-              >
-                <div className="layer-opacity-row">
-                  <label>Opacity: </label>
-                  <Slider
-                    className="input-slider--layer-opacity"
-                    min={Component.opacitySliderMin}
-                    max={Component.opacitySliderMax}
-                    value={this.getOpacitySliderValueForLayer(layerItem.id)}
-                    onChange={(event, newValue) => this.setLayerOpacityFromSliderValue(layerItem.id, newValue)}
-                    sliderStyle={{
-                      marginTop: 0,
-                      marginBottom: 0,
+                primaryText={(
+                  <div>
+                    <label>Opacity: </label>
+                    <label>{Component.getDisplayTextForLayerOpacity(this.getLayerOpacity(layerItem.id))}</label>
+                  </div>
+                )}
+                secondaryText={(
+                  <div
+                    style={{
+                      overflow: 'visible',
                     }}
-                  />
-                  <label>{Component.getDisplayTextForLayerOpacity(this.getLayerOpacity(layerItem.id))}</label>
-                </div>
-              </ListItem>
+                  >
+                    <Slider
+                      className="input-slider--layer-opacity"
+                      min={Component.opacitySliderMin}
+                      max={Component.opacitySliderMax}
+                      value={this.getOpacitySliderValueForLayer(layerItem.id)}
+                      onChange={(event, newValue) => this.setLayerOpacityFromSliderValue(layerItem.id, newValue)}
+                      sliderStyle={{
+                        marginTop: 0,
+                        marginBottom: 0,
+                      }}
+                    />
+                  </div>
+                )}
+              />,
+              <ListItem
+                key="layer-style-range"
+                disabled
+                primaryText={(
+                  <div>
+                    <label>Style Range: </label>
+                  </div>
+                )}
+                secondaryText={(
+                  <div
+                    style={{
+                      overflow: 'visible',
+                    }}
+                  >
+                    <Range
+                      className="input-slider--layer-opacity"
+                      min={layerItem.min}
+                      max={layerItem.max}
+                      defaultValue={[
+                        layerItem.min,
+                        layerItem.max,
+                      ]}
+                    />
+                  </div>
+                )}
+              />,
+              <ListItem
+                key="layer-style"
+                disabled
+                primaryText={(
+                  <div>
+                    <label>Style: </label>
+                  </div>
+                )}
+                secondaryText={(
+                  <div
+                    style={{
+                      overflow: 'visible',
+                    }}
+                  >
+                    <SelectField
+                      value={1}
+                      style={{
+                        width: '100%',
+                      }}
+                    >{layerItem.styles.map((styleName, index) => (
+                      <MenuItem
+                        key={index}
+                        value={index}
+                        primaryText={styleName}
+                      />
+                    ))}</SelectField>
+                  </div>
+                )}
+              />,
             ]}
           />
         ))}
