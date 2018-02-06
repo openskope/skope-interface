@@ -140,7 +140,7 @@ export default class Component extends SuiteBaseClass {
           extent={this.getDatasetExtent()}
           invisible={this.getLayerVisibility(layer.id) ? null : 'invisible'}
           opacity={this.getLayerOpacity(layer.id)}
-          url={this.fillOverlayUrl(layer.endpoint)}
+          url={this.fillOverlayUrl(layer.url)}
           server-type="geoserver"
         />
       );
@@ -154,17 +154,17 @@ export default class Component extends SuiteBaseClass {
    * @type {Object<string, Function>}
    */
   static overlayUrlFillers = {
-    'YYYY': function () {
+    YYYY () {
       const currentDate = this.state.currentLoadedDate;
 
       return moment(currentDate).format('YYYY');
     },
-    'MM': function () {
+    MM () {
       const currentDate = this.state.currentLoadedDate;
 
       return moment(currentDate).format('MM');
     },
-    'DD': function () {
+    DD () {
       const currentDate = this.state.currentLoadedDate;
 
       return moment(currentDate).format('DD');
@@ -381,10 +381,19 @@ export default class Component extends SuiteBaseClass {
     return buildGeoJsonWithGeometry(boundaryGeometry);
   };
 
+  /**
+   * Return the same input string with placeholders filled.
+   * @param {string} templateString
+   * @returns {string}
+   */
   fillOverlayUrl = (templateString) => {
+    if (!templateString) {
+      return templateString;
+    }
+
     const fillerNames = Object.keys(Component.overlayUrlFillers);
 
-    fillerNames.reduce((acc, fillerName) => {
+    return fillerNames.reduce((acc, fillerName) => {
       const pattern = `{${fillerName}}`;
 
       let newAcc = acc;
@@ -416,6 +425,7 @@ export default class Component extends SuiteBaseClass {
 
   renderMapLayer = (layer) => {
     if (!(layer.type in Component.mapLayerRenderers)) {
+      console.warn(`Unknown layer type “${layer.type}” for layer “${layer.id}”`);
       return null;
     }
 
@@ -509,33 +519,7 @@ export default class Component extends SuiteBaseClass {
     );
   };
 
-  renderLayerListInLayersTab = () => {
-    const {
-      /**
-       * @type {Array<Object>}
-       * @property {string} name
-       * @property {string} description
-       * @property {string} type
-       * @property {string} url
-       * @property {number} min
-       * @property {number} max
-       * @property {Array<string>} styles
-       */
-      overlays: layers,
-    } = this.props;
-    const layerListItems = layers
-    // Add `id` property to the layers if not present.
-    .map((layer, index) => ({
-      id: index,
-      ...layer,
-    }))
-    .map((layer) => ({
-      id: layer.id,
-      title: layer.name,
-      invisible: !this.getLayerVisibility(layer.id),
-      opacity: this.getLayerOpacity(layer.id),
-    }));
-
+  renderLayerListInLayersTab = (layerListItems = []) => {
     return (
       <List
         className="layer-list"
@@ -581,6 +565,37 @@ export default class Component extends SuiteBaseClass {
   };
 
   renderLayersTab = () => {
+    const {
+      /**
+       * @type {Array<Object>}
+       * @property {string} name
+       * @property {string} description
+       * @property {string} type
+       * @property {string} url
+       * @property {number} min
+       * @property {number} max
+       * @property {Array<string>} styles
+       */
+      overlays: layers,
+    } = this.props;
+    const layerListItems = layers
+    // Add `id` property to the layers if not present.
+    .map((layer, index) => ({
+      id: index,
+      ...layer,
+    }))
+    .map((layer) => ({
+      id: layer.id,
+      title: layer.name,
+      type: layer.type,
+      url: layer.url,
+      min: layer.min,
+      max: layer.max,
+      styles: layer.styles,
+      invisible: !this.getLayerVisibility(layer.id),
+      opacity: this.getLayerOpacity(layer.id),
+    }));
+
     const toolbarTooltipPosition = 'top-center';
 
     const boundaryGeoJson = this.getDatasetBoundaryGeoJson();
@@ -600,7 +615,7 @@ export default class Component extends SuiteBaseClass {
             className="overlay__controls"
             zDepth={1}
           >
-            {this.renderLayerListInLayersTab()}
+            {this.renderLayerListInLayersTab(layerListItems)}
 
             <Toolbar
               style={{
@@ -657,6 +672,7 @@ export default class Component extends SuiteBaseClass {
                 width: '100%',
               }}
             >
+              {layerListItems.map((layer) => this.renderMapLayer(layer, this.props, this.state)).reverse()}
               {boundaryGeoJsonString && (
                 <map-layer-geojson src-json={boundaryGeoJsonString} />
               )}
