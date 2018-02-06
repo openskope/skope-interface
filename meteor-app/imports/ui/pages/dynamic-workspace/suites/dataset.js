@@ -12,8 +12,11 @@ import {
 import Paper from 'material-ui/Paper';
 import Subheader from 'material-ui/Subheader';
 import {
-  LayerList,
-} from '/imports/ui/components/layerlist';
+  List,
+  ListItem,
+} from 'material-ui/List';
+import Checkbox from 'material-ui/Checkbox';
+import Slider from 'material-ui/Slider';
 import {
   Toolbar,
   ToolbarGroup,
@@ -78,8 +81,6 @@ export default class Component extends SuiteBaseClass {
     // status: PropTypes.string,
     // description: PropTypes.string,
     // dataExtent: PropTypes.arrayOf(PropTypes.number).isRequired,
-    // yearStart: PropTypes.number.isRequired,
-    // yearEnd: PropTypes.number.isRequired,
     // dataUrl: PropTypes.string.isRequired,
     // layers: PropTypes.array.isRequired,
     // metadata: PropTypes.object,
@@ -97,6 +98,11 @@ export default class Component extends SuiteBaseClass {
 
   static defaultLayerOpacity = 1;
 
+  static opacitySliderMin = 0;
+  static opacitySliderMax = 255;
+
+  static getDisplayTextForLayerOpacity = (opacity) => opacity.toFixed(2);
+
   /**
    * @param {string} urlTemplate
    * @param {Object.<placeHolder: string, value: *} values
@@ -112,6 +118,11 @@ export default class Component extends SuiteBaseClass {
       }, urlTemplate);
   };
 
+  /**
+   * Set of functions to render the element for the given layer type.
+   * `this` inside these functions will be the class instance.
+   * @type {Object<string, Function>}
+   */
   static mapLayerRenderers = {
     /**
      * @param {Object} layer
@@ -129,14 +140,34 @@ export default class Component extends SuiteBaseClass {
           extent={this.getDatasetExtent()}
           invisible={this.getLayerVisibility(layer.id) ? null : 'invisible'}
           opacity={this.getLayerOpacity(layer.id)}
-          url={layer.endpoint}
-          params={`LAYERS=${Component.composeLayerId(layer.layer, {
-            //! Maybe `moment` can fill this in a single step?
-            fullyear: moment(this.state.currentLoadedYear.toFixed(0), 'YYYY').format('YYYY'),
-          })}`}
+          url={this.fillOverlayUrl(layer.endpoint)}
           server-type="geoserver"
         />
       );
+    },
+  };
+
+  /**
+   * Set of functions to calculate the values that should replace
+   * their corresponding placeholders.
+   * `this` inside these functions will be the class instance.
+   * @type {Object<string, Function>}
+   */
+  static overlayUrlFillers = {
+    'YYYY': function () {
+      const currentDate = this.state.currentLoadedDate;
+
+      return moment(currentDate).format('YYYY');
+    },
+    'MM': function () {
+      const currentDate = this.state.currentLoadedDate;
+
+      return moment(currentDate).format('MM');
+    },
+    'DD': function () {
+      const currentDate = this.state.currentLoadedDate;
+
+      return moment(currentDate).format('DD');
     },
   };
 
@@ -158,8 +189,6 @@ export default class Component extends SuiteBaseClass {
       timespanPeriod: timespan.period,
       // @type {Date}
       currentLoadedDate: timespan.period.lte,
-      // @type {number}
-      currentLoadedYear: props.timespan.period.lte,
     };
   }
 
@@ -202,19 +231,18 @@ export default class Component extends SuiteBaseClass {
     },
   });
 
-  _changeLoadedYear (nextYear) {
-    let nextLoadedYear = nextYear;
-    nextLoadedYear = Math.max(this.props.yearStart, nextLoadedYear);
-    nextLoadedYear = Math.min(this.props.yearEnd, nextLoadedYear);
+  getOpacitySliderValueForLayer = (layerId) => {
+    const opacity = this.getLayerOpacity(layerId);
+    const sliderValue = (opacity * (Component.opacitySliderMax - Component.opacitySliderMin)) + Component.opacitySliderMin;
 
-    if (nextLoadedYear === this.state.currentLoadedYear) {
-      return;
-    }
+    return sliderValue;
+  };
 
-    this.setState({
-      currentLoadedYear: nextLoadedYear,
-    });
-  }
+  setLayerOpacityFromSliderValue = (layerId, value) => {
+    const opacity = (value - Component.opacitySliderMin) / (Component.opacitySliderMax - Component.opacitySliderMin);
+
+    this.setLayerOpacity(layerId, opacity);
+  };
 
   isBackStepInTimeAllowed = () => {
     return this.state.currentLoadedDate > this.state.timespanPeriod.gte;
@@ -353,6 +381,25 @@ export default class Component extends SuiteBaseClass {
     return buildGeoJsonWithGeometry(boundaryGeometry);
   };
 
+  fillOverlayUrl = (templateString) => {
+    const fillerNames = Object.keys(Component.overlayUrlFillers);
+
+    fillerNames.reduce((acc, fillerName) => {
+      const pattern = `{${fillerName}}`;
+
+      let newAcc = acc;
+
+      while (newAcc.indexOf(pattern) !== -1) {
+        const filler = Component.overlayUrlFillers[fillerName];
+        const replacement = filler.call(this);
+
+        newAcc = newAcc.replace(pattern, replacement);
+      }
+
+      return newAcc;
+    }, templateString);
+  };
+
   renderTabLabel = ({
     IconComponent,
     label,
@@ -462,10 +509,8 @@ export default class Component extends SuiteBaseClass {
     );
   };
 
-  renderLayersTab = () => {
+  renderLayerListInLayersTab = () => {
     const {
-      yearStart,
-      yearEnd,
       /**
        * @type {Array<Object>}
        * @property {string} name
@@ -478,7 +523,6 @@ export default class Component extends SuiteBaseClass {
        */
       overlays: layers,
     } = this.props;
-
     const layerListItems = layers
     // Add `id` property to the layers if not present.
     .map((layer, index) => ({
@@ -492,6 +536,51 @@ export default class Component extends SuiteBaseClass {
       opacity: this.getLayerOpacity(layer.id),
     }));
 
+    return (
+      <List
+        className="layer-list"
+      >
+        <Subheader>Layers</Subheader>
+        {layerListItems.map((layerItem) => (
+          <ListItem
+            key={layerItem.id}
+            className="layer-list__item"
+            leftCheckbox={(
+              <Checkbox
+                checked={this.getLayerVisibility(layerItem.id)}
+                onCheck={(event, isChecked) => this.setLayerVisibility(layerItem.id, isChecked)}
+              />
+            )}
+            primaryText={layerItem.title}
+            nestedItems={[
+              <ListItem
+                key="layer-opacity"
+                disabled
+              >
+                <div className="layer-opacity-row">
+                  <label>Opacity: </label>
+                  <Slider
+                    className="input-slider--layer-opacity"
+                    min={Component.opacitySliderMin}
+                    max={Component.opacitySliderMax}
+                    value={this.getOpacitySliderValueForLayer(layerItem.id)}
+                    onChange={(event, newValue) => this.setLayerOpacityFromSliderValue(layerItem.id, newValue)}
+                    sliderStyle={{
+                      marginTop: 0,
+                      marginBottom: 0,
+                    }}
+                  />
+                  <label>{Component.getDisplayTextForLayerOpacity(this.getLayerOpacity(layerItem.id))}</label>
+                </div>
+              </ListItem>
+            ]}
+          />
+        ))}
+      </List>
+    );
+  };
+
+  renderLayersTab = () => {
     const toolbarTooltipPosition = 'top-center';
 
     const boundaryGeoJson = this.getDatasetBoundaryGeoJson();
@@ -511,12 +600,7 @@ export default class Component extends SuiteBaseClass {
             className="overlay__controls"
             zDepth={1}
           >
-            <Subheader>Layers</Subheader>
-            <LayerList
-              layers={layerListItems}
-              onChangeLayerVisibility={this.setLayerVisibility}
-              onChangeLayerOpacity={_.debounce(this.setLayerOpacity)}
-            />
+            {this.renderLayerListInLayersTab()}
 
             <Toolbar
               style={{
