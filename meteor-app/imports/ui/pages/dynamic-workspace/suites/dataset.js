@@ -97,6 +97,11 @@ export default class Component extends SuiteBaseClass {
     // metadata: {},
   };
 
+  static paddingForSliders = {
+    paddingLeft: '8px',
+    paddingRight: '8px',
+  };
+
   static defaultLayerVisibility = false;
 
   static defaultLayerOpacity = 1;
@@ -553,6 +558,7 @@ export default class Component extends SuiteBaseClass {
                   <div
                     style={{
                       overflow: 'visible',
+                      ...Component.paddingForSliders,
                     }}
                   >
                     <Slider
@@ -581,6 +587,7 @@ export default class Component extends SuiteBaseClass {
                   <div
                     style={{
                       overflow: 'visible',
+                      ...Component.paddingForSliders,
                     }}
                   >
                     <Range
