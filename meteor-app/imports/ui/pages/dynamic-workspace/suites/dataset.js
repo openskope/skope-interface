@@ -20,6 +20,7 @@ import {
   ToolbarSeparator,
   ToolbarTitle,
 } from 'material-ui/Toolbar';
+import DatePicker from 'material-ui/DatePicker';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
@@ -36,6 +37,11 @@ import {
 } from '/imports/ui/consts';
 
 import {
+  getDateAtPrecision,
+  offsetDateAtPrecision,
+  getPrecisionByResolution,
+  getDateStringAtPrecision,
+  parseDateStringWithPrecision,
   buildGeoJsonWithGeometry,
   MarkDownRenderer,
 } from '/imports/ui/helpers';
@@ -45,6 +51,30 @@ import SuiteBaseClass from './SuiteBaseClass';
 export default class Component extends SuiteBaseClass {
 
   static propTypes = SuiteBaseClass.extendPropTypes({
+    timespan: PropTypes.shape({
+      resolution: PropTypes.string,
+      period: PropTypes.shape({
+        gte: PropTypes.oneOfType([
+          PropTypes.string,
+          PropTypes.number,
+          PropTypes.instanceOf(Date),
+        ]),
+        lte: PropTypes.oneOfType([
+          PropTypes.string,
+          PropTypes.number,
+          PropTypes.instanceOf(Date),
+        ]),
+      }),
+    }),
+    overlays: PropTypes.arrayOf(PropTypes.shape({
+       name: PropTypes.string,
+       description: PropTypes.string,
+       type: PropTypes.string,
+       url: PropTypes.string,
+       min: PropTypes.number,
+       max: PropTypes.number,
+       styles: PropTypes.arrayOf(PropTypes.string),
+    })),
     // status: PropTypes.string,
     // description: PropTypes.string,
     // dataExtent: PropTypes.arrayOf(PropTypes.number).isRequired,
@@ -56,6 +86,8 @@ export default class Component extends SuiteBaseClass {
   });
 
   static defaultProps = {
+    timespan: null,
+    overlays: null,
     // status: 'undefined',
     // description: '',
     // metadata: {},
@@ -111,6 +143,8 @@ export default class Component extends SuiteBaseClass {
   constructor (props) {
     super(props);
 
+    const timespan = this.getDatasetTimespan();
+
     this.state = {
       // @type {string}
       activeTab: 'info',
@@ -118,6 +152,12 @@ export default class Component extends SuiteBaseClass {
       layerVisibility: {},
       // @type {Object.<layerId: string, opacity: number>}
       layerOpacity: {},
+      // @type {string}
+      timespanResolution: timespan.resolution,
+      // @type {{gte: Date, lte: Date}}
+      timespanPeriod: timespan.period,
+      // @type {Date}
+      currentLoadedDate: timespan.period.lte,
       // @type {number}
       currentLoadedYear: props.timespan.period.lte,
     };
@@ -176,23 +216,103 @@ export default class Component extends SuiteBaseClass {
     });
   }
 
-  _yearStepBackButtonOnClick = (/* event */) => {
-    this._changeLoadedYear(this.state.currentLoadedYear - 1);
+  isBackStepInTimeAllowed = () => {
+    return this.state.currentLoadedDate > this.state.timespanPeriod.gte;
   };
 
-  _yearStepForwardButtonOnClick = (/* event */) => {
-    this._changeLoadedYear(this.state.currentLoadedYear + 1);
+  isForwardStepInTimeAllowed = () => {
+    return this.state.currentLoadedDate < this.state.timespanPeriod.lte;
   };
 
-  /**
-   * @param {string} value
-   */
-  _yearInputOnChange = (event, value) => {
-    if (isNaN(value)) {
+  offsetCurrentTimeAtPrecisionByAmount = (amount) => {
+    if (!amount) {
       return;
     }
 
-    this._changeLoadedYear(parseInt(value, 10));
+    const datePrecision = getPrecisionByResolution(this.state.timespanResolution);
+    let newLoadedDate = offsetDateAtPrecision(this.state.currentLoadedDate, datePrecision, amount);
+
+    if (newLoadedDate.valueOf() > this.state.timespanPeriod.lte.valueOf()) {
+      newLoadedDate = this.state.timespanPeriod.lte;
+    }
+
+    if (newLoadedDate.valueOf() < this.state.timespanPeriod.gte.valueOf()) {
+      newLoadedDate = this.state.timespanPeriod.gte;
+    }
+
+    if (newLoadedDate.valueOf() === this.state.currentLoadedDate.valueOf()) {
+      return;
+    }
+
+    this.setState({
+      currentLoadedDate: newLoadedDate,
+    });
+  };
+
+  timeStepBackButtonOnClick = (/* event */) => {
+    this.offsetCurrentTimeAtPrecisionByAmount(-1);
+  };
+
+  timeStepForwardButtonOnClick = (/* event */) => {
+    this.offsetCurrentTimeAtPrecisionByAmount(1);
+  };
+
+  loadedDateOnChange = (event, date) => {
+    const datePrecision = getPrecisionByResolution(this.state.timespanResolution);
+    let preciseDate = getDateAtPrecision(date, datePrecision);
+
+    if (preciseDate.valueOf() > this.state.timespanPeriod.lte.valueOf()) {
+      preciseDate = this.state.timespanPeriod.lte;
+    }
+
+    if (preciseDate.valueOf() < this.state.timespanPeriod.gte.valueOf()) {
+      preciseDate = this.state.timespanPeriod.gte;
+    }
+
+    if (preciseDate.valueOf() === this.state.currentLoadedDate.valueOf()) {
+      return;
+    }
+
+    this.setState({
+      currentLoadedDate: preciseDate,
+    });
+  };
+
+  /**
+   * Build a date string of the date with the precision of the current dataset.
+   * @param  {Date} date
+   * @return {string}
+   */
+  buildPreciseDateString = (date) => {
+    const datePrecision = getPrecisionByResolution(this.state.timespanResolution);
+
+    return getDateStringAtPrecision(date, datePrecision, [
+      'YYYY',
+      'YYYY-MM',
+      'YYYY-MM-DD',
+    ]);
+  };
+
+  /**
+   * @return {{resolution: string, period: {gte: Date, lte: Date}}}
+   */
+  getDatasetTimespan = () => {
+    const {
+      timespan: {
+        resolution,
+        period,
+      },
+    } = this.props;
+
+    const datePrecision = getPrecisionByResolution(resolution);
+
+    return {
+      resolution,
+      period: {
+        gte: parseDateStringWithPrecision(period.gte, datePrecision),
+        lte: parseDateStringWithPrecision(period.lte, datePrecision),
+      },
+    };
   };
 
   /**
@@ -346,8 +466,31 @@ export default class Component extends SuiteBaseClass {
     const {
       yearStart,
       yearEnd,
+      /**
+       * @type {Array<Object>}
+       * @property {string} name
+       * @property {string} description
+       * @property {string} type
+       * @property {string} url
+       * @property {number} min
+       * @property {number} max
+       * @property {Array<string>} styles
+       */
       overlays: layers,
     } = this.props;
+
+    const layerListItems = layers
+    // Add `id` property to the layers if not present.
+    .map((layer, index) => ({
+      id: index,
+      ...layer,
+    }))
+    .map((layer) => ({
+      id: layer.id,
+      title: layer.name,
+      invisible: !this.getLayerVisibility(layer.id),
+      opacity: this.getLayerOpacity(layer.id),
+    }));
 
     const toolbarTooltipPosition = 'top-center';
 
@@ -370,20 +513,7 @@ export default class Component extends SuiteBaseClass {
           >
             <Subheader>Layers</Subheader>
             <LayerList
-              layers={
-                layers
-                // Add `id` property to the layers if not present.
-                .map((layer, index) => ({
-                  id: index,
-                  ...layer,
-                }))
-                .map((layer) => ({
-                  id: layer.id,
-                  title: layer.name,
-                  invisible: !this.getLayerVisibility(layer.id),
-                  opacity: this.getLayerOpacity(layer.id),
-                }))
-              }
+              layers={layerListItems}
               onChangeLayerVisibility={this.setLayerVisibility}
               onChangeLayerOpacity={_.debounce(this.setLayerOpacity)}
             />
@@ -396,33 +526,33 @@ export default class Component extends SuiteBaseClass {
               <ToolbarGroup>
                 <ToolbarTitle text="Time" />
 
+                <DatePicker
+                  hintText="Controlled Date Input"
+                  minDate={this.state.timespanPeriod.gte}
+                  maxDate={this.state.timespanPeriod.lte}
+                  value={this.state.currentLoadedDate}
+                  onChange={this.loadedDateOnChange}
+                  openToYearSelection
+                  formatDate={this.buildPreciseDateString}
+                  textFieldStyle={{
+                    width: '85px',
+                  }}
+                />
+
                 <IconButton
                   tooltip="Step back"
                   tooltipPosition={toolbarTooltipPosition}
-                  disabled={this.state.currentLoadedYear <= yearStart}
-                  onClick={this._yearStepBackButtonOnClick}
+                  disabled={!this.isBackStepInTimeAllowed()}
+                  onClick={this.timeStepBackButtonOnClick}
                 >
                   <LeftArrowIcon />
                 </IconButton>
 
-                <TextField
-                  hintText="Year"
-                  type="text"
-                  style={{
-                    width: 50,
-                  }}
-                  inputStyle={{
-                    textAlign: 'center',
-                  }}
-                  value={this.state.currentLoadedYear}
-                  onChange={this._yearInputOnChange}
-                />
-
                 <IconButton
                   tooltip="Step forward"
                   tooltipPosition={toolbarTooltipPosition}
-                  disabled={this.state.currentLoadedYear >= yearEnd}
-                  onClick={this._yearStepForwardButtonOnClick}
+                  disabled={!this.isForwardStepInTimeAllowed()}
+                  onClick={this.timeStepForwardButtonOnClick}
                 >
                   <RightArrowIcon />
                 </IconButton>
