@@ -602,7 +602,7 @@ export default class Component extends SuiteBaseClass {
           }}
         >
           <SelectField
-            value={1}
+            value={0}
             style={{
               width: '100%',
             }}
