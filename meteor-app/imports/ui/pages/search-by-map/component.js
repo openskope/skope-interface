@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import React from 'react';
 import objectPath from 'object-path';
+import moment from 'moment';
 import Paper from 'material-ui/Paper';
 import FullWindowLayout from '/imports/ui/layouts/full-window';
 import AppbarHeader from '/imports/ui/components/appbar';
@@ -112,14 +113,14 @@ export default class SearchPage extends React.Component {
           />
 
           <DataTemporalRangeFilter
-            id="temporal-range"
+            id="timespan"
             fields={[
-              'timespan.period.gte',
-              'timespan.period.lte',
+              'timespan.period',
             ]}
-            title="Year Range"
-            min={0}
-            max={(new Date()).getUTCFullYear()}
+            min={moment('0000', 'YYYY').toDate()}
+            max={moment().toDate()}
+            resolution="month"
+            title="Timespan"
           />
 
           <div className="layout-filler" />

@@ -182,17 +182,18 @@ const getDateStringAtPrecision = (
 /**
  * @param {string} dateString
  * @param {number} precision
+ * @param {Array<string>} customFormats
  * @returns {Date}
  */
 export
 const parseDateStringWithPrecision = (
   (dateStringFormatForPrecisions) =>
-    (dateString, precision) => {
+    (dateString, precision, customFormats) => {
       if (!dateString) {
         return null;
       }
 
-      const format = dateStringFormatForPrecisions[precision];
+      const format = (customFormats || dateStringFormatForPrecisions)[precision];
 
       if (!format) {
         return null;
