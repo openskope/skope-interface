@@ -8,9 +8,12 @@
   .two-column-layout() {
     .flex-row;
 
-    & > .left,
-    & > .right {
+    & > .left {
       width: 50%;
+      max-width: 600px;
+    }
+    & > .right {
+      .layout-fill;
     }
 
     & > .full {
@@ -130,7 +133,6 @@
 
     width: 100%;
     height: 100%;
-    padding: 10px;
 
     & > .analytics__controls {
       .two-column-layout > .left;
