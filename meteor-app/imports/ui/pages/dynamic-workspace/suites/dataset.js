@@ -26,6 +26,7 @@ import {
 import DatePicker from 'material-ui/DatePicker';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
 import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
@@ -43,6 +44,7 @@ import {
 } from '/imports/ui/consts';
 
 import {
+  absoluteUrl,
   getDateAtPrecision,
   offsetDateAtPrecision,
   getPrecisionByResolution,
@@ -516,7 +518,7 @@ export default class Component extends SuiteBaseClass {
         <div className="dataset__download-tab">
           <Paper
             className="download__markdown"
-            zDepth={5}
+            zDepth={1}
           >
             <MarkDownRenderer
               value={downloadField.markdown}
@@ -771,6 +773,10 @@ export default class Component extends SuiteBaseClass {
       return null;
     }
 
+    const boundaryGeoJson = this.getDatasetBoundaryGeoJson();
+    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
+    const boundaryExtent = this.getDatasetExtent();
+
     return (
       <Tab
         label={this.renderTabLabel({
@@ -782,15 +788,49 @@ export default class Component extends SuiteBaseClass {
         <div className="dataset__analytics-tab">
           <Paper
             className="analytics__controls"
-            zDepth={5}
+            zDepth={1}
           >
-            <MarkDownRenderer
-              value={analyticsField.markdown}
-            />
+            <Toolbar>
+              <ToolbarGroup>
+                <RaisedButton
+                  label="Point"
+                  style={{
+                    margin: '0 2px',
+                  }}
+                />
+                <RaisedButton
+                  label="Rectangle"
+                  style={{
+                    margin: '0 2px',
+                  }}
+                />
+                <RaisedButton
+                  label="Polygon"
+                  style={{
+                    margin: '0 2px',
+                  }}
+                />
+              </ToolbarGroup>
+            </Toolbar>
+            <MapView
+              className="map"
+              basemap="osm"
+              projection="EPSG:4326"
+              extent={boundaryExtent}
+            >
+              {boundaryGeoJsonString && (
+                <map-layer-geojson src-json={boundaryGeoJsonString} />
+              )}
+            </MapView>
           </Paper>
           <Paper
             className="analytics__charts"
             zDepth={0}
+            style={{
+              backgroundImage: `url(${absoluteUrl('/img/charts-example.png')})`,
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'cover',
+            }}
           />
         </div>
       </Tab>
@@ -817,7 +857,7 @@ export default class Component extends SuiteBaseClass {
         <div className="dataset__model-tab">
           <Paper
             className="model__markdown"
-            zDepth={5}
+            zDepth={1}
           >
             <MarkDownRenderer
               value={modelField.markdown}
@@ -845,7 +885,7 @@ export default class Component extends SuiteBaseClass {
         <div className="dataset__metadata-tab">
           <Paper
             className="metadata__markdown"
-            zDepth={5}
+            zDepth={1}
           >
             <MarkDownRenderer
               value={metadataField.markdown}
