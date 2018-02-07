@@ -656,6 +656,11 @@ export default class Component extends SuiteBaseClass {
        */
       overlays: layers,
     } = this.props;
+
+    if (!layers) {
+      return null;
+    }
+
     const layerListItems = layers
     // Add `id` property to the layers if not present.
     .map((layer, index) => ({
