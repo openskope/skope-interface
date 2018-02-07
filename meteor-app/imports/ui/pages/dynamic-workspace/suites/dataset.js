@@ -468,7 +468,7 @@ export default class Component extends SuiteBaseClass {
         <div className="dataset__info-tab">
           <Paper
             className="info__markdown"
-            zDepth={5}
+            zDepth={1}
           >
             <MarkDownRenderer
               value={informationField.markdown}
