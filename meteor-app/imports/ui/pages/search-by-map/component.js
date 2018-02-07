@@ -21,7 +21,7 @@ import {
   NoHits,
 } from 'searchkit';
 
-import DataTemporalRangeFilter from '/imports/ui/components/searchpage-filters/data-temporal-range-filter';
+import DataTemporalRangeFilter from './filter-components/data-temporal-range-filter';
 import SelectedFilterItem from './SelectedFilterItem';
 import RenderSearchResultItemByType from './RenderSearchResultItemByType';
 
