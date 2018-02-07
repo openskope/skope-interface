@@ -527,6 +527,95 @@ export default class Component extends SuiteBaseClass {
     );
   };
 
+  renderLayerItemAdjustmentOptionControls = (layerItem) => [
+    <ListItem
+      key="layer-opacity"
+      disabled
+      primaryText={(
+        <div className="adjustment-option__header">
+          <label>Opacity: </label>
+          <label>{Component.getDisplayTextForLayerOpacity(this.getLayerOpacity(layerItem.id))}</label>
+        </div>
+      )}
+      secondaryText={(
+        <div
+          style={{
+            overflow: 'visible',
+            ...Component.paddingForSliders,
+          }}
+        >
+          <Slider
+            className="input-slider--layer-opacity"
+            min={Component.opacitySliderMin}
+            max={Component.opacitySliderMax}
+            value={this.getOpacitySliderValueForLayer(layerItem.id)}
+            onChange={(event, newValue) => this.setLayerOpacityFromSliderValue(layerItem.id, newValue)}
+            sliderStyle={{
+              marginTop: 0,
+              marginBottom: 0,
+            }}
+          />
+        </div>
+      )}
+    />,
+    <ListItem
+      key="layer-style-range"
+      disabled
+      primaryText={(
+        <div className="adjustment-option__header">
+          <label>Overlay range: </label>
+        </div>
+      )}
+      secondaryText={(
+        <div
+          style={{
+            overflow: 'visible',
+            ...Component.paddingForSliders,
+          }}
+        >
+          <Range
+            className="input-slider--layer-opacity"
+            min={layerItem.min}
+            max={layerItem.max}
+            defaultValue={[
+              layerItem.min,
+              layerItem.max,
+            ]}
+          />
+        </div>
+      )}
+    />,
+    <ListItem
+      key="layer-style"
+      disabled
+      primaryText={(
+        <div className="adjustment-option__header">
+          <label>Overlay style: </label>
+        </div>
+      )}
+      secondaryText={(
+        <div
+          style={{
+            overflow: 'visible',
+          }}
+        >
+          <SelectField
+            value={1}
+            style={{
+              width: '100%',
+            }}
+          >{layerItem.styles.map((styleName, index) => (
+            <MenuItem
+              key={index}
+              value={index}
+              primaryText={styleName}
+            />
+          ))}</SelectField>
+        </div>
+      )}
+    />,
+  ];
+
   renderLayerListInLayersTab = (layerListItems = []) => {
     return (
       <List
@@ -544,94 +633,7 @@ export default class Component extends SuiteBaseClass {
               />
             )}
             primaryText={layerItem.title}
-            nestedItems={[
-              <ListItem
-                key="layer-opacity"
-                disabled
-                primaryText={(
-                  <div className="adjustment-option__header">
-                    <label>Opacity: </label>
-                    <label>{Component.getDisplayTextForLayerOpacity(this.getLayerOpacity(layerItem.id))}</label>
-                  </div>
-                )}
-                secondaryText={(
-                  <div
-                    style={{
-                      overflow: 'visible',
-                      ...Component.paddingForSliders,
-                    }}
-                  >
-                    <Slider
-                      className="input-slider--layer-opacity"
-                      min={Component.opacitySliderMin}
-                      max={Component.opacitySliderMax}
-                      value={this.getOpacitySliderValueForLayer(layerItem.id)}
-                      onChange={(event, newValue) => this.setLayerOpacityFromSliderValue(layerItem.id, newValue)}
-                      sliderStyle={{
-                        marginTop: 0,
-                        marginBottom: 0,
-                      }}
-                    />
-                  </div>
-                )}
-              />,
-              <ListItem
-                key="layer-style-range"
-                disabled
-                primaryText={(
-                  <div className="adjustment-option__header">
-                    <label>Overlay range: </label>
-                  </div>
-                )}
-                secondaryText={(
-                  <div
-                    style={{
-                      overflow: 'visible',
-                      ...Component.paddingForSliders,
-                    }}
-                  >
-                    <Range
-                      className="input-slider--layer-opacity"
-                      min={layerItem.min}
-                      max={layerItem.max}
-                      defaultValue={[
-                        layerItem.min,
-                        layerItem.max,
-                      ]}
-                    />
-                  </div>
-                )}
-              />,
-              <ListItem
-                key="layer-style"
-                disabled
-                primaryText={(
-                  <div className="adjustment-option__header">
-                    <label>Overlay style: </label>
-                  </div>
-                )}
-                secondaryText={(
-                  <div
-                    style={{
-                      overflow: 'visible',
-                    }}
-                  >
-                    <SelectField
-                      value={1}
-                      style={{
-                        width: '100%',
-                      }}
-                    >{layerItem.styles.map((styleName, index) => (
-                      <MenuItem
-                        key={index}
-                        value={index}
-                        primaryText={styleName}
-                      />
-                    ))}</SelectField>
-                  </div>
-                )}
-              />,
-            ]}
+            nestedItems={this.renderLayerItemAdjustmentOptionControls(layerItem)}
           />
         ))}
       </List>
