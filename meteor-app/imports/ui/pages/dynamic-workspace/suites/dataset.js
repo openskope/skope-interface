@@ -549,7 +549,7 @@ export default class Component extends SuiteBaseClass {
                 key="layer-opacity"
                 disabled
                 primaryText={(
-                  <div>
+                  <div className="adjustment-option__header">
                     <label>Opacity: </label>
                     <label>{Component.getDisplayTextForLayerOpacity(this.getLayerOpacity(layerItem.id))}</label>
                   </div>
@@ -579,8 +579,8 @@ export default class Component extends SuiteBaseClass {
                 key="layer-style-range"
                 disabled
                 primaryText={(
-                  <div>
-                    <label>Style Range: </label>
+                  <div className="adjustment-option__header">
+                    <label>Overlay range: </label>
                   </div>
                 )}
                 secondaryText={(
@@ -606,8 +606,8 @@ export default class Component extends SuiteBaseClass {
                 key="layer-style"
                 disabled
                 primaryText={(
-                  <div>
-                    <label>Style: </label>
+                  <div className="adjustment-option__header">
+                    <label>Overlay style: </label>
                   </div>
                 )}
                 secondaryText={(
