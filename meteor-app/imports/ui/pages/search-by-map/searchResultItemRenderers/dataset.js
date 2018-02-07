@@ -15,12 +15,15 @@ import {
 import * as colors from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import MapView from '/imports/ui/components/mapview';
-import DownloadIcon from 'material-ui/svg-icons/file/cloud-download';
-import MapIcon from 'material-ui/svg-icons/maps/map';
-import ChartIcon from 'material-ui/svg-icons/editor/multiline-chart';
-import InfoIcon from 'material-ui/svg-icons/action/info';
-import ModelIcon from 'material-ui/svg-icons/action/build';
 import OpenIcon from 'material-ui/svg-icons/action/open-in-new';
+
+import {
+  DatasetInfoIcon,
+  DatasetDownloadIcon,
+  DatasetMapIcon,
+  DatasetChartIcon,
+  DatasetModelIcon,
+} from '/imports/ui/consts';
 
 import {
   absoluteUrl,
@@ -73,31 +76,31 @@ class SearchResultItem extends React.PureComponent {
       {
         featureName: 'Information',
         isAvailable: Boolean(informationField),
-        IconComponent: InfoIcon,
+        IconComponent: DatasetInfoIcon,
         featureDetail: informationField && informationField.markdown,
       },
       {
         featureName: 'Download',
         isAvailable: Boolean(downloadService),
-        IconComponent: DownloadIcon,
+        IconComponent: DatasetDownloadIcon,
         featureDetail: downloadService && downloadService.markdown,
       },
       {
         featureName: 'Map',
         isAvailable: Boolean(overlayService),
-        IconComponent: MapIcon,
+        IconComponent: DatasetMapIcon,
         featureDetail: overlayService && overlayService.markdown,
       },
       {
         featureName: 'Charts',
         isAvailable: Boolean(analyticService),
-        IconComponent: ChartIcon,
+        IconComponent: DatasetChartIcon,
         featureDetail: analyticService && analyticService.markdown,
       },
       {
         featureName: 'Model',
         isAvailable: Boolean(modelService),
-        IconComponent: ModelIcon,
+        IconComponent: DatasetModelIcon,
         featureDetail: modelService && modelService.markdown,
       },
     ];

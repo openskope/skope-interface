@@ -72,7 +72,69 @@ const getDateAtPrecision = (
 ]);
 
 /**
+ * @param {Date} date
+ * @param {number} precision - 0: year, 1: month, 2: day,
+ *                             3: hour, 4: minute, 5: second, 6: millisecond
+ * @param {number} offset
+ * @return {Date}
+ */
+export
+const offsetDateAtPrecision = (
+  (precisions) =>
+    (
+      date,
+      precision,
+      offset,
+    ) => {
+      const {
+        setter,
+        getter,
+      } = precisions[precision];
+
+      const newDate = new Date(date);
+
+      let value = getter.call(newDate);
+
+      value += offset;
+
+      setter.call(newDate, value);
+
+      return newDate;
+    }
+)([
+  {
+    setter: Date.prototype.setFullYear,
+    getter: Date.prototype.getFullYear,
+  },
+  {
+    setter: Date.prototype.setMonth,
+    getter: Date.prototype.getMonth,
+  },
+  {
+    setter: Date.prototype.setDate,
+    getter: Date.prototype.getDate,
+  },
+  {
+    setter: Date.prototype.setHours,
+    getter: Date.prototype.getHours,
+  },
+  {
+    setter: Date.prototype.setMinutes,
+    getter: Date.prototype.getMinutes,
+  },
+  {
+    setter: Date.prototype.setSeconds,
+    getter: Date.prototype.getSeconds,
+  },
+  {
+    setter: Date.prototype.setMilliseconds,
+    getter: Date.prototype.getMilliseconds,
+  },
+]);
+
+/**
  * @param {string} resolution
+ * @returns {number}
  */
 export
 const getPrecisionByResolution = (
@@ -92,17 +154,19 @@ const getPrecisionByResolution = (
 /**
  * @param {Date} date
  * @param {number} precision
+ * @param {Array<string>} customFormats
+ * @returns {string}
  */
 export
 const getDateStringAtPrecision = (
   (dateFormatForPrecisions) =>
-    (date, precision) => {
+    (date, precision, customFormats) => {
       if (!date) {
         return '';
       }
 
       const dateAtPrecision = getDateAtPrecision(date, precision);
-      const dateTemplateAtPrecision = dateFormatForPrecisions[precision];
+      const dateTemplateAtPrecision = (customFormats || dateFormatForPrecisions)[precision];
 
       return moment(dateAtPrecision).format(dateTemplateAtPrecision);
     }
@@ -116,9 +180,40 @@ const getDateStringAtPrecision = (
 ]);
 
 /**
+ * @param {string} dateString
+ * @param {number} precision
+ * @param {Array<string>} customFormats
+ * @returns {Date}
+ */
+export
+const parseDateStringWithPrecision = (
+  (dateStringFormatForPrecisions) =>
+    (dateString, precision, customFormats) => {
+      if (!dateString) {
+        return null;
+      }
+
+      const format = (customFormats || dateStringFormatForPrecisions)[precision];
+
+      if (!format) {
+        return null;
+      }
+
+      const date = moment(dateString, format).toDate();
+
+      return date;
+    }
+)([
+  'YYYY',
+  'YYYY-MM',
+  'YYYY-MM-DD',
+]);
+
+/**
  * @param {number} precision
  * @param {Date} start
  * @param {Date} end
+ * @returns {string}
  */
 export
 const getDateRangeStringAtPrecision = (
@@ -137,6 +232,7 @@ const getDateRangeStringAtPrecision = (
 
 /**
  * @param {Object} geometry
+ * @returns {Object}
  */
 export
 const buildGeoJsonWithGeometry = (geometry) => {

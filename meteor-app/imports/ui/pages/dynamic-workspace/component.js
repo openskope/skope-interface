@@ -125,7 +125,7 @@ export default class WorkspacePage extends React.Component {
     <this.constructor.RootElement>
       <DynamicWorkspaceSuite
         suiteType={`WORKSPACE_SUITE__${String(configData.type).toUpperCase()}`}
-        suiteProps={configData.data}
+        suiteProps={configData}
       />
     </this.constructor.RootElement>
   );

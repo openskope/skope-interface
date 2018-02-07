@@ -3,8 +3,12 @@ import { check } from 'meteor/check';
 import { HTTP } from 'meteor/http';
 import { WebApp } from 'meteor/webapp';
 import httpProxy from 'http-proxy';
+import url from 'url';
 import path from 'path';
 import objectPath from 'object-path';
+import * as elasticsearch from 'elasticsearch';
+
+const serverElasticEndpointInSettings = objectPath.get(Meteor.settings, 'server.elasticEndpoint');
 
 // Register your apis here
 
@@ -18,90 +22,69 @@ Meteor.methods({
     check(lon, Number);
     check(requestId, String);
 
-    const url = `http://demo.envirecon.org/browse/skope-rasterdata-service/api/v1/timeseries?long=${lon}&lat=${lat}`;
+    const dataUrl = `http://demo.envirecon.org/browse/skope-rasterdata-service/api/v1/timeseries?long=${lon}&lat=${lat}`;
     const {
       // statusCode,
       // content,
       data,
       // headers,
-    } = HTTP.get(url);
+    } = HTTP.get(dataUrl);
 
     return {
       requestId,
       data,
     };
   },
-  'datasetManifest.get' ({
+  async 'datasetManifest.get' ({
     datasetId,
   }) {
-    //! Request data from real backend.
-    const fakeDelay = 100;
-    const fakeData = {
-      datasetId,
-      // Title to be displayed in the workspace.
-      title: 'National Elevation Data (NED)',
-      // This affects how the consumer interprets the `data` field.
-      type: 'default',
-      data: {
-        status: 'to be determined',
-        description: 'general description about this dataset. For environmental data this description is provided by domain experts, for model results it is provide by model configuration time.',
-        dataExtent: [-114.995833333, 30.995833333999997, -101.995833333, 42.995833334],
-        yearStart: 1,
-        yearEnd: 2000,
-        layers: [
-          {
-            id: 'gdd',
-            title: 'Example layer (GDD)',
-            type: 'wms',
-            endpoint: 'http://141.142.211.232/geoserver/SKOPE/wms',
-            layer: 'SKOPE:paleocar_1_GDD_{fullyear}0101',
-          },
-          {
-            id: 'pttannual',
-            title: 'PPT Annual',
-            type: 'wms',
-            endpoint: 'http://141.142.211.232/geoserver/SKOPE/wms',
-            layer: 'SKOPE:paleocar_1_PPTannual_{fullyear}0101',
-          },
-          {
-            id: 'pptmaysep',
-            title: 'PPT May Sep.',
-            type: 'wms',
-            endpoint: 'http://141.142.211.232/geoserver/SKOPE/wms',
-            layer: 'SKOPE:paleocar_1_PPTmaysep_{fullyear}0101',
-          },
-          {
-            id: 'example-4',
-            title: 'Example layer 4',
-            type: 'undefined',
-            url: 'a/b/c/{x}/{y}/{z}/f',
-          },
-        ],
-        dataUrl: 'a/b/c/{x}/{y}/{z}/f',
-        metadata: {
-          foobar: 'I have no idea what is here.',
-        },
-        // ...
-      },
-    };
+    if (!serverElasticEndpointInSettings) {
+      return null;
+    }
 
-    Meteor._sleepForMs(fakeDelay);
+    const client = new elasticsearch.Client({
+      host: serverElasticEndpointInSettings,
+    });
 
-    return fakeData;
+    const response = await client.get({
+      index: 'datasets',
+      type: 'dataset',
+      id: datasetId,
+    });
+
+    if (!response.found) {
+      return null;
+    }
+
+    return response._source;
   },
 });
 
 // Proxy to Elastic Search.
 (() => {
-  const proxyTarget = objectPath.get(Meteor.settings, 'server.elasticEndpoint');
+  const clientElasticEndpointInSettings = objectPath.get(Meteor.settings, 'public.elasticEndpoint');
+
+  if (!clientElasticEndpointInSettings) {
+    return;
+  }
+
+  const clientEndpointHasHostName = !!url.parse(clientElasticEndpointInSettings).host;
+
+  // Don't do anything if the client-side endpoint is an absolute url (with host name).
+  if (clientEndpointHasHostName) {
+    return;
+  }
+
+  // Now we know the client-side endpoint is local, let's get the reverse-proxy setup.
+
+  const proxyTarget = serverElasticEndpointInSettings;
 
   // If proxy target is not specified, do not start proxy server.
   if (!proxyTarget) {
     return;
   }
 
-  //! What if `public.elasticEndpoint` contains an url?
-  const proxyEndpoint = path.resolve('/', objectPath.get(Meteor.settings, 'public.elasticEndpoint'));
+  const proxyEndpoint = path.resolve('/', clientElasticEndpointInSettings);
   const proxy = httpProxy.createProxyServer({});
 
   // Listen to incoming HTTP requests.

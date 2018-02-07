@@ -5,9 +5,10 @@ import {
   connect,
 } from 'react-redux';
 
-import * as Suites from '/imports/ui/components/workspace-suites';
 import { actions } from '/imports/ui/redux-store';
 import { PropPrinter } from '/imports/ui/helpers';
+
+import * as Suites from './suites';
 
 class DynamicWorkspaceSuite extends React.PureComponent {
   static propTypes = {
@@ -19,6 +20,8 @@ class DynamicWorkspaceSuite extends React.PureComponent {
 
   static defaultProps = {
     suiteProps: {},
+    suiteState: {},
+    setSuiteState: () => {},
   };
 
   shouldComponentUpdate (nextProps) {

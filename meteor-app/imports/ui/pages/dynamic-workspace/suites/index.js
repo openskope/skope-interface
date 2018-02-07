@@ -3,4 +3,4 @@
  * so the component files don't need to worry about name conflicts.
  */
 
-export WORKSPACE_SUITE__DEFAULT from './default';
+export WORKSPACE_SUITE__DATASET from './dataset';
