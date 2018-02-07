@@ -82,7 +82,7 @@ export default class SearchPage extends React.Component {
           <RefinementListFilter
             id="variables"
             title="Variables"
-            field="variables.keywords"
+            field="variables.name.raw"
             fieldOptions={{
               type: 'nested',
               options: {
