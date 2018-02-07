@@ -145,6 +145,7 @@ const getPrecisionByResolution = (
   year: 0,
   month: 1,
   date: 2,
+  day: 2, // alias to "date".
   hour: 3,
   minute: 4,
   second: 5,
