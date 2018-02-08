@@ -6,6 +6,10 @@ FROM ubuntu:14.04
 
 LABEL maintainer="Xingchen Hong <hello@xc-h.com>"
 
+# Versions should all start with a "v" when possible.
+ARG nvm_version="v0.33.8"
+ARG node_version
+
 # Do not use apt-get upgrade or dist-upgrade. See: https://github.com/lukasmartinelli/hadolint/wiki/DL3005
 # Delete the apt-get lists after installing something. See: https://github.com/lukasmartinelli/hadolint/wiki/DL3009
 RUN apt-get update \
@@ -22,35 +26,24 @@ RUN apt-get install locales \
     && localedef -i en_GB -f UTF-8 en_US.UTF-8
 #~395MB
 
-ENV APP_DIR="/usr/share/skope-web-app"
+ENV HOME="/home/meteor" \
+    APP_DIR="/usr/share/skope-web-app"
+RUN useradd -m -s /bin/bash meteor
+USER meteor
 WORKDIR "${APP_DIR}"
 #~395MB
 
 # Install NodeJS with NVM
-ARG nvm_version="0.33.8"
-ARG node_version="8.9.3"
-RUN curl -o- "https://raw.githubusercontent.com/creationix/nvm/v${nvm_version}/install.sh" | bash \
+RUN curl -o- "https://raw.githubusercontent.com/creationix/nvm/${nvm_version}/install.sh" | bash \
     && export NVM_DIR="${HOME}/.nvm" \
     && [ -s "${NVM_DIR}/nvm.sh" ] && . "${NVM_DIR}/nvm.sh" \
     && nvm install ${node_version} \
     && nvm alias default ${node_version} \
     && nvm use default
 ENV NVM_DIR="${HOME}/.nvm"
-ENV PATH="${NVM_DIR}/versions/node/v${node_version}/bin:${PATH}" \
-    NODE_PATH="${NVM_DIR}/versions/node/v${node_version}/lib/node_modules:${NODE_PATH}"
+ENV PATH="${NVM_DIR}/versions/node/${node_version}/bin:${PATH}" \
+    NODE_PATH="${NVM_DIR}/versions/node/${node_version}/lib/node_modules:${NODE_PATH}"
 #~463MB
-
-# Copy app bundle and extract it.
-# Extracting the app bundle will create a folder named "bundle".
-ADD ./meteor-app.tar.gz "${APP_DIR}"
-# Copy app settings.
-ADD ./app-settings.json "${APP_DIR}"
-#~793MB
-
-# Setup app.
-RUN printf \
-    '#!/bin/bash\nMETEOR_SETTINGS="$(<./app-settings.json)"\ncd bundle\n(cd programs/server && npm install --unsafe-perm)\nprintf "Starting app...\n"\nnode main.js\n' \
-    >> start.sh
 
 # Meteor Port Config
 ENV ROOT_URL="http://localhost" \
@@ -58,4 +51,14 @@ ENV ROOT_URL="http://localhost" \
     METEOR_SETTINGS='{"public":{}}' \
     PORT=3000
 
-ENTRYPOINT bash start.sh
+# Copy app bundle.
+ADD --chown=meteor:meteor ./bundle "${APP_DIR}/bundle"
+# Copy app settings.
+ADD --chown=meteor:meteor ./app-settings.json "${APP_DIR}"
+# Copy bootup script.
+ADD --chown=meteor:meteor ./start.sh "${APP_DIR}"
+#~793MB
+
+# ENTRYPOINT bash start.sh
+
+CMD bash
