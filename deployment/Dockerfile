@@ -2,7 +2,7 @@
 # It expects an app bundle file located at `app.tar.gz`.
 
 FROM ubuntu:14.04
-MAINTAINER Xingchen Hong <hello@xc-h.net>
+LABEL maintainer="Xingchen Hong <hello@xc-h.com>"
 
 # Do not use apt-get upgrade or dist-upgrade. See: https://github.com/lukasmartinelli/hadolint/wiki/DL3005
 # Delete the apt-get lists after installing something. See: https://github.com/lukasmartinelli/hadolint/wiki/DL3009
