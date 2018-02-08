@@ -8,10 +8,7 @@ APP_DIR="${DIR}/../meteor-app"
 
 # Read version tag from the npm package file, if not provided.
 JS="\
-var fs = require('fs');\
-var npmFile = '${APP_DIR}/package.json';\
-var npmFileContent = fs.readFileSync(npmFile);\
-var npmInfo = JSON.parse(npmFileContent);\
+var npmInfo = require('${APP_DIR}/package.json');\
 var packageVersion = npmInfo.version;\
 console.log(packageVersion);\
 "
