@@ -3,6 +3,9 @@
   "version": "0.1.1",
   "private": true,
   "demoRepository": "https://github.com/openskope/skope-interface.git",
+  "engines": {
+    "node": ">=v8.9.3"
+  },
   "scripts": {
     "lint-js": "eslint .",
     "lint-less": "lesshint .",
