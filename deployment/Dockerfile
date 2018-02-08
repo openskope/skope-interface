@@ -2,6 +2,8 @@
 # It expects an app bundle file located at `app.tar.gz`.
 
 FROM ubuntu:14.04
+#~188MB
+
 LABEL maintainer="Xingchen Hong <hello@xc-h.com>"
 
 # Do not use apt-get upgrade or dist-upgrade. See: https://github.com/lukasmartinelli/hadolint/wiki/DL3005
@@ -20,9 +22,6 @@ RUN apt-get install locales \
     && localedef -i en_GB -f UTF-8 en_US.UTF-8
 #~395MB
 
-ENV USER="meteor"
-RUN useradd -m -s /bin/bash "${USER}"
-ENV HOME="/home/${USER}"
 ENV APP_DIR="/usr/share/skope-web-app"
 WORKDIR "${APP_DIR}"
 #~395MB
@@ -41,23 +40,17 @@ ENV PATH="${NVM_DIR}/versions/node/v${node_version}/bin:${PATH}" \
     NODE_PATH="${NVM_DIR}/versions/node/v${node_version}/lib/node_modules:${NODE_PATH}"
 #~463MB
 
-# Fix permission issues.
-RUN chown -R "${USER}":"${USER}" "${HOME}"
-#~531MB
-
 # Copy app bundle and extract it.
 # Extracting the app bundle will create a folder named "bundle".
 ADD ./meteor-app.tar.gz "${APP_DIR}"
 # Copy app settings.
 ADD ./app-settings.json "${APP_DIR}"
-#~861MB
+#~793MB
 
 # Setup app.
-RUN printf '#!/bin/bash\nMETEOR_SETTINGS="$(<./app-settings.json)"\nnode "%s/main.js"\n' "${APP_DIR}/bundle" >> start.sh
-RUN cd "${APP_DIR}/bundle" \
-    && (cd programs/server && npm install --unsafe-perm) \
-    && chown -R "${USER}":"${USER}" "${APP_DIR}"
-#~1.28GB
+RUN printf \
+    '#!/bin/bash\nMETEOR_SETTINGS="$(<./app-settings.json)"\ncd bundle\n(cd programs/server && npm install --unsafe-perm)\nprintf "Starting app...\n"\nnode main.js\n' \
+    >> start.sh
 
 # Meteor Port Config
 ENV ROOT_URL="http://localhost" \
@@ -66,5 +59,3 @@ ENV ROOT_URL="http://localhost" \
     PORT=3000
 
 ENTRYPOINT bash start.sh
-
-USER "${USER}"
