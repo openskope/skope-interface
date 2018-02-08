@@ -13,11 +13,23 @@ var packageVersion = npmInfo.version;\
 console.log(packageVersion);\
 "
 TAG=${TAG:-$(echo $JS | node)}
+ORG_NAME="openskope/web-app"
+IMAGE_NAME="${ORG_NAME}:${TAG}"
+
+printf "Image will be tagged as “%s”.\n" "${IMAGE_NAME}"
 
 (
-  cd "${APP_DIR}" && \
+  cd "${APP_DIR}"
+  NODE_VER=$(meteor node --version)
+
+  printf "Meteor Node version: %s.\n" "${NODE_VER}"
+
+  printf "Building production bundle...\n"
+
   meteor npm install --production --unsafe-perm && \
   meteor build --architecture os.linux.x86_64 "${DIR}"
 )
 
-docker build -t openskope/web-app:$TAG "${DIR}"
+docker build -t "${IMAGE_NAME}" "${DIR}"
+
+docker images -a --format "{{.ID}} {{.Repository}}:{{.Tag}} ({{.Size}})" | grep "${IMAGE_NAME}"
