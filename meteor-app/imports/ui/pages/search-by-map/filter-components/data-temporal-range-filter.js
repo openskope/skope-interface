@@ -36,7 +36,8 @@ class DataTemporalRangeAccessor extends RangeAccessor {
    * @param {string} key
    * @param {Object} options
    * @param {Array.<string>} options.fields - An array of field names to be considered.
-   * @param {string} options.resolution
+   * @param {string} options.resolution - Resolution of date stored.
+   * @param {string} options.relation - Relation used in range matching.
    */
   constructor (key, options) {
     super(key, options);
@@ -106,7 +107,7 @@ class DataTemporalRangeAccessor extends RangeAccessor {
           gte: moment(rangeInDate[0]).format('YYYY-MM-DD'),
           lte: moment(rangeInDate[1]).format('YYYY-MM-DD'),
           format: 'yyyy-MM-dd',
-          relation: 'within',
+          relation: this.options.relation,
         }));
 
         return q.addFilter(`${this.uuid}__${field}`, rangeFilter);
@@ -299,14 +300,17 @@ export default class DataTemporalRangeFilter extends RangeFilter {
     ...RangeFilter.propTypes,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     field: PropTypes.string,
+    // Resolution of date.
     resolution: PropTypes.string,
+    // Relation of the range match.
+    relation: PropTypes.string,
   };
 
   static defaultProps = {
     ...RangeFilter.defaultProps,
     rangeComponent: DateRangeInput,
     resolution: 'date',
-    // rangeFormatter:
+    relation: 'within',
   };
 
   // @see `getPrecisionByResolution`.
@@ -326,6 +330,7 @@ export default class DataTemporalRangeFilter extends RangeFilter {
       rangeFormatter,
       translations,
       resolution,
+      relation,
     } = this.props;
 
     return new DataTemporalRangeAccessor(id, {
@@ -339,6 +344,7 @@ export default class DataTemporalRangeFilter extends RangeFilter {
       interval,
       fieldOptions,
       resolution,
+      relation,
     });
   }
 
