@@ -117,6 +117,7 @@ export default class SearchPage extends React.Component {
             fields={[
               'timespan.period',
             ]}
+            relation="contains"
             min={moment('0000', 'YYYY').toDate()}
             max={moment().toDate()}
             resolution="month"
