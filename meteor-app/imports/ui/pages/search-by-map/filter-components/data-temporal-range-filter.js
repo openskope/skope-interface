@@ -158,6 +158,10 @@ class DateRangeInput extends React.Component {
   };
 
   static defaultProps = {
+    min: null,
+    max: null,
+    minValue: null,
+    maxValue: null,
     onChange: () => {},
     onFinished: () => {},
     resolution: 'date',
