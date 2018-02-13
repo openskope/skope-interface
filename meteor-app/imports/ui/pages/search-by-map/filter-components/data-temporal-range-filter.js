@@ -299,7 +299,7 @@ class DateRangeInput extends React.Component {
  * An extended version of RangeFilter to support multi-field range filtering
  * and aggregation.
  */
-export default class DataTemporalRangeFilter extends RangeFilter {
+class DataTemporalRangeFilter extends RangeFilter {
   static propTypes = {
     ...RangeFilter.propTypes,
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -431,3 +431,5 @@ export default class DataTemporalRangeFilter extends RangeFilter {
     });
   };
 }
+
+export default DataTemporalRangeFilter;
