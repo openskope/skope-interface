@@ -225,7 +225,7 @@ export default class Component extends SuiteBaseClass {
   );
   setLayerVisibility = (layerId, isVisible) => this.setState({
     layerVisibility: {
-      ...this.state.layerVisibility,
+      // ...this.state.layerVisibility, // Enable this line to allow multi-select.
       [layerId]: isVisible,
     },
   });
