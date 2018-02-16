@@ -66,8 +66,8 @@
     "drawerWidth": 250,
     "drawerItems": [
       {
-        "title": "Search",
-        "url": "/search"
+        "title": "Explore Data",
+        "url": "/explore"
       },
       {
         "title": "Workspace",

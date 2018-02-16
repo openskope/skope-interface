@@ -21,6 +21,14 @@ FlowRouter.route('/', {
 
 FlowRouter.route('/search', {
   name: 'App.search',
+  triggersEnter: [(context, redirect) => {
+    redirect('/explore');
+  }],
+  action: () => {},
+});
+
+FlowRouter.route('/explore', {
+  name: 'App.explore',
   action: simpleMountAction(SearchPage),
 });
 
