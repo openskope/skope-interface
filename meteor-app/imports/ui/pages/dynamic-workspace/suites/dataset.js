@@ -20,7 +20,7 @@ import Slider from 'material-ui/Slider';
 import {
   Toolbar,
   ToolbarGroup,
-  ToolbarSeparator,
+  // ToolbarSeparator,
   ToolbarTitle,
 } from 'material-ui/Toolbar';
 import DatePicker from 'material-ui/DatePicker';
@@ -75,13 +75,13 @@ export default class Component extends SuiteBaseClass {
       }),
     }),
     overlays: PropTypes.arrayOf(PropTypes.shape({
-       name: PropTypes.string,
-       description: PropTypes.string,
-       type: PropTypes.string,
-       url: PropTypes.string,
-       min: PropTypes.number,
-       max: PropTypes.number,
-       styles: PropTypes.arrayOf(PropTypes.string),
+      name: PropTypes.string,
+      description: PropTypes.string,
+      type: PropTypes.string,
+      url: PropTypes.string,
+      min: PropTypes.number,
+      max: PropTypes.number,
+      styles: PropTypes.arrayOf(PropTypes.string),
     })),
     // status: PropTypes.string,
     // description: PropTypes.string,
