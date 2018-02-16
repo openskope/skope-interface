@@ -66,10 +66,6 @@
     "drawerWidth": 250,
     "drawerItems": [
       {
-        "title": "Home",
-        "url": "/"
-      },
-      {
         "title": "Search",
         "url": "/search"
       },

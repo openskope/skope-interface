@@ -1,7 +1,6 @@
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 
 // Import needed templates
-import HomePage from '/imports/ui/pages/home';
 import SearchPage from '/imports/ui/pages/search-by-map';
 import WorkspacePage from '/imports/ui/pages/dynamic-workspace';
 import PaleoCarModelPage from '/imports/ui/pages/model-paleocar--stepper';
@@ -14,7 +13,10 @@ import {
 // Set up all routes in the app
 FlowRouter.route('/', {
   name: 'App.home',
-  action: simpleMountAction(HomePage),
+  triggersEnter: [(context, redirect) => {
+    redirect('/search');
+  }],
+  action: () => {},
 });
 
 FlowRouter.route('/search', {
