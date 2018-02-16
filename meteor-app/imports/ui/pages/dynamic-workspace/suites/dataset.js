@@ -5,6 +5,7 @@ import moment from 'moment';
 import objectPath from 'object-path';
 import geojsonExtent from 'geojson-extent';
 
+import muiThemeable from 'material-ui/styles/muiThemeable';
 import {
   Tabs,
   Tab,
@@ -56,7 +57,7 @@ import {
 
 import SuiteBaseClass from './SuiteBaseClass';
 
-export default class Component extends SuiteBaseClass {
+class Component extends SuiteBaseClass {
 
   static propTypes = SuiteBaseClass.extendPropTypes({
     timespan: PropTypes.shape({
@@ -199,6 +200,9 @@ export default class Component extends SuiteBaseClass {
       timespanPeriod: timespan.period,
       // @type {Date}
       currentLoadedDate: timespan.period.lte,
+
+      // ID of the selected analytics.
+      activeAnalyticsId: null,
     };
   }
 
@@ -210,6 +214,12 @@ export default class Component extends SuiteBaseClass {
     // Tab switch is not done yet, wait next frame.
     _.defer(() => {
       window.dispatchEvent(new CustomEvent('resize'));
+    });
+  };
+
+  onChangeActiveAnalytics = (event, index, value) => {
+    this.setState({
+      activeAnalyticsId: value,
     });
   };
 
@@ -772,9 +782,10 @@ export default class Component extends SuiteBaseClass {
   renderAnalyticsTab = () => {
     const {
       analyticService: analyticsField,
+      analytics,
     } = this.props;
 
-    if (!analyticsField) {
+    if (!(analyticsField && analytics)) {
       return null;
     }
 
@@ -795,38 +806,70 @@ export default class Component extends SuiteBaseClass {
             className="analytics__controls"
             zDepth={1}
           >
-            <Toolbar>
-              <ToolbarGroup>
-                <RaisedButton
-                  label="Point"
-                  style={{
-                    margin: '0 2px',
-                  }}
-                />
-                <RaisedButton
-                  label="Rectangle"
-                  style={{
-                    margin: '0 2px',
-                  }}
-                />
-                <RaisedButton
-                  label="Polygon"
-                  style={{
-                    margin: '0 2px',
-                  }}
-                />
-              </ToolbarGroup>
-            </Toolbar>
-            <MapView
-              className="map"
-              basemap="osm"
-              projection="EPSG:4326"
-              extent={boundaryExtent}
+            <SelectField
+              floatingLabelText="Variable"
+              floatingLabelFixed={false}
+              value={this.state.activeAnalyticsId}
+              onChange={this.onChangeActiveAnalytics}
+              style={{
+                width: '100%',
+              }}
+              floatingLabelStyle={{
+                color: this.props.muiTheme.palette.primary1Color,
+              }}
             >
-              {boundaryGeoJsonString && (
-                <map-layer-geojson src-json={boundaryGeoJsonString} />
-              )}
-            </MapView>
+              <MenuItem
+                value={null}
+                primaryText=""
+                style={{
+                  display: 'none',
+                }}
+              />
+              {analytics.map(({ name }, index) => {
+                return (
+                  <MenuItem
+                    key={index}
+                    value={index}
+                    primaryText={name}
+                  />
+                );
+              })}
+            </SelectField>
+
+            <div className="map-and-toolbar">
+              <Toolbar>
+                <ToolbarGroup>
+                  <RaisedButton
+                    label="Point"
+                    style={{
+                      margin: '0 2px',
+                    }}
+                  />
+                  <RaisedButton
+                    label="Rectangle"
+                    style={{
+                      margin: '0 2px',
+                    }}
+                  />
+                  <RaisedButton
+                    label="Polygon"
+                    style={{
+                      margin: '0 2px',
+                    }}
+                  />
+                </ToolbarGroup>
+              </Toolbar>
+              <MapView
+                className="map"
+                basemap="osm"
+                projection="EPSG:4326"
+                extent={boundaryExtent}
+              >
+                {boundaryGeoJsonString && (
+                  <map-layer-geojson src-json={boundaryGeoJsonString} />
+                )}
+              </MapView>
+            </div>
           </Paper>
           <Paper
             className="analytics__charts"
@@ -923,3 +966,5 @@ export default class Component extends SuiteBaseClass {
     );
   }
 }
+
+export default muiThemeable()(Component);
