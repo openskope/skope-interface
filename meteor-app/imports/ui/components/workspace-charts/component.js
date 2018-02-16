@@ -12,9 +12,9 @@ import CircularProgress from 'material-ui/CircularProgress';
 import { Line } from 'react-chartjs-2';
 import Range from 'rc-slider/lib/Range';
 import 'rc-slider/assets/index.css';
+import classNames from '@xch/class-names';
 import {
   clampFilterValue,
-  getClassName,
 } from '/imports/ui/helpers';
 
 export default class ChartsPage extends React.Component {
@@ -226,7 +226,7 @@ export default class ChartsPage extends React.Component {
         </Toolbar>
 
         <div
-          className={getClassName(
+          className={classNames(
             'section_data',
             dataSectionClassName,
           )}
@@ -295,7 +295,7 @@ export default class ChartsPage extends React.Component {
 
     return (
       <div
-        className={getClassName(
+        className={classNames(
           dataSectionClassName,
         )}
       >
@@ -311,7 +311,7 @@ export default class ChartsPage extends React.Component {
 
     return (
       <div
-        className={getClassName(
+        className={classNames(
           dataSectionClassName,
         )}
         style={{

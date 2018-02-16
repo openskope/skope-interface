@@ -4,9 +4,7 @@
  */
 
 import React from 'react';
-import {
-  getClassName,
-} from '/imports/ui/helpers';
+import classNames from '@xch/class-names';
 
 export default ({
   className = '',
@@ -14,7 +12,7 @@ export default ({
   body,
   footer,
 }) => (
-  <div className={getClassName('layout', className)}>
+  <div className={classNames('layout', className)}>
     <div className="layout__header">{header}</div>
     <div className="layout__body">{body}</div>
     <div className="layout__footer">{footer}</div>

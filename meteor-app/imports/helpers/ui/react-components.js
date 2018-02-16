@@ -1,11 +1,9 @@
 import React from 'react';
 import marked from 'marked';
+import classNames from '@xch/class-names';
 
 import SafeLink from '/imports/ui/components/SafeLink';
 
-import {
-  getClassName,
-} from './dom';
 import {
   renderToStaticMarkup,
 } from './react';
@@ -64,7 +62,7 @@ const MarkDownRenderer = ({
 }) => {
   //! Make sure all the dangerous tags are sanitized.
 
-  const className = getClassName(
+  const className = classNames(
     'markdown',
     extraClassName,
   );
