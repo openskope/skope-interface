@@ -13,6 +13,7 @@ export default class MapView extends React.Component {
 
     onViewLoad: PropTypes.func,
     onViewUnLoad: PropTypes.func,
+    // (Event) => void
     onClick: PropTypes.func,
   };
 

@@ -27,7 +27,6 @@ import {
 import DatePicker from 'material-ui/DatePicker';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
-import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
 import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
@@ -40,12 +39,10 @@ import {
   DatasetInfoIcon,
   DatasetDownloadIcon,
   DatasetMapIcon,
-  DatasetChartIcon,
   DatasetModelIcon,
 } from '/imports/ui/consts';
 
 import {
-  absoluteUrl,
   getDateAtPrecision,
   offsetDateAtPrecision,
   getPrecisionByResolution,
@@ -56,6 +53,11 @@ import {
 } from '/imports/ui/helpers';
 
 import SuiteBaseClass from './SuiteBaseClass';
+
+import {
+  getInitialState as getInitialAnalyticsState,
+  render as renderAnalyticsTab,
+} from './dataset.analytics';
 
 class Component extends SuiteBaseClass {
 
@@ -201,8 +203,7 @@ class Component extends SuiteBaseClass {
       // @type {Date}
       currentLoadedDate: timespan.period.lte,
 
-      // ID of the selected analytics.
-      activeAnalyticsId: null,
+      ...getInitialAnalyticsState(props),
     };
   }
 
@@ -214,12 +215,6 @@ class Component extends SuiteBaseClass {
     // Tab switch is not done yet, wait next frame.
     _.defer(() => {
       window.dispatchEvent(new CustomEvent('resize'));
-    });
-  };
-
-  onChangeActiveAnalytics = (event, index, value) => {
-    this.setState({
-      activeAnalyticsId: value,
     });
   };
 
@@ -778,113 +773,6 @@ class Component extends SuiteBaseClass {
     );
   };
 
-  //! Change this to show charts placeholders.
-  renderAnalyticsTab = () => {
-    const {
-      analyticService: analyticsField,
-      analytics,
-    } = this.props;
-
-    if (!(analyticsField && analytics)) {
-      return null;
-    }
-
-    const boundaryGeoJson = this.getDatasetBoundaryGeoJson();
-    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
-    const boundaryExtent = this.getDatasetExtent();
-
-    return (
-      <Tab
-        label={this.renderTabLabel({
-          IconComponent: DatasetChartIcon,
-          label: 'Analytics',
-        })}
-        value="analytics"
-      >
-        <div className="dataset__analytics-tab">
-          <Paper
-            className="analytics__controls"
-            zDepth={1}
-          >
-            <SelectField
-              floatingLabelText="Variable"
-              floatingLabelFixed={false}
-              value={this.state.activeAnalyticsId}
-              onChange={this.onChangeActiveAnalytics}
-              style={{
-                width: '100%',
-              }}
-              floatingLabelStyle={{
-                color: this.props.muiTheme.palette.primary1Color,
-              }}
-            >
-              <MenuItem
-                value={null}
-                primaryText=""
-                style={{
-                  display: 'none',
-                }}
-              />
-              {analytics.map(({ name }, index) => {
-                return (
-                  <MenuItem
-                    key={index}
-                    value={index}
-                    primaryText={name}
-                  />
-                );
-              })}
-            </SelectField>
-
-            <div className="map-and-toolbar">
-              <Toolbar>
-                <ToolbarGroup>
-                  <RaisedButton
-                    label="Point"
-                    style={{
-                      margin: '0 2px',
-                    }}
-                  />
-                  <RaisedButton
-                    label="Rectangle"
-                    style={{
-                      margin: '0 2px',
-                    }}
-                  />
-                  <RaisedButton
-                    label="Polygon"
-                    style={{
-                      margin: '0 2px',
-                    }}
-                  />
-                </ToolbarGroup>
-              </Toolbar>
-              <MapView
-                className="map"
-                basemap="osm"
-                projection="EPSG:4326"
-                extent={boundaryExtent}
-              >
-                {boundaryGeoJsonString && (
-                  <map-layer-geojson src-json={boundaryGeoJsonString} />
-                )}
-              </MapView>
-            </div>
-          </Paper>
-          <Paper
-            className="analytics__charts"
-            zDepth={0}
-            style={{
-              backgroundImage: `url(${absoluteUrl('/img/charts-example.png')})`,
-              backgroundRepeat: 'no-repeat',
-              backgroundSize: 'cover',
-            }}
-          />
-        </div>
-      </Tab>
-    );
-  };
-
   renderModelTab = () => {
     const {
       modelService: modelField,
@@ -958,7 +846,7 @@ class Component extends SuiteBaseClass {
           {this.renderInfoTab()}
           {this.renderDownloadTab()}
           {this.renderLayersTab()}
-          {this.renderAnalyticsTab()}
+          {renderAnalyticsTab(this.props, this.state, this)}
           {this.renderModelTab()}
           {this.renderMetadataTab()}
         </Tabs>
