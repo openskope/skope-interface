@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import marked from 'marked';
+import uuidv4 from 'uuid/v4';
 import classNames from '@xch/class-names';
 
 import SafeLink from '/imports/ui/components/SafeLink';
@@ -91,3 +93,91 @@ const MarkDownRenderer = ({
     />
   );
 };
+
+export
+/**
+ * This is a bad workaround for fetching data. It should be avoided at all costs.
+ */
+class PatheticDataRequester extends React.PureComponent {
+  static propTypes = {
+    /**
+     * Function that does the data fetching. Must call either `resolve` or `reject`.
+     * (payload: Object, resolve: Function, reject: Function) => void
+     */
+    requester: PropTypes.func.isRequired,
+    /**
+     * Callback just before a new request is going out.
+     * (payload: Object) => void
+     */
+    onNewRequest: PropTypes.func,
+    /**
+     * Callback when data is ready or updated.
+     * (data: *) => void
+     */
+    onReady: PropTypes.func.isRequired,
+    /**
+     * Callback when error occured during the request.
+     * (error: *) => void
+     */
+    onError: PropTypes.func,
+    verbose: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    onNewRequest: () => {},
+    onError: () => {},
+    verbose: false,
+  };
+
+  constructor (props) {
+    super(props);
+
+    // @type {*} This stores the latest request ID for ignoring expired requests.
+    this._lastRequestId = null;
+  }
+
+  // Whenever props are changed, try to update.
+  componentDidMount () {
+    this.updateData();
+  }
+  componentDidUpdate () {
+    this.updateData();
+  }
+
+  updateData () {
+    const {
+      requester,
+      onNewRequest,
+      onReady,
+      onError,
+      verbose,
+      ...requestPayload
+    } = this.props;
+
+    const thisRequestId = uuidv4();
+    this._lastRequestId = thisRequestId;
+
+    onNewRequest(requestPayload);
+
+    const resolve = (data) => {
+      if (thisRequestId !== this._lastRequestId) {
+        verbose && console.warn(`abandon response from expired request ${thisRequestId}`); // eslint-disable-line no-unused-expressions, no-console
+        return;
+      }
+
+      onReady(data);
+    };
+    const reject = (reason) => {
+      if (thisRequestId !== this._lastRequestId) {
+        verbose && console.warn(`abandon response from expired request ${thisRequestId}`); // eslint-disable-line no-unused-expressions, no-console
+        return;
+      }
+
+      onError(reason);
+    };
+
+    requester(requestPayload, resolve, reject);
+  }
+
+  render = () => null;
+}

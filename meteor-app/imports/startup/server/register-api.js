@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
+import { check, Match } from 'meteor/check';
 import { HTTP } from 'meteor/http';
 import { WebApp } from 'meteor/webapp';
 import httpProxy from 'http-proxy';
@@ -14,26 +14,24 @@ const serverElasticEndpointInSettings = objectPath.get(Meteor.settings, 'server.
 
 Meteor.methods({
   'timeseries.get' ({
-    lat,
-    lon,
-    requestId,
+    variableName,
+    boundaryGeometry,
   }) {
-    check(lat, Number);
-    check(lon, Number);
-    check(requestId, String);
+    check(variableName, String);
+    check(boundaryGeometry, Match.ObjectIncluding({
+      type: String,
+      coordinates: Array,
+    }));
 
-    const dataUrl = `http://demo.envirecon.org/browse/skope-rasterdata-service/api/v1/timeseries?long=${lon}&lat=${lat}`;
-    const {
-      // statusCode,
-      // content,
-      data,
-      // headers,
-    } = HTTP.get(dataUrl);
+    console.log('timeseries.get', {
+      variableName,
+      boundaryGeometry,
+    });
 
-    return {
-      requestId,
-      data,
-    };
+    //! Write real data loading logic here.
+    Meteor._sleepForMs(300);
+
+    return {};
   },
   async 'datasetManifest.get' ({
     datasetId,
