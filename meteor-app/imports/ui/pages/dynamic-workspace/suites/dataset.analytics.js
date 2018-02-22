@@ -17,10 +17,6 @@ import {
 import RaisedButton from 'material-ui/RaisedButton';
 import PointIcon from 'material-ui/svg-icons/action/room';
 import RectangleIcon from 'material-ui/svg-icons/image/crop-landscape';
-import {
-  grey400,
-  grey800,
-} from 'material-ui/styles/colors';
 import c3 from 'c3';
 import 'c3/c3.css';
 
@@ -154,12 +150,25 @@ class AnalyticsChart extends React.PureComponent {
 
 export default
 class AnalyticsTab extends SubComponentClass {
+  static selectionTools = [
+    {
+      name: 'point',
+      IconClass: PointIcon,
+    },
+    {
+      name: 'rectangle',
+      IconClass: RectangleIcon,
+    },
+  ];
+
   getInitialState () {
     return {
       // ID of the selected analytics.
       activeAnalyticsId: null,
       // Geometry of the analytics area.
       analyticsBoundaryGeometry: null,
+      // @type {string}
+      activeSelectionToolName: null,
     };
   }
 
@@ -208,6 +217,17 @@ class AnalyticsTab extends SubComponentClass {
     console.error('request error', reason);
   };
 
+  isSelectionToolActive (toolName) {
+    return this.state.activeSelectionToolName === toolName;
+  }
+
+  setSelectionToolActive (toolName) {
+    this.setState({
+      analyticsBoundaryGeometry: null,
+      activeSelectionToolName: toolName,
+    });
+  }
+
   render () {
     const {
       analyticService: analyticsField,
@@ -238,11 +258,22 @@ class AnalyticsTab extends SubComponentClass {
         margin: '0 1px 0 0',
         minWidth: false,
         width: '48px',
-        color: grey400,
+        color: this.props.muiTheme.palette.disabledColor,
+        transition: false,
       },
       active: {
-        backgroundColor: grey400,
-        color: grey800,
+        backgroundColor: this.props.muiTheme.palette.toggleButtonActiveBackgroundColor,
+        color: this.props.muiTheme.palette.textColor,
+      },
+      icon: {
+        color: 'inherit',
+        fill: 'currentColor',
+        transition: false,
+      },
+      button: {
+        backgroundColor: 'inherit',
+        color: 'inherit',
+        transition: false,
       },
     };
 
@@ -300,28 +331,19 @@ class AnalyticsTab extends SubComponentClass {
             <div className="map-and-toolbar">
               <Toolbar>
                 <ToolbarGroup>
-                  <RaisedButton
-                    icon={<PointIcon style={{ color: 'inherit', fill: 'currentColor' }} />}
-                    style={{
-                      ...selectionToolToggleButtonStyles.normal,
-                      ...selectionToolToggleButtonStyles.active,
-                    }}
-                    buttonStyle={{
-                      backgroundColor: 'inherit',
-                      color: 'inherit',
-                    }}
-                  />
-                  <RaisedButton
-                    disabled
-                    icon={<RectangleIcon style={{ color: 'inherit', fill: 'currentColor' }} />}
-                    style={{
-                      ...selectionToolToggleButtonStyles.normal,
-                    }}
-                    buttonStyle={{
-                      backgroundColor: 'inherit',
-                      color: 'inherit',
-                    }}
-                  />
+                  {AnalyticsTab.selectionTools.map((item) => (
+                    <RaisedButton
+                      key={item.name}
+                      className="selection-tool-button"
+                      icon={<item.IconClass style={selectionToolToggleButtonStyles.icon} />}
+                      style={{
+                        ...selectionToolToggleButtonStyles.normal,
+                        ...(this.isSelectionToolActive(item.name) && selectionToolToggleButtonStyles.active),
+                      }}
+                      buttonStyle={selectionToolToggleButtonStyles.button}
+                      onClick={() => this.setSelectionToolActive(item.name)}
+                    />
+                  ))}
                 </ToolbarGroup>
               </Toolbar>
               <MapView

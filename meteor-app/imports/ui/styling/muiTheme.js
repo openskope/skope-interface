@@ -5,5 +5,6 @@ export default getMuiTheme({
     //! Example.
     // primary1Color: '#f7f5e7',
     // alternateTextColor: '#000000',
+    toggleButtonActiveBackgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
 });
