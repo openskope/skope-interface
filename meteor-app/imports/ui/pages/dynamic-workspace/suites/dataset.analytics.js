@@ -320,6 +320,9 @@ class AnalyticsTab extends SubComponentClass {
           <Paper
             className="analytics__charts"
             zDepth={0}
+            style={{
+              padding: '10px 20px',
+            }}
           >
             <AnalyticsChart
               temporalResolution={resolution}
