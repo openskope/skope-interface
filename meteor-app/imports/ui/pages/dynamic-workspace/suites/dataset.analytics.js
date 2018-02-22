@@ -1,7 +1,9 @@
 import {
   Meteor,
 } from 'meteor/meteor';
+import _ from 'lodash';
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
   Tab,
 } from 'material-ui/Tabs';
@@ -13,15 +15,18 @@ import {
   ToolbarGroup,
 } from 'material-ui/Toolbar';
 import RaisedButton from 'material-ui/RaisedButton';
+import c3 from 'c3';
+import 'c3/c3.css';
 
 import {
   DatasetChartIcon,
 } from '/imports/ui/consts';
 
 import {
-  absoluteUrl,
   buildGeoJsonWithGeometry,
   PatheticDataRequester,
+  getPrecisionByResolution,
+  offsetDateAtPrecision,
 } from '/imports/ui/helpers';
 
 import MapView from '/imports/ui/components/mapview';
@@ -38,6 +43,108 @@ const getGeometryOfPoint = (point) => {
     ],
   };
 };
+
+const fakeData = [130, 340, 200, 500, 250, 350];
+
+class AnalyticsChart extends React.PureComponent {
+  static propTypes = {
+    temporalResolution: PropTypes.string.isRequired,
+    temporalPeriod: PropTypes.shape({
+      gte: PropTypes.instanceOf(Date),
+      lte: PropTypes.instanceOf(Date),
+    }).isRequired,
+    dataPoints: PropTypes.arrayOf(PropTypes.number).isRequired,
+  };
+
+  static timeFormatsForC3 = [
+    '%Y',
+    '%Y-%m',
+    '%Y-%m-%d',
+    '%Y-%m-%d %H',
+    '%Y-%m-%d %H:%M',
+    '%Y-%m-%d %H:%M:%S',
+  ];
+
+  componentDidMount () {
+    this.renderChart();
+  }
+
+  shouldComponentUpdate (nextProps) {
+    if (nextProps.temporalResolution !== this.props.temporalResolution) {
+      return true;
+    }
+
+    if (!_.isEqual(nextProps.temporalPeriod, this.props.temporalPeriod)) {
+      return true;
+    }
+
+    if (!_.isEqual(nextProps.dataPoints, this.props.dataPoints)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  componentDidUpdate () {
+    this.renderChart();
+  }
+
+  renderChart () {
+    const {
+      temporalResolution,
+      temporalPeriod,
+      dataPoints,
+    } = this.props;
+
+    const temporalPrecision = getPrecisionByResolution(temporalResolution);
+    const startDate = new Date(temporalPeriod.gte);
+    const xAxisFormat = AnalyticsChart.timeFormatsForC3[temporalPrecision];
+    const xAxisLabels = dataPoints.map((v, index) => {
+      const date = offsetDateAtPrecision(startDate, temporalPrecision, index);
+
+      return date;
+    });
+
+    console.log('renderChart', {
+      temporalResolution,
+      startDate,
+      xAxisFormat,
+      xAxisLabels,
+    });
+
+    this._chart = c3.generate({
+      bindto: this._chartContainer,
+      data: {
+        x: 'x',
+        // xFormat: '%Y-%m', // 'xFormat' can be used as custom format of 'x'
+        // xFormat: xAxisFormat,
+        columns: [
+          ['x', ...xAxisLabels],
+          ['data', ...dataPoints],
+        ],
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          tick: {
+            format: xAxisFormat,
+          },
+        },
+      },
+      subchart: {
+        show: true,
+      },
+    });
+  }
+
+  render () {
+    return (
+      <div
+        ref={(ref) => this._chartContainer = ref}
+      />
+    );
+  }
+}
 
 export default
 class AnalyticsTab extends SubComponentClass {
@@ -114,6 +221,11 @@ class AnalyticsTab extends SubComponentClass {
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
     const boundaryExtent = this.component.getDatasetExtent();
     const analyticsBoundaryGeoJsonString = analyticsBoundaryGeometry && JSON.stringify(buildGeoJsonWithGeometry(analyticsBoundaryGeometry));
+
+    const {
+      resolution,
+      period,
+    } = this.component.timespan;
 
     return (
       <Tab
@@ -208,12 +320,13 @@ class AnalyticsTab extends SubComponentClass {
           <Paper
             className="analytics__charts"
             zDepth={0}
-            style={{
-              backgroundImage: `url(${absoluteUrl('/img/charts-example.png')})`,
-              backgroundRepeat: 'no-repeat',
-              backgroundSize: 'cover',
-            }}
-          />
+          >
+            <AnalyticsChart
+              temporalResolution={resolution}
+              temporalPeriod={period}
+              dataPoints={fakeData}
+            />
+          </Paper>
         </div>
       </Tab>
     );
