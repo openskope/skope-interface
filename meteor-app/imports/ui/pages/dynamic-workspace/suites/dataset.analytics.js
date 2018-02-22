@@ -15,6 +15,12 @@ import {
   ToolbarGroup,
 } from 'material-ui/Toolbar';
 import RaisedButton from 'material-ui/RaisedButton';
+import PointIcon from 'material-ui/svg-icons/action/room';
+import RectangleIcon from 'material-ui/svg-icons/image/crop-landscape';
+import {
+  grey400,
+  grey800,
+} from 'material-ui/styles/colors';
 import c3 from 'c3';
 import 'c3/c3.css';
 
@@ -227,6 +233,19 @@ class AnalyticsTab extends SubComponentClass {
       period,
     } = this.component.timespan;
 
+    const selectionToolToggleButtonStyles = {
+      normal: {
+        margin: '0 1px 0 0',
+        minWidth: false,
+        width: '48px',
+        color: grey400,
+      },
+      active: {
+        backgroundColor: grey400,
+        color: grey800,
+      },
+    };
+
     return (
       <Tab
         label={this.component.renderTabLabel({
@@ -282,21 +301,25 @@ class AnalyticsTab extends SubComponentClass {
               <Toolbar>
                 <ToolbarGroup>
                   <RaisedButton
-                    label="Point"
+                    icon={<PointIcon style={{ color: 'inherit', fill: 'currentColor' }} />}
                     style={{
-                      margin: '0 2px',
+                      ...selectionToolToggleButtonStyles.normal,
+                      ...selectionToolToggleButtonStyles.active,
+                    }}
+                    buttonStyle={{
+                      backgroundColor: 'inherit',
+                      color: 'inherit',
                     }}
                   />
                   <RaisedButton
-                    label="Rectangle"
+                    disabled
+                    icon={<RectangleIcon style={{ color: 'inherit', fill: 'currentColor' }} />}
                     style={{
-                      margin: '0 2px',
+                      ...selectionToolToggleButtonStyles.normal,
                     }}
-                  />
-                  <RaisedButton
-                    label="Polygon"
-                    style={{
-                      margin: '0 2px',
+                    buttonStyle={{
+                      backgroundColor: 'inherit',
+                      color: 'inherit',
                     }}
                   />
                 </ToolbarGroup>
