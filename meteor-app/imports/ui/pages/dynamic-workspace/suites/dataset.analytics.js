@@ -169,7 +169,7 @@ class AnalyticsTab extends SubComponentClass {
       // Geometry of the analytics area.
       analyticsBoundaryGeometry: null,
       // @type {string}
-      activeSelectionToolName: null,
+      activeSelectionToolName: AnalyticsTab.selectionTools[0].name,
     };
   }
 
