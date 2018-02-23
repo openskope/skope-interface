@@ -179,6 +179,10 @@ class AnalyticsTab extends SubComponentClass {
   };
 
   onClickMap = (event) => {
+    if (!this.isSelectionToolActive('point')) {
+      return;
+    }
+
     const point = {
       x: event.latLongCoordinate[0],
       y: event.latLongCoordinate[1],
