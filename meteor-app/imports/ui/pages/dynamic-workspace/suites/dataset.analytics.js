@@ -4,6 +4,7 @@ import {
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import {
   Tab,
 } from 'material-ui/Tabs';
@@ -170,6 +171,15 @@ class AnalyticsTab extends SubComponentClass {
       analyticsBoundaryGeometry: null,
       // @type {string}
       activeSelectionToolName: AnalyticsTab.selectionTools[0].name,
+      // @type {boolean}
+      isLoadingTimeSeriesData: false,
+      // @type {boolean}
+      isTimeSeriesDataLoaded: false,
+      timeSeriesData: null,
+      // @type {Date}
+      timeSeriesDataRequestDate: null,
+      // @type {Date}
+      timeSeriesDataResponseDate: null,
     };
   }
 
@@ -205,6 +215,14 @@ class AnalyticsTab extends SubComponentClass {
 
     console.log('requestData', 'requesting');
 
+    this.setState({
+      isLoadingTimeSeriesData: true,
+      isTimeSeriesDataLoaded: false,
+      timeSeriesData: null,
+      timeSeriesDataRequestDate: new Date(),
+      timeSeriesDataResponseDate: null,
+    });
+
     Meteor.call('timeseries.get', payload, (error, result) => {
       if (error) {
         reject(error);
@@ -216,10 +234,24 @@ class AnalyticsTab extends SubComponentClass {
 
   onDataReady = (data) => {
     console.log('onDataReady', data);
+
+    this.setState({
+      isLoadingTimeSeriesData: false,
+      isTimeSeriesDataLoaded: true,
+      timeSeriesData: data,
+      timeSeriesDataResponseDate: new Date(),
+    });
   };
 
   onDataError = (reason) => {
     console.error('request error', reason);
+
+    this.setState({
+      isLoadingTimeSeriesData: false,
+      isTimeSeriesDataLoaded: false,
+      timeSeriesData: null,
+      timeSeriesDataResponseDate: new Date(),
+    });
   };
 
   isSelectionToolActive (toolName) {
@@ -242,6 +274,11 @@ class AnalyticsTab extends SubComponentClass {
     const {
       activeAnalyticsId,
       analyticsBoundaryGeometry,
+      isLoadingTimeSeriesData,
+      isTimeSeriesDataLoaded,
+      timeSeriesData,
+      timeSeriesDataRequestDate,
+      timeSeriesDataResponseDate,
     } = this.state;
 
     if (!(analyticsField && analytics)) {
@@ -397,6 +434,7 @@ class AnalyticsTab extends SubComponentClass {
               </MapView>
             </div>
           </Paper>
+
           <Paper
             className="analytics__charts"
             zDepth={0}
@@ -404,11 +442,22 @@ class AnalyticsTab extends SubComponentClass {
               padding: '10px 20px',
             }}
           >
-            <AnalyticsChart
-              temporalResolution={resolution}
-              temporalPeriod={period}
-              dataPoints={fakeData}
-            />
+            {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData && (
+              <AnalyticsChart
+                temporalResolution={resolution}
+                temporalPeriod={period}
+                dataPoints={fakeData}
+              />
+            )}
+            {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && (
+              <div>Loaded in {moment.duration({
+                from: timeSeriesDataRequestDate,
+                to: timeSeriesDataResponseDate,
+              }).asSeconds()} s.</div>
+            )}
+            {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
+              <div>Loading...</div>
+            )}
           </Paper>
         </div>
       </Tab>
