@@ -270,12 +270,12 @@ class AnalyticsTab extends SubComponentClass {
           margin: '0 1px 0 0',
           minWidth: false,
           width: '2.5em',
-          color: this.props.muiTheme.palette.disabledColor,
+          color: muiTheme.palette.disabledColor,
           transition: false,
         },
         active: {
-          backgroundColor: this.props.muiTheme.palette.toggleButtonActiveBackgroundColor,
-          color: this.props.muiTheme.palette.textColor,
+          backgroundColor: muiTheme.palette.toggleButtonActiveBackgroundColor,
+          color: muiTheme.palette.textColor,
         },
         icon: {
           height: '1.25em',
