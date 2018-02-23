@@ -13,7 +13,17 @@ var npmInfo = require('${APP_DIR}/package.json');\
 var packageVersion = npmInfo.version;\
 console.log(packageVersion);\
 "
-TAG=${TAG:-$(echo $JS | node)}
+
+NPM_VER=$(echo $JS | node)
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+GIT_COMMIT=$(git rev-parse HEAD)
+DEFAULT_TAG="${NPM_VER}"
+
+if [ "$GIT_BRANCH" != "master" ]; then
+    DEFAULT_TAG="${NPM_VER}__${GIT_BRANCH}__${GIT_COMMIT}"
+fi
+
+TAG=${TAG:-"${DEFAULT_TAG}"}
 ORG_NAME="openskope/web-app"
 IMAGE_NAME="${ORG_NAME}:${TAG}"
 
