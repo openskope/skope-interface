@@ -13,6 +13,7 @@ import MenuItem from 'material-ui/MenuItem';
 import {
   Toolbar,
   ToolbarGroup,
+  ToolbarTitle,
 } from 'material-ui/Toolbar';
 import RaisedButton from 'material-ui/RaisedButton';
 import PointIcon from 'material-ui/svg-icons/action/room';
@@ -257,27 +258,42 @@ class AnalyticsTab extends SubComponentClass {
       period,
     } = this.component.timespan;
 
-    const selectionToolToggleButtonStyles = {
-      normal: {
-        margin: '0 1px 0 0',
-        minWidth: false,
-        width: '48px',
-        color: this.props.muiTheme.palette.disabledColor,
-        transition: false,
+    const mapToolbarStyles = {
+      root: {
+        padding: '0px 0.75em',
       },
-      active: {
-        backgroundColor: this.props.muiTheme.palette.toggleButtonActiveBackgroundColor,
-        color: this.props.muiTheme.palette.textColor,
+      title: {
+        fontSize: '1em',
       },
-      icon: {
-        color: 'inherit',
-        fill: 'currentColor',
-        transition: false,
-      },
-      button: {
-        backgroundColor: 'inherit',
-        color: 'inherit',
-        transition: false,
+      toggleButton: {
+        root: {
+          margin: '0 1px 0 0',
+          minWidth: false,
+          width: '2.5em',
+          color: this.props.muiTheme.palette.disabledColor,
+          transition: false,
+        },
+        active: {
+          backgroundColor: this.props.muiTheme.palette.toggleButtonActiveBackgroundColor,
+          color: this.props.muiTheme.palette.textColor,
+        },
+        icon: {
+          height: '1.25em',
+          width: '1.25em',
+          color: 'inherit',
+          fill: 'currentColor',
+          transition: false,
+        },
+        button: {
+          height: '1.875em',
+          lineHeight: '1.875em',
+          backgroundColor: 'inherit',
+          color: 'inherit',
+          transition: false,
+        },
+        overlay: {
+          height: '100%',
+        },
       },
     };
 
@@ -303,7 +319,7 @@ class AnalyticsTab extends SubComponentClass {
             zDepth={1}
           >
             <SelectField
-              floatingLabelText="Variable"
+              floatingLabelText="Select variable"
               floatingLabelFixed={false}
               value={activeAnalyticsId}
               onChange={(event, index, value) => this.onChangeActiveAnalytics(event, index, value)}
@@ -333,18 +349,33 @@ class AnalyticsTab extends SubComponentClass {
             </SelectField>
 
             <div className="map-and-toolbar">
-              <Toolbar>
+              <Toolbar
+                style={{
+                  ...mapToolbarStyles.root,
+                }}
+              >
+                <ToolbarGroup>
+                  <ToolbarTitle
+                    text="Select boundary"
+                    style={{
+                      ...mapToolbarStyles.title,
+                    }}
+                  />
+                </ToolbarGroup>
                 <ToolbarGroup>
                   {AnalyticsTab.selectionTools.map((item) => (
                     <RaisedButton
                       key={item.name}
                       className="selection-tool-button"
-                      icon={<item.IconClass style={selectionToolToggleButtonStyles.icon} />}
+                      icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
                       style={{
-                        ...selectionToolToggleButtonStyles.normal,
-                        ...(this.isSelectionToolActive(item.name) && selectionToolToggleButtonStyles.active),
+                        ...mapToolbarStyles.toggleButton.root,
+                        ...(this.isSelectionToolActive(item.name) && mapToolbarStyles.toggleButton.active),
                       }}
-                      buttonStyle={selectionToolToggleButtonStyles.button}
+                      buttonStyle={mapToolbarStyles.toggleButton.button}
+                      overlayStyle={{
+                        ...mapToolbarStyles.toggleButton.overlay,
+                      }}
                       onClick={() => this.setSelectionToolActive(item.name)}
                     />
                   ))}
