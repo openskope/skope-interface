@@ -48,8 +48,6 @@ const getGeometryOfPoint = (point) => {
   };
 };
 
-const fakeData = [130, 340, 200, 500, 250, 350];
-
 class AnalyticsChart extends React.PureComponent {
   static propTypes = {
     temporalResolution: PropTypes.string.isRequired,
@@ -446,7 +444,7 @@ class AnalyticsTab extends SubComponentClass {
               <AnalyticsChart
                 temporalResolution={resolution}
                 temporalPeriod={period}
-                dataPoints={fakeData}
+                dataPoints={timeSeriesData}
               />
             )}
             {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && (

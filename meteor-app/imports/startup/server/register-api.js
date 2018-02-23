@@ -31,7 +31,7 @@ Meteor.methods({
     //! Write real data loading logic here.
     Meteor._sleepForMs(300);
 
-    return {};
+    return [130, 340, 200, 500, 250, 350];
   },
   async 'datasetManifest.get' ({
     datasetId,
