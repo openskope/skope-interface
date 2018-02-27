@@ -20,9 +20,9 @@ import {
 } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Checkbox from 'material-ui/Checkbox';
-import Slider from 'material-ui/Slider';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import SliderWithInput from '/imports/ui/components/SliderWithInput';
 
 import Range from 'rc-slider/lib/Range';
 import 'rc-slider/assets/index.css';
@@ -63,14 +63,10 @@ class OverlayTab extends SubComponentClass {
 
   static defaultLayerVisibility = false;
   static defaultLayerOpacity = 1;
-  static opacitySliderMin = 0;
-  static opacitySliderMax = 255;
   static paddingForSliders = {
     paddingLeft: '8px',
     paddingRight: '8px',
   };
-
-  static getDisplayTextForLayerOpacity = (opacity) => opacity.toFixed(2);
 
   getInitialState () {
     return {
@@ -126,27 +122,6 @@ class OverlayTab extends SubComponentClass {
         [layerId]: opacity,
       },
     });
-  }
-
-  /**
-   * Requires component as context object.
-   * @param {string} layerId
-   */
-  getOpacitySliderValueForLayer (layerId) {
-    const opacity = this.getLayerOpacity(layerId);
-    const sliderValue = (opacity * (OverlayTab.opacitySliderMax - OverlayTab.opacitySliderMin)) + OverlayTab.opacitySliderMin;
-
-    return sliderValue;
-  }
-  /**
-   * Requires component as context object.
-   * @param {string} layerId
-   * @param {number} value
-   */
-  setLayerOpacityFromSliderValue (layerId, value) {
-    const opacity = (value - OverlayTab.opacitySliderMin) / (OverlayTab.opacitySliderMax - OverlayTab.opacitySliderMin);
-
-    this.setLayerOpacity(layerId, opacity);
   }
 
   /**
@@ -302,33 +277,36 @@ class OverlayTab extends SubComponentClass {
                     <ListItem
                       key="layer-opacity"
                       disabled
-                      primaryText={(
-                        <div className="adjustment-option__header">
-                          <label>Opacity: </label>
-                          <label>{OverlayTab.getDisplayTextForLayerOpacity(this.getLayerOpacity(layerItem.name))}</label>
-                        </div>
-                      )}
-                      secondaryText={(
-                        <div
-                          style={{
-                            overflow: 'visible',
-                            ...OverlayTab.paddingForSliders,
-                          }}
-                        >
-                          <Slider
-                            className="input-slider--layer-opacity"
-                            min={OverlayTab.opacitySliderMin}
-                            max={OverlayTab.opacitySliderMax}
-                            value={this.getOpacitySliderValueForLayer(layerItem.name)}
-                            onChange={(event, newValue) => this.setLayerOpacityFromSliderValue(layerItem.name, newValue)}
-                            sliderStyle={{
-                              marginTop: 0,
-                              marginBottom: 0,
-                            }}
-                          />
-                        </div>
-                      )}
-                    />,
+                    >
+                      <SliderWithInput
+                        label="Opacity"
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={this.getLayerOpacity(layerItem.name)}
+                        toSliderValue={(v) => v * 100}
+                        fromSliderValue={(v) => v / 100}
+                        toInputValue={(v) => `${(v * 100).toFixed(0)}%`}
+                        fromInputValue={(v) => {
+                          // We want to support both format `{N}%` and `{N}`.
+                          let str = v;
+
+                          if (str[str.length - 1] === '%') {
+                            str = str.slice(0, -1);
+                          }
+
+                          if (isNaN(str)) {
+                            return NaN;
+                          }
+
+                          return parseFloat(str) / 100;
+                        }}
+                        onChange={(event, newValue) => this.setLayerOpacity(layerItem.name, newValue)}
+                        inputStyle={{
+                          width: '60px',
+                        }}
+                      />
+                    </ListItem>,
                     <ListItem
                       key="layer-style-range"
                       disabled
