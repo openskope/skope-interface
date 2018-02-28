@@ -429,6 +429,8 @@ class AnalyticsTab extends SubComponentClass {
                 {analyticsBoundaryGeoJsonString && (
                   <map-layer-geojson src-json={analyticsBoundaryGeoJsonString} />
                 )}
+                <map-interaction-defaults />
+                <map-control-defaults />
               </MapView>
             </div>
           </Paper>
