@@ -113,7 +113,7 @@ class Component extends SuiteBaseClass {
   }
 
   /**
-   * @return {{resolution: string, period: {gte: Date, lte: Date}}}
+   * @type {{resolution: string, period: {gte: Date, lte: Date}}}
    */
   get timespan () {
     const {
@@ -134,7 +134,7 @@ class Component extends SuiteBaseClass {
   }
 
   /**
-   * @returns {Object}
+   * @type {Object}
    */
   get boundaryGeoJson () {
     const boundaryGeometry = objectPath.get(this.props.region, 'geometry');
@@ -148,7 +148,7 @@ class Component extends SuiteBaseClass {
 
   /**
    * If `extents` is specified in source, trust that. Otherwise try to calculate from boundary shape.
-   * @returns {Array.<number>}
+   * @type {Array.<number>}
    */
   get extent () {
     const boundaryExtentFromDocument = objectPath.get(this.props.region, 'extents');
