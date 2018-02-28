@@ -28,7 +28,7 @@ export default class SuiteBaseClass extends React.Component {
 
   static extendPropTypes (propTypes) {
     return {
-      ...this.propTypes,
+      ...SuiteBaseClass.propTypes,
       ...propTypes,
     };
   }
