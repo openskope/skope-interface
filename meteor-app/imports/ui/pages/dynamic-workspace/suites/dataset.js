@@ -83,12 +83,12 @@ class Component extends SuiteBaseClass {
   constructor (props) {
     super(props);
 
-    this.infoTab = new InfoTab(this);
-    this.downloadTab = new DownloadTab(this);
-    this.overlayTab = new OverlayTab(this);
-    this.analyticsTab = new AnalyticsTab(this);
-    this.modelTab = new ModelTab(this);
-    this.metadataTab = new MetadataTab(this);
+    this.infoTab = new InfoTab(this, 'InfoTab');
+    this.downloadTab = new DownloadTab(this, 'DownloadTab');
+    this.overlayTab = new OverlayTab(this, 'OverlayTab');
+    this.analyticsTab = new AnalyticsTab(this, 'AnalyticsTab');
+    this.modelTab = new ModelTab(this, 'ModelTab');
+    this.metadataTab = new MetadataTab(this, 'MetadataTab');
 
     this.state = {
       // @type {string}
