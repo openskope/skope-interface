@@ -121,6 +121,39 @@ class Component extends SuiteBaseClass {
     };
   }
 
+  /**
+   * @returns {Object}
+   */
+  get boundaryGeoJson () {
+    const boundaryGeometry = objectPath.get(this.props.region, 'geometry');
+
+    if (!boundaryGeometry) {
+      return null;
+    }
+
+    return buildGeoJsonWithGeometry(boundaryGeometry);
+  }
+
+  /**
+   * If `extents` is specified in source, trust that. Otherwise try to calculate from boundary shape.
+   * @returns {Array.<number>}
+   */
+  get extent () {
+    const boundaryExtentFromDocument = objectPath.get(this.props.region, 'extents');
+
+    if (boundaryExtentFromDocument) {
+      return boundaryExtentFromDocument.map((s) => parseFloat(s));
+    }
+
+    const boundaryGeoJson = this.boundaryGeoJson;
+
+    if (!boundaryGeoJson) {
+      return null;
+    }
+
+    return geojsonExtent(boundaryGeoJson);
+  }
+
   onTabChange = (nextTabValue) => {
     this.setState({
       activeTab: nextTabValue,
@@ -145,44 +178,6 @@ class Component extends SuiteBaseClass {
       'YYYY-MM',
       'YYYY-MM-DD',
     ]);
-  };
-
-  /**
-   * @returns {Array.<number>}
-   */
-  getDatasetExtent = () => {
-    const {
-      region,
-    } = this.props;
-
-    // If `extents` is specified in source, trust that. Otherwise try to calculate from boundary shape.
-
-    const boundaryExtentFromDocument = objectPath.get(region, 'extents');
-
-    if (boundaryExtentFromDocument) {
-      return boundaryExtentFromDocument.map((s) => parseFloat(s));
-    }
-
-    const boundaryGeoJson = this.getDatasetBoundaryGeoJson();
-
-    if (!boundaryGeoJson) {
-      return null;
-    }
-
-    return geojsonExtent(boundaryGeoJson);
-  };
-
-  /**
-   * @returns {Object}
-   */
-  getDatasetBoundaryGeoJson = () => {
-    const boundaryGeometry = objectPath.get(this.props.region, 'geometry');
-
-    if (!boundaryGeometry) {
-      return null;
-    }
-
-    return buildGeoJsonWithGeometry(boundaryGeometry);
   };
 
   renderTabLabel = ({

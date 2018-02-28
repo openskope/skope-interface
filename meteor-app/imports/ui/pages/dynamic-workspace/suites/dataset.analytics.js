@@ -283,9 +283,9 @@ class AnalyticsTab extends SubComponentClass {
       return null;
     }
 
-    const boundaryGeoJson = this.component.getDatasetBoundaryGeoJson();
+    const boundaryGeoJson = this.component.boundaryGeoJson;
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
-    const boundaryExtent = this.component.getDatasetExtent();
+    const boundaryExtent = this.component.extent;
     const analyticsBoundaryGeoJsonString = analyticsBoundaryGeometry && JSON.stringify(buildGeoJsonWithGeometry(analyticsBoundaryGeometry));
 
     const {

@@ -170,7 +170,7 @@ class OverlayTab extends SubComponentClass {
 
     return mapLayerRenderer.call(this, {
       ...layer,
-      extent: this.component.getDatasetExtent(),
+      extent: this.component.extent,
       visible: this.getLayerVisibility(layer.id),
       opacity: this.getLayerOpacity(layer.id),
     }, {
@@ -281,9 +281,9 @@ class OverlayTab extends SubComponentClass {
 
     const toolbarTooltipPosition = 'top-center';
 
-    const boundaryGeoJson = this.component.getDatasetBoundaryGeoJson();
+    const boundaryGeoJson = this.component.boundaryGeoJson;
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
-    const boundaryExtent = this.component.getDatasetExtent();
+    const boundaryExtent = this.component.extent;
 
     return (
       <Tab
