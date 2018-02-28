@@ -176,7 +176,7 @@ class Component extends SuiteBaseClass {
    * @return {string}
    */
   buildPreciseDateString = (date) => {
-    const datePrecision = getPrecisionByResolution(this.state.timespanResolution);
+    const datePrecision = getPrecisionByResolution(this.timespan.resolution);
 
     return getDateStringAtPrecision(date, datePrecision, [
       'YYYY',
