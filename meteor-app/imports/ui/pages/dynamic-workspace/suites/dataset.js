@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import objectPath from 'object-path';
 import geojsonExtent from 'geojson-extent';
+import mem from 'mem';
 
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import {
@@ -80,6 +81,18 @@ class Component extends SuiteBaseClass {
       }, urlTemplate);
   };
 
+  static memGetTimespan = mem((resolution, period) => {
+    const datePrecision = getPrecisionByResolution(resolution);
+
+    return {
+      resolution,
+      period: {
+        gte: parseDateStringWithPrecision(period.gte, datePrecision),
+        lte: parseDateStringWithPrecision(period.lte, datePrecision),
+      },
+    };
+  });
+
   constructor (props) {
     super(props);
 
@@ -110,15 +123,7 @@ class Component extends SuiteBaseClass {
       },
     } = this.props;
 
-    const datePrecision = getPrecisionByResolution(resolution);
-
-    return {
-      resolution,
-      period: {
-        gte: parseDateStringWithPrecision(period.gte, datePrecision),
-        lte: parseDateStringWithPrecision(period.lte, datePrecision),
-      },
-    };
+    return Component.memGetTimespan(resolution, period);
   }
 
   /**
