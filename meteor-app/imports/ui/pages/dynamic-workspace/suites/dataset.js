@@ -127,6 +127,13 @@ class Component extends SuiteBaseClass {
   }
 
   /**
+   * @type {number}
+   */
+  get temporalPrecision () {
+    return getPrecisionByResolution(this.timespan.resolution);
+  }
+
+  /**
    * @returns {Object}
    */
   get boundaryGeoJson () {
@@ -176,9 +183,7 @@ class Component extends SuiteBaseClass {
    * @return {string}
    */
   buildPreciseDateString = (date) => {
-    const datePrecision = getPrecisionByResolution(this.timespan.resolution);
-
-    return getDateStringAtPrecision(date, datePrecision, [
+    return getDateStringAtPrecision(date, this.temporalPrecision, [
       'YYYY',
       'YYYY-MM',
       'YYYY-MM-DD',

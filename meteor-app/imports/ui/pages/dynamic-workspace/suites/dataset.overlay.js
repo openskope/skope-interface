@@ -34,7 +34,6 @@ import {
 import {
   getDateAtPrecision,
   offsetDateAtPrecision,
-  getPrecisionByResolution,
 } from '/imports/ui/helpers';
 
 import MapView from '/imports/ui/components/mapview';
@@ -81,10 +80,6 @@ class OverlayTab extends SubComponentClass {
       layerVisibility: {},
       // @type {Object.<layerId: string, opacity: number>}
       layerOpacity: {},
-      // @type {string}
-      timespanResolution: timespan.resolution,
-      // @type {{gte: Date, lte: Date}}
-      timespanPeriod: timespan.period,
       // @type {Date}
       currentLoadedDate: timespan.period.lte,
     };
@@ -181,11 +176,11 @@ class OverlayTab extends SubComponentClass {
   }
 
   isBackStepInTimeAllowed = () => {
-    return this.state.currentLoadedDate > this.state.timespanPeriod.gte;
+    return this.state.currentLoadedDate > this.component.timespan.period.gte;
   };
 
   isForwardStepInTimeAllowed = () => {
-    return this.state.currentLoadedDate < this.state.timespanPeriod.lte;
+    return this.state.currentLoadedDate < this.component.timespan.period.lte;
   };
 
   offsetCurrentTimeAtPrecisionByAmount = (amount) => {
@@ -193,15 +188,14 @@ class OverlayTab extends SubComponentClass {
       return;
     }
 
-    const datePrecision = getPrecisionByResolution(this.state.timespanResolution);
-    let newLoadedDate = offsetDateAtPrecision(this.state.currentLoadedDate, datePrecision, amount);
+    let newLoadedDate = offsetDateAtPrecision(this.state.currentLoadedDate, this.component.temporalPrecision, amount);
 
-    if (newLoadedDate.valueOf() > this.state.timespanPeriod.lte.valueOf()) {
-      newLoadedDate = this.state.timespanPeriod.lte;
+    if (newLoadedDate.valueOf() > this.component.timespan.period.lte.valueOf()) {
+      newLoadedDate = this.component.timespan.period.lte;
     }
 
-    if (newLoadedDate.valueOf() < this.state.timespanPeriod.gte.valueOf()) {
-      newLoadedDate = this.state.timespanPeriod.gte;
+    if (newLoadedDate.valueOf() < this.component.timespan.period.gte.valueOf()) {
+      newLoadedDate = this.component.timespan.period.gte;
     }
 
     if (newLoadedDate.valueOf() === this.state.currentLoadedDate.valueOf()) {
@@ -222,15 +216,14 @@ class OverlayTab extends SubComponentClass {
   };
 
   loadedDateOnChange = (event, date) => {
-    const datePrecision = getPrecisionByResolution(this.state.timespanResolution);
-    let preciseDate = getDateAtPrecision(date, datePrecision);
+    let preciseDate = getDateAtPrecision(date, this.component.temporalPrecision);
 
-    if (preciseDate.valueOf() > this.state.timespanPeriod.lte.valueOf()) {
-      preciseDate = this.state.timespanPeriod.lte;
+    if (preciseDate.valueOf() > this.component.timespan.period.lte.valueOf()) {
+      preciseDate = this.component.timespan.period.lte;
     }
 
-    if (preciseDate.valueOf() < this.state.timespanPeriod.gte.valueOf()) {
-      preciseDate = this.state.timespanPeriod.gte;
+    if (preciseDate.valueOf() < this.component.timespan.period.gte.valueOf()) {
+      preciseDate = this.component.timespan.period.gte;
     }
 
     if (preciseDate.valueOf() === this.state.currentLoadedDate.valueOf()) {
@@ -416,8 +409,8 @@ class OverlayTab extends SubComponentClass {
                 <DatePicker
                   openToYearSelection
                   hintText="Controlled Date Input"
-                  minDate={this.state.timespanPeriod.gte}
-                  maxDate={this.state.timespanPeriod.lte}
+                  minDate={this.component.timespan.period.gte}
+                  maxDate={this.component.timespan.period.lte}
                   value={this.state.currentLoadedDate}
                   formatDate={this.component.buildPreciseDateString}
                   onChange={this.loadedDateOnChange}
