@@ -252,3 +252,33 @@ const buildGeoJsonWithGeometry = (geometry) => {
     ],
   };
 };
+
+/**
+ * Return the same input string with placeholders filled.
+ * Fillers could be functions or literal values.
+ * @param {string} templateString
+ * @param {Object<string, Function|*>} fillers
+ * @returns {string}
+ */
+export
+const fillTemplateString = (templateString, fillers) => {
+  if (!templateString) {
+    return templateString;
+  }
+
+  const fillerNames = Object.keys(fillers);
+
+  return fillerNames.reduce((acc, fillerName) => {
+    const pattern = `{${fillerName}}`;
+    const filler = fillers[fillerName];
+    const replacement = typeof filler === 'function' ? filler() : filler;
+
+    let newAcc = acc;
+
+    while (newAcc.indexOf(pattern) !== -1) {
+      newAcc = newAcc.replace(pattern, replacement);
+    }
+
+    return newAcc;
+  }, templateString);
+};

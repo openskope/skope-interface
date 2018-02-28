@@ -41,6 +41,8 @@ import MapView from '/imports/ui/components/mapview';
 
 import SubComponentClass from './SubComponentClass';
 
+import * as mapLayerRenderers from './dataset.mapLayerRenderers';
+
 export default
 class OverlayTab extends SubComponentClass {
 
@@ -69,60 +71,7 @@ class OverlayTab extends SubComponentClass {
     paddingRight: '8px',
   };
 
-  /**
-   * Set of functions to render the element for the given layer type.
-   * `this` inside these functions will be the class instance.
-   * @type {Object<string, Function>}
-   */
-  static mapLayerRenderers = {
-    /**
-     * @param {Object} layer
-     * @param {string} layer.id
-     * @param {string} layer.title
-     * @param {string} layer.title
-     * @returns {ReactElement}
-     */
-    wms (layer) {
-      return (
-        <map-layer-twms
-          key={layer.id}
-          name={layer.title}
-          projection="EPSG:4326"
-          extent={this.component.getDatasetExtent()}
-          invisible={this.getLayerVisibility(layer.id) ? null : 'invisible'}
-          opacity={this.getLayerOpacity(layer.id)}
-          url={this.fillOverlayUrl(layer.url)}
-          server-type="geoserver"
-        />
-      );
-    },
-  };
-
   static getDisplayTextForLayerOpacity = (opacity) => opacity.toFixed(2);
-
-  /**
-   * Set of functions to calculate the values that should replace
-   * their corresponding placeholders.
-   * `this` inside these functions will be the class instance.
-   * @type {Object<string, Function>}
-   */
-  static overlayUrlFillers = {
-    YYYY () {
-      const currentDate = this.state.currentLoadedDate;
-
-      return moment(currentDate).format('YYYY');
-    },
-    MM () {
-      const currentDate = this.state.currentLoadedDate;
-
-      return moment(currentDate).format('MM');
-    },
-    DD () {
-      const currentDate = this.state.currentLoadedDate;
-
-      return moment(currentDate).format('DD');
-    },
-  };
 
   getInitialState () {
     const timespan = this.component.timespan;
@@ -212,43 +161,24 @@ class OverlayTab extends SubComponentClass {
    * @param {Object} layer
    */
   renderMapLayer (layer) {
-    if (!(layer.type in OverlayTab.mapLayerRenderers)) {
+    if (!(layer.type in mapLayerRenderers)) {
       console.warn(`Unknown layer type “${layer.type}” for layer “${layer.id}”`);
       return null;
     }
 
-    const mapLayerRenderer = OverlayTab.mapLayerRenderers[layer.type];
+    const mapLayerRenderer = mapLayerRenderers[layer.type];
 
-    return mapLayerRenderer.call(this, layer);
+    return mapLayerRenderer.call(this, {
+      ...layer,
+      extent: this.component.getDatasetExtent(),
+      visible: this.getLayerVisibility(layer.id),
+      opacity: this.getLayerOpacity(layer.id),
+    }, {
+      YYYY: () => moment(this.state.currentLoadedDate).format('YYYY'),
+      MM: () => moment(this.state.currentLoadedDate).format('MM'),
+      DD: () => moment(this.state.currentLoadedDate).format('DD'),
+    });
   }
-
-  /**
-   * Return the same input string with placeholders filled.
-   * @param {string} templateString
-   * @returns {string}
-   */
-  fillOverlayUrl = (templateString) => {
-    if (!templateString) {
-      return templateString;
-    }
-
-    const fillerNames = Object.keys(OverlayTab.overlayUrlFillers);
-
-    return fillerNames.reduce((acc, fillerName) => {
-      const pattern = `{${fillerName}}`;
-
-      let newAcc = acc;
-
-      while (newAcc.indexOf(pattern) !== -1) {
-        const filler = OverlayTab.overlayUrlFillers[fillerName];
-        const replacement = filler.call(this);
-
-        newAcc = newAcc.replace(pattern, replacement);
-      }
-
-      return newAcc;
-    }, templateString);
-  };
 
   isBackStepInTimeAllowed = () => {
     return this.state.currentLoadedDate > this.state.timespanPeriod.gte;
