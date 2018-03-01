@@ -6,10 +6,9 @@ import {
 
 /**
  * @param {Object} layer
- * @param {string} layer.id
- * @param {string} layer.title
+ * @param {string} layer.name
  * @param {string} layer.url
- * @param {Array.<number>} layer.extent
+ * @param {Array<number>} layer.extent
  * @param {boolean} layer.visible
  * @param {number} layer.opacity
  * @param {Object} fillers
@@ -19,8 +18,8 @@ export
 const wms = (layer, fillers) => {
   return (
     <map-layer-twms
-      key={layer.id}
-      name={layer.title}
+      key={layer.name}
+      name={layer.name}
       projection="EPSG:4326"
       extent={layer.extent}
       invisible={layer.visible ? null : 'invisible'}

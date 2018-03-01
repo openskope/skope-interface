@@ -132,6 +132,21 @@ const offsetDateAtPrecision = (
   },
 ]);
 
+export
+const ResolutionToPrecisionMapping = {
+  year: 0,
+  month: 1,
+  date: 2,
+  day: 2, // alias to "date".
+  hour: 3,
+  minute: 4,
+  second: 5,
+  millisecond: 5,
+};
+
+export
+const AllResolutionNames = Object.keys(ResolutionToPrecisionMapping);
+
 /**
  * @param {string} resolution
  * @returns {number}
@@ -141,16 +156,7 @@ const getPrecisionByResolution = (
   (resolutionToPrecision) => (
     resolution,
   ) => resolutionToPrecision[resolution]
-)({
-  year: 0,
-  month: 1,
-  date: 2,
-  day: 2, // alias to "date".
-  hour: 3,
-  minute: 4,
-  second: 5,
-  millisecond: 5,
-});
+)(ResolutionToPrecisionMapping);
 
 /**
  * @param {Date} date

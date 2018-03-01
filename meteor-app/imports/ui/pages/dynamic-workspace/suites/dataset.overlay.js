@@ -73,15 +73,13 @@ class OverlayTab extends SubComponentClass {
   static getDisplayTextForLayerOpacity = (opacity) => opacity.toFixed(2);
 
   getInitialState () {
-    const timespan = this.component.timespan;
-
     return {
-      // @type {Object.<layerId: string, visible: boolean>}
+      // @type {Object<layerId: string, visible: boolean>}
       layerVisibility: {},
-      // @type {Object.<layerId: string, opacity: number>}
+      // @type {Object<layerId: string, opacity: number>}
       layerOpacity: {},
       // @type {Date}
-      currentLoadedDate: timespan.period.lte,
+      currentLoadedDate: this.component.timespan.period.lte,
     };
   }
 
@@ -157,7 +155,7 @@ class OverlayTab extends SubComponentClass {
    */
   renderMapLayer (layer) {
     if (!(layer.type in mapLayerRenderers)) {
-      console.warn(`Unknown layer type “${layer.type}” for layer “${layer.id}”`);
+      console.warn(`Unknown layer type “${layer.type}” for layer “${layer.name}”`);
       return null;
     }
 
@@ -166,8 +164,8 @@ class OverlayTab extends SubComponentClass {
     return mapLayerRenderer.call(this, {
       ...layer,
       extent: this.component.extent,
-      visible: this.getLayerVisibility(layer.id),
-      opacity: this.getLayerOpacity(layer.id),
+      visible: this.getLayerVisibility(layer.name),
+      opacity: this.getLayerOpacity(layer.name),
     }, {
       YYYY: () => moment(this.state.currentLoadedDate).format('YYYY'),
       MM: () => moment(this.state.currentLoadedDate).format('MM'),
@@ -255,21 +253,15 @@ class OverlayTab extends SubComponentClass {
     }
 
     const layerListItems = layers
-    // Add `id` property to the layers if not present.
-    .map((layer, index) => ({
-      id: index,
-      ...layer,
-    }))
     .map((layer) => ({
-      id: layer.id,
-      title: layer.name,
+      name: layer.name,
       type: layer.type,
       url: layer.url,
       min: layer.min,
       max: layer.max,
       styles: layer.styles,
-      invisible: !this.getLayerVisibility(layer.id),
-      opacity: this.getLayerOpacity(layer.id),
+      invisible: !this.getLayerVisibility(layer.name),
+      opacity: this.getLayerOpacity(layer.name),
     }));
 
     const toolbarTooltipPosition = 'top-center';
@@ -297,15 +289,15 @@ class OverlayTab extends SubComponentClass {
               <Subheader>Layers</Subheader>
               {layerListItems.map((layerItem) => (
                 <ListItem
-                  key={layerItem.id}
+                  key={layerItem.name}
                   className="layer-list__item"
                   leftCheckbox={(
                     <Checkbox
-                      checked={this.getLayerVisibility(layerItem.id)}
-                      onCheck={(event, isChecked) => this.setLayerVisibility(layerItem.id, isChecked)}
+                      checked={this.getLayerVisibility(layerItem.name)}
+                      onCheck={(event, isChecked) => this.setLayerVisibility(layerItem.name, isChecked)}
                     />
                   )}
-                  primaryText={layerItem.title}
+                  primaryText={layerItem.name}
                   nestedItems={[
                     <ListItem
                       key="layer-opacity"
@@ -313,7 +305,7 @@ class OverlayTab extends SubComponentClass {
                       primaryText={(
                         <div className="adjustment-option__header">
                           <label>Opacity: </label>
-                          <label>{OverlayTab.getDisplayTextForLayerOpacity(this.getLayerOpacity(layerItem.id))}</label>
+                          <label>{OverlayTab.getDisplayTextForLayerOpacity(this.getLayerOpacity(layerItem.name))}</label>
                         </div>
                       )}
                       secondaryText={(
@@ -327,8 +319,8 @@ class OverlayTab extends SubComponentClass {
                             className="input-slider--layer-opacity"
                             min={OverlayTab.opacitySliderMin}
                             max={OverlayTab.opacitySliderMax}
-                            value={this.getOpacitySliderValueForLayer(layerItem.id)}
-                            onChange={(event, newValue) => this.setLayerOpacityFromSliderValue(layerItem.id, newValue)}
+                            value={this.getOpacitySliderValueForLayer(layerItem.name)}
+                            onChange={(event, newValue) => this.setLayerOpacityFromSliderValue(layerItem.name, newValue)}
                             sliderStyle={{
                               marginTop: 0,
                               marginBottom: 0,

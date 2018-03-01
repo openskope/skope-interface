@@ -16,6 +16,7 @@ import {
   getDateStringAtPrecision,
   parseDateStringWithPrecision,
   buildGeoJsonWithGeometry,
+  AllResolutionNames,
 } from '/imports/ui/helpers';
 
 import SuiteBaseClass from './SuiteBaseClass';
@@ -30,8 +31,19 @@ import MetadataTab from './dataset.metadata';
 class Component extends SuiteBaseClass {
 
   static propTypes = SuiteBaseClass.extendPropTypes({
-    timespan: PropTypes.shape({
+    variables: PropTypes.arrayOf(PropTypes.shape({
+      name: PropTypes.string,
+      url: PropTypes.string,
+      description: PropTypes.string,
+    })),
+    region: PropTypes.shape({
+      name: PropTypes.string,
+      extents: PropTypes.arrayOf(PropTypes.number),
       resolution: PropTypes.string,
+      geometry: PropTypes.object,
+    }),
+    timespan: PropTypes.shape({
+      resolution: PropTypes.oneOf(AllResolutionNames),
       period: PropTypes.shape({
         gte: PropTypes.oneOfType([
           PropTypes.string,
@@ -68,7 +80,7 @@ class Component extends SuiteBaseClass {
 
   /**
    * @param {string} urlTemplate
-   * @param {Object.<placeHolder: string, value: *} values
+   * @param {Object<placeHolder: string, value: *} values
    * @returns {string}
    */
   static composeLayerId = (urlTemplate, values) => {
@@ -91,6 +103,23 @@ class Component extends SuiteBaseClass {
         lte: parseDateStringWithPrecision(period.lte, datePrecision),
       },
     };
+  });
+
+  static memGetVariables = mem((variables, { overlays, analytics }) => {
+    const mapOfOverlays = _.keyBy(overlays, 'name');
+    const mapOfAnalytics = _.keyBy(analytics, 'name');
+
+    const fullVariables = variables.map((v) => {
+      return {
+        ...v,
+        overlay: mapOfOverlays[v.name],
+        analytics: mapOfAnalytics[v.name],
+      };
+    });
+
+    const mapOfFullVariables = _.keyBy(fullVariables, 'name');
+
+    return mapOfFullVariables;
   });
 
   constructor (props) {
@@ -148,7 +177,7 @@ class Component extends SuiteBaseClass {
 
   /**
    * If `extents` is specified in source, trust that. Otherwise try to calculate from boundary shape.
-   * @type {Array.<number>}
+   * @type {Array<number>}
    */
   get extent () {
     const boundaryExtentFromDocument = objectPath.get(this.props.region, 'extents');
@@ -164,6 +193,20 @@ class Component extends SuiteBaseClass {
     }
 
     return geojsonExtent(boundaryGeoJson);
+  }
+
+  /**
+   * @type {Object<string, Object>}
+   */
+  get variables () {
+    const variables = objectPath.get(this.props, 'variables', []);
+    const overlays = objectPath.get(this.props, 'overlays', []);
+    const analytics = objectPath.get(this.props, 'analytics', []);
+
+    return Component.memGetVariables(variables, {
+      overlays,
+      analytics,
+    });
   }
 
   onTabChange = (nextTabValue) => {

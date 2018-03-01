@@ -2,6 +2,7 @@ import {
   Meteor,
 } from 'meteor/meteor';
 import _ from 'lodash';
+import objectPath from 'object-path';
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
@@ -36,6 +37,8 @@ import {
 import MapView from '/imports/ui/components/mapview';
 
 import SubComponentClass from './SubComponentClass';
+
+import * as mapLayerRenderers from './dataset.mapLayerRenderers';
 
 // Temporary helper function. Put this somewhere else.
 const getGeometryOfPoint = (point) => {
@@ -163,8 +166,8 @@ class AnalyticsTab extends SubComponentClass {
 
   getInitialState () {
     return {
-      // ID of the selected analytics.
-      activeAnalyticsId: null,
+      // ID of the selected variable for analytics.
+      activeVariableName: null,
       // Geometry of the analytics area.
       analyticsBoundaryGeometry: null,
       // @type {string}
@@ -183,7 +186,7 @@ class AnalyticsTab extends SubComponentClass {
 
   onChangeActiveAnalytics = (event, index, value) => {
     this.setState({
-      activeAnalyticsId: value,
+      activeVariableName: value,
     });
   };
 
@@ -263,6 +266,35 @@ class AnalyticsTab extends SubComponentClass {
     });
   }
 
+  /**
+   * @param {string} variableName
+   */
+  renderMapLayerForVariable (variableName) {
+    const layer = objectPath.get(this.component.variables, [variableName, 'overlay']);
+
+    if (!layer) {
+      return null;
+    }
+
+    if (!(layer.type in mapLayerRenderers)) {
+      console.warn(`Unknown layer type “${layer.type}” for layer “${layer.name}”`);
+      return null;
+    }
+
+    const mapLayerRenderer = mapLayerRenderers[layer.type];
+
+    return mapLayerRenderer.call(this, {
+      ...layer,
+      extent: this.component.extent,
+      visible: true,
+      opacity: 0.7,
+    }, {
+      YYYY: () => moment(this.component.timespan.period.lte).format('YYYY'),
+      MM: () => moment(this.component.timespan.period.lte).format('MM'),
+      DD: () => moment(this.component.timespan.period.lte).format('DD'),
+    });
+  }
+
   render () {
     const {
       analyticService: analyticsField,
@@ -270,7 +302,7 @@ class AnalyticsTab extends SubComponentClass {
       muiTheme,
     } = this.props;
     const {
-      activeAnalyticsId,
+      activeVariableName,
       analyticsBoundaryGeometry,
       isLoadingTimeSeriesData,
       isTimeSeriesDataLoaded,
@@ -341,7 +373,7 @@ class AnalyticsTab extends SubComponentClass {
         value="analytics"
       >
         <PatheticDataRequester
-          variableName={activeAnalyticsId}
+          variableName={activeVariableName}
           boundaryGeometry={analyticsBoundaryGeometry}
           requester={this.requestData}
           onReady={this.onDataReady}
@@ -356,7 +388,7 @@ class AnalyticsTab extends SubComponentClass {
             <SelectField
               floatingLabelText="Select variable"
               floatingLabelFixed={false}
-              value={activeAnalyticsId}
+              value={activeVariableName}
               onChange={(event, index, value) => this.onChangeActiveAnalytics(event, index, value)}
               style={{
                 width: '100%',
@@ -383,56 +415,59 @@ class AnalyticsTab extends SubComponentClass {
               })}
             </SelectField>
 
-            <div className="map-and-toolbar">
-              <Toolbar
-                style={{
-                  ...mapToolbarStyles.root,
-                }}
-              >
-                <ToolbarGroup>
-                  <ToolbarTitle
-                    text="Select boundary"
-                    style={{
-                      ...mapToolbarStyles.title,
-                    }}
-                  />
-                </ToolbarGroup>
-                <ToolbarGroup>
-                  {AnalyticsTab.selectionTools.map((item) => (
-                    <RaisedButton
-                      key={item.name}
-                      className="selection-tool-button"
-                      icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
+            {activeVariableName && (
+              <div className="map-and-toolbar">
+                <Toolbar
+                  style={{
+                    ...mapToolbarStyles.root,
+                  }}
+                >
+                  <ToolbarGroup>
+                    <ToolbarTitle
+                      text="Select boundary"
                       style={{
-                        ...mapToolbarStyles.toggleButton.root,
-                        ...(this.isSelectionToolActive(item.name) && mapToolbarStyles.toggleButton.active),
+                        ...mapToolbarStyles.title,
                       }}
-                      buttonStyle={mapToolbarStyles.toggleButton.button}
-                      overlayStyle={{
-                        ...mapToolbarStyles.toggleButton.overlay,
-                      }}
-                      onClick={() => this.setSelectionToolActive(item.name)}
                     />
-                  ))}
-                </ToolbarGroup>
-              </Toolbar>
-              <MapView
-                className="map"
-                basemap="osm"
-                projection="EPSG:4326"
-                extent={boundaryExtent}
-                onClick={(event) => this.onClickMap(event)}
-              >
-                {boundaryGeoJsonString && (
-                  <map-layer-geojson src-json={boundaryGeoJsonString} />
-                )}
-                {analyticsBoundaryGeoJsonString && (
-                  <map-layer-geojson src-json={analyticsBoundaryGeoJsonString} />
-                )}
-                <map-interaction-defaults />
-                <map-control-defaults />
-              </MapView>
-            </div>
+                  </ToolbarGroup>
+                  <ToolbarGroup>
+                    {AnalyticsTab.selectionTools.map((item) => (
+                      <RaisedButton
+                        key={item.name}
+                        className="selection-tool-button"
+                        icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
+                        style={{
+                          ...mapToolbarStyles.toggleButton.root,
+                          ...(this.isSelectionToolActive(item.name) && mapToolbarStyles.toggleButton.active),
+                        }}
+                        buttonStyle={mapToolbarStyles.toggleButton.button}
+                        overlayStyle={{
+                          ...mapToolbarStyles.toggleButton.overlay,
+                        }}
+                        onClick={() => this.setSelectionToolActive(item.name)}
+                      />
+                    ))}
+                  </ToolbarGroup>
+                </Toolbar>
+                <MapView
+                  className="map"
+                  basemap="osm"
+                  projection="EPSG:4326"
+                  extent={boundaryExtent}
+                  onClick={(event) => this.onClickMap(event)}
+                >
+                  {activeVariableName && this.renderMapLayerForVariable(activeVariableName)}
+                  {boundaryGeoJsonString && (
+                    <map-layer-geojson src-json={boundaryGeoJsonString} />
+                  )}
+                  {analyticsBoundaryGeoJsonString && (
+                    <map-layer-geojson src-json={analyticsBoundaryGeoJsonString} />
+                  )}
+                  <map-interaction-defaults />
+                  <map-control-defaults />
+                </MapView>
+              </div>
+            )}
           </Paper>
 
           <Paper
