@@ -23,6 +23,7 @@ import {
   DatasetMapIcon,
   DatasetChartIcon,
   DatasetModelIcon,
+  DatasetProvenanceIcon,
 } from '/imports/ui/consts';
 
 import {
@@ -102,6 +103,12 @@ class SearchResultItem extends React.PureComponent {
         isAvailable: Boolean(modelService),
         IconComponent: DatasetModelIcon,
         featureDetail: modelService && modelService.markdown,
+      },
+      {
+        featureName: 'Provenance',
+        isAvailable: false,
+        IconComponent: DatasetProvenanceIcon,
+        featureDetail: '',
       },
     ];
 

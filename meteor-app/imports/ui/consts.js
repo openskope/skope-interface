@@ -7,6 +7,7 @@ import DownloadIcon from 'material-ui/svg-icons/file/cloud-download';
 import MapIcon from 'material-ui/svg-icons/maps/map';
 import ChartIcon from 'material-ui/svg-icons/editor/multiline-chart';
 import BuildIcon from 'material-ui/svg-icons/action/build';
+import MergeIcon from 'material-ui/svg-icons/editor/merge-type';
 
 export const rangeMin = 1;
 export const rangeMax = 2000;
@@ -16,3 +17,4 @@ export const DatasetDownloadIcon = DownloadIcon;
 export const DatasetMapIcon = MapIcon;
 export const DatasetChartIcon = ChartIcon;
 export const DatasetModelIcon = BuildIcon;
+export const DatasetProvenanceIcon = MergeIcon;
