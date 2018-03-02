@@ -206,7 +206,14 @@ const parseDateStringWithPrecision = (
         return null;
       }
 
-      const date = moment(dateString, format).toDate();
+      // Use strict parsing to avoid unpredictable results. (`true` in the 3rd argument).
+      const $date = moment(dateString, format, true);
+
+      if (!$date.isValid()) {
+        return null;
+      }
+
+      const date = $date.toDate();
 
       return date;
     }

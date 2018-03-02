@@ -28,7 +28,7 @@ import AnalyticsTab from './dataset.analytics';
 import ModelTab from './dataset.model';
 import MetadataTab from './dataset.metadata';
 
-class Component extends SuiteBaseClass {
+class DatasetWorkspace extends SuiteBaseClass {
 
   static propTypes = SuiteBaseClass.extendPropTypes({
     variables: PropTypes.arrayOf(PropTypes.shape({
@@ -77,6 +77,12 @@ class Component extends SuiteBaseClass {
     // description: '',
     // metadata: {},
   };
+
+  static dateFormatForPrecisions = [
+    'YYYY',
+    'YYYY-MM',
+    'YYYY-MM-DD',
+  ];
 
   /**
    * @param {string} urlTemplate
@@ -152,7 +158,7 @@ class Component extends SuiteBaseClass {
       },
     } = this.props;
 
-    return Component.memGetTimespan(resolution, period);
+    return DatasetWorkspace.memGetTimespan(resolution, period);
   }
 
   /**
@@ -203,7 +209,7 @@ class Component extends SuiteBaseClass {
     const overlays = objectPath.get(this.props, 'overlays', []);
     const analytics = objectPath.get(this.props, 'analytics', []);
 
-    return Component.memGetVariables(variables, {
+    return DatasetWorkspace.memGetVariables(variables, {
       overlays,
       analytics,
     });
@@ -226,11 +232,24 @@ class Component extends SuiteBaseClass {
    * @return {string}
    */
   buildPreciseDateString = (date) => {
-    return getDateStringAtPrecision(date, this.temporalPrecision, [
-      'YYYY',
-      'YYYY-MM',
-      'YYYY-MM-DD',
-    ]);
+    return getDateStringAtPrecision(
+      date,
+      this.temporalPrecision,
+      DatasetWorkspace.dateFormatForPrecisions,
+    );
+  };
+
+  /**
+   * Does the oppsite of `#buildPreciseDateString`.
+   * @param  {string} dateString
+   * @return {Date}
+   */
+  parsePreciseDateString = (dateString) => {
+    return parseDateStringWithPrecision(
+      dateString,
+      this.temporalPrecision,
+      DatasetWorkspace.dateFormatForPrecisions,
+    );
   };
 
   renderTabLabel = ({
@@ -270,4 +289,4 @@ class Component extends SuiteBaseClass {
   }
 }
 
-export default muiThemeable()(Component);
+export default muiThemeable()(DatasetWorkspace);

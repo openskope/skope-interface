@@ -31,9 +31,15 @@ class LazyTextField extends React.Component {
     }
   }
 
-  resetValue () {
+  /**
+   * @param {string} specificValue - Optional.
+   */
+  resetValue (specificValue) {
+    const newValue = typeof specificValue === 'undefined'
+                     ? this.props.value
+                     : specificValue;
     this.setState({
-      dirtyInputValue: this.props.value,
+      dirtyInputValue: newValue,
     });
   }
 
@@ -92,18 +98,24 @@ class SliderWithInput extends React.PureComponent {
     label: PropTypes.string.isRequired,
     min: PropTypes.any.isRequired,
     max: PropTypes.any.isRequired,
-    step: PropTypes.any.isRequired,
+    step: PropTypes.any,
+    // If `step` is specified, `sliderStep` is ignored.
+    sliderStep: PropTypes.number,
     value: PropTypes.any.isRequired,
     onChange: PropTypes.func.isRequired,
     toSliderValue: PropTypes.func,
+    // This function should not throw an error. Every point on the slider should be a valid input.
     fromSliderValue: PropTypes.func,
     toInputValue: PropTypes.func,
+    // If this function throws an error, the input value will be reset.
     fromInputValue: PropTypes.func,
     sliderStyle: PropTypes.object,
     inputStyle: PropTypes.object,
   };
 
   static defaultProps = {
+    step: 0,
+    sliderStep: 1,
     toSliderValue: (v) => Number(v),
     fromSliderValue: (v) => v,
     toInputValue: (v) => String(v),
@@ -137,19 +149,23 @@ class SliderWithInput extends React.PureComponent {
   }
 
   get sliderStep () {
-    return this.props.toSliderValue(this.props.step);
+    return this.props.step ? this.props.toSliderValue(this.props.step) : this.props.sliderStep;
   }
 
   get sliderValue () {
     return this.props.toSliderValue(this.props.value);
   }
 
+  /**
+   * @param {Event} event
+   * @param {*} newValue
+   * @returns {*|null}
+   */
   triggerValueOnChange (event, newValue) {
     let finalValue = newValue;
 
     if (isNaN(finalValue)) {
-      this._input.resetValue();
-      return;
+      return null;
     }
 
     if (finalValue > this.props.max) {
@@ -161,6 +177,8 @@ class SliderWithInput extends React.PureComponent {
     }
 
     this.props.onChange(event, finalValue);
+
+    return finalValue;
   }
 
   sliderOnChange = (event, newSliderValue) => {
@@ -170,19 +188,34 @@ class SliderWithInput extends React.PureComponent {
   };
 
   inputOnChange = (event, newInputValue) => {
-    const newValue = this.props.fromInputValue(newInputValue);
+    let newValue = '';
 
-    this.triggerValueOnChange(event, newValue);
+    try {
+      newValue = this.props.fromInputValue(newInputValue);
+    } catch (error) {
+      this._input.resetValue();
+      return;
+    }
+
+    // Final value might be different from the new value after value clamping.
+    const finalValue = this.triggerValueOnChange(event, newValue);
+
+    if (finalValue !== null && this._input) {
+      const finalInputValue = this.props.toInputValue(finalValue);
+      this._input.resetValue(finalInputValue);
+    }
   };
 
   inputOnStepDown = (event) => {
-    const newValue = this.props.value - this.props.step;
+    const newSliderValue = this.sliderValue - this.sliderStep;
+    const newValue = this.props.fromSliderValue(newSliderValue);
 
     this.triggerValueOnChange(event, newValue);
   };
 
   inputOnStepUp = (event) => {
-    const newValue = this.props.value + this.props.step;
+    const newSliderValue = this.sliderValue + this.sliderStep;
+    const newValue = this.props.fromSliderValue(newSliderValue);
 
     this.triggerValueOnChange(event, newValue);
   };

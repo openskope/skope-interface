@@ -227,6 +227,8 @@ class OverlayTab extends SubComponentClass {
       return null;
     }
 
+    const timespan = this.component.timespan;
+
     const layerListItems = layers
     .map((layer) => ({
       name: layer.name,
@@ -261,7 +263,7 @@ class OverlayTab extends SubComponentClass {
             <List
               className="layer-list"
             >
-              <Subheader>Layers</Subheader>
+              <Subheader>Variables with overlay</Subheader>
               {layerListItems.map((layerItem) => (
                 <ListItem
                   key={layerItem.name}
@@ -296,7 +298,7 @@ class OverlayTab extends SubComponentClass {
                           }
 
                           if (isNaN(str)) {
-                            return NaN;
+                            throw new Error('Invalid number.');
                           }
 
                           return parseFloat(str) / 100;
@@ -366,6 +368,38 @@ class OverlayTab extends SubComponentClass {
                   ]}
                 />
               ))}
+
+              <Subheader>Temporal controls</Subheader>
+              <ListItem
+                disabled
+              >
+                <SliderWithInput
+                  label="Date"
+                  min={timespan.period.gte}
+                  max={timespan.period.lte}
+                  value={this.state.currentLoadedDate}
+                  // (Date) => number
+                  toSliderValue={(date) => moment.duration(date - timespan.period.gte).as(timespan.resolution)}
+                  // (number) => Date
+                  fromSliderValue={(v) => moment(timespan.period.gte).add(v, timespan.resolution).toDate()}
+                  // (Date) => string
+                  toInputValue={this.component.buildPreciseDateString}
+                  // (string) => Date
+                  fromInputValue={(s) => {
+                    const date = this.component.parsePreciseDateString(s);
+
+                    if (!date) {
+                      throw new Error('Invalid date.');
+                    }
+
+                    return date;
+                  }}
+                  onChange={this.loadedDateOnChange}
+                  inputStyle={{
+                    width: '60px',
+                  }}
+                />
+              </ListItem>
             </List>
 
             <Toolbar
