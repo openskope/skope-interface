@@ -1,3 +1,3 @@
 [submodule "third-party-src/web-gis-components"]
 	path = third-party-src/web-gis-components
-	url = git@github.com:Zodiase/Web-GIS-Components.git
+	url = https://github.com/Zodiase/Web-GIS-Components.git
