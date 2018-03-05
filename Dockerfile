@@ -23,7 +23,19 @@ RUN apt-get update \
 ENV HOME="/home/meteor"
 RUN useradd -m -s /bin/bash meteor \
     && mkdir -p "${APP_DIR}" \
-    && chown meteor:meteor "${APP_DIR}"
+    && chown -R meteor:meteor "${APP_DIR}"
+
+#! TODO: Use the line below to replace the workaround when `17.09` is landed
+# on Docker Cloud.
+# See https://github.com/moby/moby/issues/35731#issuecomment-360666913
+#
+# ADD --chown=meteor:meteor ./meteor-app "${APP_DIR}/source"
+#
+#! Workaround begins.
+ADD ./meteor-app "${APP_DIR}/source"
+RUN chown -R meteor:meteor "${APP_DIR}/source"
+#! End of workaround.
+
 USER meteor
 
 # Install Meteor.
@@ -31,7 +43,6 @@ RUN curl "https://install.meteor.com/?release=${METEOR_VERSION}" | sh
 ENV METEOR_PATH="${HOME}/.meteor"
 ENV PATH="$PATH:$METEOR_PATH"
 
-ADD --chown=meteor:meteor ./meteor-app "${APP_DIR}/source"
 RUN cd "${APP_DIR}/source" \
     && meteor npm install --production --unsafe-perm \
     && meteor build "${APP_DIR}" --directory --architecture os.linux.x86_64
@@ -54,9 +65,8 @@ RUN apt-get update \
 ENV HOME="/home/meteor"
 RUN useradd -m -s /bin/bash meteor \
     && mkdir -p "${APP_DIR}" \
-    && chown meteor:meteor "${APP_DIR}"
+    && chown -R meteor:meteor "${APP_DIR}"
 WORKDIR "${APP_DIR}"
-USER meteor
 
 # Meteor Port Config
 ENV NODE_ENV="production" \
@@ -65,8 +75,20 @@ ENV NODE_ENV="production" \
     METEOR_SETTINGS='{"public":{}}' \
     PORT=3000
 
-COPY --from=build --chown=meteor:meteor "${APP_DIR}/bundle" "${APP_DIR}/bundle"
-ADD --chown=meteor:meteor ./meteor-app.settings.default.json "${APP_DIR}/app-settings.json"
-ADD --chown=meteor:meteor ./Dockerfile.entrypoint.sh "${APP_DIR}/entrypoint.sh"
+#! TODO: Use the lines below to replace the workaround when `17.09` is landed
+# on Docker Cloud.
+# See https://github.com/moby/moby/issues/35731#issuecomment-360666913
+#
+# COPY --from=build --chown=meteor:meteor "${APP_DIR}/bundle" "${APP_DIR}/bundle"
+# ADD --chown=meteor:meteor ./meteor-app.settings.default.json "${APP_DIR}/app-settings.json"
+# ADD --chown=meteor:meteor ./Dockerfile.entrypoint.sh "${APP_DIR}/entrypoint.sh"
+#
+#! Workaround begins.
+COPY --from=build "${APP_DIR}/bundle" "${APP_DIR}/bundle"
+ADD ./meteor-app.settings.default.json "${APP_DIR}/app-settings.json"
+ADD ./Dockerfile.entrypoint.sh "${APP_DIR}/entrypoint.sh"
+RUN chown -R meteor:meteor "${APP_DIR}"
+#! End of workaround.
 
+USER meteor
 ENTRYPOINT bash entrypoint.sh
