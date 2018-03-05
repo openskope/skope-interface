@@ -1,0 +1,4 @@
+development
+third-party-src
+meteor-app/node_modules
+meteor-app/.meteor/local
