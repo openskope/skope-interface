@@ -415,59 +415,57 @@ class AnalyticsTab extends SubComponentClass {
               })}
             </SelectField>
 
-            {activeVariableName && (
-              <div className="map-and-toolbar">
-                <Toolbar
-                  style={{
-                    ...mapToolbarStyles.root,
-                  }}
-                >
-                  <ToolbarGroup>
-                    <ToolbarTitle
-                      text="Select boundary"
+            <div className="map-and-toolbar">
+              <Toolbar
+                style={{
+                  ...mapToolbarStyles.root,
+                }}
+              >
+                <ToolbarGroup>
+                  <ToolbarTitle
+                    text="Select boundary"
+                    style={{
+                      ...mapToolbarStyles.title,
+                    }}
+                  />
+                </ToolbarGroup>
+                <ToolbarGroup>
+                  {AnalyticsTab.selectionTools.map((item) => (
+                    <RaisedButton
+                      key={item.name}
+                      className="selection-tool-button"
+                      icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
                       style={{
-                        ...mapToolbarStyles.title,
+                        ...mapToolbarStyles.toggleButton.root,
+                        ...(this.isSelectionToolActive(item.name) && mapToolbarStyles.toggleButton.active),
                       }}
+                      buttonStyle={mapToolbarStyles.toggleButton.button}
+                      overlayStyle={{
+                        ...mapToolbarStyles.toggleButton.overlay,
+                      }}
+                      onClick={() => this.setSelectionToolActive(item.name)}
                     />
-                  </ToolbarGroup>
-                  <ToolbarGroup>
-                    {AnalyticsTab.selectionTools.map((item) => (
-                      <RaisedButton
-                        key={item.name}
-                        className="selection-tool-button"
-                        icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
-                        style={{
-                          ...mapToolbarStyles.toggleButton.root,
-                          ...(this.isSelectionToolActive(item.name) && mapToolbarStyles.toggleButton.active),
-                        }}
-                        buttonStyle={mapToolbarStyles.toggleButton.button}
-                        overlayStyle={{
-                          ...mapToolbarStyles.toggleButton.overlay,
-                        }}
-                        onClick={() => this.setSelectionToolActive(item.name)}
-                      />
-                    ))}
-                  </ToolbarGroup>
-                </Toolbar>
-                <MapView
-                  className="map"
-                  basemap="osm"
-                  projection="EPSG:4326"
-                  extent={boundaryExtent}
-                  onClick={(event) => this.onClickMap(event)}
-                >
-                  {activeVariableName && this.renderMapLayerForVariable(activeVariableName)}
-                  {boundaryGeoJsonString && (
-                    <map-layer-geojson src-json={boundaryGeoJsonString} />
-                  )}
-                  {analyticsBoundaryGeoJsonString && (
-                    <map-layer-geojson src-json={analyticsBoundaryGeoJsonString} />
-                  )}
-                  <map-interaction-defaults />
-                  <map-control-defaults />
-                </MapView>
-              </div>
-            )}
+                  ))}
+                </ToolbarGroup>
+              </Toolbar>
+              <MapView
+                className="map"
+                basemap="osm"
+                projection="EPSG:4326"
+                extent={boundaryExtent}
+                onClick={(event) => this.onClickMap(event)}
+              >
+                {activeVariableName && this.renderMapLayerForVariable(activeVariableName)}
+                {boundaryGeoJsonString && (
+                  <map-layer-geojson src-json={boundaryGeoJsonString} />
+                )}
+                {analyticsBoundaryGeoJsonString && (
+                  <map-layer-geojson src-json={analyticsBoundaryGeoJsonString} />
+                )}
+                <map-interaction-defaults />
+                <map-control-defaults />
+              </MapView>
+            </div>
           </Paper>
 
           <Paper
