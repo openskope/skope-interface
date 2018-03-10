@@ -1,6 +1,7 @@
 import {
   Meteor,
 } from 'meteor/meteor';
+import { HTTP } from 'meteor/http';
 import _ from 'lodash';
 import objectPath from 'object-path';
 import React from 'react';
@@ -58,7 +59,15 @@ class AnalyticsChart extends React.PureComponent {
       gte: PropTypes.instanceOf(Date),
       lte: PropTypes.instanceOf(Date),
     }).isRequired,
-    dataPoints: PropTypes.arrayOf(PropTypes.number).isRequired,
+    data: PropTypes.shape({
+      datasetId: PropTypes.string,
+      variableName: PropTypes.string,
+      range: PropTypes.shape({
+        start: PropTypes.number,
+        end: PropTypes.number,
+      }),
+      values: PropTypes.arrayOf(PropTypes.number),
+    }).isRequired,
   };
 
   static timeFormatsForC3 = [
@@ -83,7 +92,7 @@ class AnalyticsChart extends React.PureComponent {
       return true;
     }
 
-    if (!_.isEqual(nextProps.dataPoints, this.props.dataPoints)) {
+    if (!_.isEqual(nextProps.data, this.props.data)) {
       return true;
     }
 
@@ -98,23 +107,17 @@ class AnalyticsChart extends React.PureComponent {
     const {
       temporalResolution,
       temporalPeriod,
-      dataPoints,
+      data,
     } = this.props;
 
     const temporalPrecision = getPrecisionByResolution(temporalResolution);
     const startDate = new Date(temporalPeriod.gte);
     const xAxisFormat = AnalyticsChart.timeFormatsForC3[temporalPrecision];
-    const xAxisLabels = dataPoints.map((v, index) => {
-      const date = offsetDateAtPrecision(startDate, temporalPrecision, index);
+    const xAxisLabelBaseIndex = objectPath.get(data, 'range.start', 0);
+    const xAxisLabels = data.values.map((v, index) => {
+      const date = offsetDateAtPrecision(startDate, temporalPrecision, xAxisLabelBaseIndex + index);
 
       return date;
-    });
-
-    console.log('renderChart', {
-      temporalResolution,
-      startDate,
-      xAxisFormat,
-      xAxisLabels,
     });
 
     this._chart = c3.generate({
@@ -125,7 +128,7 @@ class AnalyticsChart extends React.PureComponent {
         // xFormat: xAxisFormat,
         columns: [
           ['x', ...xAxisLabels],
-          ['data', ...dataPoints],
+          [data.variableName, ...data.values],
         ],
       },
       axis: {
@@ -207,6 +210,12 @@ class AnalyticsTab extends SubComponentClass {
     });
   };
 
+  getAnalyticsByName = (name) => {
+    return this.props.analytics.find((analytic) => {
+      return analytic.name === name;
+    });
+  };
+
   requestData = (payload, resolve, reject) => {
     console.log('requestData', payload);
 
@@ -214,7 +223,11 @@ class AnalyticsTab extends SubComponentClass {
       return;
     }
 
-    console.log('requestData', 'requesting');
+    const analytics = this.getAnalyticsByName(payload.variableName);
+    //! Fill this url with state values if needed.
+    const remoteUrl = analytics.url;
+
+    console.log('requestData', 'requesting', analytics.url);
 
     this.setState({
       isLoadingTimeSeriesData: true,
@@ -224,13 +237,25 @@ class AnalyticsTab extends SubComponentClass {
       timeSeriesDataResponseDate: null,
     });
 
-    Meteor.call('timeseries.get', payload, (error, result) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(result);
-      }
-    });
+    HTTP.get(
+      remoteUrl,
+      {
+        json: true,
+      },
+      (error, response) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        if (response.statusCode !== 200) {
+          reject(response);
+          return;
+        }
+
+        resolve(response.data);
+      },
+    );
   };
 
   onDataReady = (data) => {
@@ -479,7 +504,7 @@ class AnalyticsTab extends SubComponentClass {
               <AnalyticsChart
                 temporalResolution={resolution}
                 temporalPeriod={period}
-                dataPoints={timeSeriesData}
+                data={timeSeriesData}
               />
             )}
             {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && (

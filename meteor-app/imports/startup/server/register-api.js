@@ -1,6 +1,4 @@
 import { Meteor } from 'meteor/meteor';
-import { check, Match } from 'meteor/check';
-import { HTTP } from 'meteor/http';
 import { WebApp } from 'meteor/webapp';
 import httpProxy from 'http-proxy';
 import url from 'url';
@@ -13,26 +11,6 @@ const serverElasticEndpointInSettings = objectPath.get(Meteor.settings, 'server.
 // Register your apis here
 
 Meteor.methods({
-  'timeseries.get' ({
-    variableName,
-    boundaryGeometry,
-  }) {
-    check(variableName, String);
-    check(boundaryGeometry, Match.ObjectIncluding({
-      type: String,
-      coordinates: Array,
-    }));
-
-    console.log('timeseries.get', {
-      variableName,
-      boundaryGeometry,
-    });
-
-    //! Write real data loading logic here.
-    Meteor._sleepForMs(300);
-
-    return [130, 340, 200, 500, 250, 350];
-  },
   async 'datasetManifest.get' ({
     datasetId,
   }) {
