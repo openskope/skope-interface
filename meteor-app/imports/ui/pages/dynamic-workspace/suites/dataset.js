@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import objectPath from 'object-path';
 import geojsonExtent from 'geojson-extent';
-import mem from 'mem';
 
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import {
@@ -99,7 +98,7 @@ class DatasetWorkspace extends SuiteBaseClass {
       }, urlTemplate);
   };
 
-  static memGetTimespan = mem((resolution, period) => {
+  static getTimespan = (resolution, period) => {
     const datePrecision = getPrecisionByResolution(resolution);
 
     return {
@@ -109,9 +108,9 @@ class DatasetWorkspace extends SuiteBaseClass {
         lte: parseDateStringWithPrecision(period.lte, datePrecision),
       },
     };
-  });
+  };
 
-  static memGetVariables = mem((variables, { overlays, analytics }) => {
+  static getVariables = (variables, { overlays, analytics }) => {
     const mapOfOverlays = _.keyBy(overlays, 'name');
     const mapOfAnalytics = _.keyBy(analytics, 'name');
 
@@ -126,7 +125,7 @@ class DatasetWorkspace extends SuiteBaseClass {
     const mapOfFullVariables = _.keyBy(fullVariables, 'name');
 
     return mapOfFullVariables;
-  });
+  };
 
   constructor (props) {
     super(props);
@@ -158,7 +157,7 @@ class DatasetWorkspace extends SuiteBaseClass {
       },
     } = this.props;
 
-    return DatasetWorkspace.memGetTimespan(resolution, period);
+    return DatasetWorkspace.getTimespan(resolution, period);
   }
 
   /**
@@ -209,7 +208,7 @@ class DatasetWorkspace extends SuiteBaseClass {
     const overlays = objectPath.get(this.props, 'overlays', []);
     const analytics = objectPath.get(this.props, 'analytics', []);
 
-    return DatasetWorkspace.memGetVariables(variables, {
+    return DatasetWorkspace.getVariables(variables, {
       overlays,
       analytics,
     });
