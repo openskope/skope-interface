@@ -11,8 +11,6 @@ import {
   Tab,
 } from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
 import {
   Toolbar,
   ToolbarGroup,
@@ -22,6 +20,14 @@ import RaisedButton from 'material-ui/RaisedButton';
 import PointIcon from 'material-ui/svg-icons/action/room';
 import RectangleIcon from 'material-ui/svg-icons/image/crop-landscape';
 import LinearProgress from 'material-ui/LinearProgress';
+import {
+  List,
+  ListItem,
+} from 'material-ui/List';
+import Subheader from 'material-ui/Subheader';
+import {
+  RadioButton,
+} from 'material-ui/RadioButton';
 import c3 from 'c3';
 import 'c3/c3.css';
 
@@ -188,7 +194,7 @@ class AnalyticsTab extends SubComponentClass {
     };
   }
 
-  onChangeActiveAnalytics = (event, index, value) => {
+  onChangeActiveAnalytics = (event, value) => {
     this.setState({
       activeVariableName: value,
     });
@@ -418,35 +424,25 @@ class AnalyticsTab extends SubComponentClass {
             className="analytics__controls"
             zDepth={1}
           >
-            <SelectField
-              floatingLabelText="Select variable"
-              floatingLabelFixed={false}
-              value={activeVariableName}
-              onChange={(event, index, value) => this.onChangeActiveAnalytics(event, index, value)}
-              style={{
-                width: '100%',
-              }}
-              floatingLabelStyle={{
-                color: muiTheme.palette.primary1Color,
-              }}
+            <List
+              className="layer-list"
             >
-              <MenuItem
-                value={null}
-                primaryText=""
-                style={{
-                  display: 'none',
-                }}
-              />
-              {analytics.map(({ name }, index) => {
-                return (
-                  <MenuItem
-                    key={index}
-                    value={name}
-                    primaryText={name}
-                  />
-                );
-              })}
-            </SelectField>
+              <Subheader>Variables with analytics</Subheader>
+              {analytics.map(({ name }) => (
+                <ListItem
+                  key={name}
+                  className="layer-list__item"
+                  leftCheckbox={(
+                    <RadioButton
+                      value={name}
+                      checked={activeVariableName === name}
+                      onCheck={(event, value) => this.onChangeActiveAnalytics(event, value)}
+                    />
+                  )}
+                  primaryText={name}
+                />
+              ))}
+            </List>
 
             <div className="map-and-toolbar">
               <Toolbar
