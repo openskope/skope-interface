@@ -216,6 +216,12 @@ class AnalyticsTab extends SubComponentClass {
     });
   };
 
+  /**
+   * @memberof AnalyticsTab
+   * @param {Object} payload - Contains everything passed to but not used by the `PatheticDataRequester`.
+   * @param {Function} resolve - Resolve the request with data.
+   * @param {Function} reject - Reject the request with a reason.
+   */
   requestData = (payload, resolve, reject) => {
     console.log('requestData', payload);
 
@@ -253,6 +259,7 @@ class AnalyticsTab extends SubComponentClass {
           return;
         }
 
+        // @see AnalyticsChart.propTypes.data
         resolve(response.data);
       },
     );
@@ -497,15 +504,23 @@ class AnalyticsTab extends SubComponentClass {
             className="analytics__charts"
             zDepth={0}
             style={{
-              padding: '10px 20px',
+              padding: '10px 30px',
             }}
           >
             {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData && (
-              <AnalyticsChart
-                temporalResolution={resolution}
-                temporalPeriod={period}
-                data={timeSeriesData}
-              />
+              <Paper
+                style={{
+                  padding: '20px 30px',
+                  margin: '20px 0',
+                }}
+                zDepth={2}
+              >
+                <AnalyticsChart
+                  temporalResolution={resolution}
+                  temporalPeriod={period}
+                  data={timeSeriesData}
+                />
+              </Paper>
             )}
             {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && (
               <div>Loaded in {moment.duration({
@@ -515,6 +530,18 @@ class AnalyticsTab extends SubComponentClass {
             )}
             {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
               <div>Loading...</div>
+            )}
+            {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
+              <Paper
+                style={{
+                  padding: '20px 30px',
+                  margin: '20px 0',
+                  textAlign: 'center',
+                }}
+                zDepth={2}
+              >
+                <h4>Select a variable and a boundary to view the time serires data.</h4>
+              </Paper>
             )}
           </Paper>
         </div>
