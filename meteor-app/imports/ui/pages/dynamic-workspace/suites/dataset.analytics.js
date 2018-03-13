@@ -21,6 +21,7 @@ import {
 import RaisedButton from 'material-ui/RaisedButton';
 import PointIcon from 'material-ui/svg-icons/action/room';
 import RectangleIcon from 'material-ui/svg-icons/image/crop-landscape';
+import LinearProgress from 'material-ui/LinearProgress';
 import c3 from 'c3';
 import 'c3/c3.css';
 
@@ -529,7 +530,7 @@ class AnalyticsTab extends SubComponentClass {
               }).asSeconds()} s.</div>
             )}
             {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
-              <div>Loading...</div>
+              <LinearProgress mode="indeterminate" />
             )}
             {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
               <Paper
