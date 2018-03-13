@@ -1,7 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
-export default class MapView extends React.Component {
+function difference(object, base) {
+	function changes(object, base) {
+		return _.transform(object, function(result, value, key) {
+			if (!_.isEqual(value, base[key])) {
+				result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
+			}
+		});
+	}
+	return changes(object, base);
+}
+
+export default class MapView extends React.PureComponent {
 
   static propTypes = {
     // Class name for the root element.
@@ -17,8 +29,32 @@ export default class MapView extends React.Component {
     onClick: PropTypes.func,
   };
 
+  static getRenderSensitiveProps = (props) => {
+    const {
+      onClick,
+      onViewLoad,
+      onViewUnLoad,
+      ...sensitiveProps
+    } = props;
+
+    return sensitiveProps;
+  };
+
   componentDidMount () {
     this._addEventListeners();
+  }
+
+  shouldComponentUpdate (nextProps) {
+    const shouldRender = !_.isEqual(
+      MapView.getRenderSensitiveProps(this.props),
+      MapView.getRenderSensitiveProps(nextProps),
+    );
+
+    if (shouldRender) {
+      console.log('difference', difference(this.props, nextProps));
+    }
+
+    return shouldRender;
   }
 
   componentWillUpdate () {
@@ -59,12 +95,7 @@ export default class MapView extends React.Component {
       style,
       children,
       ...custom
-    } = this.props;
-
-    // Remove props that should not appear on `map-view`.
-    delete custom.onClick;
-    delete custom.onViewLoad;
-    delete custom.onViewUnLoad;
+    } = MapView.getRenderSensitiveProps(this.props);
 
     return (
       <div
