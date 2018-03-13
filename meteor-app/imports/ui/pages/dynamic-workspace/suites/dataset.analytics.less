@@ -1,17 +1,26 @@
 .dataset__analytics-tab {
-  .two-column-layout;
-
+  display: grid;
   width: 100%;
   height: 100%;
 
+  grid-template-areas: "control charts"
+                       "toolbar toolbar";
+  grid-template-columns: minmax(500px, 2fr) 3fr;
+  grid-template-rows: 1fr auto;
+
   & > .analytics__controls {
-    .two-column-layout > .left;
-    .two-column-layout > .top-layer;
+    grid-area: control;
+    z-index: 3;
   }
   & > .analytics__charts {
-    .two-column-layout > .right;
-    .two-column-layout > .bottom-layer;
+    grid-area: charts;
     overflow: hidden;
+    z-index: 2;
+  }
+
+  & > .analytics__toolbar {
+    grid-area: toolbar;
+    z-index: 1;
   }
 
   .analytics__controls {

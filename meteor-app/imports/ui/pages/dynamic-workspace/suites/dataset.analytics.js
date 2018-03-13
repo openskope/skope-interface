@@ -499,7 +499,7 @@ class AnalyticsTab extends SubComponentClass {
 
           <Paper
             className="analytics__charts"
-            zDepth={0}
+            zDepth={1}
             style={{
               padding: '10px 30px',
             }}
@@ -541,6 +541,23 @@ class AnalyticsTab extends SubComponentClass {
               </Paper>
             )}
           </Paper>
+
+          <Toolbar
+            className="analytics__toolbar"
+          >
+            <ToolbarGroup>
+              <ToolbarTitle
+                text="Extra stuff here"
+              />
+            </ToolbarGroup>
+            <ToolbarGroup>
+              <RaisedButton
+                className="download-button"
+                label="Download"
+                disabled={!(!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData)}
+              />
+            </ToolbarGroup>
+          </Toolbar>
         </div>
       </Tab>
     );
