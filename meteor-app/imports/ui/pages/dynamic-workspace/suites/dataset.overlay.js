@@ -19,7 +19,9 @@ import {
   ListItem,
 } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
-import Checkbox from 'material-ui/Checkbox';
+import {
+  RadioButton,
+} from 'material-ui/RadioButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import SliderWithInput from '/imports/ui/components/SliderWithInput';
@@ -84,7 +86,7 @@ class OverlayTab extends SubComponentClass {
    * @param {boolean} layerId
    * @returns {boolean}
    */
-  getLayerVisibility (layerId) {
+  isLayerVisible (layerId) {
     return layerId in this.state.layerVisibility
           ? this.state.layerVisibility[layerId]
           : OverlayTab.defaultLayerVisibility;
@@ -139,7 +141,7 @@ class OverlayTab extends SubComponentClass {
     return mapLayerRenderer.call(this, {
       ...layer,
       extent: this.component.extent,
-      visible: this.getLayerVisibility(layer.name),
+      visible: this.isLayerVisible(layer.name),
       opacity: this.getLayerOpacity(layer.name),
     }, {
       YYYY: () => moment(this.state.currentLoadedDate).format('YYYY'),
@@ -237,7 +239,7 @@ class OverlayTab extends SubComponentClass {
       min: layer.min,
       max: layer.max,
       styles: layer.styles,
-      invisible: !this.getLayerVisibility(layer.name),
+      invisible: !this.isLayerVisible(layer.name),
       opacity: this.getLayerOpacity(layer.name),
     }));
 
@@ -269,9 +271,10 @@ class OverlayTab extends SubComponentClass {
                   key={layerItem.name}
                   className="layer-list__item"
                   leftCheckbox={(
-                    <Checkbox
-                      checked={this.getLayerVisibility(layerItem.name)}
-                      onCheck={(event, isChecked) => this.setLayerVisibility(layerItem.name, isChecked)}
+                    <RadioButton
+                      value={layerItem.name}
+                      checked={this.isLayerVisible(layerItem.name)}
+                      onCheck={() => this.setLayerVisibility(layerItem.name, true)}
                     />
                   )}
                   primaryText={layerItem.name}
