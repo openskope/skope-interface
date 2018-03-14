@@ -1,12 +1,11 @@
-import {
-  Meteor,
-} from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
 import _ from 'lodash';
 import objectPath from 'object-path';
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import JsZip from 'jszip';
+import * as FileSaver from 'file-saver';
 import {
   Tab,
 } from 'material-ui/Tabs';
@@ -40,6 +39,8 @@ import {
   PatheticDataRequester,
   getPrecisionByResolution,
   offsetDateAtPrecision,
+  makeSVGDocAsync,
+  svgDocToBlob,
 } from '/imports/ui/helpers';
 
 import MapView from '/imports/ui/components/mapview';
@@ -109,6 +110,18 @@ class AnalyticsChart extends React.PureComponent {
   componentDidUpdate () {
     this.renderChart();
   }
+
+  toBlob = async () => {
+    const svgElement = this._chartContainer.querySelector('svg');
+
+    if (!svgElement) {
+      return null;
+    }
+
+    const svgDoc = await makeSVGDocAsync(svgElement);
+
+    return svgDocToBlob(svgDoc);
+  };
 
   renderChart () {
     const {
@@ -292,6 +305,31 @@ class AnalyticsTab extends SubComponentClass {
       timeSeriesData: null,
       timeSeriesDataResponseDate: new Date(),
     });
+  };
+
+  onDownload = async () => {
+    const zip = new JsZip();
+
+    const {
+      analyticsBoundaryGeometry,
+    } = this.state;
+    const analyticsBoundaryGeoJsonString = analyticsBoundaryGeometry && JSON.stringify(buildGeoJsonWithGeometry(analyticsBoundaryGeometry));
+
+    if (analyticsBoundaryGeoJsonString) {
+      zip.file('boundary.geojson', analyticsBoundaryGeoJsonString);
+    }
+
+    const chart = this._chartComponent;
+
+    if (chart) {
+      zip.file('chart.svg', await chart.toBlob());
+    }
+
+    //! Add CSV file here.
+
+    const blob = await zip.generateAsync({ type: 'blob' });
+
+    FileSaver.saveAs(blob, 'download.zip');
   };
 
   isSelectionToolActive (toolName) {
@@ -516,6 +554,7 @@ class AnalyticsTab extends SubComponentClass {
                   temporalResolution={resolution}
                   temporalPeriod={period}
                   data={timeSeriesData}
+                  ref={(ref) => this._chartComponent = ref}
                 />
               </Paper>
             )}
@@ -552,9 +591,10 @@ class AnalyticsTab extends SubComponentClass {
             </ToolbarGroup>
             <ToolbarGroup>
               <RaisedButton
-                className="download-button"
-                label="Download"
+                className="download-chart-button"
+                label="Download Chart"
                 disabled={!(!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData)}
+                onClick={this.onDownload}
               />
             </ToolbarGroup>
           </Toolbar>
