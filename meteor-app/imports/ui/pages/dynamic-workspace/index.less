@@ -61,6 +61,18 @@
     }
   }
 
+  .tabs-panel .tab-button {
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+
+      &:not(:hover) {
+        opacity: 0.3;
+      }
+    }
+  }
+
   .tabs-panel .tab-label {
     .flex-row;
     align-items: center;

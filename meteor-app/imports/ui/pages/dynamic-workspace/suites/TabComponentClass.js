@@ -33,12 +33,16 @@ class TabComponentClass extends SubComponentClass {
   render () {
     return (
       <Tab
+        className="tab-button"
         label={this.component.renderTabLabel({
           IconComponent: this.constructor.tabIcon,
           label: this.constructor.tabLabel,
         })}
         value={this.constructor.tabName}
         disabled={!this.isTabEnabled}
+        style={{
+          cursor: false,
+        }}
       >{this.isTabEnabled && this.isActiveTab && this.renderBody()}</Tab>
     );
   }
