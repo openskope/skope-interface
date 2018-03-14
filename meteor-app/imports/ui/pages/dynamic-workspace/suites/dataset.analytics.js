@@ -88,24 +88,18 @@ class AnalyticsChart extends React.PureComponent {
     this.renderChart();
   }
 
-  shouldComponentUpdate (nextProps) {
-    if (nextProps.temporalResolution !== this.props.temporalResolution) {
-      return true;
+  componentWillReceiveProps (nextProps) {
+    if (
+      nextProps.temporalResolution !== this.props.temporalResolution ||
+      !_.isEqual(nextProps.temporalPeriod, this.props.temporalPeriod) ||
+      !_.isEqual(nextProps.data, this.props.data)
+    ) {
+      this.renderChart();
     }
-
-    if (!_.isEqual(nextProps.temporalPeriod, this.props.temporalPeriod)) {
-      return true;
-    }
-
-    if (!_.isEqual(nextProps.data, this.props.data)) {
-      return true;
-    }
-
-    return false;
   }
 
-  componentDidUpdate () {
-    this.renderChart();
+  shouldComponentUpdate () {
+    return false;
   }
 
   toBlob = async () => {
