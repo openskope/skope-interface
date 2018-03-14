@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import moment from 'moment';
 
 /**
@@ -295,3 +296,14 @@ const fillTemplateString = (templateString, fillers) => {
     return newAcc;
   }, templateString);
 };
+
+export
+function difference(object, base) {
+  return _.transform(object, function(result, value, key) {
+    if (!_.isEqual(value, base[key])) {
+      result[key] = (_.isObject(value) && _.isObject(base[key]))
+                    ? difference(value, base[key])
+                    : value;
+    }
+  });
+}
