@@ -6,9 +6,6 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import JsZip from 'jszip';
 import * as FileSaver from 'file-saver';
-import {
-  Tab,
-} from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
 import {
   Toolbar,
@@ -45,7 +42,7 @@ import {
 
 import MapView from '/imports/ui/components/mapview';
 
-import SubComponentClass from './SubComponentClass';
+import TabComponentClass from './TabComponentClass';
 
 import * as mapLayerRenderers from './dataset.mapLayerRenderers';
 
@@ -175,7 +172,7 @@ class AnalyticsChart extends React.PureComponent {
 }
 
 export default
-class AnalyticsTab extends SubComponentClass {
+class AnalyticsTab extends TabComponentClass {
   static selectionTools = [
     {
       name: 'point',
@@ -185,6 +182,14 @@ class AnalyticsTab extends SubComponentClass {
       name: 'rectangle',
       IconClass: RectangleIcon,
     },
+  ];
+
+  static tabName = 'analytics';
+  static tabIcon = DatasetChartIcon;
+  static tabLabel = 'Analytics';
+  static requiredProps = [
+    'analyticService',
+    'analytics',
   ];
 
   getInitialState () {
@@ -372,9 +377,8 @@ class AnalyticsTab extends SubComponentClass {
     });
   }
 
-  render () {
+  renderBody () {
     const {
-      analyticService: analyticsField,
       analytics,
       muiTheme,
     } = this.props;
@@ -387,10 +391,6 @@ class AnalyticsTab extends SubComponentClass {
       timeSeriesDataRequestDate,
       timeSeriesDataResponseDate,
     } = this.state;
-
-    if (!(analyticsField && analytics)) {
-      return null;
-    }
 
     const boundaryGeoJson = this.component.boundaryGeoJson;
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
@@ -442,13 +442,7 @@ class AnalyticsTab extends SubComponentClass {
     };
 
     return (
-      <Tab
-        label={this.component.renderTabLabel({
-          IconComponent: DatasetChartIcon,
-          label: 'Analytics',
-        })}
-        value="analytics"
-      >
+      <div className="dataset__analytics-tab">
         <PatheticDataRequester
           variableName={activeVariableName}
           boundaryGeometry={analyticsBoundaryGeometry}
@@ -457,149 +451,148 @@ class AnalyticsTab extends SubComponentClass {
           onError={this.onDataError}
           verbose
         />
-        <div className="dataset__analytics-tab">
-          <Paper
-            className="analytics__controls"
-            zDepth={1}
-          >
-            <List
-              className="layer-list"
-            >
-              <Subheader>Variables with analytics</Subheader>
-              {analytics.map(({ name }) => (
-                <ListItem
-                  key={name}
-                  className="layer-list__item"
-                  leftCheckbox={(
-                    <RadioButton
-                      value={name}
-                      checked={activeVariableName === name}
-                      onCheck={(event, value) => this.onChangeActiveAnalytics(event, value)}
-                    />
-                  )}
-                  primaryText={name}
-                />
-              ))}
-            </List>
 
-            <div className="map-and-toolbar">
-              <Toolbar
-                style={{
-                  ...mapToolbarStyles.root,
-                }}
-              >
-                <ToolbarGroup>
-                  <ToolbarTitle
-                    text="Select boundary"
-                    style={{
-                      ...mapToolbarStyles.title,
-                    }}
+        <Paper
+          className="analytics__controls"
+          zDepth={1}
+        >
+          <List
+            className="layer-list"
+          >
+            <Subheader>Variables with analytics</Subheader>
+            {analytics.map(({ name }) => (
+              <ListItem
+                key={name}
+                className="layer-list__item"
+                leftCheckbox={(
+                  <RadioButton
+                    value={name}
+                    checked={activeVariableName === name}
+                    onCheck={(event, value) => this.onChangeActiveAnalytics(event, value)}
                   />
-                </ToolbarGroup>
-                <ToolbarGroup>
-                  {AnalyticsTab.selectionTools.map((item) => (
-                    <RaisedButton
-                      key={item.name}
-                      className="selection-tool-button"
-                      icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
-                      style={{
-                        ...mapToolbarStyles.toggleButton.root,
-                        ...(this.isSelectionToolActive(item.name) && mapToolbarStyles.toggleButton.active),
-                      }}
-                      buttonStyle={mapToolbarStyles.toggleButton.button}
-                      overlayStyle={{
-                        ...mapToolbarStyles.toggleButton.overlay,
-                      }}
-                      onClick={() => this.setSelectionToolActive(item.name)}
-                    />
-                  ))}
-                </ToolbarGroup>
-              </Toolbar>
-              <MapView
-                className="map"
-                basemap="osm"
-                projection="EPSG:4326"
-                extent={boundaryExtent}
-                onClick={(event) => this.onClickMap(event)}
-              >
-                {activeVariableName && this.renderMapLayerForVariable(activeVariableName)}
-                {boundaryGeoJsonString && (
-                  <map-layer-geojson src-json={boundaryGeoJsonString} />
                 )}
-                {analyticsBoundaryGeoJsonString && (
-                  <map-layer-geojson src-json={analyticsBoundaryGeoJsonString} />
-                )}
-                <map-interaction-defaults />
-                <map-control-defaults />
-              </MapView>
-            </div>
-          </Paper>
+                primaryText={name}
+              />
+            ))}
+          </List>
 
-          <Paper
-            className="analytics__charts"
-            zDepth={1}
-            style={{
-              padding: '10px 30px',
-            }}
-          >
-            {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData && (
-              <Paper
-                style={{
-                  padding: '20px 30px',
-                  margin: '20px 0',
-                }}
-                zDepth={2}
-              >
-                <AnalyticsChart
-                  temporalResolution={resolution}
-                  temporalPeriod={period}
-                  data={timeSeriesData}
-                  ref={(ref) => this._chartComponent = ref}
+          <div className="map-and-toolbar">
+            <Toolbar
+              style={{
+                ...mapToolbarStyles.root,
+              }}
+            >
+              <ToolbarGroup>
+                <ToolbarTitle
+                  text="Select boundary"
+                  style={{
+                    ...mapToolbarStyles.title,
+                  }}
                 />
-              </Paper>
-            )}
-            {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && (
-              <div>Loaded in {moment.duration({
-                from: timeSeriesDataRequestDate,
-                to: timeSeriesDataResponseDate,
-              }).asSeconds()} s.</div>
-            )}
-            {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
-              <LinearProgress mode="indeterminate" />
-            )}
-            {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
-              <Paper
-                style={{
-                  padding: '20px 30px',
-                  margin: '20px 0',
-                  textAlign: 'center',
-                }}
-                zDepth={2}
-              >
-                <h4>Select a variable and a boundary to view the time serires data.</h4>
-              </Paper>
-            )}
-          </Paper>
+              </ToolbarGroup>
+              <ToolbarGroup>
+                {AnalyticsTab.selectionTools.map((item) => (
+                  <RaisedButton
+                    key={item.name}
+                    className="selection-tool-button"
+                    icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
+                    style={{
+                      ...mapToolbarStyles.toggleButton.root,
+                      ...(this.isSelectionToolActive(item.name) && mapToolbarStyles.toggleButton.active),
+                    }}
+                    buttonStyle={mapToolbarStyles.toggleButton.button}
+                    overlayStyle={{
+                      ...mapToolbarStyles.toggleButton.overlay,
+                    }}
+                    onClick={() => this.setSelectionToolActive(item.name)}
+                  />
+                ))}
+              </ToolbarGroup>
+            </Toolbar>
+            <MapView
+              className="map"
+              basemap="osm"
+              projection="EPSG:4326"
+              extent={boundaryExtent}
+              onClick={(event) => this.onClickMap(event)}
+            >
+              {activeVariableName && this.renderMapLayerForVariable(activeVariableName)}
+              {boundaryGeoJsonString && (
+                <map-layer-geojson src-json={boundaryGeoJsonString} />
+              )}
+              {analyticsBoundaryGeoJsonString && (
+                <map-layer-geojson src-json={analyticsBoundaryGeoJsonString} />
+              )}
+              <map-interaction-defaults />
+              <map-control-defaults />
+            </MapView>
+          </div>
+        </Paper>
 
-          <Toolbar
-            className="analytics__toolbar"
-          >
-            <ToolbarGroup>
-              <ToolbarTitle
-                text="Extra stuff here"
+        <Paper
+          className="analytics__charts"
+          zDepth={1}
+          style={{
+            padding: '10px 30px',
+          }}
+        >
+          {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData && (
+            <Paper
+              style={{
+                padding: '20px 30px',
+                margin: '20px 0',
+              }}
+              zDepth={2}
+            >
+              <AnalyticsChart
+                temporalResolution={resolution}
+                temporalPeriod={period}
+                data={timeSeriesData}
+                ref={(ref) => this._chartComponent = ref}
               />
-            </ToolbarGroup>
-            <ToolbarGroup>
-              <RaisedButton
-                className="download-chart-button"
-                label="Download Chart"
-                disabled={!(!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData)}
-                onClick={this.onDownload}
-              />
-            </ToolbarGroup>
-          </Toolbar>
-        </div>
-      </Tab>
+            </Paper>
+          )}
+          {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && (
+            <div>Loaded in {moment.duration({
+              from: timeSeriesDataRequestDate,
+              to: timeSeriesDataResponseDate,
+            }).asSeconds()} s.</div>
+          )}
+          {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
+            <LinearProgress mode="indeterminate" />
+          )}
+          {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
+            <Paper
+              style={{
+                padding: '20px 30px',
+                margin: '20px 0',
+                textAlign: 'center',
+              }}
+              zDepth={2}
+            >
+              <h4>Select a variable and a boundary to view the time serires data.</h4>
+            </Paper>
+          )}
+        </Paper>
+
+        <Toolbar
+          className="analytics__toolbar"
+        >
+          <ToolbarGroup>
+            <ToolbarTitle
+              text="Extra stuff here"
+            />
+          </ToolbarGroup>
+          <ToolbarGroup>
+            <RaisedButton
+              className="download-chart-button"
+              label="Download Chart"
+              disabled={!(!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData)}
+              onClick={this.onDownload}
+            />
+          </ToolbarGroup>
+        </Toolbar>
+      </div>
     );
   }
 }
