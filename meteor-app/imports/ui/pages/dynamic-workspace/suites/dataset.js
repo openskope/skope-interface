@@ -256,11 +256,13 @@ class DatasetWorkspace extends SuiteBaseClass {
     label,
   }) => (
     <div className="tab-label">
-      <IconComponent
-        style={{
-          color: 'inherit',
-        }}
-      />
+      {IconComponent && (
+        <IconComponent
+          style={{
+            color: 'inherit',
+          }}
+        />
+      )}
       <span>{label}</span>
     </div>
   );

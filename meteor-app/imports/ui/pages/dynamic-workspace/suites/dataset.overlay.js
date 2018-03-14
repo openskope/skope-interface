@@ -1,9 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import {
-  Tab,
-} from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
 import {
   Toolbar,
@@ -19,7 +16,9 @@ import {
   ListItem,
 } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
-import Checkbox from 'material-ui/Checkbox';
+import {
+  RadioButton,
+} from 'material-ui/RadioButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import SliderWithInput from '/imports/ui/components/SliderWithInput';
@@ -38,12 +37,12 @@ import {
 
 import MapView from '/imports/ui/components/mapview';
 
-import SubComponentClass from './SubComponentClass';
+import TabComponentClass from './TabComponentClass';
 
 import * as mapLayerRenderers from './dataset.mapLayerRenderers';
 
 export default
-class OverlayTab extends SubComponentClass {
+class OverlayTab extends TabComponentClass {
 
   static propTypes = {
     overlays: PropTypes.arrayOf(PropTypes.shape({
@@ -60,6 +59,13 @@ class OverlayTab extends SubComponentClass {
   static defaultProps = {
     overlays: null,
   };
+
+  static tabName = 'layers';
+  static tabIcon = DatasetMapIcon;
+  static tabLabel = 'Overlays';
+  static requiredProps = [
+    'overlays',
+  ];
 
   static defaultLayerVisibility = false;
   static defaultLayerOpacity = 1;
@@ -84,7 +90,7 @@ class OverlayTab extends SubComponentClass {
    * @param {boolean} layerId
    * @returns {boolean}
    */
-  getLayerVisibility (layerId) {
+  isLayerVisible (layerId) {
     return layerId in this.state.layerVisibility
           ? this.state.layerVisibility[layerId]
           : OverlayTab.defaultLayerVisibility;
@@ -139,7 +145,7 @@ class OverlayTab extends SubComponentClass {
     return mapLayerRenderer.call(this, {
       ...layer,
       extent: this.component.extent,
-      visible: this.getLayerVisibility(layer.name),
+      visible: this.isLayerVisible(layer.name),
       opacity: this.getLayerOpacity(layer.name),
     }, {
       YYYY: () => moment(this.state.currentLoadedDate).format('YYYY'),
@@ -208,7 +214,7 @@ class OverlayTab extends SubComponentClass {
     });
   };
 
-  render () {
+  renderBody () {
     const {
       /**
        * @type {Array<Object>}
@@ -223,10 +229,6 @@ class OverlayTab extends SubComponentClass {
       overlays: layers,
     } = this.props;
 
-    if (!layers) {
-      return null;
-    }
-
     const timespan = this.component.timespan;
 
     const layerListItems = layers
@@ -237,7 +239,7 @@ class OverlayTab extends SubComponentClass {
       min: layer.min,
       max: layer.max,
       styles: layer.styles,
-      invisible: !this.getLayerVisibility(layer.name),
+      invisible: !this.isLayerVisible(layer.name),
       opacity: this.getLayerOpacity(layer.name),
     }));
 
@@ -248,225 +250,218 @@ class OverlayTab extends SubComponentClass {
     const boundaryExtent = this.component.extent;
 
     return (
-      <Tab
-        label={this.component.renderTabLabel({
-          IconComponent: DatasetMapIcon,
-          label: 'Overlays',
-        })}
-        value="layers"
-      >
-        <div className="dataset__overlay-tab">
-          <Paper
-            className="overlay__controls"
-            zDepth={1}
+      <div className="dataset__overlay-tab">
+        <Paper
+          className="overlay__controls"
+          zDepth={1}
+        >
+          <List
+            className="layer-list"
           >
-            <List
-              className="layer-list"
-            >
-              <Subheader>Variables with overlay</Subheader>
-              {layerListItems.map((layerItem) => (
-                <ListItem
-                  key={layerItem.name}
-                  className="layer-list__item"
-                  leftCheckbox={(
-                    <Checkbox
-                      checked={this.getLayerVisibility(layerItem.name)}
-                      onCheck={(event, isChecked) => this.setLayerVisibility(layerItem.name, isChecked)}
-                    />
-                  )}
-                  primaryText={layerItem.name}
-                  nestedItems={[
-                    <ListItem
-                      key="layer-opacity"
-                      disabled
-                    >
-                      <SliderWithInput
-                        label="Opacity"
-                        min={0}
-                        max={1}
-                        step={0.01}
-                        value={this.getLayerOpacity(layerItem.name)}
-                        toSliderValue={(v) => v * 100}
-                        fromSliderValue={(v) => v / 100}
-                        toInputValue={(v) => `${(v * 100).toFixed(0)}%`}
-                        fromInputValue={(v) => {
-                          // We want to support both format `{N}%` and `{N}`.
-                          let str = v;
-
-                          if (str[str.length - 1] === '%') {
-                            str = str.slice(0, -1);
-                          }
-
-                          if (isNaN(str)) {
-                            throw new Error('Invalid number.');
-                          }
-
-                          return parseFloat(str) / 100;
-                        }}
-                        onChange={(event, newValue) => this.setLayerOpacity(layerItem.name, newValue)}
-                        inputStyle={{
-                          width: '60px',
-                        }}
-                      />
-                    </ListItem>,
-                    <ListItem
-                      key="layer-style-range"
-                      disabled
-                      primaryText={(
-                        <div className="adjustment-option__header">
-                          <label>Overlay range: </label>
-                        </div>
-                      )}
-                      secondaryText={(
-                        <div
-                          style={{
-                            overflow: 'visible',
-                            ...OverlayTab.paddingForSliders,
-                          }}
-                        >
-                          <Range
-                            className="input-slider--layer-opacity"
-                            min={layerItem.min}
-                            max={layerItem.max}
-                            defaultValue={[
-                              layerItem.min,
-                              layerItem.max,
-                            ]}
-                          />
-                        </div>
-                      )}
-                    />,
-                    <ListItem
-                      key="layer-style"
-                      disabled
-                      primaryText={(
-                        <div className="adjustment-option__header">
-                          <label>Overlay style: </label>
-                        </div>
-                      )}
-                      secondaryText={(
-                        <div
-                          style={{
-                            overflow: 'visible',
-                          }}
-                        >
-                          <SelectField
-                            value={0}
-                            style={{
-                              width: '100%',
-                            }}
-                          >{layerItem.styles.map((styleName, index) => (
-                            <MenuItem
-                              key={index}
-                              value={index}
-                              primaryText={styleName}
-                            />
-                          ))}</SelectField>
-                        </div>
-                      )}
-                    />,
-                  ]}
-                />
-              ))}
-
-              <Subheader>Temporal controls</Subheader>
+            <Subheader>Variables with overlay</Subheader>
+            {layerListItems.map((layerItem) => (
               <ListItem
-                disabled
-              >
-                <SliderWithInput
-                  label="Date"
-                  min={timespan.period.gte}
-                  max={timespan.period.lte}
-                  value={this.state.currentLoadedDate}
-                  // (Date) => number
-                  toSliderValue={(date) => moment.duration(date - timespan.period.gte).as(timespan.resolution)}
-                  // (number) => Date
-                  fromSliderValue={(v) => moment(timespan.period.gte).add(v, timespan.resolution).toDate()}
-                  // (Date) => string
-                  toInputValue={this.component.buildPreciseDateString}
-                  // (string) => Date
-                  fromInputValue={(s) => {
-                    const date = this.component.parsePreciseDateString(s);
+                key={layerItem.name}
+                className="layer-list__item"
+                leftCheckbox={(
+                  <RadioButton
+                    value={layerItem.name}
+                    checked={this.isLayerVisible(layerItem.name)}
+                    onCheck={() => this.setLayerVisibility(layerItem.name, true)}
+                  />
+                )}
+                primaryText={layerItem.name}
+                nestedItems={[
+                  <ListItem
+                    key="layer-opacity"
+                    disabled
+                  >
+                    <SliderWithInput
+                      label="Opacity"
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={this.getLayerOpacity(layerItem.name)}
+                      toSliderValue={(v) => v * 100}
+                      fromSliderValue={(v) => v / 100}
+                      toInputValue={(v) => `${(v * 100).toFixed(0)}%`}
+                      fromInputValue={(v) => {
+                        // We want to support both format `{N}%` and `{N}`.
+                        let str = v;
 
-                    if (!date) {
-                      throw new Error('Invalid date.');
-                    }
+                        if (str[str.length - 1] === '%') {
+                          str = str.slice(0, -1);
+                        }
 
-                    return date;
-                  }}
-                  onChange={this.loadedDateOnChange}
-                  inputStyle={{
-                    width: '60px',
-                  }}
-                />
-              </ListItem>
-            </List>
+                        if (isNaN(str)) {
+                          throw new Error('Invalid number.');
+                        }
 
-            <Toolbar
-              style={{
-                height: 48,
-              }}
+                        return parseFloat(str) / 100;
+                      }}
+                      onChange={(event, newValue) => this.setLayerOpacity(layerItem.name, newValue)}
+                      inputStyle={{
+                        width: '60px',
+                      }}
+                    />
+                  </ListItem>,
+                  <ListItem
+                    key="layer-style-range"
+                    disabled
+                    primaryText={(
+                      <div className="adjustment-option__header">
+                        <label>Overlay range: </label>
+                      </div>
+                    )}
+                    secondaryText={(
+                      <div
+                        style={{
+                          overflow: 'visible',
+                          ...OverlayTab.paddingForSliders,
+                        }}
+                      >
+                        <Range
+                          className="input-slider--layer-opacity"
+                          min={layerItem.min}
+                          max={layerItem.max}
+                          defaultValue={[
+                            layerItem.min,
+                            layerItem.max,
+                          ]}
+                        />
+                      </div>
+                    )}
+                  />,
+                  <ListItem
+                    key="layer-style"
+                    disabled
+                    primaryText={(
+                      <div className="adjustment-option__header">
+                        <label>Overlay style: </label>
+                      </div>
+                    )}
+                    secondaryText={(
+                      <div
+                        style={{
+                          overflow: 'visible',
+                        }}
+                      >
+                        <SelectField
+                          value={0}
+                          style={{
+                            width: '100%',
+                          }}
+                        >{layerItem.styles.map((styleName, index) => (
+                          <MenuItem
+                            key={index}
+                            value={index}
+                            primaryText={styleName}
+                          />
+                        ))}</SelectField>
+                      </div>
+                    )}
+                  />,
+                ]}
+              />
+            ))}
+
+            <Subheader>Temporal controls</Subheader>
+            <ListItem
+              disabled
             >
-              <ToolbarGroup>
-                <ToolbarTitle text="Time" />
+              <SliderWithInput
+                label="Date"
+                min={timespan.period.gte}
+                max={timespan.period.lte}
+                value={this.state.currentLoadedDate}
+                // (Date) => number
+                toSliderValue={(date) => moment.duration(date - timespan.period.gte).as(timespan.resolution)}
+                // (number) => Date
+                fromSliderValue={(v) => moment(timespan.period.gte).add(v, timespan.resolution).toDate()}
+                // (Date) => string
+                toInputValue={this.component.buildPreciseDateString}
+                // (string) => Date
+                fromInputValue={(s) => {
+                  const date = this.component.parsePreciseDateString(s);
 
-                <DatePicker
-                  openToYearSelection
-                  hintText="Controlled Date Input"
-                  minDate={this.component.timespan.period.gte}
-                  maxDate={this.component.timespan.period.lte}
-                  value={this.state.currentLoadedDate}
-                  formatDate={this.component.buildPreciseDateString}
-                  onChange={this.loadedDateOnChange}
-                  textFieldStyle={{
-                    width: '85px',
-                  }}
-                />
+                  if (!date) {
+                    throw new Error('Invalid date.');
+                  }
 
-                <IconButton
-                  tooltip="Step back"
-                  tooltipPosition={toolbarTooltipPosition}
-                  disabled={!this.isBackStepInTimeAllowed()}
-                  onClick={this.timeStepBackButtonOnClick}
-                >
-                  <LeftArrowIcon />
-                </IconButton>
+                  return date;
+                }}
+                onChange={this.loadedDateOnChange}
+                inputStyle={{
+                  width: '60px',
+                }}
+              />
+            </ListItem>
+          </List>
 
-                <IconButton
-                  tooltip="Step forward"
-                  tooltipPosition={toolbarTooltipPosition}
-                  disabled={!this.isForwardStepInTimeAllowed()}
-                  onClick={this.timeStepForwardButtonOnClick}
-                >
-                  <RightArrowIcon />
-                </IconButton>
-              </ToolbarGroup>
-            </Toolbar>
-          </Paper>
-
-          <Paper
-            className="overlay__map"
-            zDepth={0}
+          <Toolbar
+            style={{
+              height: 48,
+            }}
           >
-            <MapView
-              basemap="osm"
-              projection="EPSG:4326"
-              extent={boundaryExtent}
-              style={{
-                height: '100%',
-                width: '100%',
-              }}
-            >
-              {layerListItems.map((layer) => this.renderMapLayer(layer)).reverse()}
-              {boundaryGeoJsonString && (
-                <map-layer-geojson src-json={boundaryGeoJsonString} />
-              )}
-              <map-interaction-defaults />
-              <map-control-defaults />
-            </MapView>
-          </Paper>
-        </div>
-      </Tab>
+            <ToolbarGroup>
+              <ToolbarTitle text="Time" />
+
+              <DatePicker
+                openToYearSelection
+                hintText="Controlled Date Input"
+                minDate={this.component.timespan.period.gte}
+                maxDate={this.component.timespan.period.lte}
+                value={this.state.currentLoadedDate}
+                formatDate={this.component.buildPreciseDateString}
+                onChange={this.loadedDateOnChange}
+                textFieldStyle={{
+                  width: '85px',
+                }}
+              />
+
+              <IconButton
+                tooltip="Step back"
+                tooltipPosition={toolbarTooltipPosition}
+                disabled={!this.isBackStepInTimeAllowed()}
+                onClick={this.timeStepBackButtonOnClick}
+              >
+                <LeftArrowIcon />
+              </IconButton>
+
+              <IconButton
+                tooltip="Step forward"
+                tooltipPosition={toolbarTooltipPosition}
+                disabled={!this.isForwardStepInTimeAllowed()}
+                onClick={this.timeStepForwardButtonOnClick}
+              >
+                <RightArrowIcon />
+              </IconButton>
+            </ToolbarGroup>
+          </Toolbar>
+        </Paper>
+
+        <Paper
+          className="overlay__map"
+          zDepth={0}
+        >
+          <MapView
+            basemap="osm"
+            projection="EPSG:4326"
+            extent={boundaryExtent}
+            style={{
+              height: '100%',
+              width: '100%',
+            }}
+          >
+            {layerListItems.map((layer) => this.renderMapLayer(layer)).reverse()}
+            {boundaryGeoJsonString && (
+              <map-layer-geojson src-json={boundaryGeoJsonString} />
+            )}
+            <map-interaction-defaults />
+            <map-control-defaults />
+          </MapView>
+        </Paper>
+      </div>
     );
   }
 }

@@ -1,18 +1,12 @@
-import {
-  Meteor,
-} from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
 import _ from 'lodash';
 import objectPath from 'object-path';
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import {
-  Tab,
-} from 'material-ui/Tabs';
+import JsZip from 'jszip';
+import * as FileSaver from 'file-saver';
 import Paper from 'material-ui/Paper';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
 import {
   Toolbar,
   ToolbarGroup,
@@ -21,6 +15,15 @@ import {
 import RaisedButton from 'material-ui/RaisedButton';
 import PointIcon from 'material-ui/svg-icons/action/room';
 import RectangleIcon from 'material-ui/svg-icons/image/crop-landscape';
+import LinearProgress from 'material-ui/LinearProgress';
+import {
+  List,
+  ListItem,
+} from 'material-ui/List';
+import Subheader from 'material-ui/Subheader';
+import {
+  RadioButton,
+} from 'material-ui/RadioButton';
 import c3 from 'c3';
 import 'c3/c3.css';
 
@@ -33,11 +36,13 @@ import {
   PatheticDataRequester,
   getPrecisionByResolution,
   offsetDateAtPrecision,
+  makeSVGDocAsync,
+  svgDocToBlob,
 } from '/imports/ui/helpers';
 
 import MapView from '/imports/ui/components/mapview';
 
-import SubComponentClass from './SubComponentClass';
+import TabComponentClass from './TabComponentClass';
 
 import * as mapLayerRenderers from './dataset.mapLayerRenderers';
 
@@ -83,25 +88,31 @@ class AnalyticsChart extends React.PureComponent {
     this.renderChart();
   }
 
-  shouldComponentUpdate (nextProps) {
-    if (nextProps.temporalResolution !== this.props.temporalResolution) {
-      return true;
+  componentWillReceiveProps (nextProps) {
+    if (
+      nextProps.temporalResolution !== this.props.temporalResolution ||
+      !_.isEqual(nextProps.temporalPeriod, this.props.temporalPeriod) ||
+      !_.isEqual(nextProps.data, this.props.data)
+    ) {
+      this.renderChart();
     }
+  }
 
-    if (!_.isEqual(nextProps.temporalPeriod, this.props.temporalPeriod)) {
-      return true;
-    }
-
-    if (!_.isEqual(nextProps.data, this.props.data)) {
-      return true;
-    }
-
+  shouldComponentUpdate () {
     return false;
   }
 
-  componentDidUpdate () {
-    this.renderChart();
-  }
+  toBlob = async () => {
+    const svgElement = this._chartContainer.querySelector('svg');
+
+    if (!svgElement) {
+      return null;
+    }
+
+    const svgDoc = await makeSVGDocAsync(svgElement);
+
+    return svgDocToBlob(svgDoc);
+  };
 
   renderChart () {
     const {
@@ -155,7 +166,7 @@ class AnalyticsChart extends React.PureComponent {
 }
 
 export default
-class AnalyticsTab extends SubComponentClass {
+class AnalyticsTab extends TabComponentClass {
   static selectionTools = [
     {
       name: 'point',
@@ -165,6 +176,14 @@ class AnalyticsTab extends SubComponentClass {
       name: 'rectangle',
       IconClass: RectangleIcon,
     },
+  ];
+
+  static tabName = 'analytics';
+  static tabIcon = DatasetChartIcon;
+  static tabLabel = 'Analytics';
+  static requiredProps = [
+    'analyticService',
+    'analytics',
   ];
 
   getInitialState () {
@@ -187,7 +206,7 @@ class AnalyticsTab extends SubComponentClass {
     };
   }
 
-  onChangeActiveAnalytics = (event, index, value) => {
+  onChangeActiveAnalytics = (event, value) => {
     this.setState({
       activeVariableName: value,
     });
@@ -216,6 +235,12 @@ class AnalyticsTab extends SubComponentClass {
     });
   };
 
+  /**
+   * @memberof AnalyticsTab
+   * @param {Object} payload - Contains everything passed to but not used by the `PatheticDataRequester`.
+   * @param {Function} resolve - Resolve the request with data.
+   * @param {Function} reject - Reject the request with a reason.
+   */
   requestData = (payload, resolve, reject) => {
     console.log('requestData', payload);
 
@@ -253,6 +278,7 @@ class AnalyticsTab extends SubComponentClass {
           return;
         }
 
+        // @see AnalyticsChart.propTypes.data
         resolve(response.data);
       },
     );
@@ -278,6 +304,31 @@ class AnalyticsTab extends SubComponentClass {
       timeSeriesData: null,
       timeSeriesDataResponseDate: new Date(),
     });
+  };
+
+  onDownload = async () => {
+    const zip = new JsZip();
+
+    const {
+      analyticsBoundaryGeometry,
+    } = this.state;
+    const analyticsBoundaryGeoJsonString = analyticsBoundaryGeometry && JSON.stringify(buildGeoJsonWithGeometry(analyticsBoundaryGeometry));
+
+    if (analyticsBoundaryGeoJsonString) {
+      zip.file('boundary.geojson', analyticsBoundaryGeoJsonString);
+    }
+
+    const chart = this._chartComponent;
+
+    if (chart) {
+      zip.file('chart.svg', await chart.toBlob());
+    }
+
+    //! Add CSV file here.
+
+    const blob = await zip.generateAsync({ type: 'blob' });
+
+    FileSaver.saveAs(blob, 'download.zip');
   };
 
   isSelectionToolActive (toolName) {
@@ -320,9 +371,8 @@ class AnalyticsTab extends SubComponentClass {
     });
   }
 
-  render () {
+  renderBody () {
     const {
-      analyticService: analyticsField,
       analytics,
       muiTheme,
     } = this.props;
@@ -335,10 +385,6 @@ class AnalyticsTab extends SubComponentClass {
       timeSeriesDataRequestDate,
       timeSeriesDataResponseDate,
     } = this.state;
-
-    if (!(analyticsField && analytics)) {
-      return null;
-    }
 
     const boundaryGeoJson = this.component.boundaryGeoJson;
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
@@ -390,13 +436,7 @@ class AnalyticsTab extends SubComponentClass {
     };
 
     return (
-      <Tab
-        label={this.component.renderTabLabel({
-          IconComponent: DatasetChartIcon,
-          label: 'Analytics',
-        })}
-        value="analytics"
-      >
+      <div className="dataset__analytics-tab">
         <PatheticDataRequester
           variableName={activeVariableName}
           boundaryGeometry={analyticsBoundaryGeometry}
@@ -405,120 +445,148 @@ class AnalyticsTab extends SubComponentClass {
           onError={this.onDataError}
           verbose
         />
-        <div className="dataset__analytics-tab">
-          <Paper
-            className="analytics__controls"
-            zDepth={1}
+
+        <Paper
+          className="analytics__controls"
+          zDepth={1}
+        >
+          <List
+            className="layer-list"
           >
-            <SelectField
-              floatingLabelText="Select variable"
-              floatingLabelFixed={false}
-              value={activeVariableName}
-              onChange={(event, index, value) => this.onChangeActiveAnalytics(event, index, value)}
+            <Subheader>Variables with analytics</Subheader>
+            {analytics.map(({ name }) => (
+              <ListItem
+                key={name}
+                className="layer-list__item"
+                leftCheckbox={(
+                  <RadioButton
+                    value={name}
+                    checked={activeVariableName === name}
+                    onCheck={(event, value) => this.onChangeActiveAnalytics(event, value)}
+                  />
+                )}
+                primaryText={name}
+              />
+            ))}
+          </List>
+
+          <div className="map-and-toolbar">
+            <Toolbar
               style={{
-                width: '100%',
-              }}
-              floatingLabelStyle={{
-                color: muiTheme.palette.primary1Color,
+                ...mapToolbarStyles.root,
               }}
             >
-              <MenuItem
-                value={null}
-                primaryText=""
-                style={{
-                  display: 'none',
-                }}
-              />
-              {analytics.map(({ name }, index) => {
-                return (
-                  <MenuItem
-                    key={index}
-                    value={name}
-                    primaryText={name}
-                  />
-                );
-              })}
-            </SelectField>
-
-            <div className="map-and-toolbar">
-              <Toolbar
-                style={{
-                  ...mapToolbarStyles.root,
-                }}
-              >
-                <ToolbarGroup>
-                  <ToolbarTitle
-                    text="Select boundary"
+              <ToolbarGroup>
+                <ToolbarTitle
+                  text="Select boundary"
+                  style={{
+                    ...mapToolbarStyles.title,
+                  }}
+                />
+              </ToolbarGroup>
+              <ToolbarGroup>
+                {AnalyticsTab.selectionTools.map((item) => (
+                  <RaisedButton
+                    key={item.name}
+                    className="selection-tool-button"
+                    icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
                     style={{
-                      ...mapToolbarStyles.title,
+                      ...mapToolbarStyles.toggleButton.root,
+                      ...(this.isSelectionToolActive(item.name) && mapToolbarStyles.toggleButton.active),
                     }}
+                    buttonStyle={mapToolbarStyles.toggleButton.button}
+                    overlayStyle={{
+                      ...mapToolbarStyles.toggleButton.overlay,
+                    }}
+                    onClick={() => this.setSelectionToolActive(item.name)}
                   />
-                </ToolbarGroup>
-                <ToolbarGroup>
-                  {AnalyticsTab.selectionTools.map((item) => (
-                    <RaisedButton
-                      key={item.name}
-                      className="selection-tool-button"
-                      icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
-                      style={{
-                        ...mapToolbarStyles.toggleButton.root,
-                        ...(this.isSelectionToolActive(item.name) && mapToolbarStyles.toggleButton.active),
-                      }}
-                      buttonStyle={mapToolbarStyles.toggleButton.button}
-                      overlayStyle={{
-                        ...mapToolbarStyles.toggleButton.overlay,
-                      }}
-                      onClick={() => this.setSelectionToolActive(item.name)}
-                    />
-                  ))}
-                </ToolbarGroup>
-              </Toolbar>
-              <MapView
-                className="map"
-                basemap="osm"
-                projection="EPSG:4326"
-                extent={boundaryExtent}
-                onClick={(event) => this.onClickMap(event)}
-              >
-                {activeVariableName && this.renderMapLayerForVariable(activeVariableName)}
-                {boundaryGeoJsonString && (
-                  <map-layer-geojson src-json={boundaryGeoJsonString} />
-                )}
-                {analyticsBoundaryGeoJsonString && (
-                  <map-layer-geojson src-json={analyticsBoundaryGeoJsonString} />
-                )}
-                <map-interaction-defaults />
-                <map-control-defaults />
-              </MapView>
-            </div>
-          </Paper>
+                ))}
+              </ToolbarGroup>
+            </Toolbar>
+            <MapView
+              className="map"
+              basemap="osm"
+              projection="EPSG:4326"
+              extent={boundaryExtent}
+              onClick={(event) => this.onClickMap(event)}
+            >
+              {activeVariableName && this.renderMapLayerForVariable(activeVariableName)}
+              {boundaryGeoJsonString && (
+                <map-layer-geojson src-json={boundaryGeoJsonString} />
+              )}
+              {analyticsBoundaryGeoJsonString && (
+                <map-layer-geojson src-json={analyticsBoundaryGeoJsonString} />
+              )}
+              <map-interaction-defaults />
+              <map-control-defaults />
+            </MapView>
+          </div>
+        </Paper>
 
-          <Paper
-            className="analytics__charts"
-            zDepth={0}
-            style={{
-              padding: '10px 20px',
-            }}
-          >
-            {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData && (
+        <Paper
+          className="analytics__charts"
+          zDepth={1}
+          style={{
+            padding: '10px 30px',
+          }}
+        >
+          {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData && (
+            <Paper
+              style={{
+                padding: '20px 30px',
+                margin: '20px 0',
+              }}
+              zDepth={2}
+            >
               <AnalyticsChart
                 temporalResolution={resolution}
                 temporalPeriod={period}
                 data={timeSeriesData}
+                ref={(ref) => this._chartComponent = ref}
               />
-            )}
-            {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && (
-              <div>Loaded in {moment.duration({
-                from: timeSeriesDataRequestDate,
-                to: timeSeriesDataResponseDate,
-              }).asSeconds()} s.</div>
-            )}
-            {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
-              <div>Loading...</div>
-            )}
-          </Paper>
-        </div>
-      </Tab>
+            </Paper>
+          )}
+          {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && (
+            <div>Loaded in {moment.duration({
+              from: timeSeriesDataRequestDate,
+              to: timeSeriesDataResponseDate,
+            }).asSeconds()} s.</div>
+          )}
+          {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
+            <LinearProgress mode="indeterminate" />
+          )}
+          {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
+            <Paper
+              style={{
+                padding: '20px 30px',
+                margin: '20px 0',
+                textAlign: 'center',
+              }}
+              zDepth={2}
+            >
+              <h4>Select a variable and a boundary to view the time serires data.</h4>
+            </Paper>
+          )}
+        </Paper>
+
+        <Toolbar
+          className="analytics__toolbar"
+        >
+          <ToolbarGroup>
+            <ToolbarTitle
+              text="Extra stuff here"
+            />
+          </ToolbarGroup>
+          <ToolbarGroup>
+            <RaisedButton
+              className="download-chart-button"
+              label="Download Chart"
+              disabled={!(!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData)}
+              onClick={this.onDownload}
+            />
+          </ToolbarGroup>
+        </Toolbar>
+      </div>
     );
   }
 }

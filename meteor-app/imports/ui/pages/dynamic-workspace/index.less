@@ -1,0 +1,97 @@
+.page-workspace {
+  .flex-col;
+
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+
+  .two-column-layout() {
+    .flex-row;
+
+    & > .left {
+      width: 50%;
+      max-width: 600px;
+    }
+    & > .right {
+      .layout-fill;
+    }
+
+    & > .full {
+      width: 100%;
+    }
+
+    & > .top-layer {
+      z-index: 2;
+    }
+
+    & > .bottom-layer {
+      z-index: 1;
+    }
+  }
+  .markdown-container() {
+    padding: 15px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  & > .suite-wrapper {
+    .layout-fill;
+  }
+
+  .suite-wrapper > .tabs-panel {
+    width: 100%;
+    height: 100%;
+  }
+
+  .tabs-panel {
+    .flex-col;
+
+    & > .tabs-panel__content {
+      .layout-fill;
+      overflow: hidden;
+
+      // This is the extra wrapper for each tab content.
+      & > div {
+        width: 100%;
+        height: 100%;
+
+        overflow-x: hidden;
+        overflow-y: auto;
+      } 
+    }
+  }
+
+  .tabs-panel .tab-button {
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+
+      &:not(:hover) {
+        opacity: 0.3;
+      }
+    }
+  }
+
+  .tabs-panel .tab-label {
+    .flex-row;
+    align-items: center;
+
+    & > svg {
+      margin-right: 5px;
+    }
+  }
+
+  @import './suites/dataset.info.less';
+  @import './suites/dataset.download.less';
+  @import './suites/dataset.overlay.less';
+  @import './suites/dataset.analytics.less';
+  @import './suites/dataset.model.less';
+  @import './suites/dataset.metadata.less';
+
+  .layer-list {
+    .layer-list__item {
+      margin-bottom: 5px;
+    }
+  }
+}

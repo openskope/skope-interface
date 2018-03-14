@@ -1,7 +1,4 @@
 import React from 'react';
-import {
-  Tab,
-} from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
 
 import {
@@ -12,38 +9,33 @@ import {
   MarkDownRenderer,
 } from '/imports/ui/helpers';
 
-import SubComponentClass from './SubComponentClass';
+import TabComponentClass from './TabComponentClass';
 
 export default
-class DownloadTab extends SubComponentClass {
-  render () {
+class DownloadTab extends TabComponentClass {
+  static tabName = 'download';
+  static tabIcon = DatasetDownloadIcon;
+  static tabLabel = 'Download';
+  static requiredProps = [
+    'downloadService',
+  ];
+
+  renderBody () {
     const {
       downloadService: downloadField,
     } = this.props;
 
-    if (!downloadField) {
-      return null;
-    }
-
     return (
-      <Tab
-        label={this.component.renderTabLabel({
-          IconComponent: DatasetDownloadIcon,
-          label: 'Download',
-        })}
-        value="download"
-      >
-        <div className="dataset__download-tab">
-          <Paper
-            className="download__markdown"
-            zDepth={1}
-          >
-            <MarkDownRenderer
-              value={downloadField.markdown}
-            />
-          </Paper>
-        </div>
-      </Tab>
+      <div className="dataset__download-tab">
+        <Paper
+          className="download__markdown"
+          zDepth={1}
+        >
+          <MarkDownRenderer
+            value={downloadField.markdown}
+          />
+        </Paper>
+      </div>
     );
   }
 }
