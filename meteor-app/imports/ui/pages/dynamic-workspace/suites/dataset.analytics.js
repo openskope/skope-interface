@@ -586,7 +586,7 @@ class AnalyticsTab extends TabComponentClass {
               }}
               zDepth={2}
             >
-              <h4>Select a variable and a boundary to view the time serires data.</h4>
+              <p>Select <b>a variable</b> and <b>a valid point in the boundary</b> to view the time serires data.</p>
             </Paper>
           )}
         </Paper>
