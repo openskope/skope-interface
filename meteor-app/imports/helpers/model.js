@@ -272,10 +272,11 @@ const buildGeoJsonWithGeometry = (geometry) => {
  * Fillers could be functions or literal values.
  * @param {string} templateString
  * @param {Object<string, Function|*>} fillers
+ * @param {Object} dataStore - Optional place to store complex data types. This value will be mutated.
  * @returns {string}
  */
 export
-const fillTemplateString = (templateString, fillers) => {
+const fillTemplateString = (templateString, fillers, dataStore) => {
   if (!templateString) {
     return templateString;
   }
@@ -285,12 +286,30 @@ const fillTemplateString = (templateString, fillers) => {
   return fillerNames.reduce((acc, fillerName) => {
     const pattern = `{${fillerName}}`;
     const filler = fillers[fillerName];
-    const replacement = typeof filler === 'function' ? filler() : filler;
+    const replacementValue = typeof filler === 'function' ? filler() : filler;
+    const replacementType = typeof replacementValue;
+    let replacementString = '';
 
     let newAcc = acc;
 
+    if (replacementValue === null || typeof replacementValue === 'undefined') {
+      // `null` and undefined values should be empty.
+      replacementString = '';
+    } else if (replacementType === 'string') {
+      // String type values go straight to the url.
+      replacementString = replacementValue;
+    } else if (dataStore) {
+      // Other types of values go to the dataStore, if possible.
+      // The value in url would be empty.
+      dataStore[fillerName] = replacementValue;
+      replacementString = '';
+    } else {
+      // If dataStore is not available, force convert value into string type and place it in url.
+      replacementString = String(replacementValue);
+    }
+
     while (newAcc.indexOf(pattern) !== -1) {
-      newAcc = newAcc.replace(pattern, replacement);
+      newAcc = newAcc.replace(pattern, String(replacementString));
     }
 
     return newAcc;

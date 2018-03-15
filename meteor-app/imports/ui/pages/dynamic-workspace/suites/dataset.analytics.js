@@ -38,6 +38,7 @@ import {
   offsetDateAtPrecision,
   makeSVGDocAsync,
   svgDocToBlob,
+  fillTemplateString,
 } from '/imports/ui/helpers';
 
 import MapView from '/imports/ui/components/mapview';
@@ -249,10 +250,30 @@ class AnalyticsTab extends TabComponentClass {
     }
 
     const analytics = this.getAnalyticsByName(payload.variableName);
-    //! Fill this url with state values if needed.
-    const remoteUrl = analytics.url;
+    // const requestBody = {};
+    const remoteUrl = fillTemplateString(
+      analytics.url,
+      {
+        LAT: () => {
+          if (payload.boundaryGeometry.type === 'Point') {
+            return payload.boundaryGeometry.coordinates[1];
+          }
 
-    console.log('requestData', 'requesting', analytics.url);
+          return null;
+        },
+        LONG: () => {
+          if (payload.boundaryGeometry.type === 'Point') {
+            return payload.boundaryGeometry.coordinates[0];
+          }
+
+          return null;
+        },
+        boundaryGeometry: payload.boundaryGeometry,
+      },
+      // requestBody,
+    );
+
+    console.log('requestData', 'requesting', remoteUrl);
 
     this.setState({
       isLoadingTimeSeriesData: true,
@@ -266,6 +287,7 @@ class AnalyticsTab extends TabComponentClass {
       remoteUrl,
       {
         json: true,
+        // data: requestBody,
       },
       (error, response) => {
         if (error) {
@@ -564,7 +586,7 @@ class AnalyticsTab extends TabComponentClass {
               }}
               zDepth={2}
             >
-              <h4>Select a variable and a boundary to view the time serires data.</h4>
+              <p>Select <b>a variable</b> and <b>a valid point in the boundary</b> to view the time serires data.</p>
             </Paper>
           )}
         </Paper>
