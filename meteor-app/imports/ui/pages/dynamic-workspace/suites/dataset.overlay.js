@@ -3,15 +3,6 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import Paper from 'material-ui/Paper';
 import {
-  Toolbar,
-  ToolbarGroup,
-  ToolbarTitle,
-} from 'material-ui/Toolbar';
-import DatePicker from 'material-ui/DatePicker';
-import IconButton from 'material-ui/IconButton';
-import LeftArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
-import RightArrowIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
-import {
   List,
   ListItem,
 } from 'material-ui/List';
@@ -32,7 +23,6 @@ import {
 
 import {
   getDateAtPrecision,
-  offsetDateAtPrecision,
 } from '/imports/ui/helpers';
 
 import MapView from '/imports/ui/components/mapview';
@@ -154,46 +144,6 @@ class OverlayTab extends TabComponentClass {
     });
   }
 
-  isBackStepInTimeAllowed = () => {
-    return this.state.currentLoadedDate > this.component.timespan.period.gte;
-  };
-
-  isForwardStepInTimeAllowed = () => {
-    return this.state.currentLoadedDate < this.component.timespan.period.lte;
-  };
-
-  offsetCurrentTimeAtPrecisionByAmount = (amount) => {
-    if (!amount) {
-      return;
-    }
-
-    let newLoadedDate = offsetDateAtPrecision(this.state.currentLoadedDate, this.component.temporalPrecision, amount);
-
-    if (newLoadedDate.valueOf() > this.component.timespan.period.lte.valueOf()) {
-      newLoadedDate = this.component.timespan.period.lte;
-    }
-
-    if (newLoadedDate.valueOf() < this.component.timespan.period.gte.valueOf()) {
-      newLoadedDate = this.component.timespan.period.gte;
-    }
-
-    if (newLoadedDate.valueOf() === this.state.currentLoadedDate.valueOf()) {
-      return;
-    }
-
-    this.setState({
-      currentLoadedDate: newLoadedDate,
-    });
-  };
-
-  timeStepBackButtonOnClick = (/* event */) => {
-    this.offsetCurrentTimeAtPrecisionByAmount(-1);
-  };
-
-  timeStepForwardButtonOnClick = (/* event */) => {
-    this.offsetCurrentTimeAtPrecisionByAmount(1);
-  };
-
   loadedDateOnChange = (event, date) => {
     let preciseDate = getDateAtPrecision(date, this.component.temporalPrecision);
 
@@ -242,8 +192,6 @@ class OverlayTab extends TabComponentClass {
       invisible: !this.isLayerVisible(layer.name),
       opacity: this.getLayerOpacity(layer.name),
     }));
-
-    const toolbarTooltipPosition = 'top-center';
 
     const boundaryGeoJson = this.component.boundaryGeoJson;
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
@@ -397,47 +345,6 @@ class OverlayTab extends TabComponentClass {
               />
             </ListItem>
           </List>
-
-          <Toolbar
-            style={{
-              height: 48,
-            }}
-          >
-            <ToolbarGroup>
-              <ToolbarTitle text="Time" />
-
-              <DatePicker
-                openToYearSelection
-                hintText="Controlled Date Input"
-                minDate={this.component.timespan.period.gte}
-                maxDate={this.component.timespan.period.lte}
-                value={this.state.currentLoadedDate}
-                formatDate={this.component.buildPreciseDateString}
-                onChange={this.loadedDateOnChange}
-                textFieldStyle={{
-                  width: '85px',
-                }}
-              />
-
-              <IconButton
-                tooltip="Step back"
-                tooltipPosition={toolbarTooltipPosition}
-                disabled={!this.isBackStepInTimeAllowed()}
-                onClick={this.timeStepBackButtonOnClick}
-              >
-                <LeftArrowIcon />
-              </IconButton>
-
-              <IconButton
-                tooltip="Step forward"
-                tooltipPosition={toolbarTooltipPosition}
-                disabled={!this.isForwardStepInTimeAllowed()}
-                onClick={this.timeStepForwardButtonOnClick}
-              >
-                <RightArrowIcon />
-              </IconButton>
-            </ToolbarGroup>
-          </Toolbar>
         </Paper>
 
         <Paper
