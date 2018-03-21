@@ -527,7 +527,7 @@ class AnalyticsTab extends TabComponentClass {
             </Toolbar>
             <MapView
               className="map"
-              basemap="osm"
+              basemap="arcgis"
               projection="EPSG:4326"
               extent={boundaryExtent}
               onClick={(event) => this.onClickMap(event)}

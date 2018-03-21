@@ -47,7 +47,7 @@ class InfoTab extends TabComponentClass {
           zDepth={0}
         >
           <MapView
-            basemap="osm"
+            basemap="arcgis"
             projection="EPSG:4326"
             extent={boundaryExtent}
             style={{
