@@ -297,7 +297,7 @@ const fillTemplateString = (templateString, fillers, dataStore) => {
       replacementString = '';
     } else if (replacementType === 'string') {
       // String type values go straight to the url.
-      replacementString = replacementValue;
+      replacementString = encodeURIComponent(replacementValue);
     } else if (dataStore) {
       // Other types of values go to the dataStore, if possible.
       // The value in url would be empty.
