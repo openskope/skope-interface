@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import {
   mount as reactMount,
+  withOptions,
 } from 'react-mounter';
 import {
   Provider,
@@ -11,6 +12,11 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import globalStore from '/imports/ui/redux-store';
 import globalTheme from '/imports/ui/styling/muiTheme';
 
+// Create a custom mounter that uses a custom root element.
+const myReactMount = withOptions({
+  rootId: 'skope-app',
+}, reactMount);
+
 /**
  * Helper function to incorporate `Provider` into react mounter.
  * @param  {Object} store - Global store from Redux.
@@ -19,7 +25,7 @@ import globalTheme from '/imports/ui/styling/muiTheme';
  * @return {*}
  */
 export
-const mountWithStore = (store, ComponentClass, props) => reactMount(Provider, {
+const mountWithStore = (store, ComponentClass, props) => myReactMount(Provider, {
   store,
   children: <ComponentClass {...props} />,
 });

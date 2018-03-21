@@ -26,6 +26,30 @@ a {
   }
 }
 
+/**
+ * This helper solves one problem:
+ *   If we are overriding the style of a third-party component, depending on
+ *   the loading order of the stylesheets, simply doing this might not be
+ *   enough:
+ *
+ *       .component { ... }
+ *
+ *   And it will get messy if every single file tries to increase the
+ *   specificity on their own.
+ *
+ * With this helper, do the following:
+ *
+ *     .app-context({
+ *         .component { ... }
+ *     });
+ *
+ * This should solve most of the specificity issues.
+ */
+.app(@rules) {
+  // ID is defined in /imports/helpers/ui/react.js
+  #skope-app & { @rules(); }
+}
+
 .modal {
   position: fixed;
   margin: auto;
