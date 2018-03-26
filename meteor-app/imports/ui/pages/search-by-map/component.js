@@ -83,7 +83,7 @@ export default class SearchPage extends React.Component {
           <RefinementListFilter
             id="variables"
             title="Variables"
-            field="variables.name.raw"
+            field="variables.class.raw"
             fieldOptions={{
               type: 'nested',
               options: {
@@ -91,7 +91,7 @@ export default class SearchPage extends React.Component {
               },
             }}
             operator="OR"
-            orderKey="_term"
+            orderKey="_key"
             orderDirection="asc"
             size={5}
           />
@@ -101,7 +101,7 @@ export default class SearchPage extends React.Component {
             title="Status"
             field="status"
             operator="OR"
-            orderKey="_term"
+            orderKey="_key"
             orderDirection="asc"
             size={5}
           />
@@ -109,7 +109,8 @@ export default class SearchPage extends React.Component {
           <SpatialFilter
             id="location"
             className="spatial-filter"
-            title="Point of Interest"
+            title="Geographic Area"
+            subtitle="Click to filter datasets overlapping your area of interest."
             fields={['region.geometry']}
           />
 
@@ -122,7 +123,7 @@ export default class SearchPage extends React.Component {
             min={moment('0000', 'YYYY').toDate()}
             max={moment().toDate()}
             resolution="month"
-            title="Timespan"
+            title="Time Period"
           />
 
           <div className="layout-filler" />

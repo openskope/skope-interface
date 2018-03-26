@@ -120,12 +120,14 @@ export default class SpatialFilter extends SearchkitComponent {
   static defaultProps = {
     id: 'poi',
     mod: 'sk-spatial-filter',
+    subtitle: '',
   };
 
   static propTypes = {
     ...SearchkitComponent.propTypes,
 
     title: PropTypes.string.isRequired,
+    subtitle: PropTypes.string,
     id: PropTypes.string,
     fields: PropTypes.arrayOf(PropTypes.string),
     mod: PropTypes.string,
@@ -220,6 +222,7 @@ export default class SpatialFilter extends SearchkitComponent {
   render () {
     const {
       title,
+      subtitle,
       className,
     } = this.props;
     const {
@@ -230,6 +233,13 @@ export default class SpatialFilter extends SearchkitComponent {
       <Panel
         title={title}
       >
+        {subtitle && (
+          <div
+            style={{
+              fontSize: '0.8em',
+            }}
+          >{subtitle}</div>
+        )}
         <MapView
           className={className}
           basemap="osm"
