@@ -149,7 +149,6 @@ class SearchResultItem extends React.PureComponent {
         _source: {
           title,
           description: descriptionMarkDown,
-          revised: revisionDate,
           timespan,
           region,
         },
@@ -167,25 +166,12 @@ class SearchResultItem extends React.PureComponent {
                            : (boundaryGeoJson && geojsonExtent(boundaryGeoJson));
 
     const workspacePageUrl = absoluteUrl('/workspace', null, { dataset: _id });
-    const revisionDateString = moment(revisionDate).format('YYYY-MM-DD');
     const subtitleItems = [
-      `Revised: ${revisionDateString}`,
+      region.name,
+      timespan.name,
     ];
 
-    const timespanResolution = objectPath.get(timespan, 'resolution');
-
-    if (timespanResolution) {
-      const timespanPrecision = getPrecisionByResolution(timespanResolution);
-      const timespanStart = objectPath.get(timespan, 'period.gte');
-      const timespanEnd = objectPath.get(timespan, 'period.lte');
-      const timespanString = getDateRangeStringAtPrecision(timespanPrecision, timespanStart, timespanEnd);
-
-      if (timespanString) {
-        subtitleItems.push(`Timespan: ${timespanString}`);
-      }
-    }
-
-    const subtitle = subtitleItems.join('; ');
+    const subtitle = subtitleItems.filter(Boolean).join(' | ');
 
     return (
       <Card
