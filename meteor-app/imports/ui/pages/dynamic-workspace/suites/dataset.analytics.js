@@ -250,7 +250,7 @@ class AnalyticsTab extends TabComponentClass {
     }
 
     const analytics = this.getAnalyticsByName(payload.variableName);
-    // const requestBody = {};
+    const requestBody = {};
     const remoteUrl = fillTemplateString(
       analytics.url,
       {
@@ -270,7 +270,7 @@ class AnalyticsTab extends TabComponentClass {
         },
         boundaryGeometry: payload.boundaryGeometry,
       },
-      // requestBody,
+      requestBody,
     );
 
     console.log('requestData', 'requesting', remoteUrl);
@@ -283,11 +283,11 @@ class AnalyticsTab extends TabComponentClass {
       timeSeriesDataResponseDate: null,
     });
 
-    HTTP.get(
+    HTTP.post(
       remoteUrl,
       {
         json: true,
-        // data: requestBody,
+        data: requestBody,
       },
       (error, response) => {
         if (error) {
