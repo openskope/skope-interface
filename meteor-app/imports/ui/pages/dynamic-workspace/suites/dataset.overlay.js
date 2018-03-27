@@ -80,7 +80,7 @@ class OverlayTab extends TabComponentClass {
       // @type {Object<layerId: string, opacity: number>}
       layerOpacity: {},
       // @type {Date}
-      currentLoadedDate: this.component.timespan.period.lte,
+      currentLoadedDate: this.component.timespan.period.gte,
     };
   }
 
