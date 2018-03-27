@@ -106,6 +106,7 @@ class SliderWithInput extends React.PureComponent {
     // If `step` is specified, `sliderStep` is ignored.
     sliderStep: PropTypes.number,
     value: PropTypes.any.isRequired,
+    inputProps: PropTypes.object,
     onChange: PropTypes.func.isRequired,
     toSliderValue: PropTypes.func,
     // This function should not throw an error. Every point on the slider should be a valid input.
@@ -120,6 +121,7 @@ class SliderWithInput extends React.PureComponent {
   static defaultProps = {
     step: 0,
     sliderStep: 1,
+    inputProps: {},
     toSliderValue: (v) => Number(v),
     fromSliderValue: (v) => v,
     toInputValue: (v) => String(v),
@@ -245,6 +247,8 @@ class SliderWithInput extends React.PureComponent {
         <label className="SliderWithInput__label">{this.label}</label>
         <label className="SliderWithInput__input">
           <LazyTextField
+            {...this.props.inputProps}
+
             ref={(ref) => this._input = ref}
             value={this.inputValue}
             onChange={this.inputOnChange}

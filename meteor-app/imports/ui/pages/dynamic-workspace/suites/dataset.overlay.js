@@ -225,14 +225,19 @@ class OverlayTab extends TabComponentClass {
                     disabled
                   >
                     <SliderWithInput
-                      label="Opacity"
+                      label="Opacity (%)"
                       min={0}
                       max={1}
                       step={0.01}
                       value={this.getLayerOpacity(layerItem.name)}
+                      inputProps={{
+                        type: 'number',
+                        min: 0,
+                        max: 100,
+                      }}
                       toSliderValue={(v) => v * 100}
                       fromSliderValue={(v) => v / 100}
-                      toInputValue={(v) => `${(v * 100).toFixed(0)}%`}
+                      toInputValue={(v) => (v * 100).toFixed(0)}
                       fromInputValue={(v) => {
                         // We want to support both format `{N}%` and `{N}`.
                         let str = v;
@@ -318,10 +323,15 @@ class OverlayTab extends TabComponentClass {
               disabled
             >
               <SliderWithInput
-                label="Date"
+                label="Date (year)"
                 min={timespan.period.gte}
                 max={timespan.period.lte}
                 value={this.state.currentLoadedDate}
+                inputProps={{
+                  type: 'number',
+                  min: this.component.buildPreciseDateString(timespan.period.gte),
+                  max: this.component.buildPreciseDateString(timespan.period.lte),
+                }}
                 // (Date) => number
                 toSliderValue={(date) => moment.duration(date - timespan.period.gte).as(timespan.resolution)}
                 // (number) => Date
