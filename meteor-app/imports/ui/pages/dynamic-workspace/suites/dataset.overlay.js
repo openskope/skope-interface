@@ -12,6 +12,15 @@ import {
 } from 'material-ui/RadioButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import {
+  Toolbar,
+  ToolbarGroup,
+  ToolbarSeparator,
+} from 'material-ui/Toolbar';
+import IconButton from 'material-ui/IconButton';
+import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
+import ToStartIcon from 'material-ui/svg-icons/av/skip-previous';
+import ToEndIcon from 'material-ui/svg-icons/av/skip-next';
 import SliderWithInput from '/imports/ui/components/SliderWithInput';
 
 import Range from 'rc-slider/lib/Range';
@@ -353,6 +362,49 @@ class OverlayTab extends TabComponentClass {
                   width: '60px',
                 }}
               />
+            </ListItem>
+            <ListItem
+              disabled
+            >
+              <Toolbar
+                style={{
+                  background: 'transparent',
+                }}
+              >
+                <ToolbarGroup></ToolbarGroup>
+
+                <ToolbarGroup>
+                  <IconButton
+                    tooltip="To start"
+                  >
+                    <ToStartIcon />
+                  </IconButton>
+                  <ToolbarSeparator
+                    style={{
+                      marginLeft: '10px',
+                      marginRight: '10px',
+                    }}
+                  />
+                  <IconButton
+                    tooltip="Play/pause"
+                  >
+                    <PlayIcon />
+                  </IconButton>
+                  <ToolbarSeparator
+                    style={{
+                      marginLeft: '10px',
+                      marginRight: '10px',
+                    }}
+                  />
+                  <IconButton
+                    tooltip="To end"
+                  >
+                    <ToEndIcon />
+                  </IconButton>
+                </ToolbarGroup>
+
+                <ToolbarGroup></ToolbarGroup>
+              </Toolbar>
             </ListItem>
           </List>
         </Paper>
