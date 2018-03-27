@@ -97,6 +97,7 @@ export default
 class SliderWithInput extends React.PureComponent {
   static propTypes = {
     label: PropTypes.string.isRequired,
+    // `min`, `max`, `step` and `value` have the same unit.
     min: PropTypes.any.isRequired,
     max: PropTypes.any.isRequired,
     step: PropTypes.any,
@@ -148,6 +149,14 @@ class SliderWithInput extends React.PureComponent {
 
   get sliderMax () {
     return this.props.toSliderValue(this.props.max);
+  }
+
+  get sliderMinLabel () {
+    return this.props.toInputValue(this.props.min);
+  }
+
+  get sliderMaxLabel () {
+    return this.props.toInputValue(this.props.max);
   }
 
   get sliderStep () {
@@ -252,6 +261,10 @@ class SliderWithInput extends React.PureComponent {
           max={this.sliderMax}
           step={this.sliderStep}
           value={this.sliderValue}
+          marks={{
+            [this.sliderMin]: this.sliderMinLabel,
+            [this.sliderMax]: this.sliderMaxLabel,
+          }}
           onChange={this.sliderOnChange}
           style={{
             ...SliderWithInput.defaultSliderStyle,
