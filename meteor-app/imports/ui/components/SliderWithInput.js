@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Slider from 'material-ui/Slider';
+import Slider from 'rc-slider/lib/Slider';
+import 'rc-slider/assets/index.css';
 import TextField from 'material-ui/TextField';
 
 class LazyTextField extends React.Component {
@@ -125,6 +126,7 @@ class SliderWithInput extends React.PureComponent {
   };
 
   static defaultSliderStyle = {
+    display: 'block',
     width: 'auto',
     marginTop: '5px',
     marginBottom: 0,
@@ -181,10 +183,10 @@ class SliderWithInput extends React.PureComponent {
     return finalValue;
   }
 
-  sliderOnChange = (event, newSliderValue) => {
+  sliderOnChange = (newSliderValue) => {
     const newValue = this.props.fromSliderValue(newSliderValue);
 
-    this.triggerValueOnChange(event, newValue);
+    this.triggerValueOnChange(null, newValue);
   };
 
   inputOnChange = (event, newInputValue) => {
@@ -251,7 +253,7 @@ class SliderWithInput extends React.PureComponent {
           step={this.sliderStep}
           value={this.sliderValue}
           onChange={this.sliderOnChange}
-          sliderStyle={{
+          style={{
             ...SliderWithInput.defaultSliderStyle,
             ...this.props.sliderStyle,
           }}
