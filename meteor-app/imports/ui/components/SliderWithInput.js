@@ -4,6 +4,8 @@ import Slider from 'rc-slider/lib/Slider';
 import 'rc-slider/assets/index.css';
 import TextField from 'material-ui/TextField';
 
+const SliderWithHandle = Slider.createSliderWithTooltip(Slider);
+
 class LazyTextField extends React.Component {
   static propTypes = {
     ...TextField.propTypes,
@@ -167,6 +169,12 @@ class SliderWithInput extends React.PureComponent {
     return this.props.toSliderValue(this.props.value);
   }
 
+  tipFormatter = (sliderValue) => {
+    const newValue = this.props.fromSliderValue(sliderValue);
+
+    return this.props.toInputValue(newValue);
+  };
+
   /**
    * @param {Event} event
    * @param {*} newValue
@@ -255,7 +263,7 @@ class SliderWithInput extends React.PureComponent {
             onStepUp={this.inputOnStepUp}
           />
         </label>
-        <Slider
+        <SliderWithHandle
           className="SliderWithInput__slider"
           min={this.sliderMin}
           max={this.sliderMax}
@@ -266,6 +274,10 @@ class SliderWithInput extends React.PureComponent {
             [this.sliderMax]: this.sliderMaxLabel,
           }}
           onChange={this.sliderOnChange}
+          tipFormatter={this.tipFormatter}
+          tipProps={{
+            placement: 'bottom',
+          }}
           style={{
             ...SliderWithInput.defaultSliderStyle,
             ...this.props.sliderStyle,
