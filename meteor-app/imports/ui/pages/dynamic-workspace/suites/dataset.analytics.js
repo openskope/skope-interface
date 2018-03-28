@@ -179,7 +179,6 @@ class AnalyticsTab extends TabComponentClass {
     },
   ];
 
-  static tabName = 'analytics';
   static tabIcon = DatasetChartIcon;
   static tabLabel = 'Analytics';
   static requiredProps = [

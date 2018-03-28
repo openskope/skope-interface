@@ -10,6 +10,10 @@ class SubComponent {
     this._stateNs = stateNamespace || this.constructor.name;
   }
 
+  get name () {
+    return this._stateNs;
+  }
+
   get component () {
     return this._component;
   }
@@ -19,14 +23,14 @@ class SubComponent {
   }
 
   get state () {
-    return this.component.state[this._stateNs];
+    return this.component.state[this.name];
   }
 
   setState (newState) {
     const oldState = this.state;
 
     return this.component.setState({
-      [this._stateNs]: {
+      [this.name]: {
         ...oldState,
         ...newState,
       },
@@ -35,7 +39,7 @@ class SubComponent {
 
   getInitialStateForParent () {
     return {
-      [this._stateNs]: this.getInitialState(),
+      [this.name]: this.getInitialState(),
     };
   }
 

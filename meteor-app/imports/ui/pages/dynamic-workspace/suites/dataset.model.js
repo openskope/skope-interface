@@ -13,7 +13,6 @@ import TabComponentClass from './TabComponentClass';
 
 export default
 class ModelTab extends TabComponentClass {
-  static tabName = 'model';
   static tabIcon = DatasetModelIcon;
   static tabLabel = 'Model';
   static requiredProps = [

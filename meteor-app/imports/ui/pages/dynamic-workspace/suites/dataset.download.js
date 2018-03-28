@@ -13,7 +13,6 @@ import TabComponentClass from './TabComponentClass';
 
 export default
 class DownloadTab extends TabComponentClass {
-  static tabName = 'download';
   static tabIcon = DatasetDownloadIcon;
   static tabLabel = 'Download';
   static requiredProps = [

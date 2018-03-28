@@ -15,7 +15,6 @@ import TabComponentClass from './TabComponentClass';
 
 export default
 class InfoTab extends TabComponentClass {
-  static tabName = 'info';
   static tabIcon = DatasetInfoIcon;
   static tabLabel = 'Info';
   static requiredProps = [

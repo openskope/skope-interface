@@ -9,7 +9,6 @@ import TabComponentClass from './TabComponentClass';
 
 export default
 class MetadataTab extends TabComponentClass {
-  static tabName = 'metadata';
   static tabIcon = null;
   static tabLabel = 'Metadata';
   static requiredProps = [

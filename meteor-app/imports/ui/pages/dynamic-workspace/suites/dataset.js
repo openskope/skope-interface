@@ -130,19 +130,30 @@ class DatasetWorkspace extends SuiteBaseClass {
   constructor (props) {
     super(props);
 
-    this.infoTab = new InfoTab(this, 'InfoTab');
-    this.downloadTab = new DownloadTab(this, 'DownloadTab');
-    this.overlayTab = new OverlayTab(this, 'OverlayTab');
-    this.analyticsTab = new AnalyticsTab(this, 'AnalyticsTab');
-    this.modelTab = new ModelTab(this, 'ModelTab');
-    this.metadataTab = new MetadataTab(this, 'MetadataTab');
+    this._tabs = Object.entries({
+      infoTab: InfoTab,
+      downloadTab: DownloadTab,
+      overlayTab: OverlayTab,
+      analyticsTab: AnalyticsTab,
+      modelTab: ModelTab,
+      metadataTab: MetadataTab,
+    }).reduce((acc, [id, Construct]) => {
+      return {
+        ...acc,
+        [id]: new Construct(this, id),
+      };
+    }, {});
 
     this.state = {
       // @type {string}
-      activeTab: 'info',
+      activeTab: this._tabs.infoTab.name,
 
-      ...this.overlayTab.getInitialStateForParent(),
-      ...this.analyticsTab.getInitialStateForParent(),
+      ...(Object.values(this._tabs).reduce((acc, tab) => {
+        return {
+          ...acc,
+          ...tab.getInitialStateForParent(),
+        };
+      }, {})),
     };
   }
 
@@ -214,10 +225,34 @@ class DatasetWorkspace extends SuiteBaseClass {
     });
   }
 
-  onTabChange = (nextTabValue) => {
-    this.setState({
-      activeTab: nextTabValue,
+  setActiveTab = (newTab) => {
+    if (!(newTab in this._tabs)) {
+      throw new Error('Unknown tab.');
+    }
+
+    const currentTab = this.state.activeTab;
+
+    const event = new CustomEvent('build', {
+      detail: {
+        fromTab: currentTab,
+        toTab: newTab,
+      },
+      bubbles: false,
+      cancelable: false,
     });
+
+    console.log('setActiveTab', `${event.detail.fromTab} -> ${event.detail.toTab}`);
+
+    this._tabs[currentTab].onDeactivate(event);
+    this._tabs[newTab].onActivate(event);
+
+    this.setState({
+      activeTab: newTab,
+    });
+  }
+
+  onTabChange = (nextTabValue) => {
+    this.setActiveTab(nextTabValue);
 
     // Tab switch is not done yet, wait next frame.
     _.defer(() => {
@@ -267,6 +302,15 @@ class DatasetWorkspace extends SuiteBaseClass {
     </div>
   );
 
+  renderTabs () {
+    return Object.entries(this._tabs).map(([key, tab]) => {
+      const reactElement = tab.render();
+      return React.cloneElement(reactElement, {
+        key,
+      });
+    });
+  }
+
   render () {
     return (
       <Paper
@@ -277,14 +321,7 @@ class DatasetWorkspace extends SuiteBaseClass {
           contentContainerClassName="tabs-panel__content"
           value={this.state.activeTab}
           onChange={this.onTabChange}
-        >
-          {this.infoTab.render()}
-          {this.downloadTab.render()}
-          {this.overlayTab.render()}
-          {this.analyticsTab.render()}
-          {this.modelTab.render()}
-          {this.metadataTab.render()}
-        </Tabs>
+        >{this.renderTabs()}</Tabs>
       </Paper>
     );
   }

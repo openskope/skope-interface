@@ -19,6 +19,7 @@ import {
 } from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
+import PauseIcon from 'material-ui/svg-icons/av/pause';
 import ToStartIcon from 'material-ui/svg-icons/av/skip-previous';
 import ToEndIcon from 'material-ui/svg-icons/av/skip-next';
 import SliderWithInput from '/imports/ui/components/SliderWithInput';
@@ -59,7 +60,6 @@ class OverlayTab extends TabComponentClass {
     overlays: null,
   };
 
-  static tabName = 'layers';
   static tabIcon = DatasetMapIcon;
   static tabLabel = 'Overlays';
   static requiredProps = [
@@ -389,6 +389,7 @@ class OverlayTab extends TabComponentClass {
                     tooltip="Play/pause"
                   >
                     <PlayIcon />
+                    <PauseIcon />
                   </IconButton>
                   <ToolbarSeparator
                     style={{
