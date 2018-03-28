@@ -29,8 +29,6 @@ import {
 import {
   absoluteUrl,
   buildGeoJsonWithGeometry,
-  getPrecisionByResolution,
-  getDateRangeStringAtPrecision,
   MarkDownRenderer,
 } from '/imports/ui/helpers';
 

@@ -22,10 +22,10 @@ import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 import PauseIcon from 'material-ui/svg-icons/av/pause';
 import ToStartIcon from 'material-ui/svg-icons/av/skip-previous';
 import ToEndIcon from 'material-ui/svg-icons/av/skip-next';
-import SliderWithInput from '/imports/ui/components/SliderWithInput';
-
-import Range from 'rc-slider/lib/Range';
-import 'rc-slider/assets/index.css';
+import {
+  SliderWithInput,
+  RangeWithInput,
+} from '/imports/ui/components/SliderWithInput';
 
 import {
   DatasetMapIcon,
@@ -82,17 +82,30 @@ class OverlayTab extends TabComponentClass {
   }
 
   /**
+   * @return {*}
+   */
+  get animationRangeStart () {
+    return this.state.animationRange[0];
+  }
+  /**
+   * @return {*}
+   */
+  get animationRangeEnd () {
+    return this.state.animationRange[1];
+  }
+
+  /**
    * @return {boolean}
    */
   get isBackStepInTimeAllowed () {
-    return this.state.currentLoadedDate > this.component.timespan.period.gte;
+    return this.state.currentLoadedDate > this.animationRangeStart;
   }
 
   /**
    * @return {boolean}
    */
   get isForwardStepInTimeAllowed () {
-    return this.state.currentLoadedDate < this.component.timespan.period.lte;
+    return this.state.currentLoadedDate < this.animationRangeEnd;
   }
 
   getInitialState () {
@@ -106,6 +119,10 @@ class OverlayTab extends TabComponentClass {
       // @type {boolean}
       isPlaying: false,
       animationTimer: null,
+      animationRange: [
+        this.component.timespan.period.gte,
+        this.component.timespan.period.lte,
+      ],
     };
   }
 
@@ -172,7 +189,6 @@ class OverlayTab extends TabComponentClass {
       animationTimer,
     });
   }
-
   stopAnimation () {
     this.clearInterval(this.state.animationTimer);
     this.setState({
@@ -185,15 +201,14 @@ class OverlayTab extends TabComponentClass {
     console.log('skipping animation to start');
 
     this.setState({
-      currentLoadedDate: this.component.timespan.period.gte,
+      currentLoadedDate: this.animationRangeStart,
     });
   }
-
   skipAnimationToEnd () {
     console.log('skipping animation to end');
 
     this.setState({
-      currentLoadedDate: this.component.timespan.period.lte,
+      currentLoadedDate: this.animationRangeEnd,
     });
   }
 
@@ -240,7 +255,7 @@ class OverlayTab extends TabComponentClass {
     });
   };
 
-  loadedDateOnChange = (event, date) => {
+  getPreciseDateWithinTimespan = (date) => {
     let preciseDate = getDateAtPrecision(date, this.component.temporalPrecision);
 
     if (preciseDate.valueOf() > this.component.timespan.period.lte.valueOf()) {
@@ -251,12 +266,82 @@ class OverlayTab extends TabComponentClass {
       preciseDate = this.component.timespan.period.gte;
     }
 
+    return preciseDate;
+  };
+
+  /**
+   * @param {Date} date
+   * @return {number}
+   */
+  getSliderValueFromDate = (date) => {
+    const timespan = this.component.timespan;
+
+    return moment.duration(date - timespan.period.gte).as(timespan.resolution);
+  };
+
+  /**
+   * @param {number} value
+   * @return {Date}
+   */
+  getDateFromSliderValue = (value) => {
+    const timespan = this.component.timespan;
+
+    return moment(timespan.period.gte).add(value, timespan.resolution).toDate();
+  };
+
+  /**
+   * @param {Date} date
+   * @return {string}
+   */
+  getYearStringFromDate = (date) => {
+    return this.component.buildPreciseDateString(date);
+  };
+
+  /**
+   * @param {string} s
+   * @return {Date}
+   */
+  getDateFromYearStringInput = (s) => {
+    // Fill year string to 4 digits otherwise parsing will fail.
+    const isBcYear = s[0] === '-';
+    const absYearStr = isBcYear ? s.substr(1) : s;
+    const zeroPadding = '0'.repeat(Math.max(4 - absYearStr.length, 0));
+    const paddedAbsYearStr = zeroPadding + absYearStr;
+    const paddedYearStr = isBcYear ? `-${paddedAbsYearStr}` : paddedAbsYearStr;
+
+    const date = this.component.parsePreciseDateString(paddedYearStr);
+
+    if (!date) {
+      throw new Error('Invalid date.');
+    }
+
+    return date;
+  };
+
+  loadedDateOnChange = (event, date) => {
+    const preciseDate = this.getPreciseDateWithinTimespan(date);
+
     if (preciseDate.valueOf() === this.state.currentLoadedDate.valueOf()) {
       return;
     }
 
     this.setState({
       currentLoadedDate: preciseDate,
+    });
+  };
+
+  onChangeAnimationRange = (event, dateRange) => {
+    const preciseDateRange = dateRange.map(this.getPreciseDateWithinTimespan);
+
+    if (
+      preciseDateRange[0].valueOf() === this.animationRangeStart.valueOf()
+   && preciseDateRange[1].valueOf() === this.animationRangeEnd.valueOf()
+    ) {
+      return;
+    }
+
+    this.setState({
+      animationRange: preciseDateRange,
     });
   };
 
@@ -350,11 +435,6 @@ class OverlayTab extends TabComponentClass {
                       max={1}
                       step={0.01}
                       value={this.getLayerOpacity(layerItem.name)}
-                      inputProps={{
-                        type: 'number',
-                        min: 0,
-                        max: 100,
-                      }}
                       toSliderValue={(v) => v * 100}
                       fromSliderValue={(v) => v / 100}
                       toInputValue={(v) => (v * 100).toFixed(0)}
@@ -376,35 +456,38 @@ class OverlayTab extends TabComponentClass {
                       inputStyle={{
                         width: '60px',
                       }}
+                      sliderProps={{
+                        included: false,
+                      }}
+                      inputProps={{
+                        type: 'number',
+                        min: 0,
+                        max: 100,
+                      }}
                     />
                   </ListItem>,
                   <ListItem
                     key="layer-style-range"
                     disabled
-                    primaryText={(
-                      <div className="adjustment-option__header">
-                        <label>Overlay range: </label>
-                      </div>
-                    )}
-                    secondaryText={(
-                      <div
-                        style={{
-                          overflow: 'visible',
-                          ...OverlayTab.paddingForSliders,
-                        }}
-                      >
-                        <Range
-                          className="input-slider--layer-opacity"
-                          min={layerItem.min}
-                          max={layerItem.max}
-                          defaultValue={[
-                            layerItem.min,
-                            layerItem.max,
-                          ]}
-                        />
-                      </div>
-                    )}
-                  />,
+                  >
+                    <RangeWithInput
+                      disabled
+                      label="Range of variable values displayed on color ramp"
+                      min={layerItem.min}
+                      max={layerItem.max}
+                      step={1}
+                      value={[layerItem.min, layerItem.max]}
+                      onChange={() => {}}
+                      inputStyle={{
+                        width: '60px',
+                      }}
+                      inputProps={{
+                        type: 'number',
+                        min: layerItem.min,
+                        max: layerItem.max,
+                      }}
+                    />
+                  </ListItem>,
                   <ListItem
                     key="layer-style"
                     disabled
@@ -420,6 +503,7 @@ class OverlayTab extends TabComponentClass {
                         }}
                       >
                         <SelectField
+                          disabled
                           value={0}
                           style={{
                             width: '100%',
@@ -441,42 +525,46 @@ class OverlayTab extends TabComponentClass {
             <Subheader>Temporal controls</Subheader>
             <ListItem
               disabled
+              style={{
+                paddingTop: '0',
+                paddingRight: '16px',
+                paddingLeft: '16px',
+                paddingBottom: '22px',
+              }}
             >
-              <SliderWithInput
-                label="Date (year)"
+              <RangeWithInput
+                label="Date Range (year)"
                 min={timespan.period.gte}
                 max={timespan.period.lte}
-                value={this.state.currentLoadedDate}
-                disabled={!this.hasVisibleLayer}
-                inputProps={{
-                  type: 'number',
-                  min: this.component.buildPreciseDateString(timespan.period.gte),
-                  max: this.component.buildPreciseDateString(timespan.period.lte),
-                }}
+                value={this.state.animationRange}
+                disabled={!this.hasVisibleLayer || this.state.isPlaying}
                 // (Date) => number
-                toSliderValue={(date) => moment.duration(date - timespan.period.gte).as(timespan.resolution)}
+                toSliderValue={this.getSliderValueFromDate}
                 // (number) => Date
-                fromSliderValue={(v) => moment(timespan.period.gte).add(v, timespan.resolution).toDate()}
+                fromSliderValue={this.getDateFromSliderValue}
                 // (Date) => string
-                toInputValue={this.component.buildPreciseDateString}
+                toInputValue={this.getYearStringFromDate}
                 // (string) => Date
-                fromInputValue={(s) => {
-                  const date = this.component.parsePreciseDateString(s);
-
-                  if (!date) {
-                    throw new Error('Invalid date.');
-                  }
-
-                  return date;
-                }}
-                onChange={this.loadedDateOnChange}
+                fromInputValue={this.getDateFromYearStringInput}
+                onChange={this.onChangeAnimationRange}
                 inputStyle={{
                   width: '60px',
+                }}
+                inputProps={{
+                  type: 'number',
+                  min: this.getYearStringFromDate(timespan.period.gte),
+                  max: this.getYearStringFromDate(timespan.period.lte),
                 }}
               />
             </ListItem>
             <ListItem
               disabled
+              style={{
+                paddingTop: '0',
+                paddingRight: '16px',
+                paddingLeft: '16px',
+                paddingBottom: '0',
+              }}
             >
               <Toolbar
                 style={{
@@ -529,6 +617,43 @@ class OverlayTab extends TabComponentClass {
 
                 <ToolbarGroup />
               </Toolbar>
+            </ListItem>
+            <ListItem
+              disabled
+              style={{
+                paddingTop: '0',
+                paddingRight: '16px',
+                paddingLeft: '16px',
+                paddingBottom: '22px',
+              }}
+            >
+              <SliderWithInput
+                label="Date (year)"
+                min={this.animationRangeStart}
+                max={this.animationRangeEnd}
+                value={this.state.currentLoadedDate}
+                disabled={!this.hasVisibleLayer}
+                // (Date) => number
+                toSliderValue={this.getSliderValueFromDate}
+                // (number) => Date
+                fromSliderValue={this.getDateFromSliderValue}
+                // (Date) => string
+                toInputValue={this.getYearStringFromDate}
+                // (string) => Date
+                fromInputValue={this.getDateFromYearStringInput}
+                onChange={this.loadedDateOnChange}
+                inputStyle={{
+                  width: '60px',
+                }}
+                sliderProps={{
+                  included: false,
+                }}
+                inputProps={{
+                  type: 'number',
+                  min: this.getYearStringFromDate(this.animationRangeStart),
+                  max: this.getYearStringFromDate(this.animationRangeEnd),
+                }}
+              />
             </ListItem>
           </List>
         </Paper>
