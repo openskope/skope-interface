@@ -9,11 +9,13 @@ const SliderWithHandle = Slider.createSliderWithTooltip(Slider);
 class LazyTextField extends React.Component {
   static propTypes = {
     ...TextField.propTypes,
+    disabled: PropTypes.bool,
     onStepDown: PropTypes.func,
     onStepUp: PropTypes.func,
   };
 
   static defaultProps = {
+    disabled: false,
     onStepDown: () => {},
     onStepUp: () => {},
   };
@@ -251,6 +253,7 @@ class SliderWithInput extends React.PureComponent {
 
             ref={(ref) => this._input = ref}
             value={this.inputValue}
+            disabled={this.props.disabled}
             onChange={this.inputOnChange}
             style={{
               width: '100px',
@@ -273,6 +276,7 @@ class SliderWithInput extends React.PureComponent {
           max={this.sliderMax}
           step={this.sliderStep}
           value={this.sliderValue}
+          disabled={this.props.disabled}
           marks={{
             [this.sliderMin]: this.sliderMinLabel,
             [this.sliderMax]: this.sliderMaxLabel,

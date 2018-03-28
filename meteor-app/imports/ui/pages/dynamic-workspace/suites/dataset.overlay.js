@@ -33,6 +33,7 @@ import {
 
 import {
   getDateAtPrecision,
+  offsetDateAtPrecision,
 } from '/imports/ui/helpers';
 
 import MapView from '/imports/ui/components/mapview';
@@ -73,6 +74,27 @@ class OverlayTab extends TabComponentClass {
     paddingRight: '8px',
   };
 
+  /**
+   * @return {boolean}
+   */
+  get hasVisibleLayer () {
+    return Object.keys(this.state.layerVisibility).length > 0;
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get isBackStepInTimeAllowed () {
+    return this.state.currentLoadedDate > this.component.timespan.period.gte;
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get isForwardStepInTimeAllowed () {
+    return this.state.currentLoadedDate < this.component.timespan.period.lte;
+  }
+
   getInitialState () {
     return {
       // @type {Object<layerId: string, visible: boolean>}
@@ -81,6 +103,9 @@ class OverlayTab extends TabComponentClass {
       layerOpacity: {},
       // @type {Date}
       currentLoadedDate: this.component.timespan.period.gte,
+      // @type {boolean}
+      isPlaying: false,
+      animationTimer: null,
     };
   }
 
@@ -129,6 +154,95 @@ class OverlayTab extends TabComponentClass {
     });
   }
 
+  onNextAnimationFrame = () => {
+    if (this.isForwardStepInTimeAllowed) {
+      this.offsetCurrentTimeAtPrecisionByAmount(1);
+    } else {
+      this.stopAnimation();
+    }
+  };
+
+  startAnimation () {
+    const animationTimer = this.setInterval(this.onNextAnimationFrame, 1000);
+
+    this.setState({
+      isPlaying: true,
+      animationTimer,
+    });
+  }
+
+  stopAnimation () {
+    this.clearInterval(this.state.animationTimer);
+    this.setState({
+      isPlaying: false,
+      animationTimer: null,
+    });
+  }
+
+  onClickPlayButton = () => {
+    if (this.state.isPlaying) {
+      this.stopAnimation();
+    } else {
+      this.startAnimation();
+    }
+  };
+
+  onClickToStartButton = () => {
+    this.setState({
+      currentLoadedDate: this.component.timespan.period.gte,
+    });
+  };
+
+  onClickToEndButton = () => {
+    this.setState({
+      currentLoadedDate: this.component.timespan.period.lte,
+    });
+  };
+
+  offsetCurrentTimeAtPrecisionByAmount = (amount) => {
+    if (!amount) {
+      return;
+    }
+
+    let newLoadedDate = offsetDateAtPrecision(this.state.currentLoadedDate, this.component.temporalPrecision, amount);
+
+    if (newLoadedDate.valueOf() > this.component.timespan.period.lte.valueOf()) {
+      newLoadedDate = this.component.timespan.period.lte;
+    }
+
+    if (newLoadedDate.valueOf() < this.component.timespan.period.gte.valueOf()) {
+      newLoadedDate = this.component.timespan.period.gte;
+    }
+
+    if (newLoadedDate.valueOf() === this.state.currentLoadedDate.valueOf()) {
+      return;
+    }
+
+    this.setState({
+      currentLoadedDate: newLoadedDate,
+    });
+  };
+
+  loadedDateOnChange = (event, date) => {
+    let preciseDate = getDateAtPrecision(date, this.component.temporalPrecision);
+
+    if (preciseDate.valueOf() > this.component.timespan.period.lte.valueOf()) {
+      preciseDate = this.component.timespan.period.lte;
+    }
+
+    if (preciseDate.valueOf() < this.component.timespan.period.gte.valueOf()) {
+      preciseDate = this.component.timespan.period.gte;
+    }
+
+    if (preciseDate.valueOf() === this.state.currentLoadedDate.valueOf()) {
+      return;
+    }
+
+    this.setState({
+      currentLoadedDate: preciseDate,
+    });
+  };
+
   /**
    * Requires component as context object.
    * @param {Object} layer
@@ -152,26 +266,6 @@ class OverlayTab extends TabComponentClass {
       DD: () => moment(this.state.currentLoadedDate).format('DD'),
     });
   }
-
-  loadedDateOnChange = (event, date) => {
-    let preciseDate = getDateAtPrecision(date, this.component.temporalPrecision);
-
-    if (preciseDate.valueOf() > this.component.timespan.period.lte.valueOf()) {
-      preciseDate = this.component.timespan.period.lte;
-    }
-
-    if (preciseDate.valueOf() < this.component.timespan.period.gte.valueOf()) {
-      preciseDate = this.component.timespan.period.gte;
-    }
-
-    if (preciseDate.valueOf() === this.state.currentLoadedDate.valueOf()) {
-      return;
-    }
-
-    this.setState({
-      currentLoadedDate: preciseDate,
-    });
-  };
 
   renderBody () {
     const {
@@ -336,6 +430,7 @@ class OverlayTab extends TabComponentClass {
                 min={timespan.period.gte}
                 max={timespan.period.lte}
                 value={this.state.currentLoadedDate}
+                disabled={!this.hasVisibleLayer}
                 inputProps={{
                   type: 'number',
                   min: this.component.buildPreciseDateString(timespan.period.gte),
@@ -371,11 +466,13 @@ class OverlayTab extends TabComponentClass {
                   background: 'transparent',
                 }}
               >
-                <ToolbarGroup></ToolbarGroup>
+                <ToolbarGroup />
 
                 <ToolbarGroup>
                   <IconButton
                     tooltip="To start"
+                    disabled={!this.hasVisibleLayer || !this.isBackStepInTimeAllowed}
+                    onClick={this.onClickToStartButton}
                   >
                     <ToStartIcon />
                   </IconButton>
@@ -387,9 +484,16 @@ class OverlayTab extends TabComponentClass {
                   />
                   <IconButton
                     tooltip="Play/pause"
+                    disabled={!this.hasVisibleLayer}
+                    onClick={this.onClickPlayButton}
                   >
-                    <PlayIcon />
-                    <PauseIcon />
+                    {this.state.isPlaying
+                    ? (
+                      <PauseIcon />
+                    )
+                    : (
+                      <PlayIcon />
+                    )}
                   </IconButton>
                   <ToolbarSeparator
                     style={{
@@ -399,12 +503,14 @@ class OverlayTab extends TabComponentClass {
                   />
                   <IconButton
                     tooltip="To end"
+                    disabled={!this.hasVisibleLayer || !this.isForwardStepInTimeAllowed}
+                    onClick={this.onClickToEndButton}
                   >
                     <ToEndIcon />
                   </IconButton>
                 </ToolbarGroup>
 
-                <ToolbarGroup></ToolbarGroup>
+                <ToolbarGroup />
               </Toolbar>
             </ListItem>
           </List>
