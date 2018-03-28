@@ -155,6 +155,8 @@ class OverlayTab extends TabComponentClass {
   }
 
   onNextAnimationFrame = () => {
+    console.log('onNextAnimationFrame');
+
     if (this.isForwardStepInTimeAllowed) {
       this.offsetCurrentTimeAtPrecisionByAmount(1);
     } else {
@@ -179,24 +181,39 @@ class OverlayTab extends TabComponentClass {
     });
   }
 
+  skipAnimationToStart () {
+    console.log('skipping animation to start');
+
+    this.setState({
+      currentLoadedDate: this.component.timespan.period.gte,
+    });
+  }
+
+  skipAnimationToEnd () {
+    console.log('skipping animation to end');
+
+    this.setState({
+      currentLoadedDate: this.component.timespan.period.lte,
+    });
+  }
+
   onClickPlayButton = () => {
     if (this.state.isPlaying) {
       this.stopAnimation();
     } else {
+      if (!this.isForwardStepInTimeAllowed) {
+        this.skipAnimationToStart();
+      }
       this.startAnimation();
     }
   };
 
   onClickToStartButton = () => {
-    this.setState({
-      currentLoadedDate: this.component.timespan.period.gte,
-    });
+    this.skipAnimationToStart();
   };
 
   onClickToEndButton = () => {
-    this.setState({
-      currentLoadedDate: this.component.timespan.period.lte,
-    });
+    this.skipAnimationToEnd();
   };
 
   offsetCurrentTimeAtPrecisionByAmount = (amount) => {
