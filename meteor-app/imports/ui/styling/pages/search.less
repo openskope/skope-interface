@@ -10,22 +10,52 @@
   @resultItemMinWidth: 35em;
   @resultItemThumbnailWidth: 15em;
 
-  .flex-row;
-
-  // Set the side-to-side ratio here.
-  & > .page-search__search {
-    flex: 1 1 0;
-    max-width: 30em;
-    min-width: 20em;
-  }
-
-  & > .page-search__result {
-    flex: 2 2 0;
-    // `2` is for the margins around the result items.
-    min-width: @resultItemMinWidth + 2;
-  }
-
+  .flex-col;
   font-family: Roboto;
+
+  & > .the-dummy-tabbar {
+    .tabs-panel {
+      .tab-button {
+        cursor: pointer;
+
+        &:disabled {
+          cursor: not-allowed;
+    
+          &:not(:hover) {
+            opacity: 0.3;
+          }
+        }
+      }
+
+      .tab-label {
+        .flex-row;
+        align-items: center;
+    
+        & > svg {
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+
+  & > .not-the-dummy-tabbar {
+    flex: 1 1 0;
+
+    .flex-row;
+
+    // Set the side-to-side ratio here.
+    & > .page-search__search {
+      flex: 1 1 0;
+      max-width: 30em;
+      min-width: 20em;
+    }
+
+    & > .page-search__result {
+      flex: 2 2 0;
+      // `2` is for the margins around the result items.
+      min-width: @resultItemMinWidth + 2;
+    }
+  }
 
   .page-search__search {
     padding: @global-layout-padding;

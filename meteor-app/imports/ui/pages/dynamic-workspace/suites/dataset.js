@@ -28,6 +28,17 @@ import AnalyticsTab from './dataset.analytics';
 import ModelTab from './dataset.model';
 import MetadataTab from './dataset.metadata';
 
+// Expose this collection in case other components need to know about the tabs and their order.
+export const tabConstructs = {
+  discoverTab: DiscoverTab,
+  infoTab: InfoTab,
+  downloadTab: DownloadTab,
+  overlayTab: OverlayTab,
+  analyticsTab: AnalyticsTab,
+  modelTab: ModelTab,
+  metadataTab: MetadataTab,
+};
+
 class DatasetWorkspace extends SuiteBaseClass {
 
   static propTypes = SuiteBaseClass.extendPropTypes({
@@ -131,15 +142,8 @@ class DatasetWorkspace extends SuiteBaseClass {
   constructor (props) {
     super(props);
 
-    this._tabs = Object.entries({
-      discoverTab: DiscoverTab,
-      infoTab: InfoTab,
-      downloadTab: DownloadTab,
-      overlayTab: OverlayTab,
-      analyticsTab: AnalyticsTab,
-      modelTab: ModelTab,
-      metadataTab: MetadataTab,
-    }).reduce((acc, [id, Construct]) => {
+    this._tabs = Object.entries(tabConstructs)
+    .reduce((acc, [id, Construct]) => {
       return {
         ...acc,
         [id]: new Construct(this, id),

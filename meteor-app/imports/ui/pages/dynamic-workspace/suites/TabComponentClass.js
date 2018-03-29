@@ -12,6 +12,7 @@ class TabComponentClass extends SubComponentClass {
   // Override these.
   static tabIcon = null;
   static tabLabel = '';
+  static tabStyle = {};
   static requiredProps = [];
 
   constructor (...args) {
@@ -31,10 +32,6 @@ class TabComponentClass extends SubComponentClass {
     });
   }
 
-  // Override this.
-  get tabStyle () {
-    return {};
-  }
   // Use these helpers to manage timers so they are properly canceled when the tab becomes inactive.
 
   /**
@@ -126,7 +123,7 @@ class TabComponentClass extends SubComponentClass {
         disabled={!this.isTabEnabled}
         style={{
           cursor: false,
-          ...this.tabStyle,
+          ...this.constructor.tabStyle,
         }}
       >{this.isTabEnabled && this.isActiveTab && this.renderBody()}</Tab>
     );
