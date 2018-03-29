@@ -20,6 +20,7 @@ import {
 
 import SuiteBaseClass from './SuiteBaseClass';
 
+import DiscoverTab from './dataset.discover';
 import InfoTab from './dataset.info';
 import DownloadTab from './dataset.download';
 import OverlayTab from './dataset.overlay';
@@ -131,6 +132,7 @@ class DatasetWorkspace extends SuiteBaseClass {
     super(props);
 
     this._tabs = Object.entries({
+      discoverTab: DiscoverTab,
       infoTab: InfoTab,
       downloadTab: DownloadTab,
       overlayTab: OverlayTab,
