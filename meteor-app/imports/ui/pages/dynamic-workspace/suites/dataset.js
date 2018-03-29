@@ -26,17 +26,15 @@ import DownloadTab from './dataset.download';
 import OverlayTab from './dataset.overlay';
 import AnalyticsTab from './dataset.analytics';
 import ModelTab from './dataset.model';
-import MetadataTab from './dataset.metadata';
 
 // Expose this collection in case other components need to know about the tabs and their order.
 export const tabConstructs = {
   discoverTab: DiscoverTab,
   infoTab: InfoTab,
-  downloadTab: DownloadTab,
   overlayTab: OverlayTab,
   analyticsTab: AnalyticsTab,
+  downloadTab: DownloadTab,
   modelTab: ModelTab,
-  metadataTab: MetadataTab,
 };
 
 class DatasetWorkspace extends SuiteBaseClass {

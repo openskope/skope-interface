@@ -62,7 +62,7 @@ class OverlayTab extends TabComponentClass {
   };
 
   static tabIcon = DatasetMapIcon;
-  static tabLabel = 'Overlays';
+  static tabLabel = 'Map View';
   static requiredProps = [
     'overlays',
   ];
