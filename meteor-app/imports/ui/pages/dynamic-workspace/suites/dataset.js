@@ -322,6 +322,9 @@ class DatasetWorkspace extends SuiteBaseClass {
           className="tabs-panel"
           contentContainerClassName="tabs-panel__content"
           value={this.state.activeTab}
+          inkBarStyle={{
+            backgroundColor: this.props.muiTheme.tabs.inkBarColor,
+          }}
           onChange={this.onTabChange}
         >{this.renderTabs()}</Tabs>
       </Paper>
