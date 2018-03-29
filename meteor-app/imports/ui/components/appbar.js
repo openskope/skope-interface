@@ -18,6 +18,8 @@ import CodeIcon from 'material-ui/svg-icons/action/code';
 
 import { actions } from '/imports/ui/redux-store';
 
+import SafeLink from '/imports/ui/components/SafeLink';
+
 import {
   demoRepository,
   version,
@@ -53,7 +55,15 @@ class Component extends React.Component {
         color: appSettings.appBarTextColor,
       }}
     >
-      <span style={{ marginRight: 30 }}>SKOPE</span>
+      <SafeLink
+        href="https://www.openskope.org"
+        text="SKOPE"
+        style={{
+          color: 'currentColor',
+          marginRight: 30,
+        }}
+        noBadge
+      />
       {this.props.title}
     </div>
   );
