@@ -267,6 +267,59 @@ const buildGeoJsonWithGeometry = (geometry) => {
   };
 };
 
+const placeholderGlobalFindPattern = /\{([a-z-_][a-z0-9-_]*)\}/gim;
+const placeholderPattern = /\{([a-z-_][a-z0-9-_]*)\}/i;
+
+/**
+ * If filler is not found, replace matched string with empty string.
+ * @param {string} templateString - The data string to be modified.
+ * @param {string} matchedString - The matched placeholder string (that contains the `{}`).
+ * @param {Object<string, Function|*>} fillers - A collection of available fillers. A filler could be a function that returns the value or a literal value.
+ * @param {Object} dataStore - Optional secondary storage location if it's not favorable to store the value in string form.
+ * @return {string} - Returns the modified data string.
+ */
+const fillTemplateStringSegment = (templateString, matchedString, fillers, dataStore) => {
+  const match = matchedString.match(placeholderPattern);
+
+  if (!match) {
+    return templateString;
+  }
+
+  const fillerName = match[1];
+  const filler = fillers[fillerName];
+
+  if (!filler) {
+    return templateString.replace(matchedString, '');
+  }
+
+  const replacementValue = typeof filler === 'function' ? filler() : filler;
+  const replacementType = typeof replacementValue;
+  let replacementString = '';
+  let dataStoreValue = null;
+
+  if (replacementValue === null || typeof replacementValue === 'undefined') {
+    // `null` and undefined values should be empty.
+    replacementString = '';
+  } else if (replacementType === 'string') {
+    // String type values go straight to the url.
+    replacementString = encodeURIComponent(replacementValue);
+  } else if (dataStore) {
+    // Other types of values go to the dataStore, if possible.
+    // The value in url would be empty.
+    dataStoreValue = replacementValue;
+    replacementString = '';
+  } else {
+    // If dataStore is not available, force convert value into string type and place it in url.
+    replacementString = String(replacementValue);
+  }
+
+  if (dataStore && (dataStoreValue !== null)) {
+    dataStore[fillerName] = replacementValue;
+  }
+
+  return templateString.replace(matchedString, replacementString);
+};
+
 /**
  * Return the same input string with placeholders filled.
  * Fillers could be functions or literal values.
@@ -281,39 +334,14 @@ const fillTemplateString = (templateString, fillers, dataStore) => {
     return templateString;
   }
 
-  const fillerNames = Object.keys(fillers);
+  // @type {Array|null}
+  const match = templateString.match(placeholderGlobalFindPattern);
 
-  return fillerNames.reduce((acc, fillerName) => {
-    const pattern = `{${fillerName}}`;
-    const filler = fillers[fillerName];
-    const replacementValue = typeof filler === 'function' ? filler() : filler;
-    const replacementType = typeof replacementValue;
-    let replacementString = '';
+  if (!match) {
+    return templateString;
+  }
 
-    let newAcc = acc;
-
-    if (replacementValue === null || typeof replacementValue === 'undefined') {
-      // `null` and undefined values should be empty.
-      replacementString = '';
-    } else if (replacementType === 'string') {
-      // String type values go straight to the url.
-      replacementString = encodeURIComponent(replacementValue);
-    } else if (dataStore) {
-      // Other types of values go to the dataStore, if possible.
-      // The value in url would be empty.
-      dataStore[fillerName] = replacementValue;
-      replacementString = '';
-    } else {
-      // If dataStore is not available, force convert value into string type and place it in url.
-      replacementString = String(replacementValue);
-    }
-
-    while (newAcc.indexOf(pattern) !== -1) {
-      newAcc = newAcc.replace(pattern, String(replacementString));
-    }
-
-    return newAcc;
-  }, templateString);
+  return match.reduce((str, matchedString) => fillTemplateStringSegment(str, matchedString, fillers, dataStore), templateString);
 };
 
 export
