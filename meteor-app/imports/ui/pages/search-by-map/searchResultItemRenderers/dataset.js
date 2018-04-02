@@ -1,6 +1,5 @@
 import React from 'react';
 import objectPath from 'object-path';
-import moment from 'moment';
 import geojsonExtent from 'geojson-extent';
 import {
   Card,
@@ -144,32 +143,29 @@ class SearchResultItem extends React.PureComponent {
     const {
       result: {
         _id,
-        _source: {
-          title,
-          description: descriptionMarkDown,
-          timespan,
-          region,
-        },
+        _source: datasetSourceData,
       },
     } = this.props;
 
-    const boundaryGeometry = objectPath.get(region, 'geometry');
+    const datasetTitle = objectPath.get(datasetSourceData, 'title', '');
+    const boundaryGeometry = objectPath.get(datasetSourceData, 'region.geometry', null);
     const boundaryGeoJson = boundaryGeometry && buildGeoJsonWithGeometry(boundaryGeometry);
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
     // If `extents` is specified in source, trust that. Otherwise try to calculate from boundary shape.
-    const boundaryExtentFromDocument = objectPath.get(region, 'extents');
+    const boundaryExtentFromDocument = objectPath.get(datasetSourceData, 'region.extents', null);
     const boundaryExtent = boundaryExtentFromDocument
                            // Extent coordinates stored in the document are strings instead of numbers.
                            ? (boundaryExtentFromDocument.map((s) => parseFloat(s)))
                            : (boundaryGeoJson && geojsonExtent(boundaryGeoJson));
+    const datasetRegionName = objectPath.get(datasetSourceData, 'region.name', '');
+    const datasetTimespanName = objectPath.get(datasetSourceData, 'timespan.name', '');
+    const datasetDescriptionMarkdown = objectPath.get(datasetSourceData, 'description', '');
 
     const workspacePageUrl = absoluteUrl('/workspace', null, { dataset: _id });
-    const subtitleItems = [
-      region.name,
-      timespan.name,
-    ];
-
-    const subtitle = subtitleItems.filter(Boolean).join(' | ');
+    const subtitle = ((items) => items.filter(Boolean).join(' | '))([
+      datasetRegionName,
+      datasetTimespanName,
+    ]);
 
     return (
       <Card
@@ -196,7 +192,11 @@ class SearchResultItem extends React.PureComponent {
         >
           <CardTitle
             className="search-result-item__title"
-            title={title}
+            title={(
+              <a
+                href={workspacePageUrl}
+              >{datasetTitle}</a>
+            )}
             titleStyle={{
               fontSize: '1.2em',
               lineHeight: '1.45em',
@@ -213,8 +213,9 @@ class SearchResultItem extends React.PureComponent {
               padding: 0,
             }}
           />
-          <div
+          <a
             className="search-result-item__thumbnail"
+            href={workspacePageUrl}
             style={{
               backgroundImage: 'url(//www.openskope.org/wp-content/uploads/2016/02/ScreenShot001.bmp)',
               backgroundSize: 'cover',
@@ -230,11 +231,11 @@ class SearchResultItem extends React.PureComponent {
                 height: '100%',
               }}
             ><map-layer-geojson src-json={boundaryGeoJsonString} /></MapView>
-          )}</div>
+          )}</a>
 
           <MarkDownRenderer
             className="search-result-item__description"
-            value={descriptionMarkDown}
+            value={datasetDescriptionMarkdown}
           />
 
           <IconButton
