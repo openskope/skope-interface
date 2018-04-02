@@ -27,6 +27,7 @@ import {
 
 import {
   absoluteUrl,
+  getCurrentRoute,
   buildGeoJsonWithGeometry,
   MarkDownRenderer,
 } from '/imports/ui/helpers';
@@ -161,7 +162,10 @@ class SearchResultItem extends React.PureComponent {
     const datasetTimespanName = objectPath.get(datasetSourceData, 'timespan.name', '');
     const datasetDescriptionMarkdown = objectPath.get(datasetSourceData, 'description', '');
 
-    const workspacePageUrl = absoluteUrl('/workspace', null, { dataset: _id });
+    const workspacePageUrl = absoluteUrl('/workspace', null, {
+      dataset: _id,
+      q: JSON.stringify(getCurrentRoute().queryParams),
+    });
     const subtitle = ((items) => items.filter(Boolean).join(' | '))([
       datasetRegionName,
       datasetTimespanName,

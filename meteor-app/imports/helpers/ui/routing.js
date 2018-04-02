@@ -22,6 +22,12 @@ const absoluteUrl = (
 ) => FlowRouter.path(pathDef, params, queryParams);
 
 /**
+ * @see {@link https://github.com/VeliovGroup/flow-router/blob/master/docs/api/current.md}
+ */
+export
+const getCurrentRoute = () => FlowRouter.current();
+
+/**
  * Helper for generating simple route actions.
  * @param  {React.Component} ComponentClass - Same as the first argument to `mount`.
  * @param  {Object} props - Same as the second argument to `mount`.
