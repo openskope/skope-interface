@@ -68,21 +68,6 @@
   "appSettings": {
     "exposeStoreToGlobal": true,
     "appBarBackgroundColor": "#f7f5e7",
-    "appBarTextColor": "black",
-    "drawerWidth": 250,
-    "drawerItems": [
-      {
-        "title": "Explore Data",
-        "url": "/explore"
-      },
-      {
-        "title": "Workspace",
-        "url": "/workspace"
-      },
-      {
-        "title": "Model - PaleoCAR",
-        "url": "/model/paleocar"
-      }
-    ]
+    "appBarTextColor": "black"
   }
 }

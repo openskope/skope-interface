@@ -26,6 +26,6 @@ class DiscoverTab extends TabComponentClass {
       searchState = JSON.parse(searchStateString);
     } catch (e) {}
 
-    FlowRouter.go('/explore', null, searchState);
+    FlowRouter.go('/discover', null, searchState);
   }
 }
