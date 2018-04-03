@@ -43,6 +43,11 @@ export const PAGE_ENTRY = (state, action) => ({
   ...state,
 
   path: action.path,
+  // Save routing info here.
+  routing: {
+    params: action.params,
+    queryParams: action.queryParams,
+  },
 
   // Close drawer.
   drawer: {

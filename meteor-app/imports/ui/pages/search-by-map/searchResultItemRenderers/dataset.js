@@ -27,13 +27,13 @@ import {
 
 import {
   absoluteUrl,
-  getCurrentRoute,
   buildGeoJsonWithGeometry,
   MarkDownRenderer,
 } from '/imports/ui/helpers';
 
 import {
   defaultPropTypes,
+  defaultProps,
   bemBlockName,
   renderCardWithDivier,
   DialogButton,
@@ -41,7 +41,13 @@ import {
 
 export default
 class SearchResultItem extends React.PureComponent {
-  static propTypes = defaultPropTypes;
+  static propTypes = {
+    ...defaultPropTypes,
+  };
+
+  static defaultProps = {
+    ...defaultProps,
+  };
 
   static SlimToolbar = (props) => (
     <Toolbar
@@ -142,6 +148,7 @@ class SearchResultItem extends React.PureComponent {
 
   renderCard = () => {
     const {
+      routing,
       result: {
         _id,
         _source: datasetSourceData,
@@ -164,7 +171,7 @@ class SearchResultItem extends React.PureComponent {
 
     const workspacePageUrl = absoluteUrl('/workspace', null, {
       dataset: _id,
-      q: JSON.stringify(getCurrentRoute().queryParams),
+      q: ((obj) => (obj ? JSON.stringify(obj) : null))(objectPath.get(routing, 'queryParams', null)),
     });
     const subtitle = ((items) => items.filter(Boolean).join(' | '))([
       datasetRegionName,

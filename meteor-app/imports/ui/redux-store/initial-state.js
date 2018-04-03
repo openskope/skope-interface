@@ -8,6 +8,11 @@ export default {
   // The current path from the router.
   path: '',
 
+  routing: {
+    params: null,
+    queryParams: null,
+  },
+
   // Stuff related to the (global) drawer.
   drawer: {
     /**

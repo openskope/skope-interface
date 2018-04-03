@@ -17,11 +17,18 @@ import { Meteor } from 'meteor/meteor';
 
 import globalStore, { actions } from '/imports/ui/redux-store';
 
+import {
+  createFlowRouterHistory,
+} from '/imports/ui/helpers';
+
 import Component from './component';
 
 // If endpoint is not found in settings, use default localhost elastic.
 const elasticEndpoint = url.resolve(Meteor.absoluteUrl(), objectPath.get(Meteor.settings, 'public.elasticEndpoint', 'http://localhost:9200/'));
 const searchkit = new SearchkitManager(elasticEndpoint, {
+  searchOnLoad: true,
+  useHistory: true,
+  createHistory: createFlowRouterHistory,
   //! This is a workaround to search only the specific index. Find better solutions.
   searchUrlPath: '/datasets/_search',
 });

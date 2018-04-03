@@ -30,10 +30,16 @@ const renderCardWithDivier = ({
 
 export
 const defaultPropTypes = {
+  routing: PropTypes.object,
   result: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     _source: PropTypes.object.isRequired,
   }).isRequired,
+};
+
+export
+const defaultProps = {
+  routing: null,
 };
 
 export

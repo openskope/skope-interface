@@ -175,6 +175,7 @@ export default class SearchPage extends React.Component {
             hitsPerPage={resultsPerPage}
             itemComponent={RenderSearchResultItemByType}
             scrollTo=".page-search__result"
+            // Passing extra props doesn't expose them to item component.
           />
           <NoHits />
 

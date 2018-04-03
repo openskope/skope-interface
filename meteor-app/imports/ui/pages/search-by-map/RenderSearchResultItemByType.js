@@ -1,5 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import React from 'react';
+import {
+  connect,
+} from 'react-redux';
 import objectPath from 'object-path';
 
 import * as searchResultItemRenderers from './searchResultItemRenderers';
@@ -10,7 +13,7 @@ const resultTypeFieldPath = 'result._source.type';
 const renderSearchResultItemsWithUnknownType = objectPath.get(Meteor.settings, 'public.renderSearchResultItemsWithUnknownType', false);
 const renderInvalidSearchResultItems = objectPath.get(Meteor.settings, 'public.renderInvalidSearchResultItems', false);
 
-export default (props) => {
+const Component = (props) => {
   const resultItemType = objectPath.get(props, resultTypeFieldPath);
 
   if (!resultItemType) {
@@ -36,3 +39,13 @@ export default (props) => {
 
   return React.createElement(Renderer, props);
 };
+
+export default
+connect(
+  // mapStateToProps
+  (state) => ({
+    // Search state in url. Items can use attach this to links so the link target can navigate back.
+    routing: state.routing,
+  }),
+  null,
+)(Component);
