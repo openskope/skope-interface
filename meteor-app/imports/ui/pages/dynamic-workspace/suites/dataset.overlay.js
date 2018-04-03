@@ -275,8 +275,9 @@ class OverlayTab extends TabComponentClass {
    */
   getSliderValueFromDate = (date) => {
     const timespan = this.component.timespan;
+    const sliderRawValue = moment.duration(date - timespan.period.gte).as(timespan.resolution);
 
-    return moment.duration(date - timespan.period.gte).as(timespan.resolution);
+    return Math.floor(sliderRawValue);
   };
 
   /**
