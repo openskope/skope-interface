@@ -272,7 +272,7 @@ class AnalyticsTab extends TabComponentClass {
       requestBody,
     );
 
-    console.log('requestData', 'requesting', remoteUrl);
+    console.log('requestData', 'requesting', remoteUrl, requestBody);
 
     this.setState({
       isLoadingTimeSeriesData: true,
