@@ -151,6 +151,9 @@ class AnalyticsChart extends React.PureComponent {
           },
         },
       },
+      point: {
+        show: false
+      },
       subchart: {
         show: true,
       },
