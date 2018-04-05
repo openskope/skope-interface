@@ -10,6 +10,14 @@ import JsZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import Paper from 'material-ui/Paper';
 import {
+  Card,
+  CardActions,
+  CardHeader,
+  CardMedia,
+  CardTitle,
+  CardText,
+} from 'material-ui/Card';
+import {
   Toolbar,
   ToolbarGroup,
   ToolbarTitle,
@@ -148,10 +156,7 @@ class AnalyticsChart extends React.PureComponent {
         },
       },
       point: {
-        show: false
-      },
-      subchart: {
-        show: true,
+        show: false,
       },
     });
   }
@@ -235,7 +240,7 @@ class AnalyticsTab extends TabComponentClass {
   requestData = (payload, resolve, reject) => {
     console.log('requestData', payload);
 
-    if (!(payload.variableName && payload.boundaryGeometry)) {
+    if (!(payload.variableName && payload.boundaryGeometry && payload.dateRange)) {
       return;
     }
 
@@ -259,6 +264,8 @@ class AnalyticsTab extends TabComponentClass {
           return null;
         },
         boundaryGeometry: payload.boundaryGeometry,
+        start: () => this.getFrameIndexInTimespan(payload.dateRange[0]),
+        end: () => this.getFrameIndexInTimespan(payload.dateRange[1]),
       },
       requestBody,
     );
@@ -277,7 +284,12 @@ class AnalyticsTab extends TabComponentClass {
       remoteUrl,
       {
         json: true,
-        data: requestBody,
+        data: {
+          // Workaround until the url templates are ready.
+          start: this.getFrameIndexInTimespan(payload.dateRange[0]),
+          end: this.getFrameIndexInTimespan(payload.dateRange[1]),
+          ...requestBody,
+        },
       },
       (error, response) => {
         if (error) {
@@ -323,6 +335,7 @@ class AnalyticsTab extends TabComponentClass {
 
     const {
       analyticsBoundaryGeometry,
+      timeSeriesData,
     } = this.state;
     const analyticsBoundaryGeoJsonString = analyticsBoundaryGeometry && JSON.stringify(buildGeoJsonWithGeometry(analyticsBoundaryGeometry));
 
@@ -330,13 +343,17 @@ class AnalyticsTab extends TabComponentClass {
       zip.file('boundary.geojson', analyticsBoundaryGeoJsonString);
     }
 
+    const csvString = objectPath.get(timeSeriesData, 'csv');
+
+    if (csvString) {
+      zip.file('time-series.csv', csvString);
+    }
+
     const chart = this._chartComponent;
 
     if (chart) {
       zip.file('chart.svg', await chart.toBlob());
     }
-
-    //! Add CSV file here.
 
     const blob = await zip.generateAsync({ type: 'blob' });
 
@@ -374,7 +391,6 @@ class AnalyticsTab extends TabComponentClass {
 
     const {
       resolution,
-      period,
     } = this.component.timespan;
 
     const mapToolbarStyles = {
@@ -421,6 +437,7 @@ class AnalyticsTab extends TabComponentClass {
         <PatheticDataRequester
           variableName={this.selectedVariableId}
           boundaryGeometry={analyticsBoundaryGeometry}
+          dateRange={this.dateRange}
           requester={this.requestData}
           onReady={this.onDataReady}
           onError={this.onDataError}
@@ -513,26 +530,35 @@ class AnalyticsTab extends TabComponentClass {
           }}
         >
           {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData && (
-            <Paper
-              style={{
-                padding: '20px 30px',
-                margin: '20px 0',
-              }}
-              zDepth={2}
+            <Card
+              zDepth={0}
             >
-              <AnalyticsChart
-                temporalResolution={resolution}
-                temporalPeriod={period}
-                data={timeSeriesData}
-                ref={(ref) => this._chartComponent = ref}
-              />
-            </Paper>
-          )}
-          {!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && (
-            <div>Loaded in {moment.duration({
-              from: timeSeriesDataRequestDate,
-              to: timeSeriesDataResponseDate,
-            }).asSeconds()} s.</div>
+              <CardMedia>
+                <AnalyticsChart
+                  temporalResolution={resolution}
+                  temporalPeriod={{
+                    gte: this.dateRange[0],
+                    lte: this.dateRange[1],
+                  }}
+                  data={timeSeriesData}
+                  ref={(ref) => this._chartComponent = ref}
+                />
+              </CardMedia>
+              <CardText>
+                <div>Loaded in {moment.duration({
+                  from: timeSeriesDataRequestDate,
+                  to: timeSeriesDataResponseDate,
+                }).asSeconds()} s.</div>
+              </CardText>
+              <CardActions>
+                <RaisedButton
+                  className="download-chart-button"
+                  label="Download Chart"
+                  disabled={!(!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData)}
+                  onClick={this.onDownload}
+                />
+              </CardActions>
+            </Card>
           )}
           {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
             <LinearProgress mode="indeterminate" />
@@ -550,24 +576,6 @@ class AnalyticsTab extends TabComponentClass {
             </Paper>
           )}
         </Paper>
-
-        <Toolbar
-          className="analytics__toolbar"
-        >
-          <ToolbarGroup>
-            <ToolbarTitle
-              text="Extra stuff here"
-            />
-          </ToolbarGroup>
-          <ToolbarGroup>
-            <RaisedButton
-              className="download-chart-button"
-              label="Download Chart"
-              disabled={!(!isLoadingTimeSeriesData && isTimeSeriesDataLoaded && timeSeriesData)}
-              onClick={this.onDownload}
-            />
-          </ToolbarGroup>
-        </Toolbar>
       </div>
     );
   }

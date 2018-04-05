@@ -134,12 +134,14 @@ class TabComponentClass extends SubComponentClass {
    * @param {Date} date
    * @return {number}
    */
-  getSliderValueFromDate = (date) => {
+  getFrameIndexInTimespan = (date) => {
     const timespan = this.component.timespan;
     const sliderRawValue = moment.duration(date - timespan.period.gte).as(timespan.resolution);
 
     return Math.floor(sliderRawValue);
   };
+
+  getSliderValueFromDate = (date) => this.getFrameIndexInTimespan(date);
 
   /**
    * @param {number} value
