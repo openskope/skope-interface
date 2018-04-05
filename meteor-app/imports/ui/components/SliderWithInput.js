@@ -124,6 +124,7 @@ class SliderWithInput extends React.PureComponent {
     inputStyle: PropTypes.object,
     sliderProps: PropTypes.object,
     inputProps: PropTypes.object,
+    style: PropTypes.object,
   };
 
   static defaultProps = {
@@ -137,6 +138,14 @@ class SliderWithInput extends React.PureComponent {
     inputStyle: {},
     sliderProps: {},
     inputProps: {},
+    style: {},
+  };
+
+  static defaultStyle = {
+    paddingTop: '0.5em',
+    paddingLeft: '1em',
+    paddingRight: '1em',
+    paddingBottom: '1.5em',
   };
 
   static defaultSliderStyle = {
@@ -327,7 +336,13 @@ class SliderWithInput extends React.PureComponent {
 
   render () {
     return (
-      <div className="SliderWithInput">
+      <div
+        className="SliderWithInput"
+        style={{
+          ...this.constructor.defaultStyle,
+          ...this.props.style,
+        }}
+      >
         <label className="SliderWithInput__label">{this.label}</label>
         <label className="SliderWithInput__input">
           <LazyTextField
@@ -530,7 +545,13 @@ class RangeWithInput extends SliderWithInput {
     const inputValues = this.inputValue;
 
     return (
-      <div className="RangeWithInput">
+      <div
+        className="RangeWithInput"
+        style={{
+          ...this.constructor.defaultStyle,
+          ...this.props.style,
+        }}
+      >
         <label className="RangeWithInput__label">{this.label}</label>
         <label className="RangeWithInput__input">
           <LazyTextField
