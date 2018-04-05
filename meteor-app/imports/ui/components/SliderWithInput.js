@@ -148,6 +148,12 @@ class SliderWithInput extends React.PureComponent {
     marginRight: '10px',
   };
 
+  static defaultMarkStyle = {
+    width: false,
+    marginLeft: false,
+    transform: 'translateX(-50%)',
+  };
+
   constructor (props) {
     super(props);
 
@@ -212,6 +218,23 @@ class SliderWithInput extends React.PureComponent {
    */
   get sliderValue () {
     return this.props.toSliderValue(this.props.value);
+  }
+
+  get sliderMarks () {
+    return {
+      [this.sliderMin]: {
+        style: {
+          ...this.constructor.defaultMarkStyle,
+        },
+        label: this.sliderMinLabel,
+      },
+      [this.sliderMax]: {
+        style: {
+          ...this.constructor.defaultMarkStyle,
+        },
+        label: this.sliderMaxLabel,
+      },
+    };
   }
 
   /**
@@ -338,10 +361,7 @@ class SliderWithInput extends React.PureComponent {
           step={this.sliderStep}
           value={this.sliderValue}
           disabled={this.props.disabled}
-          marks={{
-            [this.sliderMin]: this.sliderMinLabel,
-            [this.sliderMax]: this.sliderMaxLabel,
-          }}
+          marks={this.sliderMarks}
           onChange={this.sliderOnChange}
           tipFormatter={this.tipFormatter}
           tipProps={{
@@ -566,10 +586,7 @@ class RangeWithInput extends SliderWithInput {
           step={this.sliderStep}
           value={this.sliderValue}
           disabled={this.props.disabled}
-          marks={{
-            [this.sliderMin]: this.sliderMinLabel,
-            [this.sliderMax]: this.sliderMaxLabel,
-          }}
+          marks={this.sliderMarks}
           onChange={this.sliderOnChange}
           tipFormatter={this.tipFormatter}
           tipProps={{
