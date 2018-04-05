@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import marked from 'marked';
 import uuidv4 from 'uuid/v4';
 import classNames from '@xch/class-names';
@@ -136,11 +137,21 @@ class PatheticDataRequester extends React.PureComponent {
     this._lastRequestId = null;
   }
 
-  // Whenever props are changed, try to update.
   componentDidMount () {
+    // Whenever props are changed, try to update.
     this.updateData();
   }
+
+  shouldComponentUpdate (nextProps) {
+    return Object.entries(nextProps).some(([propName, propValue]) => {
+      const propChanged = !_.isEqual(propValue, this.props[propName]);
+
+      return propChanged;
+    });
+  }
+
   componentDidUpdate () {
+    // Whenever props are changed, try to update.
     this.updateData();
   }
 
