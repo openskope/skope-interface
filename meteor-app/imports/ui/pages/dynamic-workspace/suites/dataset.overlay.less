@@ -7,8 +7,22 @@
   & > .overlay__controls {
     .two-column-layout > .left;
     .two-column-layout > .top-layer;
+  }
+  & > .overlay__map {
+    .two-column-layout > .right;
+    .two-column-layout > .bottom-layer;
 
     .flex-col;
+
+    & > .mapview {
+      .layout-fill;
+    }
+  }
+
+  .overlay__controls {
+    .flex-col;
+    overflow-x: hidden;
+    overflow-y: auto;
 
     & > .layer-list {
       .layout-fill;
@@ -16,8 +30,12 @@
       overflow: auto;
     }
   }
-  & > .overlay__map {
-    .two-column-layout > .right;
-    .two-column-layout > .bottom-layer;
+
+  .overlay__map {
+    .flex-col;
+
+    & > .mapview {
+      .layout-fill;
+    }
   }
 }

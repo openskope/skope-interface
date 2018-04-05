@@ -120,6 +120,9 @@ class DatasetWorkspace extends SuiteBaseClass {
     };
   };
 
+  /**
+   * @returns {Object}
+   */
   static getVariables = (variables, { overlays, analytics }) => {
     const mapOfOverlays = _.keyBy(overlays, 'name');
     const mapOfAnalytics = _.keyBy(analytics, 'name');
@@ -148,17 +151,30 @@ class DatasetWorkspace extends SuiteBaseClass {
       };
     }, {});
 
-    this.state = {
+    /**
+     * This is a deep merge so `.getInitialStateForParent` could return state for multiple namespaces,
+     * and all of the namespaces returned from different tabs would be merged.
+     * ! Should it warn about collisions?
+     */
+    this.state = _.merge({
+      _shared: {
+        // @type {string}
+        selectedVariableId: '',
+        // @type {Object<boolean>}
+        isPanelOpen: {
+          'variable-list': true,
+          'temporal-controls': true,
+        },
+        // @type {[Date, Date]}
+        dateRange: [
+          this.timespan.period.gte,
+          this.timespan.period.lte,
+        ],
+      },
+
       // @type {string}
       activeTab: this._tabs.infoTab.name,
-
-      ...(Object.values(this._tabs).reduce((acc, tab) => {
-        return {
-          ...acc,
-          ...tab.getInitialStateForParent(),
-        };
-      }, {})),
-    };
+    }, ...(Object.values(this._tabs).map((tab) => tab.getInitialStateForParent())));
   }
 
   /**

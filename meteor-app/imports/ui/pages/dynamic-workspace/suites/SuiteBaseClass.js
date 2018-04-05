@@ -63,9 +63,7 @@ export default class SuiteBaseClass extends React.Component {
       return;
     }
 
-    if ('_backupState' in this) {
-      this._backupState = { ...state };
-    }
+    this._backupState = { ...state };
 
     this.props.setSuiteState(state, {
       reset: true,
