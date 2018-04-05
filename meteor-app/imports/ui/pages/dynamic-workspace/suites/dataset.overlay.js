@@ -219,6 +219,7 @@ class OverlayTab extends TabComponentClass {
     const boundaryGeoJson = this.component.boundaryGeoJson;
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
     const boundaryExtent = this.component.extent;
+    const mapToolbarStyles = this.mapToolbarStyles;
 
     return (
       <div className="dataset__overlay-tab">
@@ -229,6 +230,38 @@ class OverlayTab extends TabComponentClass {
           <List>
             {this.renderVariableList()}
             {this.renderTemporalControls()}
+
+            <ListItem
+              key="spatial-overview"
+              primaryText="Spatial overview"
+              primaryTogglesNestedList
+              open={this.isPanelOpen('spatial-overview')}
+              onNestedListToggle={() => this.togglePanelOpenState('spatial-overview')}
+              nestedItems={[
+                <ListItem
+                  disabled
+                  key="map"
+                >
+                  <MapView
+                    className="map"
+                    basemap="arcgis"
+                    projection="EPSG:4326"
+                    extent={boundaryExtent}
+                    onClick={(event) => this.onClickMap(event)}
+                    style={{
+                      '--aspect-ratio': '4/3',
+                    }}
+                  >
+                    {this.hasSelectedVariable && this.renderMapLayerForSelectedVariable()}
+                    {boundaryGeoJsonString && (
+                      <map-layer-geojson src-json={boundaryGeoJsonString} />
+                    )}
+                    <map-interaction-defaults />
+                    <map-control-defaults />
+                  </MapView>
+                </ListItem>,
+              ]}
+            />
           </List>
         </Paper>
 

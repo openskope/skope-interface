@@ -161,10 +161,7 @@ class DatasetWorkspace extends SuiteBaseClass {
         // @type {string}
         selectedVariableId: '',
         // @type {Object<boolean>}
-        isPanelOpen: {
-          'variable-list': true,
-          'temporal-controls': true,
-        },
+        isPanelOpen: {},
         // @type {[Date, Date]}
         dateRange: [
           this.timespan.period.gte,

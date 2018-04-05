@@ -83,6 +83,51 @@ class TabComponentClass extends SubComponentClass {
     return this.sharedState.dateRange;
   }
 
+  get mapToolbarStyles () {
+    const {
+      muiTheme,
+    } = this.props;
+
+    return {
+      root: {
+        padding: '0px 0.75em',
+      },
+      title: {
+        fontSize: '1em',
+      },
+      toggleButton: {
+        root: {
+          margin: '0 1px 0 0',
+          minWidth: false,
+          width: '2.5em',
+          color: muiTheme.palette.disabledColor,
+          transition: false,
+        },
+        active: {
+          backgroundColor: muiTheme.palette.toggleButtonActiveBackgroundColor,
+          color: muiTheme.palette.textColor,
+        },
+        icon: {
+          height: '1.25em',
+          width: '1.25em',
+          color: 'inherit',
+          fill: 'currentColor',
+          transition: false,
+        },
+        button: {
+          height: '1.875em',
+          lineHeight: '1.875em',
+          backgroundColor: 'inherit',
+          color: 'inherit',
+          transition: false,
+        },
+        overlay: {
+          height: '100%',
+        },
+      },
+    };
+  }
+
   getPreciseDateWithinTimespan = (date) => {
     let preciseDate = getDateAtPrecision(date, this.component.temporalPrecision);
 
@@ -116,7 +161,10 @@ class TabComponentClass extends SubComponentClass {
   }
 
   isPanelOpen (panelId) {
-    return this.sharedState.isPanelOpen[panelId] || false;
+    return panelId in this.sharedState.isPanelOpen
+           ? this.sharedState.isPanelOpen[panelId]
+           // Open all panels by default.
+           : true;
   }
 
   togglePanelOpenState (panelId) {

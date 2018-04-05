@@ -12,9 +12,7 @@ import Paper from 'material-ui/Paper';
 import {
   Card,
   CardActions,
-  CardHeader,
   CardMedia,
-  CardTitle,
   CardText,
 } from 'material-ui/Card';
 import {
@@ -176,10 +174,12 @@ class AnalyticsTab extends TabComponentClass {
     {
       name: 'point',
       IconClass: PointIcon,
+      title: 'Point tool',
     },
     {
       name: 'rectangle',
       IconClass: RectangleIcon,
+      title: 'Rectangle tool',
     },
   ];
 
@@ -373,9 +373,6 @@ class AnalyticsTab extends TabComponentClass {
 
   renderBody () {
     const {
-      muiTheme,
-    } = this.props;
-    const {
       analyticsBoundaryGeometry,
       isLoadingTimeSeriesData,
       isTimeSeriesDataLoaded,
@@ -392,45 +389,7 @@ class AnalyticsTab extends TabComponentClass {
     const {
       resolution,
     } = this.component.timespan;
-
-    const mapToolbarStyles = {
-      root: {
-        padding: '0px 0.75em',
-      },
-      title: {
-        fontSize: '1em',
-      },
-      toggleButton: {
-        root: {
-          margin: '0 1px 0 0',
-          minWidth: false,
-          width: '2.5em',
-          color: muiTheme.palette.disabledColor,
-          transition: false,
-        },
-        active: {
-          backgroundColor: muiTheme.palette.toggleButtonActiveBackgroundColor,
-          color: muiTheme.palette.textColor,
-        },
-        icon: {
-          height: '1.25em',
-          width: '1.25em',
-          color: 'inherit',
-          fill: 'currentColor',
-          transition: false,
-        },
-        button: {
-          height: '1.875em',
-          lineHeight: '1.875em',
-          backgroundColor: 'inherit',
-          color: 'inherit',
-          transition: false,
-        },
-        overlay: {
-          height: '100%',
-        },
-      },
-    };
+    const mapToolbarStyles = this.mapToolbarStyles;
 
     return (
       <div className="dataset__analytics-tab">
@@ -453,17 +412,15 @@ class AnalyticsTab extends TabComponentClass {
             {this.renderTemporalControls()}
 
             <ListItem
-              key="spatial-controls"
-              primaryText="Spatial controls"
+              key="analytics-boundary"
+              primaryText="Select analytics boundary"
               primaryTogglesNestedList
-              open
+              open={this.isPanelOpen('analytics-boundary')}
+              onNestedListToggle={() => this.togglePanelOpenState('analytics-boundary')}
               nestedItems={[
                 <ListItem
                   disabled
-                  key="map-and-toolbar"
-                  style={{
-                    padding: '0',
-                  }}
+                  key="map"
                 >
                   <div className="map-and-toolbar">
                     <Toolbar
@@ -473,7 +430,7 @@ class AnalyticsTab extends TabComponentClass {
                     >
                       <ToolbarGroup>
                         <ToolbarTitle
-                          text="Select boundary"
+                          text="Tools"
                           style={{
                             ...mapToolbarStyles.title,
                           }}
@@ -504,6 +461,9 @@ class AnalyticsTab extends TabComponentClass {
                       projection="EPSG:4326"
                       extent={boundaryExtent}
                       onClick={(event) => this.onClickMap(event)}
+                      style={{
+                        '--aspect-ratio': '4/3',
+                      }}
                     >
                       {this.hasSelectedVariable && this.renderMapLayerForSelectedVariable()}
                       {boundaryGeoJsonString && (
