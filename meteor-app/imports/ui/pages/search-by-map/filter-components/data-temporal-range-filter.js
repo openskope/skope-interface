@@ -8,18 +8,16 @@ import {
   RangeQuery,
   renderComponent,
 } from 'searchkit';
-import DatePicker from 'material-ui/DatePicker';
-import {
-  Toolbar,
-  ToolbarGroup,
-  ToolbarSeparator,
-} from 'material-ui/Toolbar';
 
 import {
   getPrecisionByResolution,
   getDateStringAtPrecision,
   parseDateStringWithPrecision,
 } from '/imports/ui/helpers';
+
+import {
+  RangeWithInput,
+} from '/imports/ui/components/SliderWithInput';
 
 const dateStringFormatForPrecisions = [
   'YYYY',
@@ -236,6 +234,36 @@ class DateRangeInput extends React.Component {
     }
   };
 
+  /**
+   * @param {Event} event
+   * @param {Array<Date>} range
+   * @param {boolean} ending
+   */
+  rangeOnChange = (event, range, ending) => {
+    const {
+      onChange,
+      onFinished,
+    } = this.props;
+
+    if (ending && onFinished) {
+      onFinished({
+        min: range[0],
+        max: range[1],
+      });
+      return;
+    }
+
+    if (onChange) {
+      onChange({
+        min: range[0],
+        max: range[1],
+      });
+    }
+  };
+  rangeOnFinish = (event, range) => {
+    return this.rangeOnChange(event, range, true);
+  };
+
   render = () => {
     const {
       min: minDate,
@@ -245,52 +273,45 @@ class DateRangeInput extends React.Component {
     } = this.props;
 
     return (
-      <Toolbar
-        style={{
-          background: 'transparent',
+      <RangeWithInput
+        label="Date Range (year)"
+        min={minDate}
+        max={maxDate}
+        value={[minValue, maxValue]}
+        // (Date) => number
+        toSliderValue={(date) => Math.round(moment.duration(date - minDate).as('year'))}
+        // (number) => Date
+        fromSliderValue={(value) => moment(minDate).add(value, 'year').toDate()}
+        // (Date) => string
+        toInputValue={(date) => getDateStringAtPrecision(date, 0)}
+        // (string) => Date
+        fromInputValue={(s) => {
+          // Fill year string to 4 digits otherwise parsing will fail.
+          const isBcYear = s[0] === '-';
+          const absYearStr = isBcYear ? s.substr(1) : s;
+          const zeroPadding = '0'.repeat(Math.max(4 - absYearStr.length, 0));
+          const paddedAbsYearStr = zeroPadding + absYearStr;
+          const paddedYearStr = isBcYear ? `-${paddedAbsYearStr}` : paddedAbsYearStr;
+
+          const date = parseDateStringWithPrecision(paddedYearStr, 0);
+
+          if (!date) {
+            throw new Error('Invalid date.');
+          }
+
+          return date;
         }}
-      >
-        <ToolbarGroup>
-          <DatePicker
-            ref={(ref) => this._minDatePicker = ref}
-            openToYearSelection
-            hintText="Start"
-            value={minValue}
-            minDate={minDate}
-            maxDate={maxDate}
-            formatDate={this.buildPreciseDateString}
-            onChange={this.minDateOnChange}
-            style={{
-              flex: '1 1 0',
-            }}
-            textFieldStyle={{
-              width: 'auto',
-            }}
-          />
-          <ToolbarSeparator
-            style={{
-              marginLeft: '10px',
-              marginRight: '10px',
-            }}
-          />
-          <DatePicker
-            ref={(ref) => this._maxDatePicker = ref}
-            openToYearSelection
-            hintText="End"
-            value={maxValue}
-            minDate={minDate}
-            maxDate={maxDate}
-            formatDate={this.buildPreciseDateString}
-            onChange={this.maxDateOnChange}
-            style={{
-              flex: '1 1 0',
-            }}
-            textFieldStyle={{
-              width: 'auto',
-            }}
-          />
-        </ToolbarGroup>
-      </Toolbar>
+        onChange={this.rangeOnChange}
+        onFinish={this.rangeOnFinish}
+        inputStyle={{
+          width: '60px',
+        }}
+        inputProps={{
+          type: 'number',
+          min: getDateStringAtPrecision(minDate, 0),
+          max: getDateStringAtPrecision(maxDate, 0),
+        }}
+      />
     );
   };
 }
@@ -313,7 +334,7 @@ class DataTemporalRangeFilter extends RangeFilter {
   static defaultProps = {
     ...RangeFilter.defaultProps,
     rangeComponent: DateRangeInput,
-    resolution: 'date',
+    resolution: 'year',
     relation: 'within',
   };
 

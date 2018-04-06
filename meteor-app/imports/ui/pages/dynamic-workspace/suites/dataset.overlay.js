@@ -26,6 +26,7 @@ import {
 } from '/imports/ui/consts';
 
 import {
+  getYearStringFromDate,
   offsetDateAtPrecision,
 } from '/imports/ui/helpers';
 
@@ -349,7 +350,7 @@ class OverlayTab extends TabComponentClass {
             // (number) => Date
             fromSliderValue={this.getDateFromSliderValue}
             // (Date) => string
-            toInputValue={this.getYearStringFromDate}
+            toInputValue={getYearStringFromDate}
             // (string) => Date
             fromInputValue={this.getDateFromYearStringInput}
             onChange={this.onChangeLoadedDate}
@@ -361,8 +362,8 @@ class OverlayTab extends TabComponentClass {
             }}
             inputProps={{
               type: 'number',
-              min: this.getYearStringFromDate(this.dateRangeStart),
-              max: this.getYearStringFromDate(this.dateRangeEnd),
+              min: getYearStringFromDate(this.dateRangeStart),
+              max: getYearStringFromDate(this.dateRangeEnd),
             }}
           />
         </Paper>

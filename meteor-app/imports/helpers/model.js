@@ -267,6 +267,13 @@ const buildGeoJsonWithGeometry = (geometry) => {
   };
 };
 
+/**
+ * @param {Date} date
+ * @return {string}
+ */
+export
+const getYearStringFromDate = (date) => getDateStringAtPrecision(date, 0);
+
 const placeholderGlobalFindPattern = /\{([a-z-_][a-z0-9-_]*)\}/gim;
 const placeholderPattern = /\{([a-z-_][a-z0-9-_]*)\}/i;
 

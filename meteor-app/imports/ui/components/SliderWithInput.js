@@ -69,11 +69,13 @@ class LazyTextField extends React.Component {
         event.target.blur();
         break;
       case event.keyCode === 38 && !event.altKey && !event.ctrlKey && !event.shiftKey:
-        event.preventDefault();
+        // Allow the user to prevent default.
+        // event.preventDefault();
         this.props.onStepUp(event);
         break;
       case event.keyCode === 40 && !event.altKey && !event.ctrlKey && !event.shiftKey:
-        event.preventDefault();
+        // Allow the user to prevent default.
+        // event.preventDefault();
         this.props.onStepDown(event);
         break;
       default:
@@ -114,6 +116,7 @@ class SliderWithInput extends React.PureComponent {
     sliderStep: PropTypes.number,
     value: PropTypes.any.isRequired,
     onChange: PropTypes.func.isRequired,
+    onFinish: PropTypes.func,
     toSliderValue: PropTypes.func,
     // This function should not throw an error. Every point on the slider should be a valid input.
     fromSliderValue: PropTypes.func,
@@ -130,6 +133,7 @@ class SliderWithInput extends React.PureComponent {
   static defaultProps = {
     step: 0,
     sliderStep: 1,
+    onFinish: () => {},
     toSliderValue: (v) => Number(v),
     fromSliderValue: (v) => v,
     toInputValue: (v) => String(v),
@@ -272,9 +276,10 @@ class SliderWithInput extends React.PureComponent {
   /**
    * @param {Event} event
    * @param {*} newValue
+   * @param {boolean} ending - Interaction is ending (e.g. mouseup on slider)
    * @returns {*|null}
    */
-  triggerValueOnChange (event, newValue) {
+  triggerValueOnChange (event, newValue, ending) {
     let finalValue = newValue;
 
     if (isNaN(finalValue)) {
@@ -291,13 +296,28 @@ class SliderWithInput extends React.PureComponent {
 
     this.props.onChange(event, finalValue);
 
+    if (ending && this.props.onFinish) {
+      this.props.onFinish(event, finalValue);
+    }
+
     return finalValue;
   }
 
+  /**
+   * @param {number} newSliderValue
+   */
   sliderOnChange = (newSliderValue) => {
     const newValue = this.props.fromSliderValue(newSliderValue);
 
     this.triggerValueOnChange(null, newValue);
+  };
+  /**
+   * @param {number} newSliderValue
+   */
+  sliderOnFinish = (newSliderValue) => {
+    const newValue = this.props.fromSliderValue(newSliderValue);
+
+    this.triggerValueOnChange(null, newValue, true);
   };
 
   inputOnChange = (event, newInputValue) => {
@@ -307,12 +327,14 @@ class SliderWithInput extends React.PureComponent {
     try {
       newValue = this.props.fromInputValue(newInputValue);
     } catch (error) {
+      console.warn('SliderWithInput.inputOnChange', error);
+
       inputComponent.resetValue();
       return;
     }
 
     // Final value might be different from the new value after value clamping.
-    const finalValue = this.triggerValueOnChange(event, newValue);
+    const finalValue = this.triggerValueOnChange(event, newValue, true);
 
     if (finalValue !== null && inputComponent) {
       const finalInputValue = this.props.toInputValue(finalValue);
@@ -321,17 +343,41 @@ class SliderWithInput extends React.PureComponent {
   };
 
   inputOnStepDown = (event) => {
+    // Number input has built-in stepping shortcuts.
+    if (this.props.inputProps.type === 'number') {
+      return;
+    }
+
     const newSliderValue = this.sliderValue - this.sliderStep;
     const newValue = this.props.fromSliderValue(newSliderValue);
 
-    this.triggerValueOnChange(event, newValue);
+    console.log('SliderWithInput.inputOnStepDown', {
+      sliderValue: this.sliderValue,
+      sliderStep: this.sliderStep,
+      newSliderValue,
+      newValue,
+    });
+
+    this.triggerValueOnChange(event, newValue, true);
   };
 
   inputOnStepUp = (event) => {
+    // Number input has built-in stepping shortcuts.
+    if (this.props.inputProps.type === 'number') {
+      return;
+    }
+
     const newSliderValue = this.sliderValue + this.sliderStep;
     const newValue = this.props.fromSliderValue(newSliderValue);
 
-    this.triggerValueOnChange(event, newValue);
+    console.log('SliderWithInput.inputOnStepUp', {
+      sliderValue: this.sliderValue,
+      sliderStep: this.sliderStep,
+      newSliderValue,
+      newValue,
+    });
+
+    this.triggerValueOnChange(event, newValue, true);
   };
 
   render () {
@@ -378,6 +424,7 @@ class SliderWithInput extends React.PureComponent {
           disabled={this.props.disabled}
           marks={this.sliderMarks}
           onChange={this.sliderOnChange}
+          onAfterChange={this.sliderOnFinish}
           tipFormatter={this.tipFormatter}
           tipProps={{
             placement: 'bottom',
@@ -445,9 +492,10 @@ class RangeWithInput extends SliderWithInput {
   /**
    * @param {Event} event
    * @param {Array<*>} newValues
+   * @param {boolean} ending - Interaction is ending (e.g. mouseup on slider)
    * @returns {Array<*>|null}
    */
-  triggerValueOnChange (event, newValues) {
+  triggerValueOnChange (event, newValues, ending) {
     const finalValues = newValues.map((value) => {
       let finalValue = value;
 
@@ -473,17 +521,30 @@ class RangeWithInput extends SliderWithInput {
 
     this.props.onChange(event, finalValues);
 
+    if (ending && this.props.onFinish) {
+      this.props.onFinish(event, finalValues);
+    }
+
     return finalValues;
   }
 
   /**
-   * @param {Array<*>} newSliderValue
+   * @param {Array<number>} newSliderValue
    */
   sliderOnChange = (newSliderValue) => {
     // @type {Array<*>}
     const newValues = newSliderValue.map((sliderValue) => this.props.fromSliderValue(sliderValue));
 
     this.triggerValueOnChange(null, newValues);
+  };
+  /**
+   * @param {Array<number>} newSliderValue
+   */
+  sliderOnFinish = (newSliderValue) => {
+    // @type {Array<*>}
+    const newValues = newSliderValue.map((sliderValue) => this.props.fromSliderValue(sliderValue));
+
+    this.triggerValueOnChange(null, newValues, true);
   };
 
   /**
@@ -498,6 +559,8 @@ class RangeWithInput extends SliderWithInput {
     try {
       newValue = this.props.fromInputValue(newInputValue);
     } catch (error) {
+      console.warn('RangeWithInput.inputOnChange', error);
+
       inputComponent.resetValue();
       return;
     }
@@ -506,7 +569,7 @@ class RangeWithInput extends SliderWithInput {
 
     // Final value might be different from the new value after value clamping.
     // @type {Array<*>|null}
-    const finalValues = this.triggerValueOnChange(event, newValues);
+    const finalValues = this.triggerValueOnChange(event, newValues, true);
 
     if (finalValues !== null && inputComponent) {
       const finalValue = finalValues[valueIndex];
@@ -520,12 +583,24 @@ class RangeWithInput extends SliderWithInput {
    * @param {number} valueIndex
    */
   inputOnStepDown = (event, valueIndex) => {
+    // Number input has built-in stepping shortcuts.
+    if (this.props.inputProps.type === 'number') {
+      return;
+    }
+
     const sliderValue = this.sliderValue[valueIndex];
     const newSliderValue = sliderValue - this.sliderStep;
     const newValue = this.props.fromSliderValue(newSliderValue);
     const newValues = this.props.value.map((v, i) => ((i === valueIndex) ? newValue : v));
 
-    this.triggerValueOnChange(event, newValues);
+    console.log('RangeWithInput.inputOnStepDown', valueIndex, {
+      sliderValue: this.sliderValue,
+      sliderStep: this.sliderStep,
+      newSliderValue,
+      newValue,
+    });
+
+    this.triggerValueOnChange(event, newValues, true);
   };
 
   /**
@@ -533,12 +608,25 @@ class RangeWithInput extends SliderWithInput {
    * @param {number} valueIndex
    */
   inputOnStepUp = (event, valueIndex) => {
+    // Number input has built-in stepping shortcuts.
+    if (this.props.inputProps.type === 'number') {
+      return;
+    }
+
     const sliderValue = this.sliderValue[valueIndex];
     const newSliderValue = sliderValue + this.sliderStep;
     const newValue = this.props.fromSliderValue(newSliderValue);
     const newValues = this.props.value.map((v, i) => ((i === valueIndex) ? newValue : v));
 
-    this.triggerValueOnChange(event, newValues);
+    console.log('RangeWithInput.inputOnStepUp', valueIndex, {
+      sliderValue: this.sliderValue,
+      sliderStep: this.sliderStep,
+      newSliderValue,
+      newValue,
+    });
+    event.preventDefault();
+
+    this.triggerValueOnChange(event, newValues, true);
   };
 
   render () {
@@ -609,6 +697,7 @@ class RangeWithInput extends SliderWithInput {
           disabled={this.props.disabled}
           marks={this.sliderMarks}
           onChange={this.sliderOnChange}
+          onAfterChange={this.sliderOnFinish}
           tipFormatter={this.tipFormatter}
           tipProps={{
             placement: 'bottom',

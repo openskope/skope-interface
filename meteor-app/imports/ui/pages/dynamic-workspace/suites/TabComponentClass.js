@@ -15,6 +15,7 @@ import {
 
 import {
   getDateAtPrecision,
+  getYearStringFromDate,
 } from '/imports/ui/helpers';
 
 import {
@@ -184,9 +185,22 @@ class TabComponentClass extends SubComponentClass {
    */
   getFrameIndexInTimespan = (date) => {
     const timespan = this.component.timespan;
-    const sliderRawValue = moment.duration(date - timespan.period.gte).as(timespan.resolution);
+    const baseDate = timespan.period.gte;
+    //! This logic needs to be fixed to avoid rounding errors.
+    //! Instead of using difference in milliseconds, perhaps first get integer
+    //! year value and then get the difference in years.
+    //! The millisecond difference between 1000 and 2000 may not be a whole 1000 years.
+    const sliderRawValue = moment.duration(date - baseDate).as(timespan.resolution);
+    const integerValue = Math.round(sliderRawValue);
 
-    return Math.floor(sliderRawValue);
+    // console.log('TabComponentClass.getFrameIndexInTimespan', {
+    //   baseDate,
+    //   date,
+    //   sliderRawValue,
+    //   integerValue,
+    // });
+
+    return integerValue;
   };
 
   getSliderValueFromDate = (date) => this.getFrameIndexInTimespan(date);
@@ -197,16 +211,17 @@ class TabComponentClass extends SubComponentClass {
    */
   getDateFromSliderValue = (value) => {
     const timespan = this.component.timespan;
+    const baseDate = timespan.period.gte;
+    const valueDate = moment(baseDate).add(value, timespan.resolution).toDate();
 
-    return moment(timespan.period.gte).add(value, timespan.resolution).toDate();
-  };
+    // console.log('TabComponentClass.getDateFromSliderValue', {
+    //   baseDate,
+    //   value,
+    //   resolution: timespan.resolution,
+    //   valueDate,
+    // });
 
-  /**
-   * @param {Date} date
-   * @return {string}
-   */
-  getYearStringFromDate = (date) => {
-    return this.component.buildPreciseDateString(date);
+    return valueDate;
   };
 
   /**
@@ -417,7 +432,7 @@ class TabComponentClass extends SubComponentClass {
               // (number) => Date
               fromSliderValue={this.getDateFromSliderValue}
               // (Date) => string
-              toInputValue={this.getYearStringFromDate}
+              toInputValue={getYearStringFromDate}
               // (string) => Date
               fromInputValue={this.getDateFromYearStringInput}
               onChange={this.onChangeDateRange}
@@ -426,8 +441,8 @@ class TabComponentClass extends SubComponentClass {
               }}
               inputProps={{
                 type: 'number',
-                min: this.getYearStringFromDate(timespan.period.gte),
-                max: this.getYearStringFromDate(timespan.period.lte),
+                min: getYearStringFromDate(timespan.period.gte),
+                max: getYearStringFromDate(timespan.period.lte),
               }}
             />
           </ListItem>,
