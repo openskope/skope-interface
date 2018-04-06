@@ -5,7 +5,6 @@ import moment from 'moment';
 import Paper from 'material-ui/Paper';
 import FullWindowLayout from '/imports/ui/layouts/full-window';
 import AppbarHeader from '/imports/ui/components/appbar';
-import SpatialFilter from '/imports/ui/components/searchkit-spatial-filter';
 import FlatButton from 'material-ui/FlatButton';
 
 import {
@@ -22,6 +21,7 @@ import {
   NoHits,
 } from 'searchkit';
 
+import SpatialFilter from './filter-components/spatial-filter';
 import DataTemporalRangeFilter from './filter-components/data-temporal-range-filter';
 import SelectedFilterItem from './SelectedFilterItem';
 import RenderSearchResultItemByType from './RenderSearchResultItemByType';

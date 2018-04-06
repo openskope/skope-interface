@@ -115,7 +115,8 @@ class SpatialAccessor extends FilterBasedAccessor {
   }
 }
 
-export default class SpatialFilter extends SearchkitComponent {
+export default
+class SpatialFilter extends SearchkitComponent {
 
   static defaultProps = {
     id: 'poi',
@@ -247,6 +248,9 @@ export default class SpatialFilter extends SearchkitComponent {
           zoom="5"
           onClick={this._mapOnClick}
           onContextMenu={this._mapOnClick}
+          style={{
+            '--aspect-ratio': '4/3',
+          }}
           ref={(ref) => this._mapview = ref}
         >
           <map-layer-singlepoint
