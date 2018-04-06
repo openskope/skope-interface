@@ -112,14 +112,6 @@ export default class SearchPage extends React.Component {
               size={5}
             />
 
-            <SpatialFilter
-              id="location"
-              className="spatial-filter"
-              title="Geographic Area"
-              subtitle="Click to filter datasets overlapping your area of interest."
-              fields={['region.geometry']}
-            />
-
             <DataTemporalRangeFilter
               id="timespan"
               fields={[
@@ -129,6 +121,14 @@ export default class SearchPage extends React.Component {
               min={moment('0000', 'YYYY').toDate()}
               max={moment().toDate()}
               title="Time Period"
+            />
+
+            <SpatialFilter
+              id="location"
+              className="spatial-filter"
+              title="Geographic Area"
+              subtitle="Click to filter datasets overlapping your area of interest."
+              fields={['region.geometry']}
             />
 
             <div className="layout-filler" />
