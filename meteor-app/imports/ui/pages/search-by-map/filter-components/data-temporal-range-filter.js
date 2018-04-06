@@ -408,18 +408,23 @@ class DataTemporalRangeFilter extends RangeFilter {
 
   getValueFromState = () => {
     // Values stored in the state are date strings.
+    // This is an empty object when the state is empty.
     const stateValue = this.accessor.state.getValue();
     const datePrecision = this.datePrecision;
-    const minDate = parseDateStringWithPrecision(
-      stateValue.min,
-      datePrecision,
-      dateStringFormatForPrecisions,
-    );
-    const maxDate = parseDateStringWithPrecision(
-      stateValue.max,
-      datePrecision,
-      dateStringFormatForPrecisions,
-    );
+    const minDate = typeof stateValue.min === 'undefined'
+                    ? this.props.min
+                    : parseDateStringWithPrecision(
+                      stateValue.min,
+                      datePrecision,
+                      dateStringFormatForPrecisions,
+                    );
+    const maxDate = typeof stateValue.max === 'undefined'
+                    ? this.props.max
+                    : parseDateStringWithPrecision(
+                      stateValue.max,
+                      datePrecision,
+                      dateStringFormatForPrecisions,
+                    );
 
     return {
       min: minDate,
