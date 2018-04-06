@@ -243,7 +243,7 @@ class SpatialFilter extends SearchkitComponent {
         )}
         <MapView
           className={className}
-          basemap="osm"
+          basemap="arcgis"
           center="-12107625, 4495720"
           zoom="5"
           onClick={this._mapOnClick}
