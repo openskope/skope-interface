@@ -12,9 +12,15 @@ import * as Suites from './suites';
 
 class DynamicWorkspaceSuite extends React.PureComponent {
   static propTypes = {
+    // Routing info from state.
+    routing: PropTypes.object.isRequired,
+    // Suite type determines the renderer to use.
     suiteType: PropTypes.string.isRequired,
+    // Props passed to the suite renderer.
     suiteProps: PropTypes.object,
+    // State passed to the suite renderer.
     suiteState: PropTypes.object,
+    // Callback when the suite needs to set state.
     setSuiteState: PropTypes.func,
   };
 
@@ -48,6 +54,7 @@ class DynamicWorkspaceSuite extends React.PureComponent {
       return (
         <WorkspaceSuite
           {...this.props.suiteProps}
+          routing={this.props.routing}
           suiteState={this.props.suiteState}
           setSuiteState={this.props.setSuiteState}
         />
@@ -71,6 +78,7 @@ class DynamicWorkspaceSuite extends React.PureComponent {
 export default connect(
   // mapStateToProps
   (state) => ({
+    routing: state.routing,
     suiteState: state.workspace.DynamicSuiteNS,
   }),
   // mapDispatchToProps
