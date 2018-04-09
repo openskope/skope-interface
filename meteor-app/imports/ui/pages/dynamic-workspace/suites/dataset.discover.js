@@ -1,11 +1,7 @@
+import objectPath from 'object-path';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 
 import globalTheme from '/imports/ui/styling/muiTheme';
-
-
-import {
-  getCurrentRoute,
-} from '/imports/ui/helpers';
 
 import TabComponentClass from './TabComponentClass';
 
@@ -19,13 +15,20 @@ class DiscoverTab extends TabComponentClass {
   };
 
   onActivate () {
-    const searchStateString = getCurrentRoute().queryParams.q;
-    let searchState = {};
+    /**
+     * Search query state from the routing.
+     * @type {Object}
+     */
+    const searchQuery = ((searchStateString) => {
+      let searchState = null;
 
-    try {
-      searchState = JSON.parse(searchStateString);
-    } catch (e) {}
+      try {
+        searchState = JSON.parse(searchStateString);
+      } catch (e) {}
 
-    FlowRouter.go('/discover', null, searchState);
+      return searchState;
+    })(objectPath.get(this.props, 'routing.queryParams.q'));
+
+    FlowRouter.go('/discover', null, searchQuery);
   }
 }
