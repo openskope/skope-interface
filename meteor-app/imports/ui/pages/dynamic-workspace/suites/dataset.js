@@ -152,6 +152,49 @@ class DatasetWorkspace extends SuiteBaseClass {
     }, {});
 
     /**
+     * Initial date range decided from various factors.
+     * If a range is specified in the search query, use that.
+     * Otherwise use the date range from the dataset.
+     * @type {[Date, Date]}
+     */
+    const initialDateRange = (() => {
+      /**
+       * Search query state from the routing.
+       * @type {Object}
+       */
+      const searchQuery = ((searchStateString) => {
+        let searchState = null;
+
+        try {
+          searchState = JSON.parse(searchStateString);
+        } catch (e) {}
+
+        return searchState;
+      })(objectPath.get(props, 'routing.queryParams.q'));
+
+      const queryDateRange = [
+        parseDateStringWithPrecision(objectPath.get(searchQuery, 'timespan.min'), 0),
+        parseDateStringWithPrecision(objectPath.get(searchQuery, 'timespan.max'), 0),
+      ];
+      const isValidQueryDateRange = queryDateRange.every((date) => date !== null);
+
+      if (isValidQueryDateRange) {
+        return queryDateRange;
+      }
+
+      /**
+       * Date range of the dataset.
+       * @type {[Date, Date]}
+       */
+      const datasetDateRange = [
+        this.timespan.period.gte,
+        this.timespan.period.lte,
+      ];
+
+      return datasetDateRange;
+    })();
+
+    /**
      * This is a deep merge so `.getInitialStateForParent` could return state for multiple namespaces,
      * and all of the namespaces returned from different tabs would be merged.
      * ! Should it warn about collisions?
@@ -163,10 +206,7 @@ class DatasetWorkspace extends SuiteBaseClass {
         // @type {Object<boolean>}
         isPanelOpen: {},
         // @type {[Date, Date]}
-        dateRange: [
-          this.timespan.period.gte,
-          this.timespan.period.lte,
-        ],
+        dateRange: initialDateRange,
       },
 
       // @type {string}
