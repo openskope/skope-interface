@@ -220,7 +220,6 @@ class OverlayTab extends TabComponentClass {
     const boundaryGeoJson = this.component.boundaryGeoJson;
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
     const boundaryExtent = this.component.extent;
-    const mapToolbarStyles = this.mapToolbarStyles;
 
     return (
       <div className="dataset__overlay-tab">
@@ -257,8 +256,6 @@ class OverlayTab extends TabComponentClass {
                     {boundaryGeoJsonString && (
                       <map-layer-geojson src-json={boundaryGeoJsonString} />
                     )}
-                    <map-interaction-defaults />
-                    <map-control-defaults />
                   </MapView>
                 </ListItem>,
               ]}
