@@ -1,6 +1,7 @@
 import {
   Meteor,
 } from 'meteor/meteor';
+import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 import store, { actions } from '/imports/ui/redux-store';
 import {
@@ -229,12 +230,15 @@ export const WORKSPACE_LOAD_DATASET = scopedReducer((workspace, action) => {
         datasetId,
       },
       (error, data) => {
-        store.dispatch({
-          type: actions.WORKSPACE_RESOLVE_DATASET_DATA.type,
-          datasetId,
-          requestId,
-          error,
-          data,
+        // Defer this action so the error is disconnected with `Meteor.call`.
+        _.defer(() => {
+          store.dispatch({
+            type: actions.WORKSPACE_RESOLVE_DATASET_DATA.type,
+            datasetId,
+            requestId,
+            error,
+            data,
+          });
         });
       },
     );
