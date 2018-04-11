@@ -5,10 +5,10 @@ import {
   MarkDownRenderer,
 } from '/imports/ui/helpers';
 
-import TabComponentClass from './TabComponentClass';
+import TabBaseClass from './dataset.tab.BaseClass';
 
 export default
-class MetadataTab extends TabComponentClass {
+class MetadataTab extends TabBaseClass {
   static tabIcon = null;
   static tabLabel = 'Metadata';
   static requiredProps = [

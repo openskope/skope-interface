@@ -20,12 +20,12 @@ import {
 
 import SuiteBaseClass from './SuiteBaseClass';
 
-import DiscoverTab from './dataset.discover';
-import InfoTab from './dataset.info';
-import DownloadTab from './dataset.download';
-import OverlayTab from './dataset.overlay';
-import AnalyticsTab from './dataset.analytics';
-import ModelTab from './dataset.model';
+import DiscoverTab from './dataset.tab.discover';
+import InfoTab from './dataset.tab.info';
+import DownloadTab from './dataset.tab.download';
+import OverlayTab from './dataset.tab.overlay';
+import AnalyticsTab from './dataset.tab.analytics';
+import ModelTab from './dataset.tab.model';
 
 // Expose this collection in case other components need to know about the tabs and their order.
 export const tabConstructs = {

@@ -361,3 +361,34 @@ function difference(object, base) {
     }
   });
 }
+
+/**
+ * Go through objects or arrays to find strings and convert them into numbers whenever possible.
+ */
+export
+const stringToNumber = (value, postProcess = (x) => x) => {
+  let finalValue = value;
+
+  switch (typeof value) {
+    case 'string':
+      if (!isNaN(value)) {
+        finalValue = parseFloat(value);
+      }
+      break;
+    case 'object':
+      if (Array.isArray(value)) {
+        finalValue = value.map((item) => stringToNumber(item, postProcess));
+      } else if (value !== null) {
+        finalValue = Object.entries(value).reduce((acc, [key, value]) => {
+          return {
+            ...acc,
+            [key]: stringToNumber(value, postProcess),
+          };
+        }, {});
+      }
+      break;
+    default:
+  }
+
+  return postProcess(finalValue);
+};

@@ -1,10 +1,10 @@
 import objectPath from 'object-path';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 
-import TabComponentClass from './TabComponentClass';
+import TabBaseClass from './dataset.tab.BaseClass';
 
 export default
-class DiscoverTab extends TabComponentClass {
+class DiscoverTab extends TabBaseClass {
   static tabLabel = 'Discover';
   static tabStyle = {
     fontSize: '1.2em',

@@ -9,10 +9,10 @@ import {
   MarkDownRenderer,
 } from '/imports/ui/helpers';
 
-import TabComponentClass from './TabComponentClass';
+import TabBaseClass from './dataset.tab.BaseClass';
 
 export default
-class DownloadTab extends TabComponentClass {
+class DownloadTab extends TabBaseClass {
   static tabIcon = DatasetDownloadIcon;
   static tabLabel = 'Download';
   static requiredProps = [

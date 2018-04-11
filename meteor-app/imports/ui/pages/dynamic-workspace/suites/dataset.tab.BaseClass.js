@@ -27,7 +27,7 @@ import SubComponentClass from './SubComponentClass';
 import * as mapLayerRenderers from './dataset.mapLayerRenderers';
 
 export default
-class TabComponentClass extends SubComponentClass {
+class TabBaseClass extends SubComponentClass {
   // Override these.
   static tabIcon = null;
   static tabLabel = '';
@@ -84,51 +84,6 @@ class TabComponentClass extends SubComponentClass {
     return this.sharedState.dateRange;
   }
 
-  get mapToolbarStyles () {
-    const {
-      muiTheme,
-    } = this.props;
-
-    return {
-      root: {
-        padding: '0px 0.75em',
-      },
-      title: {
-        fontSize: '1em',
-      },
-      toggleButton: {
-        root: {
-          margin: '0 1px 0 0',
-          minWidth: false,
-          width: '2.5em',
-          color: muiTheme.palette.disabledColor,
-          transition: false,
-        },
-        active: {
-          backgroundColor: muiTheme.palette.toggleButtonActiveBackgroundColor,
-          color: muiTheme.palette.textColor,
-        },
-        icon: {
-          height: '1.25em',
-          width: '1.25em',
-          color: 'inherit',
-          fill: 'currentColor',
-          transition: false,
-        },
-        button: {
-          height: '1.875em',
-          lineHeight: '1.875em',
-          backgroundColor: 'inherit',
-          color: 'inherit',
-          transition: false,
-        },
-        overlay: {
-          height: '100%',
-        },
-      },
-    };
-  }
-
   getPreciseDateWithinTimespan = (date) => {
     let preciseDate = getDateAtPrecision(date, this.component.temporalPrecision);
 
@@ -161,14 +116,14 @@ class TabComponentClass extends SubComponentClass {
     });
   }
 
-  isPanelOpen (panelId) {
+  isPanelOpen = (panelId) => {
     return panelId in this.sharedState.isPanelOpen
            ? this.sharedState.isPanelOpen[panelId]
            // Open all panels by default.
            : true;
-  }
+  };
 
-  togglePanelOpenState (panelId) {
+  togglePanelOpenState = (panelId) => {
     const panelOpenState = this.sharedState.isPanelOpen;
 
     this.setSharedState({
@@ -177,7 +132,7 @@ class TabComponentClass extends SubComponentClass {
         [panelId]: !this.isPanelOpen(panelId),
       },
     });
-  }
+  };
 
   /**
    * @param {Date} date
@@ -193,7 +148,7 @@ class TabComponentClass extends SubComponentClass {
     const sliderRawValue = moment.duration(date - baseDate).as(timespan.resolution);
     const integerValue = Math.round(sliderRawValue);
 
-    // console.log('TabComponentClass.getFrameIndexInTimespan', {
+    // console.log('TabBaseClass.getFrameIndexInTimespan', {
     //   baseDate,
     //   date,
     //   sliderRawValue,
@@ -214,7 +169,7 @@ class TabComponentClass extends SubComponentClass {
     const baseDate = timespan.period.gte;
     const valueDate = moment(baseDate).add(value, timespan.resolution).toDate();
 
-    // console.log('TabComponentClass.getDateFromSliderValue', {
+    // console.log('TabBaseClass.getDateFromSliderValue', {
     //   baseDate,
     //   value,
     //   resolution: timespan.resolution,
@@ -374,7 +329,13 @@ class TabComponentClass extends SubComponentClass {
     return this.renderMapLayer(layer);
   }
 
-  renderVariableList () {
+  /**
+   * This component is closely associated with the dataset so it can not be
+   * independent.
+   * Use the `props` parameter to pass customizable options.
+   * @param {Object} props
+   */
+  renderVariableList = () => {
     const variableListItems = Object.entries(this.component.variables)
     .map(([variableId, variable]) => (
       <ListItem
@@ -401,9 +362,18 @@ class TabComponentClass extends SubComponentClass {
         nestedItems={variableListItems}
       />
     );
-  }
+  };
 
-  renderTemporalControls () {
+  /**
+   * This component is closely associated with the dataset so it can not be
+   * independent.
+   * Use the `props` parameter to pass customizable options.
+   * @param {Object} props
+   */
+  renderTemporalControls = (props = {}) => {
+    const {
+      disabled,
+    } = props;
     const timespan = this.component.timespan;
 
     return (
@@ -426,7 +396,7 @@ class TabComponentClass extends SubComponentClass {
               min={timespan.period.gte}
               max={timespan.period.lte}
               value={this.dateRange}
-              disabled={!this.hasSelectedVariable || this.state.isPlaying}
+              disabled={disabled}
               // (Date) => number
               toSliderValue={this.getSliderValueFromDate}
               // (number) => Date
@@ -449,7 +419,7 @@ class TabComponentClass extends SubComponentClass {
         ]}
       />
     );
-  }
+  };
 
   // Override this.
   renderBody () {

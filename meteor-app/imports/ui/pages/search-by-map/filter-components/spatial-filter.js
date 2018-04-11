@@ -1,12 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import {
   SearchkitComponent,
   FilterBasedAccessor,
   ObjectState,
   Panel,
 } from 'searchkit';
+import {
+  Toolbar,
+  ToolbarGroup,
+  ToolbarTitle,
+} from 'material-ui/Toolbar';
+import RaisedButton from 'material-ui/RaisedButton';
 import MapView from '/imports/ui/components/mapview';
+
+import {
+  mapToolbarStyles,
+  PanToolIcon,
+  BoxToolIcon,
+} from '/imports/ui/consts';
+
+import {
+  buildGeoJsonWithGeometry,
+  stringToNumber,
+} from '/imports/ui/helpers';
 
 /**
  * The `SpatialAccessor` is only responsible for wrapping the query value in a `geo_shape` filter.
@@ -131,15 +149,67 @@ class SpatialFilter extends SearchkitComponent {
     subtitle: PropTypes.string,
     id: PropTypes.string,
     fields: PropTypes.arrayOf(PropTypes.string),
+    projection: PropTypes.string,
+    defaultExtent: PropTypes.arrayOf(PropTypes.number),
     mod: PropTypes.string,
   };
+
+  static defaultProps = {
+    ...SearchkitComponent.defaultProps,
+    projection: 'EPSG:4326',
+    defaultExtent: null,
+  };
+
+  static selectionTools = [
+    {
+      name: 'pan',
+      IconClass: PanToolIcon,
+      title: 'Pan tool',
+    },
+    {
+      name: 'rectangle',
+      IconClass: BoxToolIcon,
+      title: 'Rectangle tool',
+      drawingType: 'Box',
+    },
+  ];
 
   constructor (props) {
     super(props);
 
+    this._mapview = null;
+    this._searchBoundaryDrawingLayer = null;
+    this._searchBoundaryDrawingInteraction = null;
+
+    const defaultSelectionTool = SpatialFilter.selectionTools[0];
+
     this.state = {
-      selectedPoint: null,
+      /**
+       * Make sure all the coordinates here are in EPSG:4326 (lat-long).
+       * @type {Object}
+       */
+      filterGeometry: null,
+      // @type {string}
+      activeSelectionToolName: defaultSelectionTool.name,
+      // @type {string|null}
+      activeDrawingType: defaultSelectionTool.drawingType,
     };
+  }
+
+  componentDidMount () {
+    this.connectMap();
+  }
+
+  componentWillUpdate () {
+    this.disconnectMap();
+  }
+
+  componentDidUpdate () {
+    this.connectMap();
+  }
+
+  componentWillUnmount () {
+    this.disconnectMap();
   }
 
   defineBEMBlocks = () => ({
@@ -160,64 +230,102 @@ class SpatialFilter extends SearchkitComponent {
         fields,
         onQueryStateChange: () => {
           if (!this.unmounted) {
-            this.setState({
-              selectedPoint: this.getSelectedPoint(),
-            });
+            const queryShape = this.accessor.getQueryShape();
+
+            if (!queryShape) {
+              this.setState({
+                filterGeometry: null,
+              });
+            } else {
+              // Coordinates must have numbers only.
+              const geometryWithNumbers = stringToNumber(queryShape.shape);
+
+              this.setState({
+                filterGeometry: geometryWithNumbers,
+              });
+            }
           }
         },
       },
     );
   }
 
+  clearSearchBoundaryFeature = () => {
+    this._searchBoundaryDrawingLayer.clearFeatures();
+  };
+
+  updateSearchBoundaryOnAddNewFeature = (olEvent) => {
+    const olGeometry = olEvent.feature.getGeometry();
+    const jsonGeometry = this._searchBoundaryDrawingLayer.writeGeometryObject(olGeometry);
+
+    this.setGeometryQuery(jsonGeometry);
+
+    this._searchBoundaryDrawingLayer.clearFeatures();
+  };
+
+  connectMap () {
+    // Restrict to have at most 1 feature in the layer.
+    if (this._searchBoundaryDrawingInteraction) {
+      this._searchBoundaryDrawingInteraction.addEventListener('drawstart', this.clearSearchBoundaryFeature);
+    }
+    // When a new box is drawn, update the viewing extent.
+    if (this._searchBoundaryDrawingLayer) {
+      this._searchBoundaryDrawingLayer.addEventListener('addfeature', this.updateSearchBoundaryOnAddNewFeature);
+    }
+  }
+
+  disconnectMap () {
+    if (this._searchBoundaryDrawingInteraction) {
+      this._searchBoundaryDrawingInteraction.removeEventListener('drawstart', this.clearSearchBoundaryFeature);
+    }
+    if (this._searchBoundaryDrawingLayer) {
+      this._searchBoundaryDrawingLayer.removeEventListener('addfeature', this.updateSearchBoundaryOnAddNewFeature);
+    }
+  }
+
   /**
-   * This function needs to build a proper point query.
-   * The query should search for all items containing the given point.
+   * This function needs to build a proper geometry query.
+   * The query should search for all items containing the given geometry.
    * @param {Array.<number>} pointCoords
    */
-  buildPointQuery = (pointCoords) => ({
-    shape: {
-      type: 'Point',
-      coordinates: pointCoords,
-    },
+  buildGeometryQuery = (geometry) => ({
+    shape: geometry,
     relation: 'contains',
   });
 
   /**
-   * @return {Array.<number>|null}
+   * @param {Object|null} geometry
    */
-  getSelectedPoint () {
-    const shapeAndRelation = this.accessor.getQueryShape();
-
-    if (!shapeAndRelation) {
-      return null;
-    }
-
-    if (shapeAndRelation.shape.type === 'Point') {
-      return shapeAndRelation.shape.coordinates;
-    }
-
-    return null;
-  }
-
-  /**
-   * @param {Array.<number>|null} pointCoords
-   */
-  setPointQuery (pointCoords) {
-    if (!pointCoords) {
+  setGeometryQuery (geometry) {
+    if (!geometry) {
       this.accessor.clearQueryShape();
     } else {
-      this.accessor.setQueryShape(this.buildPointQuery(pointCoords));
+      this.accessor.setQueryShape(this.buildGeometryQuery(geometry));
     }
 
-    this.searchkit.performSearch();
+    _.defer(() => {
+      this.searchkit.performSearch();
+    });
   }
 
-  _mapOnClick = (event) => {
-    event.preventDefault();
+  setSelectionToolActive (tool) {
+    this.setState({
+      activeSelectionToolName: tool.name,
+      activeDrawingType: tool.drawingType,
+    });
 
-    const selectedPoint = event.latLongCoordinate || null;
+    // If the new tool can't draw, don't clear existing features.
+    if (tool.drawingType) {
+      this.accessor.clearQueryShape();
 
-    this.setPointQuery(selectedPoint);
+      _.defer(() => {
+        this.searchkit.performSearch();
+      });
+    }
+  }
+
+  isSelectionToolActive (tool) {
+    return this.state.activeSelectionToolName === tool.name;
   }
 
   render () {
@@ -225,10 +333,27 @@ class SpatialFilter extends SearchkitComponent {
       title,
       subtitle,
       className,
+      projection,
+      defaultExtent,
     } = this.props;
     const {
-      selectedPoint,
-     } = this.state;
+      filterGeometry,
+      activeDrawingType,
+    } = this.state;
+
+    const extent = (() => {
+      if (!(filterGeometry && this._searchBoundaryDrawingLayer)) {
+        return defaultExtent;
+      }
+
+      const olGeometry = this._searchBoundaryDrawingLayer.readGeometryObject(filterGeometry);
+
+      olGeometry.scale(1.2);
+
+      return olGeometry.getExtent();
+    })();
+    const filterBoundaryGeoJson = filterGeometry && buildGeoJsonWithGeometry(filterGeometry);
+    const filterBoundaryGeoJsonString = filterBoundaryGeoJson && JSON.stringify(filterBoundaryGeoJson);
 
     return (
       <Panel
@@ -241,25 +366,66 @@ class SpatialFilter extends SearchkitComponent {
             }}
           >{subtitle}</div>
         )}
+        <Toolbar
+          style={{
+            ...mapToolbarStyles.root,
+          }}
+        >
+          <ToolbarGroup>
+            <ToolbarTitle
+              text="Tools"
+              style={{
+                ...mapToolbarStyles.title,
+              }}
+            />
+          </ToolbarGroup>
+          <ToolbarGroup>
+            {SpatialFilter.selectionTools.map((item) => (
+              <RaisedButton
+                key={item.name}
+                className="selection-tool-button"
+                icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
+                style={{
+                  ...mapToolbarStyles.toggleButton.root,
+                  ...(this.isSelectionToolActive(item) && mapToolbarStyles.toggleButton.active),
+                }}
+                buttonStyle={mapToolbarStyles.toggleButton.button}
+                overlayStyle={{
+                  ...mapToolbarStyles.toggleButton.overlay,
+                }}
+                onClick={() => this.setSelectionToolActive(item)}
+              />
+            ))}
+          </ToolbarGroup>
+        </Toolbar>
         <MapView
           className={className}
           basemap="arcgis"
-          center="-12107625, 4495720"
-          zoom="5"
-          onClick={this._mapOnClick}
-          onContextMenu={this._mapOnClick}
+          projection={projection}
+          extent={extent}
           style={{
             '--aspect-ratio': '4/3',
           }}
           ref={(ref) => this._mapview = ref}
         >
-          <map-layer-singlepoint
-            invisible={!selectedPoint ? 'invisible' : null}
-            latitude={selectedPoint ? selectedPoint[1] : 0}
-            longitude={selectedPoint ? selectedPoint[0] : 0}
+          <map-layer-geojson
+            invisible={!filterBoundaryGeoJsonString ? 'invisible' : null}
+            src-json={filterBoundaryGeoJsonString}
+            src-projection={projection}
+          />
+          <map-layer-vector
+            id="search-boundary-drawing-layer"
+            src-projection={projection}
+            ref={(ref) => this._searchBoundaryDrawingLayer = ref}
           />
 
           <map-control-defaults />
+          <map-interaction-draw
+            disabled={activeDrawingType ? null : 'disabled'}
+            source="search-boundary-drawing-layer"
+            type={activeDrawingType}
+            ref={(ref) => this._searchBoundaryDrawingInteraction = ref}
+          />
           <map-interaction-defaults />
         </MapView>
       </Panel>

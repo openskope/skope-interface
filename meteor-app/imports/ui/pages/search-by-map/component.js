@@ -129,6 +129,7 @@ export default class SearchPage extends React.Component {
               title="Geographic Area"
               subtitle="Click to filter datasets overlapping your area of interest."
               fields={['region.geometry']}
+              defaultExtent={[-130.58488296266117, 16.545175776537654, -72.57707046266117, 59.963144526537654]}
             />
 
             <div className="layout-filler" />

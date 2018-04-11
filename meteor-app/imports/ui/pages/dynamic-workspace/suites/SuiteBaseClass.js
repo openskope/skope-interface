@@ -26,6 +26,10 @@ export default class SuiteBaseClass extends React.Component {
     setSuiteState: PropTypes.func.isRequired,
   };
 
+  static defaultProps = {
+    suiteState: {},
+  };
+
   static extendPropTypes (propTypes) {
     return {
       ...SuiteBaseClass.propTypes,
