@@ -108,6 +108,16 @@ class OverlayTabContent extends React.Component {
     this.connectOverviewMap();
   }
 
+  componentWillReceiveProps (nextProps) {
+    const updates = {};
+
+    if (nextProps.currentLoadedDate.valueOf() !== this.state.currentLoadedDateTemporal.valueOf()) {
+      updates.currentLoadedDateTemporal = nextProps.currentLoadedDate;
+    }
+
+    this.setState(updates);
+  }
+
   shouldComponentUpdate (nextProps, nextState) {
     return ![
       _.isEqual(nextProps, this.props),

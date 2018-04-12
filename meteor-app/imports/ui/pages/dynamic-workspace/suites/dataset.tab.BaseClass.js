@@ -312,6 +312,7 @@ class TabBaseClass extends SubComponentClass {
     const preciseDateRange = dateRange.map(this.getPreciseDateWithinTimespan);
 
     this.dateRange = preciseDateRange;
+    this.dateRangeTemporal = preciseDateRange;
   };
 
   /**
