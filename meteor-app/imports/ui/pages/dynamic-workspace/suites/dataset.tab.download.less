@@ -4,8 +4,18 @@
   width: 100%;
   height: 100%;
 
+  & > .download__controls {
+    .two-column-layout > .left;
+    .two-column-layout > .top-layer;
+  }
   & > .download__markdown {
-    .two-column-layout > .full;
+    .two-column-layout > .right;
+    .two-column-layout > .bottom-layer;
     .markdown-container;
+  }
+
+  .download__controls {
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 }
