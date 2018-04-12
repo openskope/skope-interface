@@ -73,6 +73,17 @@ class TabBaseClass extends SubComponentClass {
   /**
    * @return {[Date, Date]}
    */
+  get dateRangeTemporal () {
+    return this.sharedState.dateRangeTemporal;
+  }
+  set dateRangeTemporal (value) {
+    this.setSharedState({
+      dateRangeTemporal: value,
+    });
+  }
+  /**
+   * @return {[Date, Date]}
+   */
   get dateRange () {
     return this.sharedState.dateRange;
   }
@@ -294,16 +305,13 @@ class TabBaseClass extends SubComponentClass {
   onChangeDateRange = (event, dateRange) => {
     const preciseDateRange = dateRange.map(this.getPreciseDateWithinTimespan);
 
-    if (
-      preciseDateRange[0].valueOf() === this.dateRangeStart.valueOf()
-   && preciseDateRange[1].valueOf() === this.dateRangeEnd.valueOf()
-    ) {
-      return;
-    }
+    this.dateRangeTemporal = preciseDateRange;
+  };
 
-    this.setSharedState({
-      dateRange: preciseDateRange,
-    });
+  onFinishDateRange = (event, dateRange) => {
+    const preciseDateRange = dateRange.map(this.getPreciseDateWithinTimespan);
+
+    this.dateRange = preciseDateRange;
   };
 
   /**
@@ -412,7 +420,7 @@ class TabBaseClass extends SubComponentClass {
               label="Date Range (year)"
               min={timespan.period.gte}
               max={timespan.period.lte}
-              value={this.dateRange}
+              value={this.dateRangeTemporal}
               disabled={disabled}
               // (Date) => number
               toSliderValue={this.getSliderValueFromDate}
@@ -423,8 +431,16 @@ class TabBaseClass extends SubComponentClass {
               // (string) => Date
               fromInputValue={this.getDateFromYearStringInput}
               onChange={this.onChangeDateRange}
+              onFinish={this.onFinishDateRange}
               inputStyle={{
                 width: '60px',
+              }}
+              sliderProps={{
+                handleStyle: [
+                  {
+                    transform: 'scale(1.4)',
+                  },
+                ],
               }}
               inputProps={{
                 type: 'number',

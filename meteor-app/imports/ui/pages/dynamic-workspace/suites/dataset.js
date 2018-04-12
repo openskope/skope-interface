@@ -260,6 +260,10 @@ class DatasetWorkspace extends SuiteBaseClass {
          */
         dateRange: initialDateRange,
         /**
+         * This should be an exact copy of `dateRange` but gets updated much frequently more by the sliders.
+         */
+        dateRangeTemporal: initialDateRange,
+        /**
          * The date of the currently selected time frame/band.
          * This affects what layers are displayed in the map view and the graph view.
          * @type {Date}

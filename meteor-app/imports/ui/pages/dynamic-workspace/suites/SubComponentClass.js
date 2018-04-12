@@ -53,7 +53,7 @@ class SubComponent {
       this._statePhantom = _.cloneDeep(this.state);
     }
 
-    _.merge(this._statePhantom, newState);
+    this._statePhantom = _.merge({}, this._statePhantom, newState);
 
     return this.component.setState({
       [this.name]: _.cloneDeep(this._statePhantom),
@@ -67,7 +67,7 @@ class SubComponent {
       this._sharedStatePhantom = _.cloneDeep(this.sharedState);
     }
 
-    _.merge(this._sharedStatePhantom, newSharedState);
+    this._sharedStatePhantom = _.merge({}, this._sharedStatePhantom, newSharedState);
 
     return this.component.setState({
       _shared: _.cloneDeep(this._sharedStatePhantom),

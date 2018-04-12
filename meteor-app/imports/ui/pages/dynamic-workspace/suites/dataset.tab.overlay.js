@@ -89,6 +89,8 @@ class OverlayTabContent extends React.Component {
     const defaultSelectionTool = OverlayTabContent.selectionTools[0];
 
     this.state = {
+      // Copy of the date for the sliders.
+      currentLoadedDateTemporal: props.currentLoadedDate,
       // @type {Object<layerId: string, opacity: number>}
       layerOpacity: {},
       // @type {string}
@@ -308,6 +310,7 @@ class OverlayTabContent extends React.Component {
       focusGeometry,
     } = this.props;
     const {
+      currentLoadedDateTemporal,
       activeDrawingType,
     } = this.state;
 
@@ -491,7 +494,7 @@ class OverlayTabContent extends React.Component {
             label="Date (year)"
             min={dateRangeStart}
             max={dateRangeEnd}
-            value={currentLoadedDate}
+            value={currentLoadedDateTemporal}
             disabled={!hasSelectedVariable}
             // (Date) => number
             toSliderValue={this.props.getSliderValueFromDate}
@@ -501,12 +504,18 @@ class OverlayTabContent extends React.Component {
             toInputValue={getYearStringFromDate}
             // (string) => Date
             fromInputValue={this.props.getDateFromYearStringInput}
-            onChange={(event, date) => this.props.updateLoadedDate(date)}
+            onChange={(event, date) => this.setState({ currentLoadedDateTemporal: date })}
+            onFinish={(event, date) => this.props.updateLoadedDate(date)}
             inputStyle={{
               width: '60px',
             }}
             sliderProps={{
               included: false,
+              handleStyle: [
+                {
+                  transform: 'scale(1.4)',
+                },
+              ],
             }}
             inputProps={{
               type: 'number',
