@@ -2,6 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import Paper from 'material-ui/Paper';
 import {
   List,
@@ -305,7 +306,6 @@ class OverlayTabContent extends React.Component {
       hasSelectedVariable,
       dateRangeStart,
       dateRangeEnd,
-      currentLoadedDate,
       boundaryGeometry,
       focusGeometry,
     } = this.props;
