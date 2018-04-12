@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import objectPath from 'object-path';
+import moment from 'moment';
 import geojsonExtent from 'geojson-extent';
 
 import muiThemeable from 'material-ui/styles/muiThemeable';
@@ -16,6 +17,7 @@ import {
   parseDateStringWithPrecision,
   buildGeoJsonWithGeometry,
   AllResolutionNames,
+  stringToNumber,
 } from '/imports/ui/helpers';
 
 import SuiteBaseClass from './SuiteBaseClass';
@@ -151,6 +153,32 @@ class DatasetWorkspace extends SuiteBaseClass {
       };
     }, {});
 
+    // This vector layer element is used to help handle vector data.
+    this._utilVectorLayerElement = (() => {
+      const element = document.createElement('map-layer-vector');
+
+      element.srcProjection = 'EPSG:4326';
+      element.projection = 'EPSG:4326';
+
+      return element;
+    })();
+
+    /**
+     * Search query state from the routing.
+     * @type {Object}
+     */
+    const searchQuery = ((searchStateString) => {
+      let searchState = null;
+
+      try {
+        searchState = JSON.parse(searchStateString);
+      } catch (e) {}
+
+      return searchState;
+    })(objectPath.get(props, 'routing.queryParams.q'));
+
+    console.log('searchQuery', searchQuery);
+
     /**
      * Initial date range decided from various factors.
      * If a range is specified in the search query, use that.
@@ -158,20 +186,6 @@ class DatasetWorkspace extends SuiteBaseClass {
      * @type {[Date, Date]}
      */
     const initialDateRange = (() => {
-      /**
-       * Search query state from the routing.
-       * @type {Object}
-       */
-      const searchQuery = ((searchStateString) => {
-        let searchState = null;
-
-        try {
-          searchState = JSON.parse(searchStateString);
-        } catch (e) {}
-
-        return searchState;
-      })(objectPath.get(props, 'routing.queryParams.q'));
-
       const queryDateRange = [
         parseDateStringWithPrecision(objectPath.get(searchQuery, 'timespan.min'), 0),
         parseDateStringWithPrecision(objectPath.get(searchQuery, 'timespan.max'), 0),
@@ -194,19 +208,69 @@ class DatasetWorkspace extends SuiteBaseClass {
       return datasetDateRange;
     })();
 
+    console.log('initialDateRange', initialDateRange);
+
+    const initialFocusGeometry = (() => {
+      const queryShape = objectPath.get(searchQuery, 'location', null);
+
+      if (queryShape && queryShape.shape) {
+        const geometryWithNumbers = stringToNumber(queryShape.shape);
+
+        return geometryWithNumbers;
+      }
+
+      const boundaryGeometry = this.boundaryGeometry;
+
+      if (boundaryGeometry) {
+        return boundaryGeometry;
+      }
+
+      return null;
+    })();
+
+    console.log('initialFocusGeometry', initialFocusGeometry);
+
     /**
      * This is a deep merge so `.getInitialStateForParent` could return state for multiple namespaces,
      * and all of the namespaces returned from different tabs would be merged.
      * ! Should it warn about collisions?
      */
     this.state = _.merge({
+      // These state properties are shared across multiple tabs.
+      // Check `dataset.tab.BaseClass.js` for helper getters and setters.
       _shared: {
-        // @type {string}
+        /**
+         * The ID of the currently selected variable.
+         * If need default selection, configure it here.
+         * Empty string denotes null selection.
+         * @type {string}
+         */
         selectedVariableId: '',
-        // @type {Object<boolean>}
+        /**
+         * A collection of boolean values indicating if a panel is open.
+         * When there is no value for a specific key, the default state is up to the reader's interpretation.
+         * @type {Object<boolean>}
+         */
         isPanelOpen: {},
-        // @type {[Date, Date]}
+        /**
+         * Range of the current selection.
+         * This tuple-style structure is used by the slider component.
+         * Since the slider is a high-update-frequency component, it's better to reduce the amount of convertion necessary.
+         * @type {[Date, Date]}
+         */
         dateRange: initialDateRange,
+        /**
+         * The date of the currently selected time frame/band.
+         * This affects what layers are displayed in the map view and the graph view.
+         * @type {Date}
+         */
+        currentLoadedDate: initialDateRange[0],
+        /**
+         * The geometry of the area of interest.
+         * This determines the highlighted area of the map view and the study area of the graph view.
+         * @type {Object}
+         */
+        focusGeometry: initialFocusGeometry,
       },
 
       // @type {string}
@@ -236,16 +300,17 @@ class DatasetWorkspace extends SuiteBaseClass {
   }
 
   /**
-   * @type {Object}
+   * @type {Object|null}
+   */
+  get boundaryGeometry () {
+    return objectPath.get(this.props.region, 'geometry', null);
+  }
+
+  /**
+   * @type {Object|null}
    */
   get boundaryGeoJson () {
-    const boundaryGeometry = objectPath.get(this.props.region, 'geometry');
-
-    if (!boundaryGeometry) {
-      return null;
-    }
-
-    return buildGeoJsonWithGeometry(boundaryGeometry);
+    return buildGeoJsonWithGeometry(this.boundaryGeometry);
   }
 
   /**
@@ -281,6 +346,63 @@ class DatasetWorkspace extends SuiteBaseClass {
       analytics,
     });
   }
+
+  /**
+   * @param {Object} geometry
+   * @returns {Array.<number>}
+   */
+  getExtentFromGeometry = (geometry) => {
+    const olGeometry = this._utilVectorLayerElement.readGeometryObject(geometry);
+
+    return olGeometry.getExtent();
+  };
+
+  /**
+   * @param {Array.<number>} extent
+   * @returns {Object}
+   */
+  getGeometryFromExtent = (extent) => {
+    const olGeometry = this._utilVectorLayerElement.createGeometryFromExtent(extent);
+
+    return this._utilVectorLayerElement.writeGeometryObject(olGeometry);
+  };
+
+  /**
+   * @param {ol.geometry.Geometry}
+   * @returns {Object}
+   */
+  getGeometryFromOlGeometry = (olGeometry) => {
+    return this._utilVectorLayerElement.writeGeometryObject(olGeometry);
+  };
+
+  /**
+   * @param {Date} date
+   * @return {number}
+   */
+  getFrameIndexInTimespan = (date) => {
+    const timespan = this.timespan;
+    const baseDate = timespan.period.gte;
+    //! This logic needs to be fixed to avoid rounding errors.
+    //! Instead of using difference in milliseconds, perhaps first get integer
+    //! year value and then get the difference in years.
+    //! The millisecond difference between 1000 and 2000 may not be a whole 1000 years.
+    const sliderRawValue = moment.duration(date - baseDate).as(timespan.resolution);
+    const integerValue = Math.round(sliderRawValue);
+
+    return integerValue;
+  };
+
+  /**
+   * @param {number} value
+   * @return {Date}
+   */
+  getDateFromFrameIndex = (value) => {
+    const timespan = this.timespan;
+    const baseDate = timespan.period.gte;
+    const valueDate = moment(baseDate).add(value, timespan.resolution).toDate();
+
+    return valueDate;
+  };
 
   setActiveTab = (newTab) => {
     if (!(newTab in this._tabs)) {

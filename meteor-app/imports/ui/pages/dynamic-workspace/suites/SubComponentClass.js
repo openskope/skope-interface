@@ -4,6 +4,8 @@
  * parent component.
  */
 
+import _ from 'lodash';
+
 export default
 class SubComponent {
   // Override this.
@@ -48,16 +50,13 @@ class SubComponent {
     // During one update cycle, multiple calls to `.setState` see the same state object.
     if (this._statePhantomBase !== this.state) {
       this._statePhantomBase = this.state;
-      this._statePhantom = { ...this.state };
+      this._statePhantom = _.cloneDeep(this.state);
     }
 
-    this._statePhantom = {
-      ...this._statePhantom,
-      ...newState,
-    };
+    _.merge(this._statePhantom, newState);
 
     return this.component.setState({
-      [this.name]: { ...this._statePhantom },
+      [this.name]: _.cloneDeep(this._statePhantom),
     });
   }
 
@@ -65,16 +64,13 @@ class SubComponent {
     // During one update cycle, multiple calls to `.setState` see the same state object.
     if (this._sharedStatePhantomBase !== this.sharedState) {
       this._sharedStatePhantomBase = this.sharedState;
-      this._sharedStatePhantom = { ...this.sharedState };
+      this._sharedStatePhantom = _.cloneDeep(this.sharedState);
     }
 
-    this._sharedStatePhantom = {
-      ...this._sharedStatePhantom,
-      ...newSharedState,
-    };
+    _.merge(this._sharedStatePhantom, newSharedState);
 
     return this.component.setState({
-      _shared: { ...this._sharedStatePhantom },
+      _shared: _.cloneDeep(this._sharedStatePhantom),
     });
   }
 

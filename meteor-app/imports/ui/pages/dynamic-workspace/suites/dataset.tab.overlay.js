@@ -32,6 +32,7 @@ import {
 import {
   getYearStringFromDate,
   offsetDateAtPrecision,
+  buildGeoJsonWithGeometry,
 } from '/imports/ui/helpers';
 
 import MapView from '/imports/ui/components/mapview';
@@ -41,8 +42,15 @@ import TabBaseClass from './dataset.tab.BaseClass';
 class OverlayTabContent extends React.Component {
 
   static propTypes = {
+    // Some data.
+    hasSelectedVariable: PropTypes.bool.isRequired,
+    currentLoadedDate: PropTypes.instanceOf(Date).isRequired,
+    dateRangeStart: PropTypes.instanceOf(Date).isRequired,
+    dateRangeEnd: PropTypes.instanceOf(Date).isRequired,
+    boundaryGeometry: PropTypes.object.isRequired,
+    focusGeometry: PropTypes.object.isRequired,
+
     // Some helper functions.
-    getPreciseDateWithinTimespan: PropTypes.func.isRequired,
     getSliderValueFromDate: PropTypes.func.isRequired,
     getDateFromSliderValue: PropTypes.func.isRequired,
     getDateFromYearStringInput: PropTypes.func.isRequired,
@@ -50,17 +58,13 @@ class OverlayTabContent extends React.Component {
     togglePanelOpenState: PropTypes.func.isRequired,
     renderVariableList: PropTypes.func.isRequired,
     renderTemporalControls: PropTypes.func.isRequired,
-
-    // Some data.
-    temporalPrecision: PropTypes.any.isRequired,
-    boundaryExtent: PropTypes.arrayOf(PropTypes.number).isRequired,
-    boundaryGeoJsonString: PropTypes.string.isRequired,
-    dateRangeStart: PropTypes.instanceOf(Date).isRequired,
-    dateRangeEnd: PropTypes.instanceOf(Date).isRequired,
-    hasSelectedVariable: PropTypes.bool.isRequired,
-
-    // Some components.
-    mapLayerOfTheSelectedVariable: PropTypes.any.isRequired,
+    renderMapLayerForSelectedVariable: PropTypes.func.isRequired,
+    updateFocusGeometry: PropTypes.func.isRequired,
+    updateLoadedDate: PropTypes.func.isRequired,
+    offsetCurrentTimeAtPrecisionByAmount: PropTypes.func.isRequired,
+    getGeometryFromExtent: PropTypes.func.isRequired,
+    getExtentFromGeometry: PropTypes.func.isRequired,
+    getGeometryFromOlGeometry: PropTypes.func.isRequired,
   };
 
   static defaultLayerOpacity = 1;
@@ -79,21 +83,18 @@ class OverlayTabContent extends React.Component {
 
     this._overviewMap = null;
     this._detailMap = null;
-    this._extentDrawingLayer = null;
-    this._extentDrawingInteraction = null;
+    this._focusGeometryDrawingLayer = null;
+    this._focusGeometryDrawingInteraction = null;
 
     const defaultSelectionTool = OverlayTabContent.selectionTools[0];
 
     this.state = {
       // @type {Object<layerId: string, opacity: number>}
       layerOpacity: {},
-      viewingExtent: props.boundaryExtent,
       // @type {string}
       activeSelectionToolName: defaultSelectionTool.name,
       // @type {string|null}
       activeDrawingType: defaultSelectionTool.drawingType,
-      // @type {Date}
-      currentLoadedDate: props.dateRangeStart,
       // @type {boolean}
       isPlaying: false,
       animationTimer: null,
@@ -102,6 +103,13 @@ class OverlayTabContent extends React.Component {
 
   componentDidMount () {
     this.connectOverviewMap();
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    return ![
+      _.isEqual(nextProps, this.props),
+      _.isEqual(nextState, this.state),
+    ].every(Boolean);
   }
 
   componentWillUpdate () {
@@ -143,23 +151,37 @@ class OverlayTabContent extends React.Component {
     console.log('onNextAnimationFrame');
 
     if (this.isForwardStepInTimeAllowed) {
-      this.offsetCurrentTimeAtPrecisionByAmount(1);
+      this.props.offsetCurrentTimeAtPrecisionByAmount(1);
     } else {
       this.stopAnimation();
     }
   };
 
-  onChangeLoadedDate = (event, date) => {
-    const preciseDate = this.props.getPreciseDateWithinTimespan(date);
+  onStartDrawingNewFocusGeometry = () => {
+    this.clearFocusFeatureDrawing();
+  };
 
-    if (preciseDate.valueOf() === this.state.currentLoadedDate.valueOf()) {
+  onDrawNewFocusFeature = (olEvent) => {
+    const olGeometry = olEvent.feature.getGeometry();
+    const jsonGeometry = this.props.getGeometryFromOlGeometry(olGeometry);
+
+    // Report new focus geometry.
+    this.props.updateFocusGeometry(jsonGeometry);
+
+    this.clearFocusFeatureDrawing();
+  };
+
+  onChangeViewingExtent = _.throttle(() => {
+    if (!(this._detailMap && this._detailMap.map)) {
       return;
     }
 
-    this.setState({
-      currentLoadedDate: preciseDate,
-    });
-  };
+    const newExtent = this._detailMap.map.extent;
+    const extenJsonGeometry = this.props.getGeometryFromExtent(newExtent);
+
+    // Report new focus geometry.
+    this.props.updateFocusGeometry(extenJsonGeometry);
+  }, 3);
 
   /**
    * @param {string} layerId
@@ -184,14 +206,16 @@ class OverlayTabContent extends React.Component {
 
   setSelectionToolActive (tool) {
     this.setState({
-      viewingExtent: this.props.boundaryExtent,
       activeSelectionToolName: tool.name,
       activeDrawingType: tool.drawingType,
     });
 
+    // Setting focus gemoetry to null should load the default focus geometry.
+    this.props.updateFocusGeometry(null);
+
     // If the new tool can't draw, don't clear existing features.
     if (tool.drawingType) {
-      this.clearExtentFeature();
+      this.clearFocusFeatureDrawing();
     }
   }
 
@@ -203,73 +227,49 @@ class OverlayTabContent extends React.Component {
    * @return {boolean}
    */
   get isBackStepInTimeAllowed () {
-    return this.state.currentLoadedDate > this.props.dateRangeStart;
+    return this.props.currentLoadedDate > this.props.dateRangeStart;
   }
   /**
    * @return {boolean}
    */
   get isForwardStepInTimeAllowed () {
-    return this.state.currentLoadedDate < this.props.dateRangeEnd;
+    return this.props.currentLoadedDate < this.props.dateRangeEnd;
   }
 
   isSelectionToolActive (tool) {
     return this.state.activeSelectionToolName === tool.name;
   }
 
-  clearExtentFeature = () => {
-    if (this._extentDrawingLayer) {
-      this._extentDrawingLayer.clearFeatures();
+  clearFocusFeatureDrawing () {
+    if (this._focusGeometryDrawingLayer) {
+      this._focusGeometryDrawingLayer.clearFeatures();
     }
-  };
-
-  updateViewingExtentOnAddNewExtentFeature = (olEvent) => {
-    this.setState({
-      viewingExtent: olEvent.feature.getGeometry().getExtent(),
-    });
-  };
-
-  updateExtentFeatureOnChangeViewingExtent = () => {
-    if (!(this._detailMap && this._detailMap.map && this._extentDrawingLayer)) {
-      return;
-    }
-
-    const extent = this._detailMap.map.extent;
-    const extentGeometry = this._extentDrawingLayer.createGeometryFromExtent(extent);
-    const features = this._extentDrawingLayer.getFeatures();
-
-    if (features.length > 0) {
-      const extentFeature = features[0];
-
-      extentFeature.setGeometry(extentGeometry);
-    } else {
-      this._extentDrawingLayer.addFeature(this._extentDrawingLayer.createFeature(extentGeometry));
-    }
-  };
+  }
 
   connectOverviewMap () {
     // Restrict to have at most 1 feature in the layer.
-    if (this._extentDrawingInteraction) {
-      this._extentDrawingInteraction.addEventListener('drawstart', this.clearExtentFeature);
+    if (this._focusGeometryDrawingInteraction) {
+      this._focusGeometryDrawingInteraction.addEventListener('drawstart', this.onStartDrawingNewFocusGeometry);
     }
     // When a new box is drawn, update the viewing extent.
-    if (this._extentDrawingLayer) {
-      this._extentDrawingLayer.addEventListener('addfeature', this.updateViewingExtentOnAddNewExtentFeature);
+    if (this._focusGeometryDrawingLayer) {
+      this._focusGeometryDrawingLayer.addEventListener('addfeature', this.onDrawNewFocusFeature);
     }
     // When the viewing extent is changed, reflect on the overview.
     if (this._detailMap && this._detailMap.map) {
-      this._detailMap.map.addEventListener('change:extent', this.updateExtentFeatureOnChangeViewingExtent);
+      this._detailMap.map.addEventListener('change:extent', this.onChangeViewingExtent);
     }
   }
 
   disconnectOverviewMap () {
-    if (this._extentDrawingInteraction) {
-      this._extentDrawingInteraction.removeEventListener('drawstart', this.clearExtentFeature);
+    if (this._focusGeometryDrawingInteraction) {
+      this._focusGeometryDrawingInteraction.removeEventListener('drawstart', this.onStartDrawingNewFocusGeometry);
     }
-    if (this._extentDrawingLayer) {
-      this._extentDrawingLayer.removeEventListener('addfeature', this.updateViewingExtentOnAddNewExtentFeature);
+    if (this._focusGeometryDrawingLayer) {
+      this._focusGeometryDrawingLayer.removeEventListener('addfeature', this.onDrawNewFocusFeature);
     }
     if (this._detailMap && this._detailMap.map) {
-      this._detailMap.map.removeEventListener('change:extent', this.updateExtentFeatureOnChangeViewingExtent);
+      this._detailMap.map.removeEventListener('change:extent', this.onChangeViewingExtent);
     }
   }
 
@@ -290,67 +290,33 @@ class OverlayTabContent extends React.Component {
   skipAnimationToStart () {
     console.log('skipping animation to start');
 
-    this.setState({
-      currentLoadedDate: this.props.dateRangeStart,
-    });
+    this.props.updateLoadedDate(this.props.dateRangeStart);
   }
   skipAnimationToEnd () {
     console.log('skipping animation to end');
 
-    this.setState({
-      currentLoadedDate: this.props.dateRangeEnd,
-    });
+    this.props.updateLoadedDate(this.props.dateRangeEnd);
   }
-
-  offsetCurrentTimeAtPrecisionByAmount = (amount) => {
-    if (!amount) {
-      return;
-    }
-
-    const maxDate = this.props.dateRangeEnd;
-    const minDate = this.props.dateRangeStart;
-    let newLoadedDate = offsetDateAtPrecision(this.state.currentLoadedDate, this.props.temporalPrecision, amount);
-
-    if (newLoadedDate.valueOf() > maxDate.valueOf()) {
-      newLoadedDate = maxDate;
-    }
-
-    if (newLoadedDate.valueOf() < minDate.valueOf()) {
-      newLoadedDate = minDate;
-    }
-
-    if (newLoadedDate.valueOf() === this.state.currentLoadedDate.valueOf()) {
-      return;
-    }
-
-    this.setState({
-      currentLoadedDate: newLoadedDate,
-    });
-  };
 
   render () {
     const {
-      getSliderValueFromDate,
-      getDateFromSliderValue,
-      getDateFromYearStringInput,
-      isPanelOpen,
-      togglePanelOpenState,
-      renderVariableList,
-      renderTemporalControls,
-
-      boundaryExtent,
-      boundaryGeoJsonString,
+      hasSelectedVariable,
       dateRangeStart,
       dateRangeEnd,
-      hasSelectedVariable,
-
-      mapLayerOfTheSelectedVariable,
+      currentLoadedDate,
+      boundaryGeometry,
+      focusGeometry,
     } = this.props;
     const {
-      currentLoadedDate,
-      viewingExtent,
       activeDrawingType,
     } = this.state;
+
+    const boundaryExtent = this.props.getExtentFromGeometry(boundaryGeometry);
+    const boundaryGeoJson = buildGeoJsonWithGeometry(boundaryGeometry);
+    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
+    const focusExtent = this.props.getExtentFromGeometry(focusGeometry);
+    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(focusGeometry);
+    const focusBoundaryGeoJsonString = focusBoundaryGeoJson && JSON.stringify(focusBoundaryGeoJson);
 
     return (
       <div className="dataset__overlay-tab">
@@ -359,8 +325,8 @@ class OverlayTabContent extends React.Component {
           zDepth={1}
         >
           <List>
-            {renderVariableList({})}
-            {renderTemporalControls({
+            {this.props.renderVariableList({})}
+            {this.props.renderTemporalControls({
               disabled: !hasSelectedVariable || this.isPlaying,
             })}
 
@@ -368,8 +334,8 @@ class OverlayTabContent extends React.Component {
               key="spatial-overview"
               primaryText="Spatial overview"
               primaryTogglesNestedList
-              open={isPanelOpen('spatial-overview')}
-              onNestedListToggle={() => togglePanelOpenState('spatial-overview')}
+              open={this.props.isPanelOpen('spatial-overview')}
+              onNestedListToggle={() => this.props.togglePanelOpenState('spatial-overview')}
               nestedItems={[
                 <ListItem
                   disabled
@@ -417,22 +383,31 @@ class OverlayTabContent extends React.Component {
                     }}
                     ref={(ref) => this._overviewMap = ref}
                   >
-                    {mapLayerOfTheSelectedVariable}
+                    {hasSelectedVariable && this.props.renderMapLayerForSelectedVariable({})}
                     {boundaryGeoJsonString && (
                       <map-layer-geojson
+                        id="boundary-geometry-display-layer"
                         src-json={boundaryGeoJsonString}
+                        src-projection="EPSG:4326"
+                        opacity="0.3"
+                      />
+                    )}
+                    {focusBoundaryGeoJsonString && (
+                      <map-layer-geojson
+                        id="focus-geometry-display-layer"
+                        src-json={focusBoundaryGeoJsonString}
                         src-projection="EPSG:4326"
                       />
                     )}
                     <map-layer-vector
-                      id="extent-drawing-layer"
-                      ref={(ref) => this._extentDrawingLayer = ref}
+                      id="focus-geometry-drawing-layer"
+                      ref={(ref) => this._focusGeometryDrawingLayer = ref}
                     />
                     <map-interaction-draw
                       disabled={activeDrawingType ? null : 'disabled'}
-                      source="extent-drawing-layer"
+                      source="focus-geometry-drawing-layer"
                       type={activeDrawingType}
-                      ref={(ref) => this._extentDrawingInteraction = ref}
+                      ref={(ref) => this._focusGeometryDrawingInteraction = ref}
                     />
                   </MapView>
                 </ListItem>,
@@ -449,16 +424,10 @@ class OverlayTabContent extends React.Component {
             className="mapview"
             basemap="arcgis"
             projection="EPSG:4326"
-            extent={viewingExtent}
+            extent={focusExtent}
             ref={(ref) => this._detailMap = ref}
           >
-            {mapLayerOfTheSelectedVariable}
-            {boundaryGeoJsonString && (
-              <map-layer-geojson
-                src-json={boundaryGeoJsonString}
-                src-projection="EPSG:4326"
-              />
-            )}
+            {hasSelectedVariable && this.props.renderMapLayerForSelectedVariable()}
             <map-interaction-defaults />
             <map-control-defaults />
           </MapView>
@@ -525,14 +494,14 @@ class OverlayTabContent extends React.Component {
             value={currentLoadedDate}
             disabled={!hasSelectedVariable}
             // (Date) => number
-            toSliderValue={getSliderValueFromDate}
+            toSliderValue={this.props.getSliderValueFromDate}
             // (number) => Date
-            fromSliderValue={getDateFromSliderValue}
+            fromSliderValue={this.props.getDateFromSliderValue}
             // (Date) => string
             toInputValue={getYearStringFromDate}
             // (string) => Date
-            fromInputValue={getDateFromYearStringInput}
-            onChange={this.onChangeLoadedDate}
+            fromInputValue={this.props.getDateFromYearStringInput}
+            onChange={(event, date) => this.props.updateLoadedDate(date)}
             inputStyle={{
               width: '60px',
             }}
@@ -576,22 +545,18 @@ class OverlayTab extends TabBaseClass {
     'overlays',
   ];
 
-  onDeactivate (event) {
-    super.onDeactivate(event);
-
-    if (this.state.isPlaying) {
-      this.stopAnimation();
-    }
-  }
-
   renderBody () {
-    const boundaryGeoJson = this.component.boundaryGeoJson;
-    const hasSelectedVariable = this.hasSelectedVariable;
-
     return (
       <OverlayTabContent
+        // Some data.
+        hasSelectedVariable={this.hasSelectedVariable}
+        currentLoadedDate={this.currentLoadedDate}
+        dateRangeStart={this.dateRangeStart}
+        dateRangeEnd={this.dateRangeEnd}
+        boundaryGeometry={this.component.boundaryGeometry}
+        focusGeometry={this.focusGeometry}
+
         // Some helper functions.
-        getPreciseDateWithinTimespan={this.getPreciseDateWithinTimespan}
         getSliderValueFromDate={this.getSliderValueFromDate}
         getDateFromSliderValue={this.getDateFromSliderValue}
         getDateFromYearStringInput={this.getDateFromYearStringInput}
@@ -599,17 +564,19 @@ class OverlayTab extends TabBaseClass {
         togglePanelOpenState={this.togglePanelOpenState}
         renderVariableList={this.renderVariableList}
         renderTemporalControls={this.renderTemporalControls}
+        renderMapLayerForSelectedVariable={this.renderMapLayerForSelectedVariable}
+        updateFocusGeometry={(value) => this.focusGeometry = value}
+        updateLoadedDate={(value) => this.currentLoadedDate = value}
+        offsetCurrentTimeAtPrecisionByAmount={(amount) => {
+          if (!amount) {
+            return;
+          }
 
-        // Some data.
-        temporalPrecision={this.component.temporalPrecision}
-        boundaryExtent={this.component.extent}
-        boundaryGeoJsonString={boundaryGeoJson && JSON.stringify(boundaryGeoJson)}
-        dateRangeStart={this.dateRangeStart}
-        dateRangeEnd={this.dateRangeEnd}
-        hasSelectedVariable={hasSelectedVariable}
-
-        // Some components.
-        mapLayerOfTheSelectedVariable={hasSelectedVariable && this.renderMapLayerForSelectedVariable()}
+          this.currentLoadedDate = offsetDateAtPrecision(this.currentLoadedDate, this.component.temporalPrecision, amount);
+        }}
+        getGeometryFromExtent={this.component.getGeometryFromExtent}
+        getExtentFromGeometry={this.component.getExtentFromGeometry}
+        getGeometryFromOlGeometry={this.component.getGeometryFromOlGeometry}
       />
     );
   }

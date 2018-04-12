@@ -51,17 +51,6 @@ import MapView from '/imports/ui/components/mapview';
 
 import TabBaseClass from './dataset.tab.BaseClass';
 
-// Temporary helper function. Put this somewhere else.
-const getGeometryOfPoint = (point) => {
-  return {
-    type: 'Point',
-    coordinates: [
-      point.x,
-      point.y,
-    ],
-  };
-};
-
 class AnalyticsChart extends React.PureComponent {
   static propTypes = {
     temporalResolution: PropTypes.string.isRequired,
@@ -175,16 +164,20 @@ class AnalyticsTabContent extends React.Component {
   static propTypes = {
     analytics: PropTypes.any.isRequired,
     selectedVariableId: PropTypes.string.isRequired,
+    hasSelectedVariable: PropTypes.bool.isRequired,
     dateRange: PropTypes.any.isRequired,
     dateResolution: PropTypes.any.isRequired,
-    boundaryExtent: PropTypes.arrayOf(PropTypes.number).isRequired,
-    boundaryGeoJsonString: PropTypes.string.isRequired,
+    boundaryGeometry: PropTypes.object.isRequired,
+    focusGeometry: PropTypes.object.isRequired,
 
     isPanelOpen: PropTypes.func.isRequired,
     togglePanelOpenState: PropTypes.func.isRequired,
     getFrameIndexInTimespan: PropTypes.func.isRequired,
     renderVariableList: PropTypes.func.isRequired,
     renderTemporalControls: PropTypes.func.isRequired,
+    renderMapLayerForSelectedVariable: PropTypes.func.isRequired,
+    updateFocusGeometry: PropTypes.func.isRequired,
+    getExtentFromGeometry: PropTypes.func.isRequired,
   };
 
   static selectionTools = [
@@ -211,14 +204,12 @@ class AnalyticsTabContent extends React.Component {
     super(props);
 
     this._chartComponent = null;
-    this._analyticsBoundaryDrawingLayer = null;
-    this._analyticsBoundaryDrawingInteraction = null;
+    this._focusGeometryDrawingLayer = null;
+    this._focusGeometryDrawingInteraction = null;
 
     const defaultSelectionTool = AnalyticsTabContent.selectionTools[0];
 
     this.state = {
-      // Geometry of the analytics area.
-      analyticsBoundaryGeometry: null,
       // @type {string}
       activeSelectionToolName: defaultSelectionTool.name,
       // @type {string|null}
@@ -237,6 +228,13 @@ class AnalyticsTabContent extends React.Component {
 
   componentDidMount () {
     this.connectOverviewMap();
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    return ![
+      _.isEqual(nextProps, this.props),
+      _.isEqual(nextState, this.state),
+    ].every(Boolean);
   }
 
   componentWillUpdate () {
@@ -277,13 +275,17 @@ class AnalyticsTabContent extends React.Component {
     const zip = new JsZip();
 
     const {
-      analyticsBoundaryGeometry,
+      focusGeometry,
+    } = this.props;
+    const {
       timeSeriesData,
     } = this.state;
-    const analyticsBoundaryGeoJsonString = analyticsBoundaryGeometry && JSON.stringify(buildGeoJsonWithGeometry(analyticsBoundaryGeometry));
 
-    if (analyticsBoundaryGeoJsonString) {
-      zip.file('boundary.geojson', analyticsBoundaryGeoJsonString);
+    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(focusGeometry);
+    const focusBoundaryGeoJsonString = focusBoundaryGeoJson && JSON.stringify(focusBoundaryGeoJson);
+
+    if (focusBoundaryGeoJsonString) {
+      zip.file('boundary.geojson', focusBoundaryGeoJsonString);
     }
 
     const csvString = objectPath.get(timeSeriesData, 'csv');
@@ -303,6 +305,20 @@ class AnalyticsTabContent extends React.Component {
     FileSaver.saveAs(blob, 'download.zip');
   };
 
+  onStartDrawingNewFocusGeometry = () => {
+    this.clearFocusFeatureDrawing();
+  };
+
+  onDrawNewFocusFeature = (olEvent) => {
+    const olGeometry = olEvent.feature.getGeometry();
+    const jsonGeometry = this._focusGeometryDrawingLayer.writeGeometryObject(olGeometry);
+
+    // Report new focus geometry.
+    this.props.updateFocusGeometry(jsonGeometry);
+
+    this.clearFocusFeatureDrawing();
+  };
+
   getAnalyticsByName = (name) => {
     return this.props.analytics.find((analytic) => {
       return analytic.name === name;
@@ -310,15 +326,19 @@ class AnalyticsTabContent extends React.Component {
   };
 
   setSelectionToolActive (tool) {
+    console.warn('setSelectionToolActive', tool);
+
     this.setState({
-      analyticsBoundaryGeometry: null,
       activeSelectionToolName: tool.name,
       activeDrawingType: tool.drawingType,
     });
 
+    // Setting focus gemoetry to null should load the default focus geometry.
+    this.props.updateFocusGeometry(null);
+
     // If the new tool can't draw, don't clear existing features.
     if (tool.drawingType) {
-      this.clearAnalyticsBoundaryFeature();
+      this.clearFocusFeatureDrawing();
     }
   }
 
@@ -326,36 +346,29 @@ class AnalyticsTabContent extends React.Component {
     return this.state.activeSelectionToolName === tool.name;
   }
 
-  clearAnalyticsBoundaryFeature = () => {
-    this._analyticsBoundaryDrawingLayer.clearFeatures();
-  };
-
-  updateAnalyticsBoundaryOnAddNewExtentFeature = (olEvent) => {
-    const olGeometry = olEvent.feature.getGeometry();
-    const jsonGeometry = this._analyticsBoundaryDrawingLayer.writeGeometryObject(olGeometry);
-
-    this.setState({
-      analyticsBoundaryGeometry: jsonGeometry,
-    });
-  };
+  clearFocusFeatureDrawing () {
+    if (this._focusGeometryDrawingLayer) {
+      this._focusGeometryDrawingLayer.clearFeatures();
+    }
+  }
 
   connectOverviewMap () {
     // Restrict to have at most 1 feature in the layer.
-    if (this._analyticsBoundaryDrawingInteraction) {
-      this._analyticsBoundaryDrawingInteraction.addEventListener('drawstart', this.clearAnalyticsBoundaryFeature);
+    if (this._focusGeometryDrawingInteraction) {
+      this._focusGeometryDrawingInteraction.addEventListener('drawstart', this.onStartDrawingNewFocusGeometry);
     }
     // When a new box is drawn, update the viewing extent.
-    if (this._analyticsBoundaryDrawingLayer) {
-      this._analyticsBoundaryDrawingLayer.addEventListener('addfeature', this.updateAnalyticsBoundaryOnAddNewExtentFeature);
+    if (this._focusGeometryDrawingLayer) {
+      this._focusGeometryDrawingLayer.addEventListener('addfeature', this.onDrawNewFocusFeature);
     }
   }
 
   disconnectOverviewMap () {
-    if (this._analyticsBoundaryDrawingInteraction) {
-      this._analyticsBoundaryDrawingInteraction.removeEventListener('drawstart', this.clearAnalyticsBoundaryFeature);
+    if (this._focusGeometryDrawingInteraction) {
+      this._focusGeometryDrawingInteraction.removeEventListener('drawstart', this.onStartDrawingNewFocusGeometry);
     }
-    if (this._analyticsBoundaryDrawingLayer) {
-      this._analyticsBoundaryDrawingLayer.removeEventListener('addfeature', this.updateAnalyticsBoundaryOnAddNewExtentFeature);
+    if (this._focusGeometryDrawingLayer) {
+      this._focusGeometryDrawingLayer.removeEventListener('addfeature', this.onDrawNewFocusFeature);
     }
   }
 
@@ -448,18 +461,13 @@ class AnalyticsTabContent extends React.Component {
   render () {
     const {
       selectedVariableId,
+      hasSelectedVariable,
       dateRange,
       dateResolution,
-      boundaryExtent,
-      boundaryGeoJsonString,
-
-      isPanelOpen,
-      togglePanelOpenState,
-      renderVariableList,
-      renderTemporalControls,
+      boundaryGeometry,
+      focusGeometry,
     } = this.props;
     const {
-      analyticsBoundaryGeometry,
       activeDrawingType,
       isLoadingTimeSeriesData,
       isTimeSeriesDataLoaded,
@@ -468,13 +476,17 @@ class AnalyticsTabContent extends React.Component {
       timeSeriesDataResponseDate,
     } = this.state;
 
-    const analyticsBoundaryGeoJsonString = analyticsBoundaryGeometry && JSON.stringify(buildGeoJsonWithGeometry(analyticsBoundaryGeometry));
+    const boundaryExtent = this.props.getExtentFromGeometry(boundaryGeometry);
+    const boundaryGeoJson = buildGeoJsonWithGeometry(boundaryGeometry);
+    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
+    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(focusGeometry);
+    const focusBoundaryGeoJsonString = focusBoundaryGeoJson && JSON.stringify(focusBoundaryGeoJson);
 
     return (
       <div className="dataset__analytics-tab">
         <PatheticDataRequester
           variableName={selectedVariableId}
-          boundaryGeometry={analyticsBoundaryGeometry}
+          boundaryGeometry={focusGeometry}
           dateRange={dateRange}
           requester={this.requestData}
           onReady={this.onDataReady}
@@ -487,15 +499,15 @@ class AnalyticsTabContent extends React.Component {
           zDepth={1}
         >
           <List>
-            {renderVariableList({})}
-            {renderTemporalControls({})}
+            {this.props.renderVariableList({})}
+            {this.props.renderTemporalControls({})}
 
             <ListItem
               key="analytics-boundary"
               primaryText="Select analytics boundary"
               primaryTogglesNestedList
-              open={isPanelOpen('analytics-boundary')}
-              onNestedListToggle={() => togglePanelOpenState('analytics-boundary')}
+              open={this.props.isPanelOpen('analytics-boundary')}
+              onNestedListToggle={() => this.props.togglePanelOpenState('analytics-boundary')}
               nestedItems={[
                 <ListItem
                   disabled
@@ -538,28 +550,36 @@ class AnalyticsTabContent extends React.Component {
                     basemap="arcgis"
                     projection="EPSG:4326"
                     extent={boundaryExtent}
-                    // onClick={(event) => this.onClickMap(event)}
                     style={{
                       '--aspect-ratio': '4/3',
                     }}
                   >
-                    {this.hasSelectedVariable && this.renderMapLayerForSelectedVariable()}
+                    {hasSelectedVariable && this.props.renderMapLayerForSelectedVariable()}
                     {boundaryGeoJsonString && (
-                      <map-layer-geojson src-json={boundaryGeoJsonString} />
+                      <map-layer-geojson
+                        id="boundary-geometry-display-layer"
+                        src-json={boundaryGeoJsonString}
+                        src-projection="EPSG:4326"
+                        opacity="0.3"
+                      />
                     )}
-                    {analyticsBoundaryGeoJsonString && (
-                      <map-layer-geojson src-json={analyticsBoundaryGeoJsonString} />
+                    {focusBoundaryGeoJsonString && (
+                      <map-layer-geojson
+                        id="focus-geometry-display-layer"
+                        src-json={focusBoundaryGeoJsonString}
+                        src-projection="EPSG:4326"
+                      />
                     )}
                     <map-layer-vector
-                      id="analytics-boundary-drawing-layer"
-                      ref={(ref) => this._analyticsBoundaryDrawingLayer = ref}
+                      id="focus-geometry-drawing-layer"
+                      ref={(ref) => this._focusGeometryDrawingLayer = ref}
                     />
                     <map-interaction-defaults />
                     <map-interaction-draw
                       disabled={activeDrawingType ? null : 'disabled'}
-                      source="analytics-boundary-drawing-layer"
+                      source="focus-geometry-drawing-layer"
                       type={activeDrawingType}
-                      ref={(ref) => this._analyticsBoundaryDrawingInteraction = ref}
+                      ref={(ref) => this._focusGeometryDrawingInteraction = ref}
                     />
                     <map-control-defaults />
                   </MapView>
@@ -638,40 +658,25 @@ class AnalyticsTab extends TabBaseClass {
     'analytics',
   ];
 
-  onClickMap = (event) => {
-    if (!this.isSelectionToolActive('point')) {
-      return;
-    }
-
-    const point = {
-      x: event.latLongCoordinate[0],
-      y: event.latLongCoordinate[1],
-    };
-
-    console.log('point', point);
-
-    this.setState({
-      analyticsBoundaryGeometry: getGeometryOfPoint(point),
-    });
-  };
-
   renderBody () {
-    const boundaryGeoJson = this.component.boundaryGeoJson;
-
     return (
       <AnalyticsTabContent
         analytics={this.props.analytics}
         selectedVariableId={this.selectedVariableId}
+        hasSelectedVariable={this.hasSelectedVariable}
         dateRange={this.dateRange}
         dateResolution={this.component.timespan.resolution}
-        boundaryExtent={this.component.extent}
-        boundaryGeoJsonString={boundaryGeoJson && JSON.stringify(boundaryGeoJson)}
+        boundaryGeometry={this.component.boundaryGeometry}
+        focusGeometry={this.focusGeometry}
 
         isPanelOpen={this.isPanelOpen}
         togglePanelOpenState={this.togglePanelOpenState}
-        getFrameIndexInTimespan={this.getFrameIndexInTimespan}
+        getFrameIndexInTimespan={this.component.getFrameIndexInTimespan}
         renderVariableList={this.renderVariableList}
         renderTemporalControls={this.renderTemporalControls}
+        renderMapLayerForSelectedVariable={this.renderMapLayerForSelectedVariable}
+        updateFocusGeometry={(value) => this.focusGeometry = value}
+        getExtentFromGeometry={this.component.getExtentFromGeometry}
       />
     );
   }

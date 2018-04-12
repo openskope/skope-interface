@@ -57,33 +57,88 @@ class TabBaseClass extends SubComponentClass {
   get selectedVariableId () {
     return this.sharedState.selectedVariableId;
   }
+  set selectedVariableId (value) {
+    this.setSharedState({
+      selectedVariableId: value,
+    });
+  }
 
   /**
    * @return {boolean}
    */
   get hasSelectedVariable () {
-    return this.sharedState.selectedVariableId !== '';
+    return this.selectedVariableId !== '';
   }
 
-  /**
-   * @return {Date}
-   */
-  get dateRangeStart () {
-    return this.sharedState.dateRange[0];
-  }
-  /**
-   * @return {Date}
-   */
-  get dateRangeEnd () {
-    return this.sharedState.dateRange[1];
-  }
   /**
    * @return {[Date, Date]}
    */
   get dateRange () {
     return this.sharedState.dateRange;
   }
+  set dateRange (value) {
+    this.setSharedState({
+      dateRange: value,
+    });
+  }
+  /**
+   * @return {Date}
+   */
+  get dateRangeStart () {
+    return this.dateRange[0];
+  }
+  /**
+   * @return {Date}
+   */
+  get dateRangeEnd () {
+    return this.dateRange[1];
+  }
 
+  /**
+   * @return {Date}
+   */
+  get currentLoadedDate () {
+    return this.sharedState.currentLoadedDate;
+  }
+  set currentLoadedDate (value) {
+    const maxDate = this.dateRangeEnd;
+    const minDate = this.dateRangeStart;
+    let preciseDate = this.getPreciseDateWithinTimespan(value);
+
+    if (preciseDate.valueOf() > maxDate.valueOf()) {
+      preciseDate = maxDate;
+    }
+
+    if (preciseDate.valueOf() < minDate.valueOf()) {
+      preciseDate = minDate;
+    }
+
+    if (preciseDate.valueOf() === this.currentLoadedDate.valueOf()) {
+      return;
+    }
+
+    this.setSharedState({
+      currentLoadedDate: preciseDate,
+    });
+  }
+
+  /**
+   * @return {Object}
+   */
+  get focusGeometry () {
+    return this.sharedState.focusGeometry;
+  }
+  set focusGeometry (value) {
+    this.setSharedState({
+      focusGeometry: value || this.component.boundaryGeometry,
+    });
+  }
+
+  /**
+   * Make sure the given date stays within the dataset timespan and has the proper resolution.
+   * @param {Date} date
+   * @returns {Date}
+   */
   getPreciseDateWithinTimespan = (date) => {
     let preciseDate = getDateAtPrecision(date, this.component.temporalPrecision);
 
@@ -104,18 +159,13 @@ class TabBaseClass extends SubComponentClass {
    * @returns {boolean}
    */
   isSelectedVariable (variableId) {
-    return variableId === this.sharedState.selectedVariableId;
+    return variableId === this.selectedVariableId;
   }
 
   /**
-   * @param {string} variableId
+   * @param {string} panelId
+   * @returns {boolean}
    */
-  setSelectedVariableId (variableId) {
-    this.setSharedState({
-      selectedVariableId: variableId,
-    });
-  }
-
   isPanelOpen = (panelId) => {
     return panelId in this.sharedState.isPanelOpen
            ? this.sharedState.isPanelOpen[panelId]
@@ -123,12 +173,12 @@ class TabBaseClass extends SubComponentClass {
            : true;
   };
 
+  /**
+   * @param {string} panelId
+   */
   togglePanelOpenState = (panelId) => {
-    const panelOpenState = this.sharedState.isPanelOpen;
-
     this.setSharedState({
       isPanelOpen: {
-        ...panelOpenState,
         [panelId]: !this.isPanelOpen(panelId),
       },
     });
@@ -136,48 +186,15 @@ class TabBaseClass extends SubComponentClass {
 
   /**
    * @param {Date} date
-   * @return {number}
+   * @returns {number}
    */
-  getFrameIndexInTimespan = (date) => {
-    const timespan = this.component.timespan;
-    const baseDate = timespan.period.gte;
-    //! This logic needs to be fixed to avoid rounding errors.
-    //! Instead of using difference in milliseconds, perhaps first get integer
-    //! year value and then get the difference in years.
-    //! The millisecond difference between 1000 and 2000 may not be a whole 1000 years.
-    const sliderRawValue = moment.duration(date - baseDate).as(timespan.resolution);
-    const integerValue = Math.round(sliderRawValue);
-
-    // console.log('TabBaseClass.getFrameIndexInTimespan', {
-    //   baseDate,
-    //   date,
-    //   sliderRawValue,
-    //   integerValue,
-    // });
-
-    return integerValue;
-  };
-
-  getSliderValueFromDate = (date) => this.getFrameIndexInTimespan(date);
+  getSliderValueFromDate = (date) => this.component.getFrameIndexInTimespan(date);
 
   /**
    * @param {number} value
    * @return {Date}
    */
-  getDateFromSliderValue = (value) => {
-    const timespan = this.component.timespan;
-    const baseDate = timespan.period.gte;
-    const valueDate = moment(baseDate).add(value, timespan.resolution).toDate();
-
-    // console.log('TabBaseClass.getDateFromSliderValue', {
-    //   baseDate,
-    //   value,
-    //   resolution: timespan.resolution,
-    //   valueDate,
-    // });
-
-    return valueDate;
-  };
+  getDateFromSliderValue = (value) => this.component.getDateFromFrameIndex(value);
 
   /**
    * @param {string} s
@@ -293,7 +310,7 @@ class TabBaseClass extends SubComponentClass {
    * Requires component as context object.
    * @param {Object} layer
    */
-  renderMapLayer (layer) {
+  renderMapLayer = (layer) => {
     if (!(layer.type in mapLayerRenderers)) {
       console.warn(`Unknown layer type “${layer.type}” for layer “${layer.name}”`);
       return null;
@@ -301,9 +318,9 @@ class TabBaseClass extends SubComponentClass {
 
     const mapLayerRenderer = mapLayerRenderers[layer.type];
     // @type {Date}
-    const dateOfLayer = (typeof this.state.currentLoadedDate === 'undefined' || this.state.currentLoadedDate === null)
-                        ? this.component.timespan.period.lte
-                        : this.state.currentLoadedDate;
+    const dateOfLayer = (typeof this.currentLoadedDate === 'undefined' || this.currentLoadedDate === null)
+                        ? this.component.timespan.period.gte
+                        : this.currentLoadedDate;
 
     return mapLayerRenderer.call(this, {
       ...layer,
@@ -316,10 +333,10 @@ class TabBaseClass extends SubComponentClass {
       MM: () => moment(dateOfLayer).format('MM'),
       DD: () => moment(dateOfLayer).format('DD'),
     });
-  }
+  };
 
-  renderMapLayerForSelectedVariable () {
-    const variableId = this.sharedState.selectedVariableId;
+  renderMapLayerForSelectedVariable = () => {
+    const variableId = this.selectedVariableId;
     const layer = objectPath.get(this.component.variables, [variableId, 'overlay']);
 
     if (!layer) {
@@ -327,7 +344,7 @@ class TabBaseClass extends SubComponentClass {
     }
 
     return this.renderMapLayer(layer);
-  }
+  };
 
   /**
    * This component is closely associated with the dataset so it can not be
@@ -345,7 +362,7 @@ class TabBaseClass extends SubComponentClass {
           <RadioButton
             value={variableId}
             checked={this.isSelectedVariable(variableId)}
-            onCheck={() => this.setSelectedVariableId(variableId)}
+            onCheck={() => this.selectedVariableId = variableId}
           />
         )}
         primaryText={variable.name}

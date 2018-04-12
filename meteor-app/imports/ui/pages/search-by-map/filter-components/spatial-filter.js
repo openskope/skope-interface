@@ -194,6 +194,16 @@ class SpatialFilter extends SearchkitComponent {
       // @type {string|null}
       activeDrawingType: defaultSelectionTool.drawingType,
     };
+
+    // This vector layer element is used to help handle vector data.
+    this._utilVectorLayerElement = (() => {
+      const element = document.createElement('map-layer-vector');
+
+      element.srcProjection = 'EPSG:4326';
+      element.projection = 'EPSG:4326';
+
+      return element;
+    })();
   }
 
   componentDidMount () {
@@ -243,6 +253,8 @@ class SpatialFilter extends SearchkitComponent {
               this.setState({
                 filterGeometry: geometryWithNumbers,
               });
+
+              this.focusMapOnGeometry(geometryWithNumbers);
             }
           }
         },
@@ -250,36 +262,58 @@ class SpatialFilter extends SearchkitComponent {
     );
   }
 
-  clearSearchBoundaryFeature = () => {
-    this._searchBoundaryDrawingLayer.clearFeatures();
+  onStartDrawingNewSearchBoundary = () => {
+    this.clearSearchBoundaryFeatureDrawing();
   };
 
-  updateSearchBoundaryOnAddNewFeature = (olEvent) => {
+  onDrawNewSearchBoundaryFeature = (olEvent) => {
     const olGeometry = olEvent.feature.getGeometry();
-    const jsonGeometry = this._searchBoundaryDrawingLayer.writeGeometryObject(olGeometry);
+    const jsonGeometry = this._utilVectorLayerElement.writeGeometryObject(olGeometry);
 
     this.setGeometryQuery(jsonGeometry);
 
-    this._searchBoundaryDrawingLayer.clearFeatures();
+    this.clearSearchBoundaryFeatureDrawing();
   };
+
+  clearSearchBoundaryFeatureDrawing () {
+    if (this._searchBoundaryDrawingLayer) {
+      this._searchBoundaryDrawingLayer.clearFeatures();
+    }
+  }
+
+  /**
+   * @param {Object} geometry
+   * @param {number} zoomFactor
+   */
+  focusMapOnGeometry (geometry, zoomFactor = 1.1) {
+    if (!(this._mapview && this._mapview.map)) {
+      return;
+    }
+
+    const olGeometry = this._utilVectorLayerElement.readGeometryObject(geometry);
+
+    olGeometry.scale(zoomFactor);
+
+    this._mapview.map.extent = olGeometry.getExtent();
+  }
 
   connectMap () {
     // Restrict to have at most 1 feature in the layer.
     if (this._searchBoundaryDrawingInteraction) {
-      this._searchBoundaryDrawingInteraction.addEventListener('drawstart', this.clearSearchBoundaryFeature);
+      this._searchBoundaryDrawingInteraction.addEventListener('drawstart', this.onStartDrawingNewSearchBoundary);
     }
     // When a new box is drawn, update the viewing extent.
     if (this._searchBoundaryDrawingLayer) {
-      this._searchBoundaryDrawingLayer.addEventListener('addfeature', this.updateSearchBoundaryOnAddNewFeature);
+      this._searchBoundaryDrawingLayer.addEventListener('addfeature', this.onDrawNewSearchBoundaryFeature);
     }
   }
 
   disconnectMap () {
     if (this._searchBoundaryDrawingInteraction) {
-      this._searchBoundaryDrawingInteraction.removeEventListener('drawstart', this.clearSearchBoundaryFeature);
+      this._searchBoundaryDrawingInteraction.removeEventListener('drawstart', this.onStartDrawingNewSearchBoundary);
     }
     if (this._searchBoundaryDrawingLayer) {
-      this._searchBoundaryDrawingLayer.removeEventListener('addfeature', this.updateSearchBoundaryOnAddNewFeature);
+      this._searchBoundaryDrawingLayer.removeEventListener('addfeature', this.onDrawNewSearchBoundaryFeature);
     }
   }
 
@@ -341,17 +375,17 @@ class SpatialFilter extends SearchkitComponent {
       activeDrawingType,
     } = this.state;
 
-    const extent = (() => {
-      if (!(filterGeometry && this._searchBoundaryDrawingLayer)) {
-        return defaultExtent;
-      }
+    // const extent = (() => {
+    //   if (!(filterGeometry && this._utilVectorLayerElement)) {
+    //     return defaultExtent;
+    //   }
 
-      const olGeometry = this._searchBoundaryDrawingLayer.readGeometryObject(filterGeometry);
+    //   const olGeometry = this._utilVectorLayerElement.readGeometryObject(filterGeometry);
 
-      olGeometry.scale(1.2);
+    //   olGeometry.scale(1.2);
 
-      return olGeometry.getExtent();
-    })();
+    //   return olGeometry.getExtent();
+    // })();
     const filterBoundaryGeoJson = filterGeometry && buildGeoJsonWithGeometry(filterGeometry);
     const filterBoundaryGeoJsonString = filterBoundaryGeoJson && JSON.stringify(filterBoundaryGeoJson);
 
@@ -402,7 +436,7 @@ class SpatialFilter extends SearchkitComponent {
           className={className}
           basemap="arcgis"
           projection={projection}
-          extent={extent}
+          extent={defaultExtent}
           style={{
             '--aspect-ratio': '4/3',
           }}
