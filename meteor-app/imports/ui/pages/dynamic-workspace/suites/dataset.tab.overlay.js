@@ -88,15 +88,11 @@ class OverlayTabContent extends React.Component {
 
     this._detailMap = null;
 
-    const defaultSelectionTool = OverlayTabContent.selectionTools[0];
-
     this.state = {
       // Copy of the date for the sliders.
       currentLoadedDateTemporal: props.currentLoadedDate,
       // @type {Object<layerId: string, opacity: number>}
       layerOpacity: {},
-      // @type {string}
-      activeSelectionToolName: defaultSelectionTool.name,
       // @type {boolean}
       isPlaying: false,
       animationTimer: null,
