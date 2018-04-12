@@ -287,7 +287,7 @@ class OverlayTabContent extends React.Component {
           <List>
             {this.props.renderVariableList({})}
             {this.props.renderTemporalControls({
-              disabled: !hasSelectedVariable || this.isPlaying,
+              disabled: this.isPlaying,
             })}
             {this.props.renderFocusBoundaryMap({
               selectionTools: OverlayTabContent.selectionTools,
