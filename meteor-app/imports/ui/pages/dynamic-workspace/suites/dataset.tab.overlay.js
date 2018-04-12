@@ -117,13 +117,6 @@ class OverlayTabContent extends React.Component {
     this.setState(updates);
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
-    return ![
-      _.isEqual(nextProps, this.props),
-      _.isEqual(nextState, this.state),
-    ].every(Boolean);
-  }
-
   componentWillUpdate () {
     this.disconnectOverviewMap();
   }
