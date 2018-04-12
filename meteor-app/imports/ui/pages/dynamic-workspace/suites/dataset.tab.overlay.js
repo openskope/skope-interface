@@ -6,16 +6,13 @@ import _ from 'lodash';
 import Paper from 'material-ui/Paper';
 import {
   List,
-  ListItem,
 } from 'material-ui/List';
 import {
   Toolbar,
   ToolbarGroup,
-  ToolbarTitle,
   ToolbarSeparator,
 } from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
-import RaisedButton from 'material-ui/RaisedButton';
 import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 import PauseIcon from 'material-ui/svg-icons/av/pause';
 import ToStartIcon from 'material-ui/svg-icons/av/skip-previous';
@@ -26,14 +23,13 @@ import {
 
 import {
   DatasetMapIcon,
-  mapToolbarStyles,
+  PanToolIcon,
   BoxToolIcon,
 } from '/imports/ui/consts';
 
 import {
   getYearStringFromDate,
   offsetDateAtPrecision,
-  buildGeoJsonWithGeometry,
 } from '/imports/ui/helpers';
 
 import MapView from '/imports/ui/components/mapview';
@@ -49,16 +45,15 @@ class OverlayTabContent extends React.Component {
     dateRangeStart: PropTypes.instanceOf(Date).isRequired,
     dateRangeEnd: PropTypes.instanceOf(Date).isRequired,
     boundaryGeometry: PropTypes.object.isRequired,
-    focusGeometry: PropTypes.object.isRequired,
+    focusGeometry: PropTypes.object,
 
     // Some helper functions.
     getSliderValueFromDate: PropTypes.func.isRequired,
     getDateFromSliderValue: PropTypes.func.isRequired,
     getDateFromYearStringInput: PropTypes.func.isRequired,
-    isPanelOpen: PropTypes.func.isRequired,
-    togglePanelOpenState: PropTypes.func.isRequired,
     renderVariableList: PropTypes.func.isRequired,
     renderTemporalControls: PropTypes.func.isRequired,
+    renderFocusBoundaryMap: PropTypes.func.isRequired,
     renderMapLayerForSelectedVariable: PropTypes.func.isRequired,
     updateFocusGeometry: PropTypes.func.isRequired,
     updateLoadedDate: PropTypes.func.isRequired,
@@ -68,9 +63,18 @@ class OverlayTabContent extends React.Component {
     getGeometryFromOlGeometry: PropTypes.func.isRequired,
   };
 
+  static defaultProps = {
+    focusGeometry: null,
+  };
+
   static defaultLayerOpacity = 1;
 
   static selectionTools = [
+    {
+      name: 'pan',
+      IconClass: PanToolIcon,
+      title: 'Pan tool',
+    },
     {
       name: 'rectangle',
       IconClass: BoxToolIcon,
@@ -82,10 +86,7 @@ class OverlayTabContent extends React.Component {
   constructor (props) {
     super(props);
 
-    this._overviewMap = null;
     this._detailMap = null;
-    this._focusGeometryDrawingLayer = null;
-    this._focusGeometryDrawingInteraction = null;
 
     const defaultSelectionTool = OverlayTabContent.selectionTools[0];
 
@@ -96,8 +97,6 @@ class OverlayTabContent extends React.Component {
       layerOpacity: {},
       // @type {string}
       activeSelectionToolName: defaultSelectionTool.name,
-      // @type {string|null}
-      activeDrawingType: defaultSelectionTool.drawingType,
       // @type {boolean}
       isPlaying: false,
       animationTimer: null,
@@ -217,21 +216,6 @@ class OverlayTabContent extends React.Component {
     });
   }
 
-  setSelectionToolActive (tool) {
-    this.setState({
-      activeSelectionToolName: tool.name,
-      activeDrawingType: tool.drawingType,
-    });
-
-    // Setting focus gemoetry to null should load the default focus geometry.
-    this.props.updateFocusGeometry(null);
-
-    // If the new tool can't draw, don't clear existing features.
-    if (tool.drawingType) {
-      this.clearFocusFeatureDrawing();
-    }
-  }
-
   get isPlaying () {
     return this.state.isPlaying;
   }
@@ -249,25 +233,7 @@ class OverlayTabContent extends React.Component {
     return this.props.currentLoadedDate < this.props.dateRangeEnd;
   }
 
-  isSelectionToolActive (tool) {
-    return this.state.activeSelectionToolName === tool.name;
-  }
-
-  clearFocusFeatureDrawing () {
-    if (this._focusGeometryDrawingLayer) {
-      this._focusGeometryDrawingLayer.clearFeatures();
-    }
-  }
-
   connectOverviewMap () {
-    // Restrict to have at most 1 feature in the layer.
-    if (this._focusGeometryDrawingInteraction) {
-      this._focusGeometryDrawingInteraction.addEventListener('drawstart', this.onStartDrawingNewFocusGeometry);
-    }
-    // When a new box is drawn, update the viewing extent.
-    if (this._focusGeometryDrawingLayer) {
-      this._focusGeometryDrawingLayer.addEventListener('addfeature', this.onDrawNewFocusFeature);
-    }
     // When the viewing extent is changed, reflect on the overview.
     if (this._detailMap && this._detailMap.map) {
       this._detailMap.map.addEventListener('change:extent', this.onChangeViewingExtent);
@@ -275,12 +241,6 @@ class OverlayTabContent extends React.Component {
   }
 
   disconnectOverviewMap () {
-    if (this._focusGeometryDrawingInteraction) {
-      this._focusGeometryDrawingInteraction.removeEventListener('drawstart', this.onStartDrawingNewFocusGeometry);
-    }
-    if (this._focusGeometryDrawingLayer) {
-      this._focusGeometryDrawingLayer.removeEventListener('addfeature', this.onDrawNewFocusFeature);
-    }
     if (this._detailMap && this._detailMap.map) {
       this._detailMap.map.removeEventListener('change:extent', this.onChangeViewingExtent);
     }
@@ -321,15 +281,9 @@ class OverlayTabContent extends React.Component {
     } = this.props;
     const {
       currentLoadedDateTemporal,
-      activeDrawingType,
     } = this.state;
 
-    const boundaryExtent = this.props.getExtentFromGeometry(boundaryGeometry);
-    const boundaryGeoJson = buildGeoJsonWithGeometry(boundaryGeometry);
-    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
-    const focusExtent = this.props.getExtentFromGeometry(focusGeometry);
-    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(focusGeometry);
-    const focusBoundaryGeoJsonString = focusBoundaryGeoJson && JSON.stringify(focusBoundaryGeoJson);
+    const focusExtent = this.props.getExtentFromGeometry(focusGeometry || boundaryGeometry);
 
     return (
       <div className="dataset__overlay-tab">
@@ -342,90 +296,9 @@ class OverlayTabContent extends React.Component {
             {this.props.renderTemporalControls({
               disabled: !hasSelectedVariable || this.isPlaying,
             })}
-
-            <ListItem
-              key="spatial-overview"
-              primaryText="Spatial overview"
-              primaryTogglesNestedList
-              open={this.props.isPanelOpen('spatial-overview')}
-              onNestedListToggle={() => this.props.togglePanelOpenState('spatial-overview')}
-              nestedItems={[
-                <ListItem
-                  disabled
-                  key="map"
-                >
-                  <Toolbar
-                    style={{
-                      ...mapToolbarStyles.root,
-                    }}
-                  >
-                    <ToolbarGroup>
-                      <ToolbarTitle
-                        text="Tools"
-                        style={{
-                          ...mapToolbarStyles.title,
-                        }}
-                      />
-                    </ToolbarGroup>
-                    <ToolbarGroup>
-                      {OverlayTabContent.selectionTools.map((item) => (
-                        <RaisedButton
-                          key={item.name}
-                          className="selection-tool-button"
-                          icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
-                          style={{
-                            ...mapToolbarStyles.toggleButton.root,
-                            ...(this.isSelectionToolActive(item) && mapToolbarStyles.toggleButton.active),
-                          }}
-                          buttonStyle={mapToolbarStyles.toggleButton.button}
-                          overlayStyle={{
-                            ...mapToolbarStyles.toggleButton.overlay,
-                          }}
-                          onClick={() => this.setSelectionToolActive(item)}
-                        />
-                      ))}
-                    </ToolbarGroup>
-                  </Toolbar>
-                  <MapView
-                    className="overview-map"
-                    basemap="arcgis"
-                    projection="EPSG:4326"
-                    extent={boundaryExtent}
-                    style={{
-                      '--aspect-ratio': '4/3',
-                    }}
-                    ref={(ref) => this._overviewMap = ref}
-                  >
-                    {hasSelectedVariable && this.props.renderMapLayerForSelectedVariable({})}
-                    {boundaryGeoJsonString && (
-                      <map-layer-geojson
-                        id="boundary-geometry-display-layer"
-                        src-json={boundaryGeoJsonString}
-                        src-projection="EPSG:4326"
-                        opacity="0.3"
-                      />
-                    )}
-                    {focusBoundaryGeoJsonString && (
-                      <map-layer-geojson
-                        id="focus-geometry-display-layer"
-                        src-json={focusBoundaryGeoJsonString}
-                        src-projection="EPSG:4326"
-                      />
-                    )}
-                    <map-layer-vector
-                      id="focus-geometry-drawing-layer"
-                      ref={(ref) => this._focusGeometryDrawingLayer = ref}
-                    />
-                    <map-interaction-draw
-                      disabled={activeDrawingType ? null : 'disabled'}
-                      source="focus-geometry-drawing-layer"
-                      type={activeDrawingType}
-                      ref={(ref) => this._focusGeometryDrawingInteraction = ref}
-                    />
-                  </MapView>
-                </ListItem>,
-              ]}
-            />
+            {this.props.renderFocusBoundaryMap({
+              selectionTools: OverlayTabContent.selectionTools,
+            })}
           </List>
         </Paper>
 
@@ -579,10 +452,9 @@ class OverlayTab extends TabBaseClass {
         getSliderValueFromDate={this.getSliderValueFromDate}
         getDateFromSliderValue={this.getDateFromSliderValue}
         getDateFromYearStringInput={this.getDateFromYearStringInput}
-        isPanelOpen={this.isPanelOpen}
-        togglePanelOpenState={this.togglePanelOpenState}
         renderVariableList={this.renderVariableList}
         renderTemporalControls={this.renderTemporalControls}
+        renderFocusBoundaryMap={this.renderFocusBoundaryMap}
         renderMapLayerForSelectedVariable={this.renderMapLayerForSelectedVariable}
         updateFocusGeometry={(value) => this.focusGeometry = value}
         updateLoadedDate={(value) => this.currentLoadedDate = value}

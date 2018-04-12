@@ -23,8 +23,8 @@ import {
 } from '/imports/ui/components/SliderWithInput';
 
 import SubComponentClass from './SubComponentClass';
-
 import * as mapLayerRenderers from './dataset.mapLayerRenderers';
+import MapWithToolbar from './dataset.MapWithToolbar';
 
 export default
 class TabBaseClass extends SubComponentClass {
@@ -141,7 +141,7 @@ class TabBaseClass extends SubComponentClass {
   }
   set focusGeometry (value) {
     this.setSharedState({
-      focusGeometry: value || this.component.boundaryGeometry,
+      focusGeometry: value,
     });
   }
 
@@ -288,14 +288,14 @@ class TabBaseClass extends SubComponentClass {
   /**
    * Called when this tab becomes active.
    */
-  onActivate (event) {
+  onActivate (/* event */) {
     // Override this.
   }
 
   /**
    * Called when this tab becomes inactive.
    */
-  onDeactivate (event) {
+  onDeactivate (/* event */) {
     Object.values(this._timeoutIds).forEach(this.clearTimeout);
     Object.values(this._intervalIds).forEach(this.clearInterval);
 
@@ -398,7 +398,7 @@ class TabBaseClass extends SubComponentClass {
    */
   renderTemporalControls = (props = {}) => {
     const {
-      disabled,
+      disabled = false,
     } = props;
     const timespan = this.component.timespan;
 
@@ -449,6 +449,42 @@ class TabBaseClass extends SubComponentClass {
                 max: getYearStringFromDate(timespan.period.lte),
               }}
             />
+          </ListItem>,
+        ]}
+      />
+    );
+  };
+
+  renderFocusBoundaryMap = (props = {}) => {
+    const {
+      key = 'focus-boundary',
+      title = 'Select analytics boundary',
+      // @type {Array<{name: string, IconClass: Icon, [drawingType: string]}>}
+      selectionTools = [],
+    } = props;
+
+    return (
+      <ListItem
+        key={key}
+        primaryText={title}
+        primaryTogglesNestedList
+        open={this.isPanelOpen(key)}
+        onNestedListToggle={() => this.togglePanelOpenState(key)}
+        nestedItems={[
+          <ListItem
+            disabled
+            key="map"
+          >
+            <MapWithToolbar
+              id={key}
+              selectionTools={selectionTools}
+              boundaryGeometry={this.component.boundaryGeometry}
+              focusGeometry={this.focusGeometry}
+              getExtentFromGeometry={this.component.getExtentFromGeometry}
+              updateFocusGeometry={(value) => this.focusGeometry = value}
+            >
+              {this.hasSelectedVariable && this.renderMapLayerForSelectedVariable()}
+            </MapWithToolbar>
           </ListItem>,
         ]}
       />
