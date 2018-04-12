@@ -246,6 +246,10 @@ class DatasetWorkspace extends SuiteBaseClass {
          * @type {string}
          */
         selectedVariableId: '',
+        // @type {Object<variableId: string, opacity: number>}
+        variableOpacity: {},
+        // @type {Object<variableId: string, stylingRange: [Date, Date]>}
+        variableStylingRange: {},
         /**
          * A collection of boolean values indicating if a panel is open.
          * When there is no value for a specific key, the default state is up to the reader's interpretation.

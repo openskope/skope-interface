@@ -36,7 +36,7 @@ defaultMarkdownRenderer.link = (
       href={href}
       title={title}
       text={text}
-    />
+    />,
   );
 };
 

@@ -67,8 +67,6 @@ class OverlayTabContent extends React.Component {
     focusGeometry: null,
   };
 
-  static defaultLayerOpacity = 1;
-
   static selectionTools = [
     {
       name: 'pan',
@@ -91,8 +89,6 @@ class OverlayTabContent extends React.Component {
     this.state = {
       // Copy of the date for the sliders.
       currentLoadedDateTemporal: props.currentLoadedDate,
-      // @type {Object<layerId: string, opacity: number>}
-      layerOpacity: {},
       // @type {boolean}
       isPlaying: false,
       animationTimer: null,
@@ -183,27 +179,6 @@ class OverlayTabContent extends React.Component {
     // Report new focus geometry.
     this.props.updateFocusGeometry(extenJsonGeometry);
   }, 3);
-
-  /**
-   * @param {string} layerId
-   */
-  getLayerOpacity (layerId) {
-    return layerId in this.state.layerOpacity
-           ? this.state.layerOpacity[layerId]
-           : OverlayTabContent.defaultLayerOpacity;
-  }
-  /**
-   * @param {string} layerId
-   * @param {number} opacity
-   */
-  setLayerOpacity (layerId, opacity) {
-    this.setState({
-      layerOpacity: {
-        ...this.state.layerOpacity,
-        [layerId]: opacity,
-      },
-    });
-  }
 
   get isPlaying () {
     return this.state.isPlaying;

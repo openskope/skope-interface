@@ -12,6 +12,8 @@ import {
 import {
   RadioButton,
 } from 'material-ui/RadioButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 import {
   getDateAtPrecision,
@@ -19,6 +21,7 @@ import {
 } from '/imports/ui/helpers';
 
 import {
+  SliderWithInput,
   RangeWithInput,
 } from '/imports/ui/components/SliderWithInput';
 
@@ -33,6 +36,8 @@ class TabBaseClass extends SubComponentClass {
   static tabLabel = '';
   static tabStyle = {};
   static requiredProps = [];
+
+  static defaultVariableOpacity = 1;
 
   constructor (...args) {
     super(...args);
@@ -171,6 +176,50 @@ class TabBaseClass extends SubComponentClass {
    */
   isSelectedVariable (variableId) {
     return variableId === this.selectedVariableId;
+  }
+
+  /**
+   * @param {string} variableId
+   * @returns {number}
+   */
+  getVariableOpacity (variableId) {
+    return variableId in this.sharedState.variableOpacity
+           ? this.sharedState.variableOpacity[variableId]
+           : TabBaseClass.defaultVariableOpacity;
+  }
+
+  /**
+   * @param {string} variableId
+   * @param {number} opacity
+   */
+  setVariableOpacity (variableId, opacity) {
+    this.setSharedState({
+      variableOpacity: {
+        [variableId]: opacity,
+      },
+    });
+  }
+
+  /**
+   * @param {string} variableId
+   * @returns {[Date, Date]|null}
+   */
+  getVariableStylingRange (variableId, defaultValue = null) {
+    return variableId in this.sharedState.variableStylingRange
+           ? this.sharedState.variableStylingRange[variableId]
+           : defaultValue;
+  }
+
+  /**
+   * @param {string} variableId
+   * @param {[Date, Date]|null} range
+   */
+  setVariableStylingRange (variableId, range) {
+    this.setSharedState({
+      variableStylingRange: {
+        [variableId]: range,
+      },
+    });
   }
 
   /**
@@ -335,8 +384,8 @@ class TabBaseClass extends SubComponentClass {
       ...layer,
       extent: this.component.extent,
       visible: this.isSelectedVariable(layer.name),
-      // opacity: this.getLayerOpacity(layer.name),
-      opacity: 0.7,
+      opacity: this.getVariableOpacity(layer.name),
+      // opacity: 0.7,
     }, {
       YYYY: () => moment(dateOfLayer).format('YYYY'),
       MM: () => moment(dateOfLayer).format('MM'),
@@ -366,7 +415,7 @@ class TabBaseClass extends SubComponentClass {
     .map(([variableId, variable]) => (
       <ListItem
         key={`variable-list-item__${variableId}`}
-        className="layer-list__item"
+        className="variable-list__item"
         leftCheckbox={(
           <RadioButton
             value={variableId}
@@ -375,6 +424,113 @@ class TabBaseClass extends SubComponentClass {
           />
         )}
         primaryText={variable.name}
+        nestedItems={[
+          <ListItem
+            disabled
+            key="variable-opacity"
+            style={{
+              padding: '0',
+            }}
+          >
+            <SliderWithInput
+              label="Opacity"
+              min={0}
+              max={1}
+              step={0.01}
+              value={this.getVariableOpacity(variableId)}
+              toSliderValue={(v) => v * 100}
+              fromSliderValue={(v) => v / 100}
+              toInputValue={(v) => `${(v * 100).toFixed(0)}%`}
+              fromInputValue={(v) => {
+                // We want to support both format `{N}%` and `{N}`.
+                let str = v;
+
+                if (str[str.length - 1] === '%') {
+                  str = str.slice(0, -1);
+                }
+
+                if (isNaN(str)) {
+                  throw new Error('Invalid number.');
+                }
+
+                return parseFloat(str) / 100;
+              }}
+              onChange={(event, newValue) => this.setVariableOpacity(variableId, newValue)}
+              inputStyle={{
+                width: '60px',
+              }}
+              sliderProps={{
+                included: false,
+                handleStyle: [
+                  {
+                    transform: 'scale(1.4)',
+                  },
+                ],
+              }}
+            />
+          </ListItem>,
+
+          <ListItem
+            disabled
+            key="overlay-style-range"
+            style={{
+              padding: '0',
+            }}
+          >
+            <RangeWithInput
+              label="Overlay range"
+              min={variable.overlay.min}
+              max={variable.overlay.max}
+              value={this.getVariableStylingRange(variableId, [variable.overlay.min, variable.overlay.max])}
+              onChange={(event, newValue) => this.setVariableStylingRange(variableId, newValue)}
+              inputStyle={{
+                width: '60px',
+              }}
+              sliderProps={{
+                handleStyle: [
+                  {
+                    transform: 'scale(1.4)',
+                  },
+                ],
+              }}
+              inputProps={{
+                type: 'number',
+                min: variable.overlay.min,
+                max: variable.overlay.max,
+              }}
+            />
+          </ListItem>,
+
+          <ListItem
+            key="overlay-style"
+            disabled
+            primaryText={(
+              <div className="adjustment-option__header">
+                <label>Overlay style: </label>
+              </div>
+            )}
+            secondaryText={(
+              <div
+                style={{
+                  overflow: 'visible',
+                }}
+              >
+                <SelectField
+                  value={0}
+                  style={{
+                    width: '100%',
+                  }}
+                >{variable.overlay.styles.map((styleName) => (
+                  <MenuItem
+                    key={styleName}
+                    value={styleName}
+                    primaryText={styleName}
+                  />
+                ))}</SelectField>
+              </div>
+            )}
+          />,
+        ]}
       />
     ));
 
