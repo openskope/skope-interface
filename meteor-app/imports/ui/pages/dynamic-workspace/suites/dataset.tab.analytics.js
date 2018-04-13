@@ -330,10 +330,15 @@ class AnalyticsTabContent extends React.Component {
             <LinearProgress mode="indeterminate" />
           )}
           {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && !timeSeriesDataRequestError && (
-            <p>Select <b>a variable</b> and <b>a valid point in the boundary</b> to view the time series data.</p>
+            <div>
+              <p>Select <b>a variable</b> and <b>a valid point in the boundary</b> to view the time series data.</p>
+            </div>
           )}
           {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && timeSeriesDataRequestError && (
-            <p>Error when requesting the data: <pre style={{ whiteSpace: 'pre-wrap' }}>{timeSeriesDataRequestError}</pre></p>
+            <div>
+              <p>Error when requesting the data: </p>
+              <pre style={{ whiteSpace: 'pre-wrap' }}>{timeSeriesDataRequestError}</pre>
+            </div>
           )}
         </Paper>
       </div>
