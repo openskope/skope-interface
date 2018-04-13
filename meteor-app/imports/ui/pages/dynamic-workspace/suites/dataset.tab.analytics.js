@@ -116,6 +116,10 @@ class AnalyticsChart extends React.PureComponent {
       return date;
     });
 
+    // Number in pixels.
+    const XTickSize = 60;
+    const xTickCount = Math.floor(this._chartContainer.clientWidth / XTickSize);
+
     this._chart = c3.generate({
       bindto: this._chartContainer,
       data: {
@@ -132,6 +136,26 @@ class AnalyticsChart extends React.PureComponent {
           type: 'timeseries',
           tick: {
             format: xAxisFormat,
+            values: (xRange) => {
+              // @type {number}
+              const minX = xRange[0].valueOf();
+              // @type {number}
+              const maxX = xRange[1].valueOf();
+              // @type {number}
+              const segmentCount = xTickCount - 1;
+              // @type {number}
+              const segmentSize = (maxX - minX) / segmentCount;
+
+              const vals = [];
+
+              for (let i = 0; i < segmentCount; i += 1) {
+                const thisValue = new Date(minX + (segmentSize * i));
+
+                vals.push(thisValue);
+              }
+
+              return vals;
+            },
           },
         },
       },
