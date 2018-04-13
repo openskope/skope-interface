@@ -95,12 +95,14 @@ class AnalyticsChart extends React.PureComponent {
 
     const chartDataColumns = [
       ['x', ...xAxisLabels],
-      ['value', ...dataValues],
     ];
 
     if (dataUncertaintyValues.every((list) => list.length > 0)) {
-      chartDataColumns.push(['lower bound', ...dataUncertaintyValues[0]]);
       chartDataColumns.push(['upper bound', ...dataUncertaintyValues[1]]);
+      chartDataColumns.push(['value', ...dataValues]);
+      chartDataColumns.push(['lower bound', ...dataUncertaintyValues[0]]);
+    } else {
+      chartDataColumns.push(['value', ...dataValues]);
     }
 
     // Number in pixels.
@@ -114,6 +116,17 @@ class AnalyticsChart extends React.PureComponent {
         // xFormat: '%Y-%m', // 'xFormat' can be used as custom format of 'x'
         // xFormat: xAxisFormat,
         columns: chartDataColumns,
+        types: {
+          'upper bound': 'area',
+          'lower bound': 'area',
+        },
+        colors: {
+          'upper bound': '#CCCCCC',
+          'lower bound': '#FFFFFF',
+        },
+      },
+      area: {
+        zerobased: false,
       },
       axis: {
         y: {
