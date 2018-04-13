@@ -83,8 +83,8 @@ class AnalyticsChart extends React.PureComponent {
     const xAxisLabelBaseIndex = objectPath.get(data, 'range.start', 0);
     const dataValues = objectPath.get(data, 'values', []);
     const dataUncertaintyValues = [
-      objectPath.get(data, 'lowerBounds', []),
-      objectPath.get(data, 'upperBounds', []),
+      objectPath.get(data, 'lowerBounds') || [],
+      objectPath.get(data, 'upperBounds') || [],
     ];
     const dataLabel = objectPath.get(data, 'variableName', '');
     const xAxisLabels = dataValues.map((v, index) => {
@@ -97,7 +97,7 @@ class AnalyticsChart extends React.PureComponent {
       ['x', ...xAxisLabels],
     ];
 
-    if (dataUncertaintyValues.every((list) => list.length > 0)) {
+    if (dataUncertaintyValues.every((list) => list && list.length > 0)) {
       chartDataColumns.push(['upper bound', ...dataUncertaintyValues[1]]);
       chartDataColumns.push(['value', ...dataValues]);
       chartDataColumns.push(['lower bound', ...dataUncertaintyValues[0]]);
