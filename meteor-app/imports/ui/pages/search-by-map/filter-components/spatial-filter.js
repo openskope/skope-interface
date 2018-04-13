@@ -286,7 +286,7 @@ class SpatialFilter extends SearchkitComponent {
    * @param {number} zoomFactor
    */
   focusMapOnGeometry (geometry, zoomFactor = 1.1) {
-    if (!(this._mapview && this._mapview.map)) {
+    if (!(this._mapview && this._mapview.map && this._utilVectorLayerElement)) {
       return;
     }
 
