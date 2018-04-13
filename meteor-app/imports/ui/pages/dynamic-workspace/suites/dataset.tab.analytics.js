@@ -236,6 +236,8 @@ class AnalyticsTabContent extends React.Component {
       timeSeriesData: null,
       // @type {Date}
       timeSeriesDataRequestDate: null,
+      // @type {string|null}
+      timeSeriesDataRequestError: null,
       // @type {Date}
       timeSeriesDataResponseDate: null,
     };
@@ -248,6 +250,7 @@ class AnalyticsTabContent extends React.Component {
       isLoadingTimeSeriesData: false,
       isTimeSeriesDataLoaded: true,
       timeSeriesData: data,
+      timeSeriesDataRequestError: null,
       timeSeriesDataResponseDate: new Date(),
     });
   };
@@ -259,6 +262,7 @@ class AnalyticsTabContent extends React.Component {
       isLoadingTimeSeriesData: false,
       isTimeSeriesDataLoaded: false,
       timeSeriesData: null,
+      timeSeriesDataRequestError: reason.message,
       timeSeriesDataResponseDate: new Date(),
     });
   };
@@ -318,6 +322,7 @@ class AnalyticsTabContent extends React.Component {
       isTimeSeriesDataLoaded: false,
       timeSeriesData: null,
       timeSeriesDataRequestDate: null,
+      timeSeriesDataRequestError: null,
       timeSeriesDataResponseDate: null,
     });
 
@@ -358,6 +363,7 @@ class AnalyticsTabContent extends React.Component {
       isTimeSeriesDataLoaded: false,
       timeSeriesData: null,
       timeSeriesDataRequestDate: new Date(),
+      timeSeriesDataRequestError: null,
       timeSeriesDataResponseDate: null,
     });
 
@@ -401,6 +407,7 @@ class AnalyticsTabContent extends React.Component {
       isTimeSeriesDataLoaded,
       timeSeriesData,
       timeSeriesDataRequestDate,
+      timeSeriesDataRequestError,
       timeSeriesDataResponseDate,
     } = this.state;
 
@@ -470,17 +477,11 @@ class AnalyticsTabContent extends React.Component {
           {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
             <LinearProgress mode="indeterminate" />
           )}
-          {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
-            <Paper
-              style={{
-                padding: '20px 30px',
-                margin: '20px 0',
-                textAlign: 'center',
-              }}
-              zDepth={2}
-            >
-              <p>Select <b>a variable</b> and <b>a valid point in the boundary</b> to view the time series data.</p>
-            </Paper>
+          {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && !timeSeriesDataRequestError && (
+            <p>Select <b>a variable</b> and <b>a valid point in the boundary</b> to view the time series data.</p>
+          )}
+          {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && timeSeriesDataRequestError && (
+            <p>Error when requesting the data: <pre style={{ whiteSpace: 'pre-wrap' }}>{timeSeriesDataRequestError}</pre></p>
           )}
         </Paper>
       </div>
