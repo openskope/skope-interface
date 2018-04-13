@@ -132,8 +132,18 @@ class AnalyticsChart extends React.PureComponent {
         ],
       },
       axis: {
+        y: {
+          label: {
+            text: data.variableName,
+            position: 'outer-middle',
+          },
+        },
         x: {
           type: 'timeseries',
+          label: {
+            text: `Date (${temporalResolution})`,
+            position: 'outer-center',
+          },
           tick: {
             format: xAxisFormat,
             values: (xRange) => {
