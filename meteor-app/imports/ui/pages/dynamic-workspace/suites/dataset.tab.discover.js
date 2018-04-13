@@ -25,6 +25,8 @@ class DiscoverTab extends TabBaseClass {
       return searchState;
     })(objectPath.get(this.props, 'routing.queryParams.q'));
 
-    FlowRouter.go('/discover', null, searchQuery);
+    const url = FlowRouter.path('/discover', null, searchQuery);
+
+    location.href = url;
   }
 }
