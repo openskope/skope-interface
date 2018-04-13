@@ -219,12 +219,6 @@ class DatasetWorkspace extends SuiteBaseClass {
         return geometryWithNumbers;
       }
 
-      const boundaryGeometry = this.boundaryGeometry;
-
-      if (boundaryGeometry) {
-        return boundaryGeometry;
-      }
-
       return null;
     })();
 
