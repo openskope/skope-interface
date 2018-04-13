@@ -1,7 +1,6 @@
 // This is the "Graph View".
 
 import { HTTP } from 'meteor/http';
-import _ from 'lodash';
 import objectPath from 'object-path';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -20,8 +19,6 @@ import LinearProgress from 'material-ui/LinearProgress';
 import {
   List,
 } from 'material-ui/List';
-import c3 from 'c3';
-import 'c3/c3.css';
 
 import {
   DatasetChartIcon,
@@ -33,10 +30,6 @@ import {
 import {
   buildGeoJsonWithGeometry,
   PatheticDataRequester,
-  getPrecisionByResolution,
-  offsetDateAtPrecision,
-  makeSVGDocAsync,
-  svgDocToBlob,
   fillTemplateString,
 } from '/imports/ui/helpers';
 

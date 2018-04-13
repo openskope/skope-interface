@@ -60,7 +60,6 @@ class OverlayTabContent extends React.Component {
     offsetCurrentTimeAtPrecisionByAmount: PropTypes.func.isRequired,
     getGeometryFromExtent: PropTypes.func.isRequired,
     getExtentFromGeometry: PropTypes.func.isRequired,
-    getGeometryFromOlGeometry: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -152,20 +151,6 @@ class OverlayTabContent extends React.Component {
     } else {
       this.stopAnimation();
     }
-  };
-
-  onStartDrawingNewFocusGeometry = () => {
-    this.clearFocusFeatureDrawing();
-  };
-
-  onDrawNewFocusFeature = (olEvent) => {
-    const olGeometry = olEvent.feature.getGeometry();
-    const jsonGeometry = this.props.getGeometryFromOlGeometry(olGeometry);
-
-    // Report new focus geometry.
-    this.props.updateFocusGeometry(jsonGeometry);
-
-    this.clearFocusFeatureDrawing();
   };
 
   onChangeViewingExtent = _.throttle(() => {
@@ -431,7 +416,6 @@ class OverlayTab extends TabBaseClass {
         }}
         getGeometryFromExtent={this.component.getGeometryFromExtent}
         getExtentFromGeometry={this.component.getExtentFromGeometry}
-        getGeometryFromOlGeometry={this.component.getGeometryFromOlGeometry}
       />
     );
   }
