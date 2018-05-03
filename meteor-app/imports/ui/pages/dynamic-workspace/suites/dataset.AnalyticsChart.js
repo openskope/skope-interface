@@ -98,9 +98,9 @@ class AnalyticsChart extends React.PureComponent {
     ];
 
     if (dataUncertaintyValues.every((list) => list && list.length > 0)) {
-      chartDataColumns.push(['upper bound', ...dataUncertaintyValues[1]]);
+      chartDataColumns.push(['range +', ...dataUncertaintyValues[1]]);
       chartDataColumns.push(['value', ...dataValues]);
-      chartDataColumns.push(['lower bound', ...dataUncertaintyValues[0]]);
+      chartDataColumns.push(['range -', ...dataUncertaintyValues[0]]);
     } else {
       chartDataColumns.push(['value', ...dataValues]);
     }
@@ -117,12 +117,12 @@ class AnalyticsChart extends React.PureComponent {
         // xFormat: xAxisFormat,
         columns: chartDataColumns,
         types: {
-          'upper bound': 'area',
-          'lower bound': 'area',
+          'range +': 'area',
+          'range -': 'area',
         },
         colors: {
-          'upper bound': '#CCCCCC',
-          'lower bound': '#FFFFFF',
+          'range +': '#CCCCCC',
+          'range -': '#FFFFFF',
         },
       },
       area: {
