@@ -67,6 +67,7 @@
   "appSettings": {
     "exposeStoreToGlobal": true,
     "appBarBackgroundColor": "#f7f5e7",
-    "appBarTextColor": "black"
+    "appBarTextColor": "black",
+    "appBarLogoColor": "rgb(128, 0, 0)"
   }
 }

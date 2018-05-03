@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {
   connect,
 } from 'react-redux';
+import objectPath from 'object-path';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
@@ -22,6 +23,10 @@ import {
   version,
   appSettings,
 } from '/package.json';
+
+const appBarTextColor = objectPath.get(appSettings, 'appBarTextColor', 'currentColor');
+const appBarBackgroundColor = objectPath.get(appSettings, 'appBarBackgroundColor', 'transparent');
+const appBarLogoColor = objectPath.get(appSettings, 'appBarLogoColor', 'currentColor');
 
 class Component extends React.Component {
   static propTypes = {
@@ -43,14 +48,16 @@ class Component extends React.Component {
   renderTitle = () => (
     <div
       style={{
-        color: appSettings.appBarTextColor,
+        color: appBarTextColor,
       }}
     >
       <SafeLink
         href="https://www.openskope.org"
         text="SKOPE"
         style={{
-          color: 'currentColor',
+          color: appBarLogoColor,
+          fontFamily: "'Bitter', serif",
+          fontSize: '1.3em',
           marginRight: 30,
         }}
         noBadge
@@ -65,7 +72,7 @@ class Component extends React.Component {
         iconButtonElement={
           <IconButton
             tooltip="Notifications"
-          ><NoNotificationIcon color={appSettings.appBarTextColor} /></IconButton>
+          ><NoNotificationIcon color={appBarTextColor} /></IconButton>
         }
         targetOrigin={{
           horizontal: 'middle',
@@ -83,7 +90,7 @@ class Component extends React.Component {
         iconButtonElement={
           <IconButton
             tooltip="Account"
-          ><AccountIcon color={appSettings.appBarTextColor} /></IconButton>
+          ><AccountIcon color={appBarTextColor} /></IconButton>
         }
         targetOrigin={{
           horizontal: 'middle',
@@ -102,14 +109,14 @@ class Component extends React.Component {
       <IconButton
         tooltip="Help"
         onClick={this.props.onClickHelpButton}
-      ><HelpIcon color={appSettings.appBarTextColor} /></IconButton>
+      ><HelpIcon color={appBarTextColor} /></IconButton>
 
       <IconMenu
         iconButtonElement={
           <IconButton
             tooltip="Boring Stuff"
             tooltipPosition="bottom-left"
-          ><CodeIcon color={appSettings.appBarTextColor} /></IconButton>
+          ><CodeIcon color={appBarTextColor} /></IconButton>
         }
         targetOrigin={{
           horizontal: 'right',
@@ -131,7 +138,7 @@ class Component extends React.Component {
     <div className="appbar">
       <AppBar
         style={{
-          backgroundColor: appSettings.appBarBackgroundColor,
+          backgroundColor: appBarBackgroundColor,
         }}
         title={this.renderTitle()}
         showMenuIconButton={false}
