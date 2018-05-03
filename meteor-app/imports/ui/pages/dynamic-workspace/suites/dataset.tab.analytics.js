@@ -331,7 +331,7 @@ class AnalyticsTabContent extends React.Component {
           )}
           {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && !timeSeriesDataRequestError && (
             <div>
-              <p>Select <b>a variable</b> and <b>a valid point in the boundary</b> to view the time series data.</p>
+              <p>Select <b>a variable</b> and <b>a valid point or area in the boundary</b> to view the time series data.</p>
             </div>
           )}
           {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && timeSeriesDataRequestError && (
