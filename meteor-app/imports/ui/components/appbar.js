@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -13,6 +14,7 @@ import HelpIcon from 'material-ui/svg-icons/action/help';
 import AccountIcon from 'material-ui/svg-icons/action/account-circle';
 import NoNotificationIcon from 'material-ui/svg-icons/social/notifications-none';
 import CodeIcon from 'material-ui/svg-icons/action/code';
+import EmailIcon from 'material-ui/svg-icons/communication/email';
 
 import { actions } from '/imports/ui/redux-store';
 
@@ -27,6 +29,7 @@ import {
 const appBarTextColor = objectPath.get(appSettings, 'appBarTextColor', 'currentColor');
 const appBarBackgroundColor = objectPath.get(appSettings, 'appBarBackgroundColor', 'transparent');
 const appBarLogoColor = objectPath.get(appSettings, 'appBarLogoColor', 'currentColor');
+const contactEmail = objectPath.get(Meteor.settings, 'public.contactEmail');
 
 class Component extends React.Component {
   static propTypes = {
@@ -35,6 +38,7 @@ class Component extends React.Component {
     currentRouterPath: PropTypes.string,
     navigateTo: PropTypes.func,
     onClickHelpButton: PropTypes.func,
+    onClickContactButton: PropTypes.func,
   };
 
   static defaultProps = {
@@ -43,6 +47,7 @@ class Component extends React.Component {
     currentRouterPath: '',
     navigateTo: () => {},
     onClickHelpButton: () => {},
+    onClickContactButton: () => {},
   };
 
   renderTitle = () => (
@@ -106,10 +111,36 @@ class Component extends React.Component {
         <MenuItem disabled>Sign up</MenuItem>
       </IconMenu>
 
-      <IconButton
-        tooltip="Help"
-        onClick={this.props.onClickHelpButton}
-      ><HelpIcon color={appBarTextColor} /></IconButton>
+      <IconMenu
+        iconButtonElement={
+          <IconButton
+            tooltip="Help"
+            tooltipPosition="bottom-left"
+          ><HelpIcon color={appBarTextColor} /></IconButton>
+        }
+        targetOrigin={{
+          horizontal: 'right',
+          vertical: 'top',
+        }}
+        anchorOrigin={{
+          horizontal: 'right',
+          vertical: 'bottom',
+        }}
+      >
+        <MenuItem
+          disabled
+          insetChildren
+          onClick={this.props.onClickHelpButton}
+          primaryText="Manual"
+        />
+        <Divider />
+        <MenuItem
+          leftIcon={<EmailIcon />}
+          disabled={!contactEmail}
+          onClick={this.props.onClickContactButton}
+          primaryText="Contact"
+        />
+      </IconMenu>
 
       <IconMenu
         iconButtonElement={
@@ -152,6 +183,19 @@ export default connect(
   // mapStateToProps
   (state) => ({
     currentRouterPath: state.path,
+    onClickContactButton: () => {
+      const anchorElement = document.createElement('a');
+      const subject = '';
+      const body = `\n\n\n\n
+Please do not modify the content below to help technical support.
+--------------------------------------------------------------------------------
+Version: ${version}
+State: ${btoa(encodeURIComponent(JSON.stringify(state)))}
+`;
+
+      anchorElement.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      anchorElement.click();
+    },
   }),
   // mapDispatchToProps
   (dispatch) => ({

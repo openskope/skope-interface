@@ -1,5 +1,6 @@
 {
     "public": {
+        "contactEmail": "kintigh@asu.edu",
         "searchpage": {
             "resultsPerPage": 10,
             "logSearchKitQueries": false,
