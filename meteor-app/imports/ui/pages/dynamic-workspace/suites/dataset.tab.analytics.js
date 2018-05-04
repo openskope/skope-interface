@@ -15,7 +15,6 @@ import {
   CardText,
 } from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
-import LinearProgress from 'material-ui/LinearProgress';
 import {
   List,
 } from 'material-ui/List';
@@ -92,6 +91,14 @@ class AnalyticsTabContent extends React.Component {
       timeSeriesDataRequestError: null,
       // @type {Date}
       timeSeriesDataResponseDate: null,
+      // @type {boolean}
+      isPendingTimeSeriesChartRender: false,
+      // @type {boolean}
+      isRenderingTimeSeriesChart: false,
+      // @type {Date}
+      timeSeriesChartRenderStartDate: null,
+      // @type {Date}
+      timeSeriesChartRenderEndDate: null,
     };
   }
 
@@ -104,6 +111,7 @@ class AnalyticsTabContent extends React.Component {
       timeSeriesData: data,
       timeSeriesDataRequestError: null,
       timeSeriesDataResponseDate: new Date(),
+      isPendingTimeSeriesChartRender: true,
     });
   };
 
@@ -116,6 +124,26 @@ class AnalyticsTabContent extends React.Component {
       timeSeriesData: null,
       timeSeriesDataRequestError: reason.message,
       timeSeriesDataResponseDate: new Date(),
+      isPendingTimeSeriesChartRender: false,
+    });
+  };
+
+  onChartRenderStart = () => {
+    console.log('onChartRenderStart');
+
+    this.setState({
+      isPendingTimeSeriesChartRender: false,
+      isRenderingTimeSeriesChart: true,
+      timeSeriesChartRenderStartDate: new Date(),
+    });
+  };
+
+  onChartRenderEnd = () => {
+    console.log('onChartRenderEnd');
+
+    this.setState({
+      isRenderingTimeSeriesChart: false,
+      timeSeriesChartRenderEndDate: new Date(),
     });
   };
 
@@ -261,6 +289,10 @@ class AnalyticsTabContent extends React.Component {
       timeSeriesDataRequestDate,
       timeSeriesDataRequestError,
       timeSeriesDataResponseDate,
+      isPendingTimeSeriesChartRender,
+      isRenderingTimeSeriesChart,
+      timeSeriesChartRenderStartDate,
+      timeSeriesChartRenderEndDate,
     } = this.state;
 
     return (
@@ -307,6 +339,8 @@ class AnalyticsTabContent extends React.Component {
                     lte: dateRange[1],
                   }}
                   data={timeSeriesData}
+                  onRenderStart={this.onChartRenderStart}
+                  onRenderEnd={this.onChartRenderEnd}
                   ref={(ref) => this._chartComponent = ref}
                 />
               </CardMedia>
@@ -315,6 +349,12 @@ class AnalyticsTabContent extends React.Component {
                   from: timeSeriesDataRequestDate,
                   to: timeSeriesDataResponseDate,
                 }).asSeconds()} s.</div>
+                {!isPendingTimeSeriesChartRender && !isRenderingTimeSeriesChart && (
+                  <div>Rendered in {moment.duration({
+                    from: timeSeriesChartRenderStartDate,
+                    to: timeSeriesChartRenderEndDate,
+                  }).asSeconds()} s.</div>
+                )}
               </CardText>
               <CardActions>
                 <RaisedButton
@@ -327,7 +367,10 @@ class AnalyticsTabContent extends React.Component {
             </Card>
           )}
           {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
-            <LinearProgress mode="indeterminate" />
+            <div>
+              <div className="linear-progress" />
+              <p>Please wait while the chart is being loaded...</p>
+            </div>
           )}
           {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && !timeSeriesDataRequestError && (
             <div>

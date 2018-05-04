@@ -30,6 +30,13 @@ class AnalyticsChart extends React.Component {
       }),
       values: PropTypes.arrayOf(PropTypes.number),
     }).isRequired,
+    onRenderStart: PropTypes.func,
+    onRenderEnd: PropTypes.func,
+  };
+
+  static defaultProps = {
+    onRenderStart: () => {},
+    onRenderEnd: () => {},
   };
 
   static timeFormatsForC3 = [
@@ -102,7 +109,7 @@ class AnalyticsChart extends React.Component {
       return;
     }
 
-    console.log('Rendering chart...');
+    this.props.onRenderStart();
 
     const {
       temporalResolution,
@@ -204,7 +211,7 @@ class AnalyticsChart extends React.Component {
       },
     });
 
-    console.log('Chart rendering complete.');
+    this.props.onRenderEnd();
   }
 
   render () {
