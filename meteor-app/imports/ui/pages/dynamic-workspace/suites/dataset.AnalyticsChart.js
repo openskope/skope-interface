@@ -4,6 +4,7 @@ import _ from 'lodash';
 import objectPath from 'object-path';
 import c3 from 'c3';
 import 'c3/c3.css';
+import Toggle from 'material-ui/Toggle';
 
 import {
   getPrecisionByResolution,
@@ -13,7 +14,7 @@ import {
 } from '/imports/ui/helpers';
 
 export default
-class AnalyticsChart extends React.PureComponent {
+class AnalyticsChart extends React.Component {
   static propTypes = {
     temporalResolution: PropTypes.string.isRequired,
     temporalPeriod: PropTypes.shape({
@@ -40,22 +41,48 @@ class AnalyticsChart extends React.PureComponent {
     '%Y-%m-%d %H:%M:%S',
   ];
 
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      displayDataUncertaintyValues: true,
+    };
+  }
+
   componentDidMount () {
     this.renderChart();
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (
-      nextProps.temporalResolution !== this.props.temporalResolution ||
-      !_.isEqual(nextProps.temporalPeriod, this.props.temporalPeriod) ||
-      !_.isEqual(nextProps.data, this.props.data)
-    ) {
-      this.renderChart();
-    }
+  shouldComponentUpdate (nextProps, nextState) {
+    return !(_.isEqual(nextProps, this.props) && _.isEqual(nextState, this.state));
   }
 
-  shouldComponentUpdate () {
-    return false;
+  componentDidUpdate () {
+    this.renderChart();
+  }
+
+  onToggleDataUncertainty = () => {
+    this.setState({
+      displayDataUncertaintyValues: !this.state.displayDataUncertaintyValues,
+    });
+  };
+
+  get dataUncertaintyValues () {
+    const {
+      data,
+    } = this.props;
+
+    const lowerBounds = objectPath.get(data, 'lowerBounds', null);
+    const upperBounds = objectPath.get(data, 'upperBounds', null);
+
+    if (!(lowerBounds && upperBounds)) {
+      return null;
+    }
+
+    return [
+      lowerBounds,
+      upperBounds,
+    ];
   }
 
   toBlob = async () => {
@@ -71,21 +98,27 @@ class AnalyticsChart extends React.PureComponent {
   };
 
   renderChart () {
+    if (!this._chartContainer) {
+      return;
+    }
+
+    console.log('Rendering chart...');
+
     const {
       temporalResolution,
       temporalPeriod,
       data,
     } = this.props;
+    const {
+      displayDataUncertaintyValues,
+    } = this.state;
 
     const temporalPrecision = getPrecisionByResolution(temporalResolution);
     const startDate = new Date(temporalPeriod.gte);
     const xAxisFormat = AnalyticsChart.timeFormatsForC3[temporalPrecision];
     const xAxisLabelBaseIndex = objectPath.get(data, 'range.start', 0);
     const dataValues = objectPath.get(data, 'values', []);
-    const dataUncertaintyValues = [
-      objectPath.get(data, 'lowerBounds') || [],
-      objectPath.get(data, 'upperBounds') || [],
-    ];
+    const dataUncertaintyValues = this.dataUncertaintyValues;
     const dataLabel = objectPath.get(data, 'variableName', '');
     const xAxisLabels = dataValues.map((v, index) => {
       const date = offsetDateAtPrecision(startDate, temporalPrecision, xAxisLabelBaseIndex + index);
@@ -97,7 +130,7 @@ class AnalyticsChart extends React.PureComponent {
       ['x', ...xAxisLabels],
     ];
 
-    if (dataUncertaintyValues.every((list) => list && list.length > 0)) {
+    if (dataUncertaintyValues && displayDataUncertaintyValues) {
       chartDataColumns.push(['range +', ...dataUncertaintyValues[1]]);
       chartDataColumns.push(['value', ...dataValues]);
       chartDataColumns.push(['range -', ...dataUncertaintyValues[0]]);
@@ -170,13 +203,27 @@ class AnalyticsChart extends React.PureComponent {
         show: false,
       },
     });
+
+    console.log('Chart rendering complete.');
   }
 
   render () {
+    const dataUncertaintyValues = this.dataUncertaintyValues;
+
     return (
-      <div
-        ref={(ref) => this._chartContainer = ref}
-      />
+      <div>
+        <div
+          ref={(ref) => this._chartContainer = ref}
+        />
+        {dataUncertaintyValues && (
+          <Toggle
+            label="Show uncertainty"
+            labelPosition="right"
+            toggled={this.state.displayDataUncertaintyValues}
+            onToggle={this.onToggleDataUncertainty}
+          />
+        )}
+      </div>
     );
   }
 }
