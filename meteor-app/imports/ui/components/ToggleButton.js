@@ -2,13 +2,37 @@ import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
 
-import {
-  mapToolbarStyles,
-} from '/imports/ui/consts';
+import globalTheme from '/imports/ui/styling/muiTheme';
+
+const styles = {
+  root: {},
+  icon: {
+    color: 'inherit',
+    fill: 'currentColor',
+  },
+  button: {
+    minWidth: false,
+    height: '1.875em',
+    lineHeight: '1.875em',
+    backgroundColor: 'inherit',
+    color: 'inherit',
+    transition: false,
+  },
+  button_iconOnly: {
+    paddingLeft: '0.5em',
+    paddingRight: '0.5em',
+  },
+  button_active: {
+    backgroundColor: globalTheme.palette.toggleButtonActiveBackgroundColor,
+    color: globalTheme.palette.textColor,
+  },
+};
 
 export default
 (props) => {
   const {
+    defaultZDepth = 0,
+    label = '',
     icon = null,
     style = {},
     toggled = false,
@@ -18,8 +42,7 @@ export default
 
   const iconCloned = icon && React.cloneElement(icon, {
     style: {
-      color: 'inherit',
-      fill: 'currentColor',
+      ...styles.icon,
       ...icon.props.style,
     },
     key: 'iconCloned',
@@ -28,18 +51,21 @@ export default
   return (
     <Paper
       style={{
+        ...styles.root,
         ...style,
       }}
-      zDepth={toggled ? 1 : 0}
+      zDepth={toggled ? 1 : defaultZDepth}
     >
       <FlatButton
         {...otherProps}
 
+        label={label}
         icon={iconCloned}
 
         style={{
-          ...mapToolbarStyles.toggleButton.button,
-          ...(toggled && mapToolbarStyles.toggleButton.active),
+          ...styles.button,
+          ...(icon && !label && styles.button_iconOnly),
+          ...(toggled && styles.button_active),
         }}
         onClick={(event) => onToggle(event, !toggled)}
       />

@@ -7,7 +7,6 @@ import {
   ToolbarGroup,
   ToolbarTitle,
 } from 'material-ui/Toolbar';
-import RaisedButton from 'material-ui/RaisedButton';
 
 import {
   dataSpatialBoundaryFillColor,
@@ -17,6 +16,8 @@ import {
 import {
   buildGeoJsonWithGeometry,
 } from '/imports/ui/helpers';
+
+import ToggleButton from '/imports/ui/components/ToggleButton';
 
 import MapView from '/imports/ui/components/mapview';
 
@@ -170,19 +171,13 @@ class MapWithToolbar extends React.Component {
           </ToolbarGroup>
           <ToolbarGroup>
             {selectionTools.map((item) => (
-              <RaisedButton
+              <ToggleButton
                 key={item.name}
                 className="selection-tool-button"
                 icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
-                style={{
-                  ...mapToolbarStyles.toggleButton.root,
-                  ...(this.isSelectionToolActive(item) && mapToolbarStyles.toggleButton.active),
-                }}
-                buttonStyle={mapToolbarStyles.toggleButton.button}
-                overlayStyle={{
-                  ...mapToolbarStyles.toggleButton.overlay,
-                }}
-                onClick={() => this.setSelectionToolActive(item)}
+                defaultZDepth={1}
+                toggled={this.isSelectionToolActive(item)}
+                onToggle={(event, toggled) => toggled && this.setSelectionToolActive(item)}
               />
             ))}
           </ToolbarGroup>
