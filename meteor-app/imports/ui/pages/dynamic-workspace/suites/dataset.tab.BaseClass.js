@@ -37,7 +37,7 @@ class TabBaseClass extends SubComponentClass {
   static tabStyle = {};
   static requiredProps = [];
 
-  static defaultVariableOpacity = 1;
+  static defaultVariableOpacity = 0.5;
 
   constructor (...args) {
     super(...args);
