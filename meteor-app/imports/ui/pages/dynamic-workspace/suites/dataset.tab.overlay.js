@@ -297,7 +297,7 @@ class OverlayTabContent extends React.Component {
 
     return (
       <SliderWithInput
-        label="Date (year)"
+        label="Date (year):"
         min={dateRangeStart}
         max={dateRangeEnd}
         value={currentLoadedDateTemporal}
@@ -312,6 +312,11 @@ class OverlayTabContent extends React.Component {
         fromInputValue={this.props.getDateFromYearStringInput}
         onChange={(event, date) => this.setState({ currentLoadedDateTemporal: date })}
         onFinish={(event, date) => this.props.updateLoadedDate(date)}
+        style={{
+          // This is a workaround to insert cells used only for spacing into the grid to achieve the desired effect.
+          gridTemplateAreas: '"spacing-left label spacing-inBetween input spacing-right" "slider slider slider slider slider"',
+          gridAutoColumns: '1fr auto 1em auto 1fr',
+        }}
         inputStyle={{
           width: '60px',
         }}
