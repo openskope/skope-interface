@@ -32,6 +32,7 @@ export default
 (props) => {
   const {
     defaultZDepth = 0,
+    zDepthWhenToggled = 1,
     label = '',
     icon = null,
     style = {},
@@ -54,7 +55,7 @@ export default
         ...styles.root,
         ...style,
       }}
-      zDepth={toggled ? 1 : defaultZDepth}
+      zDepth={toggled ? zDepthWhenToggled : defaultZDepth}
     >
       <FlatButton
         {...otherProps}

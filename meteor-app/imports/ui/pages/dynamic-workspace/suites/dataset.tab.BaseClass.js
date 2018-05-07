@@ -15,6 +15,8 @@ import {
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import ImageStyleIcon from 'material-ui/svg-icons/image/style';
+import ExpandIcon from 'material-ui/svg-icons/navigation/expand-more';
+import CollapseIcon from 'material-ui/svg-icons/navigation/expand-less';
 
 import {
   getDateAtPrecision,
@@ -412,14 +414,30 @@ class TabBaseClass extends SubComponentClass {
       label = '',
       children = null,
     } = props;
+    const isNestedItemsVisible = this.isPanelOpen(id, true);
+    const toggleNestedItemsVisible = () => this.togglePanelOpenState(id, !isNestedItemsVisible);
 
     return (
       <ListItem
         key={id}
         primaryText={label}
         primaryTogglesNestedList
-        open={this.isPanelOpen(id)}
-        onNestedListToggle={() => this.togglePanelOpenState(id)}
+        rightIconButton={(
+          <ToggleButton
+            label={isNestedItemsVisible ? 'Collapse' : 'Expand'}
+            icon={isNestedItemsVisible ? <CollapseIcon /> : <ExpandIcon />}
+            labelPosition="before"
+            zDepthWhenToggled={0}
+            toggled={isNestedItemsVisible}
+            onToggle={toggleNestedItemsVisible}
+            style={{
+              color: 'rgba(0, 0, 0, 0.5)',
+              top: '9px',
+              width: false,
+            }}
+          />
+        )}
+        open={isNestedItemsVisible}
         nestedItems={Array.isArray(children) ? children : [children]}
       />
     );
