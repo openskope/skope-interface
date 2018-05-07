@@ -17,6 +17,7 @@ import MapView from '/imports/ui/components/mapview';
 import OpenIcon from 'material-ui/svg-icons/action/open-in-new';
 
 import {
+  dataSpatialBoundaryFillColor,
   DatasetInfoIcon,
   DatasetDownloadIcon,
   DatasetMapIcon,
@@ -241,7 +242,14 @@ class SearchResultItem extends React.PureComponent {
                 width: '100%',
                 height: '100%',
               }}
-            ><map-layer-geojson src-json={boundaryGeoJsonString} /></MapView>
+            >
+              <map-layer-geojson
+                style={{
+                  fill: dataSpatialBoundaryFillColor,
+                }}
+                src-json={boundaryGeoJsonString}
+              />
+            </MapView>
           )}</a>
 
           <MarkDownRenderer

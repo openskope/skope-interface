@@ -20,7 +20,6 @@ const wms = (layer, fillers) => {
     <map-layer-twms
       key={layer.name}
       name={layer.name}
-      projection="EPSG:4326"
       extent={layer.extent}
       invisible={layer.visible ? null : 'invisible'}
       opacity={layer.opacity}

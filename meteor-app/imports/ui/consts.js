@@ -17,6 +17,8 @@ import CropIcon from 'material-ui/svg-icons/image/crop-landscape';
 export const rangeMin = 1;
 export const rangeMax = 2000;
 
+export const dataSpatialBoundaryFillColor = 'rgba(255, 255, 255, 0.5)';
+
 export const DatasetInfoIcon = InfoIcon;
 export const DatasetDownloadIcon = DownloadIcon;
 export const DatasetMapIcon = MapIcon;

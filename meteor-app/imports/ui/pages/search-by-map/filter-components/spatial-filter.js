@@ -16,6 +16,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import MapView from '/imports/ui/components/mapview';
 
 import {
+  dataSpatialBoundaryFillColor,
   mapToolbarStyles,
   PanToolIcon,
   BoxToolIcon,
@@ -444,6 +445,9 @@ class SpatialFilter extends SearchkitComponent {
         >
           <map-layer-geojson
             invisible={!filterBoundaryGeoJsonString ? 'invisible' : null}
+            style={{
+              fill: dataSpatialBoundaryFillColor,
+            }}
             src-json={filterBoundaryGeoJsonString}
             src-projection={projection}
           />

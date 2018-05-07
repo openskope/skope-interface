@@ -385,7 +385,6 @@ class TabBaseClass extends SubComponentClass {
       extent: this.component.extent,
       visible: this.isSelectedVariable(layer.name),
       opacity: this.getVariableOpacity(layer.name),
-      // opacity: 0.7,
     }, {
       YYYY: () => moment(dateOfLayer).format('YYYY'),
       MM: () => moment(dateOfLayer).format('MM'),

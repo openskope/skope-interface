@@ -10,6 +10,7 @@ import {
 import RaisedButton from 'material-ui/RaisedButton';
 
 import {
+  dataSpatialBoundaryFillColor,
   mapToolbarStyles,
 } from '/imports/ui/consts';
 
@@ -200,16 +201,19 @@ class MapWithToolbar extends React.Component {
           {boundaryGeoJsonString && (
             <map-layer-geojson
               id={`${id}__boundary-geometry-display-layer`}
+              style={{
+                strokeColor: 'red',
+              }}
               src-json={boundaryGeoJsonString}
-              src-projection="EPSG:4326"
-              opacity="0.3"
             />
           )}
           {focusBoundaryGeoJsonString && (
             <map-layer-geojson
               id={`${id}__focus-geometry-display-layer`}
+              style={{
+                fill: dataSpatialBoundaryFillColor,
+              }}
               src-json={focusBoundaryGeoJsonString}
-              src-projection="EPSG:4326"
             />
           )}
           <map-layer-vector

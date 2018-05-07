@@ -2,6 +2,7 @@ import React from 'react';
 import Paper from 'material-ui/Paper';
 
 import {
+  dataSpatialBoundaryFillColor,
   DatasetInfoIcon,
 } from '/imports/ui/consts';
 
@@ -47,6 +48,9 @@ class InfoTabContent extends React.Component {
           >
             {boundaryGeoJsonString && (
               <map-layer-geojson
+                style={{
+                  fill: dataSpatialBoundaryFillColor,
+                }}
                 src-json={boundaryGeoJsonString}
                 src-projection="EPSG:4326"
               />
