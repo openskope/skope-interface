@@ -6,13 +6,14 @@ import _ from 'lodash';
 import Paper from 'material-ui/Paper';
 import {
   List,
+  ListItem,
 } from 'material-ui/List';
 import {
   Toolbar,
   ToolbarGroup,
   ToolbarSeparator,
 } from 'material-ui/Toolbar';
-import IconButton from 'material-ui/IconButton';
+import FlatButton from 'material-ui/FlatButton';
 import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 import PauseIcon from 'material-ui/svg-icons/av/pause';
 import ToStartIcon from 'material-ui/svg-icons/av/skip-previous';
@@ -60,6 +61,8 @@ class OverlayTabContent extends React.Component {
     offsetCurrentTimeAtPrecisionByAmount: PropTypes.func.isRequired,
     getGeometryFromExtent: PropTypes.func.isRequired,
     getExtentFromGeometry: PropTypes.func.isRequired,
+    isPanelOpen: PropTypes.func.isRequired,
+    togglePanelOpenState: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -220,17 +223,121 @@ class OverlayTabContent extends React.Component {
     this.props.updateLoadedDate(this.props.dateRangeEnd);
   }
 
-  render () {
+  renderAnimationControls () {
+    const {
+      hasSelectedVariable,
+    } = this.props;
+
+    return (
+      <Toolbar
+        style={{
+          background: 'transparent',
+          height: '48px',
+        }}
+      >
+        <ToolbarGroup />
+
+        <ToolbarGroup>
+          <FlatButton
+            label="To start"
+            icon={<ToStartIcon />}
+            disabled={!hasSelectedVariable || !this.isBackStepInTimeAllowed}
+            onClick={this.onClickToStartButton}
+            style={{
+              margin: false,
+            }}
+          />
+          <ToolbarSeparator
+            style={{
+              marginLeft: '10px',
+              marginRight: '10px',
+            }}
+          />
+          <FlatButton
+            label={this.isPlaying ? 'Pause' : 'Play'}
+            icon={this.isPlaying ? <PauseIcon /> : <PlayIcon />}
+            disabled={!hasSelectedVariable}
+            onClick={this.onClickPlayButton}
+            style={{
+              width: '6.5em',
+              margin: false,
+            }}
+          />
+          <ToolbarSeparator
+            style={{
+              marginLeft: '10px',
+              marginRight: '10px',
+            }}
+          />
+          <FlatButton
+            label="To end"
+            icon={<ToEndIcon />}
+            disabled={!hasSelectedVariable || !this.isForwardStepInTimeAllowed}
+            onClick={this.onClickToEndButton}
+            style={{
+              margin: false,
+            }}
+          />
+        </ToolbarGroup>
+
+        <ToolbarGroup />
+      </Toolbar>
+    );
+  }
+
+  renderTimeline () {
     const {
       hasSelectedVariable,
       dateRangeStart,
       dateRangeEnd,
-      boundaryGeometry,
-      focusGeometry,
     } = this.props;
     const {
       currentLoadedDateTemporal,
     } = this.state;
+
+    return (
+      <SliderWithInput
+        label="Date (year)"
+        min={dateRangeStart}
+        max={dateRangeEnd}
+        value={currentLoadedDateTemporal}
+        disabled={!hasSelectedVariable}
+        // (Date) => number
+        toSliderValue={this.props.getSliderValueFromDate}
+        // (number) => Date
+        fromSliderValue={this.props.getDateFromSliderValue}
+        // (Date) => string
+        toInputValue={getYearStringFromDate}
+        // (string) => Date
+        fromInputValue={this.props.getDateFromYearStringInput}
+        onChange={(event, date) => this.setState({ currentLoadedDateTemporal: date })}
+        onFinish={(event, date) => this.props.updateLoadedDate(date)}
+        inputStyle={{
+          width: '60px',
+        }}
+        sliderProps={{
+          included: false,
+          handleStyle: [
+            {
+              transform: 'scale(1.4)',
+            },
+          ],
+        }}
+        inputProps={{
+          type: 'number',
+          min: getYearStringFromDate(dateRangeStart),
+          max: getYearStringFromDate(dateRangeEnd),
+        }}
+      />
+    );
+  }
+
+  render () {
+    const {
+      hasSelectedVariable,
+      boundaryGeometry,
+      focusGeometry,
+    } = this.props;
 
     const focusExtent = this.props.getExtentFromGeometry(focusGeometry || boundaryGeometry);
 
@@ -267,94 +374,31 @@ class OverlayTabContent extends React.Component {
             <map-control-defaults />
           </MapView>
 
-          <Toolbar
-            style={{
-              background: 'transparent',
-            }}
-          >
-            <ToolbarGroup />
-
-            <ToolbarGroup>
-              <IconButton
-                tooltip="To start"
-                tooltipPosition="top-center"
-                disabled={!hasSelectedVariable || !this.isBackStepInTimeAllowed}
-                onClick={this.onClickToStartButton}
-              >
-                <ToStartIcon />
-              </IconButton>
-              <ToolbarSeparator
-                style={{
-                  marginLeft: '10px',
-                  marginRight: '10px',
-                }}
-              />
-              <IconButton
-                tooltip="Play/pause"
-                tooltipPosition="top-center"
-                disabled={!hasSelectedVariable}
-                onClick={this.onClickPlayButton}
-              >
-                {this.isPlaying
-                ? (
-                  <PauseIcon />
-                )
-                : (
-                  <PlayIcon />
-                )}
-              </IconButton>
-              <ToolbarSeparator
-                style={{
-                  marginLeft: '10px',
-                  marginRight: '10px',
-                }}
-              />
-              <IconButton
-                tooltip="To end"
-                tooltipPosition="top-center"
-                disabled={!hasSelectedVariable || !this.isForwardStepInTimeAllowed}
-                onClick={this.onClickToEndButton}
-              >
-                <ToEndIcon />
-              </IconButton>
-            </ToolbarGroup>
-
-            <ToolbarGroup />
-          </Toolbar>
-
-          <SliderWithInput
-            label="Date (year)"
-            min={dateRangeStart}
-            max={dateRangeEnd}
-            value={currentLoadedDateTemporal}
-            disabled={!hasSelectedVariable}
-            // (Date) => number
-            toSliderValue={this.props.getSliderValueFromDate}
-            // (number) => Date
-            fromSliderValue={this.props.getDateFromSliderValue}
-            // (Date) => string
-            toInputValue={getYearStringFromDate}
-            // (string) => Date
-            fromInputValue={this.props.getDateFromYearStringInput}
-            onChange={(event, date) => this.setState({ currentLoadedDateTemporal: date })}
-            onFinish={(event, date) => this.props.updateLoadedDate(date)}
-            inputStyle={{
-              width: '60px',
-            }}
-            sliderProps={{
-              included: false,
-              handleStyle: [
-                {
-                  transform: 'scale(1.4)',
-                },
-              ],
-            }}
-            inputProps={{
-              type: 'number',
-              min: getYearStringFromDate(dateRangeStart),
-              max: getYearStringFromDate(dateRangeEnd),
-            }}
-          />
+          <List>
+            <ListItem
+              key="overlay-animation"
+              primaryText="Animation"
+              primaryTogglesNestedList
+              open={this.props.isPanelOpen('overlay-animation')}
+              onNestedListToggle={() => this.props.togglePanelOpenState('overlay-animation')}
+              nestedItems={[
+                <ListItem
+                  disabled
+                  key="animation-controls"
+                  style={{
+                    padding: '0',
+                  }}
+                >{this.renderAnimationControls()}</ListItem>,
+                <ListItem
+                  disabled
+                  key="animation-timeline"
+                  style={{
+                    padding: '0',
+                  }}
+                >{this.renderTimeline()}</ListItem>,
+              ]}
+            />
+          </List>
         </Paper>
       </div>
     );
@@ -416,6 +460,8 @@ class OverlayTab extends TabBaseClass {
         }}
         getGeometryFromExtent={this.component.getGeometryFromExtent}
         getExtentFromGeometry={this.component.getExtentFromGeometry}
+        isPanelOpen={this.isPanelOpen}
+        togglePanelOpenState={this.togglePanelOpenState}
       />
     );
   }
