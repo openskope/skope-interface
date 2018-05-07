@@ -14,11 +14,14 @@ import {
 } from 'material-ui/RadioButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import ImageStyleIcon from 'material-ui/svg-icons/image/style';
 
 import {
   getDateAtPrecision,
   getYearStringFromDate,
 } from '/imports/ui/helpers';
+
+import ToggleButton from '/imports/ui/components/ToggleButton';
 
 import {
   SliderWithInput,
@@ -226,20 +229,20 @@ class TabBaseClass extends SubComponentClass {
    * @param {string} panelId
    * @returns {boolean}
    */
-  isPanelOpen = (panelId) => {
+  isPanelOpen = (panelId, defaultState = true) => {
     return panelId in this.sharedState.isPanelOpen
            ? this.sharedState.isPanelOpen[panelId]
            // Open all panels by default.
-           : true;
+           : defaultState;
   };
 
   /**
    * @param {string} panelId
    */
-  togglePanelOpenState = (panelId) => {
+  togglePanelOpenState = (panelId, setTo = !this.isPanelOpen(panelId)) => {
     this.setSharedState({
       isPanelOpen: {
-        [panelId]: !this.isPanelOpen(panelId),
+        [panelId]: setTo,
       },
     });
   };
@@ -411,127 +414,149 @@ class TabBaseClass extends SubComponentClass {
    */
   renderVariableList = () => {
     const variableListItems = Object.entries(this.component.variables)
-    .map(([variableId, variable]) => (
-      <ListItem
-        key={`variable-list-item__${variableId}`}
-        className="variable-list__item"
-        leftCheckbox={(
-          <RadioButton
-            value={variableId}
-            checked={this.isSelectedVariable(variableId)}
-            onCheck={() => this.selectedVariableId = variableId}
-          />
-        )}
-        primaryText={variable.name}
-        nestedItems={[
-          <ListItem
-            disabled
-            key="variable-opacity"
-            style={{
-              padding: '0',
-            }}
-          >
-            <SliderWithInput
-              label="Opacity"
-              min={0}
-              max={1}
-              step={0.01}
-              value={this.getVariableOpacity(variableId)}
-              toSliderValue={(v) => v * 100}
-              fromSliderValue={(v) => v / 100}
-              toInputValue={(v) => `${(v * 100).toFixed(0)}%`}
-              fromInputValue={(v) => {
-                // We want to support both format `{N}%` and `{N}`.
-                let str = v;
+    .map(([variableId, variable]) => {
+      const itemId = `variable-list-item__${variableId}`;
+      const isConfigOptionsVisible = this.isPanelOpen(itemId, false);
+      const toggleConfigOptionsVisible = () => this.togglePanelOpenState(itemId, !isConfigOptionsVisible);
 
-                if (str[str.length - 1] === '%') {
-                  str = str.slice(0, -1);
-                }
-
-                if (isNaN(str)) {
-                  throw new Error('Invalid number.');
-                }
-
-                return parseFloat(str) / 100;
-              }}
-              onChange={(event, newValue) => this.setVariableOpacity(variableId, newValue)}
-              inputStyle={{
-                width: '60px',
-              }}
-              sliderProps={{
-                included: false,
-                handleStyle: [
-                  {
-                    transform: 'scale(1.4)',
-                  },
-                ],
+      return (
+        <ListItem
+          key={itemId}
+          className="variable-list__item"
+          leftCheckbox={(
+            <RadioButton
+              value={variableId}
+              checked={this.isSelectedVariable(variableId)}
+              onCheck={() => this.selectedVariableId = variableId}
+            />
+          )}
+          primaryText={variable.name}
+          rightIconButton={(
+            <ToggleButton
+              label="Style"
+              icon={(
+                <ImageStyleIcon />
+              )}
+              toggled={isConfigOptionsVisible}
+              onToggle={toggleConfigOptionsVisible}
+              style={{
+                color: 'rgba(0, 0, 0, 0.5)',
+                top: '9px',
+                width: false,
               }}
             />
-          </ListItem>,
+          )}
+          open={isConfigOptionsVisible}
+          nestedItems={[
+            <ListItem
+              disabled
+              key="variable-opacity"
+              style={{
+                padding: '0',
+              }}
+            >
+              <SliderWithInput
+                label="Opacity"
+                min={0}
+                max={1}
+                step={0.01}
+                value={this.getVariableOpacity(variableId)}
+                toSliderValue={(v) => v * 100}
+                fromSliderValue={(v) => v / 100}
+                toInputValue={(v) => `${(v * 100).toFixed(0)}%`}
+                fromInputValue={(v) => {
+                  // We want to support both format `{N}%` and `{N}`.
+                  let str = v;
 
-          <ListItem
-            disabled
-            key="overlay-style-range"
-            style={{
-              padding: '0',
-            }}
-          >
-            <RangeWithInput
-              label="Overlay range"
-              min={variable.overlay.min}
-              max={variable.overlay.max}
-              value={this.getVariableStylingRange(variableId, [variable.overlay.min, variable.overlay.max])}
-              onChange={(event, newValue) => this.setVariableStylingRange(variableId, newValue)}
-              inputStyle={{
-                width: '60px',
-              }}
-              sliderProps={{
-                handleStyle: [
-                  {
-                    transform: 'scale(1.4)',
-                  },
-                ],
-              }}
-              inputProps={{
-                type: 'number',
-                min: variable.overlay.min,
-                max: variable.overlay.max,
-              }}
-            />
-          </ListItem>,
+                  if (str[str.length - 1] === '%') {
+                    str = str.slice(0, -1);
+                  }
 
-          <ListItem
-            key="overlay-style"
-            disabled
-            primaryText={(
-              <div className="adjustment-option__header">
-                <label>Overlay style: </label>
-              </div>
-            )}
-            secondaryText={(
-              <div
-                style={{
-                  overflow: 'visible',
+                  if (isNaN(str)) {
+                    throw new Error('Invalid number.');
+                  }
+
+                  return parseFloat(str) / 100;
                 }}
-              >
-                <SelectField
-                  value={0}
+                onChange={(event, newValue) => this.setVariableOpacity(variableId, newValue)}
+                inputStyle={{
+                  width: '60px',
+                }}
+                sliderProps={{
+                  included: false,
+                  handleStyle: [
+                    {
+                      transform: 'scale(1.4)',
+                    },
+                  ],
+                }}
+              />
+            </ListItem>,
+
+            <ListItem
+              disabled
+              key="overlay-style-range"
+              style={{
+                padding: '0',
+              }}
+            >
+              <RangeWithInput
+                label="Overlay range"
+                min={variable.overlay.min}
+                max={variable.overlay.max}
+                value={this.getVariableStylingRange(variableId, [variable.overlay.min, variable.overlay.max])}
+                onChange={(event, newValue) => this.setVariableStylingRange(variableId, newValue)}
+                inputStyle={{
+                  width: '60px',
+                }}
+                sliderProps={{
+                  handleStyle: [
+                    {
+                      transform: 'scale(1.4)',
+                    },
+                  ],
+                }}
+                inputProps={{
+                  type: 'number',
+                  min: variable.overlay.min,
+                  max: variable.overlay.max,
+                }}
+              />
+            </ListItem>,
+
+            <ListItem
+              key="overlay-style"
+              disabled
+              primaryText={(
+                <div className="adjustment-option__header">
+                  <label>Overlay style: </label>
+                </div>
+              )}
+              secondaryText={(
+                <div
                   style={{
-                    width: '100%',
+                    overflow: 'visible',
                   }}
-                >{variable.overlay.styles.map((styleName) => (
-                  <MenuItem
-                    key={styleName}
-                    value={styleName}
-                    primaryText={styleName}
-                  />
-                ))}</SelectField>
-              </div>
-            )}
-          />,
-        ]}
-      />
-    ));
+                >
+                  <SelectField
+                    value={0}
+                    style={{
+                      width: '100%',
+                    }}
+                  >{variable.overlay.styles.map((styleName) => (
+                    <MenuItem
+                      key={styleName}
+                      value={styleName}
+                      primaryText={styleName}
+                    />
+                  ))}</SelectField>
+                </div>
+              )}
+            />,
+          ]}
+        />
+      );
+    });
 
     return (
       <ListItem
