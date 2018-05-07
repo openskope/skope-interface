@@ -406,6 +406,25 @@ class TabBaseClass extends SubComponentClass {
     return this.renderMapLayer(layer);
   };
 
+  SidePanelCommonCollapsibleSectionContainer = (props) => {
+    const {
+      id = '',
+      label = '',
+      children = null,
+    } = props;
+
+    return (
+      <ListItem
+        key={id}
+        primaryText={label}
+        primaryTogglesNestedList
+        open={this.isPanelOpen(id)}
+        onNestedListToggle={() => this.togglePanelOpenState(id)}
+        nestedItems={Array.isArray(children) ? children : [children]}
+      />
+    );
+  };
+
   /**
    * This component is closely associated with the dataset so it can not be
    * independent.
@@ -559,14 +578,10 @@ class TabBaseClass extends SubComponentClass {
     });
 
     return (
-      <ListItem
-        key="variable-list"
-        primaryText="Select variable to display"
-        primaryTogglesNestedList
-        open={this.isPanelOpen('variable-list')}
-        onNestedListToggle={() => this.togglePanelOpenState('variable-list')}
-        nestedItems={variableListItems}
-      />
+      <this.SidePanelCommonCollapsibleSectionContainer
+        id="variable-list"
+        label="Select variable to display"
+      >{variableListItems}</this.SidePanelCommonCollapsibleSectionContainer>
     );
   };
 
@@ -581,57 +596,54 @@ class TabBaseClass extends SubComponentClass {
       disabled = false,
     } = props;
     const timespan = this.component.timespan;
+    const controls = [
+      <ListItem
+        disabled
+        key="date-range"
+        style={{
+          padding: '0',
+        }}
+      >
+        <RangeWithInput
+          label="Date Range (year)"
+          min={timespan.period.gte}
+          max={timespan.period.lte}
+          value={this.dateRangeTemporal}
+          disabled={disabled}
+          // (Date) => number
+          toSliderValue={this.getSliderValueFromDate}
+          // (number) => Date
+          fromSliderValue={this.getDateFromSliderValue}
+          // (Date) => string
+          toInputValue={getYearStringFromDate}
+          // (string) => Date
+          fromInputValue={this.getDateFromYearStringInput}
+          onChange={this.onChangeDateRange}
+          onFinish={this.onFinishDateRange}
+          inputStyle={{
+            width: '60px',
+          }}
+          sliderProps={{
+            handleStyle: [
+              {
+                transform: 'scale(1.4)',
+              },
+            ],
+          }}
+          inputProps={{
+            type: 'number',
+            min: getYearStringFromDate(timespan.period.gte),
+            max: getYearStringFromDate(timespan.period.lte),
+          }}
+        />
+      </ListItem>,
+    ];
 
     return (
-      <ListItem
-        key="temporal-controls"
-        primaryText="Temporal controls"
-        primaryTogglesNestedList
-        open={this.isPanelOpen('temporal-controls')}
-        onNestedListToggle={() => this.togglePanelOpenState('temporal-controls')}
-        nestedItems={[
-          <ListItem
-            disabled
-            key="date-range"
-            style={{
-              padding: '0',
-            }}
-          >
-            <RangeWithInput
-              label="Date Range (year)"
-              min={timespan.period.gte}
-              max={timespan.period.lte}
-              value={this.dateRangeTemporal}
-              disabled={disabled}
-              // (Date) => number
-              toSliderValue={this.getSliderValueFromDate}
-              // (number) => Date
-              fromSliderValue={this.getDateFromSliderValue}
-              // (Date) => string
-              toInputValue={getYearStringFromDate}
-              // (string) => Date
-              fromInputValue={this.getDateFromYearStringInput}
-              onChange={this.onChangeDateRange}
-              onFinish={this.onFinishDateRange}
-              inputStyle={{
-                width: '60px',
-              }}
-              sliderProps={{
-                handleStyle: [
-                  {
-                    transform: 'scale(1.4)',
-                  },
-                ],
-              }}
-              inputProps={{
-                type: 'number',
-                min: getYearStringFromDate(timespan.period.gte),
-                max: getYearStringFromDate(timespan.period.lte),
-              }}
-            />
-          </ListItem>,
-        ]}
-      />
+      <this.SidePanelCommonCollapsibleSectionContainer
+        id="temporal-controls"
+        label="Temporal controls"
+      >{controls}</this.SidePanelCommonCollapsibleSectionContainer>
     );
   };
 
@@ -644,30 +656,26 @@ class TabBaseClass extends SubComponentClass {
     } = props;
 
     return (
-      <ListItem
-        key={key}
-        primaryText={title}
-        primaryTogglesNestedList
-        open={this.isPanelOpen(key)}
-        onNestedListToggle={() => this.togglePanelOpenState(key)}
-        nestedItems={[
-          <ListItem
-            disabled
-            key="map"
+      <this.SidePanelCommonCollapsibleSectionContainer
+        id={key}
+        label={title}
+      >
+        <ListItem
+          disabled
+          key="map"
+        >
+          <MapWithToolbar
+            id={key}
+            selectionTools={selectionTools}
+            boundaryGeometry={this.component.boundaryGeometry}
+            focusGeometry={this.focusGeometry}
+            getExtentFromGeometry={this.component.getExtentFromGeometry}
+            updateFocusGeometry={(value) => this.focusGeometry = value}
           >
-            <MapWithToolbar
-              id={key}
-              selectionTools={selectionTools}
-              boundaryGeometry={this.component.boundaryGeometry}
-              focusGeometry={this.focusGeometry}
-              getExtentFromGeometry={this.component.getExtentFromGeometry}
-              updateFocusGeometry={(value) => this.focusGeometry = value}
-            >
-              {this.hasSelectedVariable && this.renderMapLayerForSelectedVariable()}
-            </MapWithToolbar>
-          </ListItem>,
-        ]}
-      />
+            {this.hasSelectedVariable && this.renderMapLayerForSelectedVariable()}
+          </MapWithToolbar>
+        </ListItem>
+      </this.SidePanelCommonCollapsibleSectionContainer>
     );
   };
 
