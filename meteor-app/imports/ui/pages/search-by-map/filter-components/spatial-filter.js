@@ -172,6 +172,7 @@ class SpatialFilter extends SearchkitComponent {
       IconClass: BoxToolIcon,
       title: 'Rectangle tool',
       drawingType: 'Box',
+      freehandDrawing: true,
     },
   ];
 

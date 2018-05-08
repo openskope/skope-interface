@@ -80,6 +80,7 @@ class OverlayTabContent extends React.Component {
       IconClass: BoxToolIcon,
       title: 'Rectangle tool',
       drawingType: 'Box',
+      freehandDrawing: true,
     },
   ];
 

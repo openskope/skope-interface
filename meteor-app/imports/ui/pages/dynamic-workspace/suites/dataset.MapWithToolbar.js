@@ -48,6 +48,7 @@ class MapWithToolbar extends React.Component {
     this.state = {
       activeSelectionToolName: defaultSelectionTool.name,
       activeDrawingType: defaultSelectionTool.drawingType,
+      freehandDrawing: defaultSelectionTool.freehandDrawing,
     };
   }
 
@@ -92,6 +93,7 @@ class MapWithToolbar extends React.Component {
     this.setState({
       activeSelectionToolName: tool.name,
       activeDrawingType: tool.drawingType,
+      freehandDrawing: tool.freehandDrawing,
     });
 
     // Setting focus gemoetry to null should load the default focus geometry.
@@ -144,6 +146,7 @@ class MapWithToolbar extends React.Component {
     } = this.props;
     const {
       activeDrawingType,
+      freehandDrawing,
     } = this.state;
 
     const boundaryExtent = getExtentFromGeometry(boundaryGeometry);
@@ -220,6 +223,7 @@ class MapWithToolbar extends React.Component {
             disabled={activeDrawingType ? null : 'disabled'}
             source={`${id}__focus-geometry-drawing-layer`}
             type={activeDrawingType}
+            freehand={freehandDrawing}
             ref={(ref) => this._focusGeometryDrawingInteraction = ref}
           />
           <map-control-defaults />

@@ -71,6 +71,7 @@ class AnalyticsTabContent extends React.Component {
       IconClass: BoxToolIcon,
       title: 'Rectangle tool',
       drawingType: 'Box',
+      freehandDrawing: true,
     },
   ];
 
