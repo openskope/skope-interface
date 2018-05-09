@@ -378,6 +378,7 @@ class OverlayTabContent extends React.Component {
             {hasSelectedVariable && this.props.renderMapLayerForSelectedVariable()}
             <map-interaction-defaults />
             <map-control-defaults />
+            <map-control-scale-line slot="bottom-dock" />
           </MapView>
 
           <List>
