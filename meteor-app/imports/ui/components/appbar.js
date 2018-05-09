@@ -63,6 +63,7 @@ class Component extends React.Component {
           color: appBarLogoColor,
           fontFamily: "'Bitter', serif",
           fontSize: '1.3em',
+          fontWeight: 'bold',
           marginRight: 30,
         }}
         noBadge
