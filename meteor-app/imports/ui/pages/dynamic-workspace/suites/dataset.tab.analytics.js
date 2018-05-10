@@ -123,7 +123,18 @@ class AnalyticsTabContent extends React.Component {
       isLoadingTimeSeriesData: false,
       isTimeSeriesDataLoaded: false,
       timeSeriesData: null,
-      timeSeriesDataRequestError: reason.message,
+      timeSeriesDataRequestError: {
+        raw: reason.message,
+        // Prepare a more friendly error message. If this always returns a valid value then the raw error will never be displayed.
+        nice: (() => {
+          switch (true) {
+            case reason.response && reason.response.data && reason.response.data.status === 400 && reason.response.data.message.indexOf('exceeded time limit of') > -1:
+              return 'The server took too long to respond. Please try again or select a smaller area.';
+            default:
+              return undefined;
+          }
+        })(),
+      },
       timeSeriesDataResponseDate: new Date(),
       isPendingTimeSeriesChartRender: false,
     });
@@ -379,10 +390,18 @@ class AnalyticsTabContent extends React.Component {
             </div>
           )}
           {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && timeSeriesDataRequestError && (
-            <div>
-              <p>Error when requesting the data: </p>
-              <pre style={{ whiteSpace: 'pre-wrap' }}>{timeSeriesDataRequestError}</pre>
-            </div>
+            timeSeriesDataRequestError.nice
+            ? (
+              <div>
+                <p>{timeSeriesDataRequestError.nice}</p>
+              </div>
+            )
+            : (
+              <div>
+                <p>Error when requesting the data: </p>
+                <pre style={{ whiteSpace: 'pre-wrap' }}>{timeSeriesDataRequestError.raw}</pre>
+              </div>
+            )
           )}
         </Paper>
       </div>
