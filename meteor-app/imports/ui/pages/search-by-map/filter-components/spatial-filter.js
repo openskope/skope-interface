@@ -1,3 +1,5 @@
+/* global HTMLMapLayerVector */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -7,23 +9,14 @@ import {
   ObjectState,
   Panel,
 } from 'searchkit';
-import {
-  Toolbar,
-  ToolbarGroup,
-  ToolbarTitle,
-} from 'material-ui/Toolbar';
-import RaisedButton from 'material-ui/RaisedButton';
-import MapView from '/imports/ui/components/mapview';
+import MapWithToolbar from '/imports/ui/pages/dynamic-workspace/suites/dataset.MapWithToolbar';
 
 import {
-  dataSpatialBoundaryFillColor,
-  mapToolbarStyles,
   PanToolIcon,
   BoxToolIcon,
 } from '/imports/ui/consts';
 
 import {
-  buildGeoJsonWithGeometry,
   stringToNumber,
 } from '/imports/ui/helpers';
 
@@ -157,7 +150,7 @@ class SpatialFilter extends SearchkitComponent {
 
   static defaultProps = {
     ...SearchkitComponent.defaultProps,
-    projection: 'EPSG:4326',
+    projection: 'EPSG:3857',
     defaultExtent: null,
   };
 
@@ -179,49 +172,13 @@ class SpatialFilter extends SearchkitComponent {
   constructor (props) {
     super(props);
 
-    this._mapview = null;
-    this._searchBoundaryDrawingLayer = null;
-    this._searchBoundaryDrawingInteraction = null;
-
-    const defaultSelectionTool = SpatialFilter.selectionTools[0];
-
     this.state = {
       /**
        * Make sure all the coordinates here are in EPSG:4326 (lat-long).
        * @type {Object}
        */
       filterGeometry: null,
-      // @type {string}
-      activeSelectionToolName: defaultSelectionTool.name,
-      // @type {string|null}
-      activeDrawingType: defaultSelectionTool.drawingType,
     };
-
-    // This vector layer element is used to help handle vector data.
-    this._utilVectorLayerElement = (() => {
-      const element = document.createElement('map-layer-vector');
-
-      element.srcProjection = 'EPSG:4326';
-      element.projection = 'EPSG:4326';
-
-      return element;
-    })();
-  }
-
-  componentDidMount () {
-    this.connectMap();
-  }
-
-  componentWillUpdate () {
-    this.disconnectMap();
-  }
-
-  componentDidUpdate () {
-    this.connectMap();
-  }
-
-  componentWillUnmount () {
-    this.disconnectMap();
   }
 
   defineBEMBlocks = () => ({
@@ -255,68 +212,11 @@ class SpatialFilter extends SearchkitComponent {
               this.setState({
                 filterGeometry: geometryWithNumbers,
               });
-
-              this.focusMapOnGeometry(geometryWithNumbers);
             }
           }
         },
       },
     );
-  }
-
-  onStartDrawingNewSearchBoundary = () => {
-    this.clearSearchBoundaryFeatureDrawing();
-  };
-
-  onDrawNewSearchBoundaryFeature = (olEvent) => {
-    const olGeometry = olEvent.feature.getGeometry();
-    const jsonGeometry = this._utilVectorLayerElement.writeGeometryObject(olGeometry);
-
-    this.setGeometryQuery(jsonGeometry);
-
-    this.clearSearchBoundaryFeatureDrawing();
-  };
-
-  clearSearchBoundaryFeatureDrawing () {
-    if (this._searchBoundaryDrawingLayer) {
-      this._searchBoundaryDrawingLayer.clearFeatures();
-    }
-  }
-
-  /**
-   * @param {Object} geometry
-   * @param {number} zoomFactor
-   */
-  focusMapOnGeometry (geometry, zoomFactor = 1.1) {
-    if (!(this._mapview && this._mapview.map && this._utilVectorLayerElement)) {
-      return;
-    }
-
-    const olGeometry = this._utilVectorLayerElement.readGeometryObject(geometry);
-
-    olGeometry.scale(zoomFactor);
-
-    this._mapview.map.extent = olGeometry.getExtent();
-  }
-
-  connectMap () {
-    // Restrict to have at most 1 feature in the layer.
-    if (this._searchBoundaryDrawingInteraction) {
-      this._searchBoundaryDrawingInteraction.addEventListener('drawstart', this.onStartDrawingNewSearchBoundary);
-    }
-    // When a new box is drawn, update the viewing extent.
-    if (this._searchBoundaryDrawingLayer) {
-      this._searchBoundaryDrawingLayer.addEventListener('addfeature', this.onDrawNewSearchBoundaryFeature);
-    }
-  }
-
-  disconnectMap () {
-    if (this._searchBoundaryDrawingInteraction) {
-      this._searchBoundaryDrawingInteraction.removeEventListener('drawstart', this.onStartDrawingNewSearchBoundary);
-    }
-    if (this._searchBoundaryDrawingLayer) {
-      this._searchBoundaryDrawingLayer.removeEventListener('addfeature', this.onDrawNewSearchBoundaryFeature);
-    }
   }
 
   /**
@@ -344,56 +244,21 @@ class SpatialFilter extends SearchkitComponent {
     });
   }
 
-  setSelectionToolActive (tool) {
-    this.setState({
-      activeSelectionToolName: tool.name,
-      activeDrawingType: tool.drawingType,
-    });
-
-    // If the new tool can't draw, don't clear existing features.
-    if (tool.drawingType) {
-      this.accessor.clearQueryShape();
-
-      _.defer(() => {
-        this.searchkit.performSearch();
-      });
-    }
-  }
-
-  isSelectionToolActive (tool) {
-    return this.state.activeSelectionToolName === tool.name;
-  }
-
   render () {
     const {
       title,
       subtitle,
       className,
-      projection,
       defaultExtent,
     } = this.props;
     const {
       filterGeometry,
-      activeDrawingType,
     } = this.state;
-
-    // const extent = (() => {
-    //   if (!(filterGeometry && this._utilVectorLayerElement)) {
-    //     return defaultExtent;
-    //   }
-
-    //   const olGeometry = this._utilVectorLayerElement.readGeometryObject(filterGeometry);
-
-    //   olGeometry.scale(1.2);
-
-    //   return olGeometry.getExtent();
-    // })();
-    const filterBoundaryGeoJson = filterGeometry && buildGeoJsonWithGeometry(filterGeometry);
-    const filterBoundaryGeoJsonString = filterBoundaryGeoJson && JSON.stringify(filterBoundaryGeoJson);
 
     return (
       <Panel
         title={title}
+        className={className}
       >
         {subtitle && (
           <div
@@ -402,71 +267,13 @@ class SpatialFilter extends SearchkitComponent {
             }}
           >{subtitle}</div>
         )}
-        <Toolbar
-          style={{
-            ...mapToolbarStyles.root,
-          }}
-        >
-          <ToolbarGroup>
-            <ToolbarTitle
-              text="Tools"
-              style={{
-                ...mapToolbarStyles.title,
-              }}
-            />
-          </ToolbarGroup>
-          <ToolbarGroup>
-            {SpatialFilter.selectionTools.map((item) => (
-              <RaisedButton
-                key={item.name}
-                className="selection-tool-button"
-                icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
-                style={{
-                  ...mapToolbarStyles.toggleButton.root,
-                  ...(this.isSelectionToolActive(item) && mapToolbarStyles.toggleButton.active),
-                }}
-                buttonStyle={mapToolbarStyles.toggleButton.button}
-                overlayStyle={{
-                  ...mapToolbarStyles.toggleButton.overlay,
-                }}
-                onClick={() => this.setSelectionToolActive(item)}
-              />
-            ))}
-          </ToolbarGroup>
-        </Toolbar>
-        <MapView
-          className={className}
-          basemap="arcgis"
-          projection={projection}
-          extent={defaultExtent}
-          style={{
-            '--aspect-ratio': '4/3',
-          }}
-          ref={(ref) => this._mapview = ref}
-        >
-          <map-layer-geojson
-            invisible={!filterBoundaryGeoJsonString ? 'invisible' : null}
-            style={{
-              fill: dataSpatialBoundaryFillColor,
-            }}
-            src-json={filterBoundaryGeoJsonString}
-            src-projection={projection}
-          />
-          <map-layer-vector
-            id="search-boundary-drawing-layer"
-            src-projection={projection}
-            ref={(ref) => this._searchBoundaryDrawingLayer = ref}
-          />
-
-          <map-control-defaults />
-          <map-interaction-draw
-            disabled={activeDrawingType ? null : 'disabled'}
-            source="search-boundary-drawing-layer"
-            type={activeDrawingType}
-            ref={(ref) => this._searchBoundaryDrawingInteraction = ref}
-          />
-          <map-interaction-defaults />
-        </MapView>
+        <MapWithToolbar
+          id="spatial-filter"
+          selectionTools={SpatialFilter.selectionTools}
+          boundaryGeometry={HTMLMapLayerVector.getGeometryFromExtent(defaultExtent)}
+          focusGeometry={filterGeometry}
+          updateFocusGeometry={(geom) => this.setGeometryQuery(geom)}
+        />
       </Panel>
     );
   }

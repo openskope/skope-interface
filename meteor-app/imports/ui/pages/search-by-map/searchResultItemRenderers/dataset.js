@@ -236,7 +236,7 @@ class SearchResultItem extends React.PureComponent {
           >{boundaryGeoJson && (
             <MapView
               basemap="arcgis"
-              projection="EPSG:4326"
+              projection="EPSG:3857"
               extent={boundaryExtent}
               style={{
                 width: '100%',

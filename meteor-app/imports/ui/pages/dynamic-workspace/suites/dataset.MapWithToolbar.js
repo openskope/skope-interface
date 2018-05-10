@@ -1,3 +1,5 @@
+/* global HTMLMapLayerVector */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -28,16 +30,19 @@ class MapWithToolbar extends React.Component {
     id: PropTypes.string.isRequired,
     // @type {Array<{name: string, IconClass: Icon, [drawingType: string]}>}
     selectionTools: PropTypes.arrayOf(PropTypes.object),
-    boundaryGeometry: PropTypes.object.isRequired,
+    boundaryGeometry: PropTypes.object,
     focusGeometry: PropTypes.object,
-    getExtentFromGeometry: PropTypes.func.isRequired,
     updateFocusGeometry: PropTypes.func.isRequired,
-    children: PropTypes.any.isRequired,
+    projection: PropTypes.string,
+    children: PropTypes.any,
   };
 
   static defaultProps = {
     selectionTools: [],
+    boundaryGeometry: null,
     focusGeometry: null,
+    projection: 'EPSG:3857',
+    children: null,
   };
 
   constructor (props) {
@@ -141,7 +146,7 @@ class MapWithToolbar extends React.Component {
       selectionTools,
       boundaryGeometry,
       focusGeometry,
-      getExtentFromGeometry,
+      projection,
       children,
     } = this.props;
     const {
@@ -149,7 +154,7 @@ class MapWithToolbar extends React.Component {
       freehandDrawing,
     } = this.state;
 
-    const boundaryExtent = getExtentFromGeometry(boundaryGeometry);
+    const boundaryExtent = boundaryGeometry && HTMLMapLayerVector.getExtentFromGeometry(boundaryGeometry, HTMLMapLayerVector.IOProjection);
     const boundaryGeoJson = buildGeoJsonWithGeometry(boundaryGeometry);
     const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
     const focusBoundaryGeoJson = buildGeoJsonWithGeometry(focusGeometry);
@@ -189,7 +194,7 @@ class MapWithToolbar extends React.Component {
         <MapView
           className="map"
           basemap="arcgis"
-          projection="EPSG:4326"
+          projection={projection}
           extent={boundaryExtent}
           style={{
             '--aspect-ratio': '4/3',

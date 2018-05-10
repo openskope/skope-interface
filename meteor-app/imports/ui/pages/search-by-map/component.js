@@ -125,7 +125,6 @@ export default class SearchPage extends React.Component {
 
             <SpatialFilter
               id="location"
-              className="spatial-filter"
               title="Geographic Area"
               subtitle="Click to filter datasets overlapping your area of interest."
               fields={['region.geometry']}

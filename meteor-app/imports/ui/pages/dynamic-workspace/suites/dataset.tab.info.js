@@ -39,7 +39,7 @@ class InfoTabContent extends React.Component {
         >
           <MapView
             basemap="arcgis"
-            projection="EPSG:4326"
+            projection="EPSG:3857"
             extent={boundaryExtent}
             style={{
               height: '100%',

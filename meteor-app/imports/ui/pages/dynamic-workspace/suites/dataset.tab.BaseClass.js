@@ -687,8 +687,7 @@ class TabBaseClass extends SubComponentClass {
             selectionTools={selectionTools}
             boundaryGeometry={this.component.boundaryGeometry}
             focusGeometry={this.focusGeometry}
-            getExtentFromGeometry={this.component.getExtentFromGeometry}
-            updateFocusGeometry={(value) => this.focusGeometry = value}
+            updateFocusGeometry={(geom) => this.focusGeometry = geom}
           >
             {this.hasSelectedVariable && this.renderMapLayerForSelectedVariable()}
           </MapWithToolbar>

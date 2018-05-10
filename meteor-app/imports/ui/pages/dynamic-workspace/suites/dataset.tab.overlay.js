@@ -1,4 +1,5 @@
 // This is the "Map View".
+/* global HTMLMapLayerVector */
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -59,8 +60,6 @@ class OverlayTabContent extends React.Component {
     updateFocusGeometry: PropTypes.func.isRequired,
     updateLoadedDate: PropTypes.func.isRequired,
     offsetCurrentTimeAtPrecisionByAmount: PropTypes.func.isRequired,
-    getGeometryFromExtent: PropTypes.func.isRequired,
-    getExtentFromGeometry: PropTypes.func.isRequired,
     isPanelOpen: PropTypes.func.isRequired,
     togglePanelOpenState: PropTypes.func.isRequired,
   };
@@ -163,7 +162,7 @@ class OverlayTabContent extends React.Component {
     }
 
     const newExtent = this._detailMap.map.extent;
-    const extenJsonGeometry = this.props.getGeometryFromExtent(newExtent);
+    const extenJsonGeometry = HTMLMapLayerVector.getGeometryFromExtent(newExtent, HTMLMapLayerVector.IOProjection);
 
     // Report new focus geometry.
     this.props.updateFocusGeometry(extenJsonGeometry);
@@ -345,7 +344,8 @@ class OverlayTabContent extends React.Component {
       focusGeometry,
     } = this.props;
 
-    const focusExtent = this.props.getExtentFromGeometry(focusGeometry || boundaryGeometry);
+    const finalFocusGeometry = focusGeometry || boundaryGeometry;
+    const focusExtent = finalFocusGeometry && HTMLMapLayerVector.getExtentFromGeometry(finalFocusGeometry, HTMLMapLayerVector.IOProjection);
 
     return (
       <div className="dataset__overlay-tab">
@@ -371,7 +371,7 @@ class OverlayTabContent extends React.Component {
           <MapView
             className="mapview"
             basemap="arcgis"
-            projection="EPSG:4326"
+            projection="EPSG:3857"
             extent={focusExtent}
             ref={(ref) => this._detailMap = ref}
           >
@@ -465,8 +465,6 @@ class OverlayTab extends TabBaseClass {
 
           this.currentLoadedDate = offsetDateAtPrecision(this.currentLoadedDate, this.component.temporalPrecision, amount);
         }}
-        getGeometryFromExtent={this.component.getGeometryFromExtent}
-        getExtentFromGeometry={this.component.getExtentFromGeometry}
         isPanelOpen={this.isPanelOpen}
         togglePanelOpenState={this.togglePanelOpenState}
       />

@@ -90,7 +90,7 @@ export default class SearchResultItem extends React.PureComponent {
           >{boundaryGeoJson && (
             <MapView
               basemap="osm"
-              projection="EPSG:4326"
+              projection="EPSG:3857"
               extent={boundaryExtent}
               style={{
                 width: '100%',

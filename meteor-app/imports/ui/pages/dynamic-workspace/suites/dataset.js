@@ -153,16 +153,6 @@ class DatasetWorkspace extends SuiteBaseClass {
       };
     }, {});
 
-    // This vector layer element is used to help handle vector data.
-    this._utilVectorLayerElement = (() => {
-      const element = document.createElement('map-layer-vector');
-
-      element.srcProjection = 'EPSG:4326';
-      element.projection = 'EPSG:4326';
-
-      return element;
-    })();
-
     /**
      * Search query state from the routing.
      * @type {Object}
@@ -348,34 +338,6 @@ class DatasetWorkspace extends SuiteBaseClass {
       analytics,
     });
   }
-
-  /**
-   * @param {Object} geometry
-   * @returns {Array.<number>}
-   */
-  getExtentFromGeometry = (geometry) => {
-    const olGeometry = this._utilVectorLayerElement.readGeometryObject(geometry);
-
-    return olGeometry.getExtent();
-  };
-
-  /**
-   * @param {Array.<number>} extent
-   * @returns {Object}
-   */
-  getGeometryFromExtent = (extent) => {
-    const olGeometry = this._utilVectorLayerElement.createGeometryFromExtent(extent);
-
-    return this._utilVectorLayerElement.writeGeometryObject(olGeometry);
-  };
-
-  /**
-   * @param {ol.geometry.Geometry}
-   * @returns {Object}
-   */
-  getGeometryFromOlGeometry = (olGeometry) => {
-    return this._utilVectorLayerElement.writeGeometryObject(olGeometry);
-  };
 
   /**
    * @param {Date} date
