@@ -538,6 +538,7 @@ class TabBaseClass extends SubComponentClass {
               }}
             >
               <RangeWithInput
+                disabled
                 label="Overlay range"
                 min={variable.overlay.min}
                 max={variable.overlay.max}
@@ -576,6 +577,7 @@ class TabBaseClass extends SubComponentClass {
                   }}
                 >
                   <SelectField
+                    disabled
                     value={0}
                     style={{
                       width: '100%',
