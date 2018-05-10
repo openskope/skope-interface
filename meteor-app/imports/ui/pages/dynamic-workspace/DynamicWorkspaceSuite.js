@@ -10,7 +10,7 @@ import { PropPrinter } from '/imports/ui/helpers';
 
 import * as Suites from './suites';
 
-class DynamicWorkspaceSuite extends React.PureComponent {
+class DynamicWorkspaceSuite extends React.Component {
   static propTypes = {
     // Routing info from state.
     routing: PropTypes.object.isRequired,
