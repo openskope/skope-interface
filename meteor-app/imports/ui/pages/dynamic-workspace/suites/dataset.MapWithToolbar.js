@@ -101,11 +101,10 @@ class MapWithToolbar extends React.Component {
       freehandDrawing: tool.freehandDrawing,
     });
 
-    // Setting focus gemoetry to null should load the default focus geometry.
-    this.props.updateFocusGeometry(null);
-
     // If the new tool can't draw, don't clear existing features.
     if (tool.drawingType) {
+      // Setting focus gemoetry to null should load the default focus geometry.
+      this.props.updateFocusGeometry(null);
       this.clearFocusFeatureDrawing();
     }
   }
