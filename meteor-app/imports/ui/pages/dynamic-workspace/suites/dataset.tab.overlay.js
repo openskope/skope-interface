@@ -375,7 +375,7 @@ class OverlayTabContent extends React.Component {
             extent={focusExtent}
             ref={(ref) => this._detailMap = ref}
           >
-            {hasSelectedVariable && this.props.renderMapLayerForSelectedVariable()}
+            {hasSelectedVariable && this.props.renderMapLayerForSelectedVariable({ legend: true })}
             <map-interaction-defaults />
             <map-control-defaults />
             <map-control-scale-line slot="bottom-dock" />

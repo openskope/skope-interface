@@ -4,6 +4,14 @@ import React from 'react';
 import objectPath from 'object-path';
 import moment from 'moment';
 import {
+  parse as parseUrl,
+  format as formatUrl,
+} from 'url';
+import {
+  parse as parseQueryString,
+  stringify as stringifyQueryString,
+} from 'querystring';
+import {
   Tab,
 } from 'material-ui/Tabs';
 import {
@@ -32,6 +40,7 @@ import {
 
 import SubComponentClass from './SubComponentClass';
 import * as mapLayerRenderers from './dataset.mapLayerRenderers';
+import * as mapLayerLegendRenderers from './dataset.mapLayerLegendRenderers';
 import MapWithToolbar from './dataset.MapWithToolbar';
 
 export default
@@ -379,13 +388,13 @@ class TabBaseClass extends SubComponentClass {
       return null;
     }
 
-    const mapLayerRenderer = mapLayerRenderers[layer.type];
+    const renderer = mapLayerRenderers[layer.type];
     // @type {Date}
     const dateOfLayer = (typeof this.currentLoadedDate === 'undefined' || this.currentLoadedDate === null)
                         ? this.component.timespan.period.gte
                         : this.currentLoadedDate;
 
-    return mapLayerRenderer.call(this, {
+    return renderer.call(this, {
       ...layer,
       extent: this.component.extent,
       visible: this.isSelectedVariable(layer.name),
@@ -397,7 +406,28 @@ class TabBaseClass extends SubComponentClass {
     });
   };
 
-  renderMapLayerForSelectedVariable = () => {
+  renderMapLayerLegend = (layer) => {
+    if (!(layer.type in mapLayerLegendRenderers)) {
+      console.warn(`Unknown layer type “${layer.type}” for layer “${layer.name}”`);
+      return null;
+    }
+
+    const renderer = mapLayerLegendRenderers[layer.type];
+    // @type {Date}
+    const dateOfLayer = (typeof this.currentLoadedDate === 'undefined' || this.currentLoadedDate === null)
+                        ? this.component.timespan.period.gte
+                        : this.currentLoadedDate;
+
+    return renderer.call(this, {
+      ...layer,
+    }, {
+      YYYY: () => moment(dateOfLayer).format('YYYY'),
+      MM: () => moment(dateOfLayer).format('MM'),
+      DD: () => moment(dateOfLayer).format('DD'),
+    });
+  };
+
+  renderMapLayerForSelectedVariable = (options = { legend: false }) => {
     const variableId = this.selectedVariableId;
     const layer = objectPath.get(this.component.variables, [variableId, 'overlay']);
 
@@ -405,7 +435,12 @@ class TabBaseClass extends SubComponentClass {
       return null;
     }
 
-    return this.renderMapLayer(layer);
+    return (
+      <React.Fragment>
+        {this.renderMapLayer(layer)}
+        {options.legend && this.renderMapLayerLegend(layer)}
+      </React.Fragment>
+    );
   };
 
   SidePanelCommonCollapsibleSectionContainer = (props) => {
