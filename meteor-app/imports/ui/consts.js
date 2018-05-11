@@ -22,10 +22,13 @@ import CropIcon from 'material-ui/svg-icons/image/crop-landscape';
  */
 export const presentationProjection = objectPath.get(Meteor.settings, 'public.presentationProjection', 'EPSG:4326');
 
+/**
+ * Color used to fill the spatial boundary of available data.
+ */
+export const dataSpatialBoundaryFillColor = objectPath.get(Meteor.settings, 'public.dataSpatialBoundaryFillColor', 'rgba(255, 255, 255, 0.5)');
+
 export const rangeMin = 1;
 export const rangeMax = 2000;
-
-export const dataSpatialBoundaryFillColor = 'rgba(255, 255, 255, 0.5)';
 
 export const DatasetInfoIcon = InfoIcon;
 export const DatasetDownloadIcon = DownloadIcon;
