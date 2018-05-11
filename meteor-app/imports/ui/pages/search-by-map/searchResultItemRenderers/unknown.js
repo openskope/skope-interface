@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import React from 'react';
 import {
   Card,
@@ -6,7 +5,10 @@ import {
 } from 'material-ui/Card';
 import Avatar from 'material-ui/Avatar';
 import AlertIcon from 'material-ui/svg-icons/alert/warning';
-import objectPath from 'object-path';
+
+import {
+  clientElasticEndpoint as elasticEndpoint,
+} from '/imports/ui/consts';
 
 import {
   absoluteUrl,
@@ -17,8 +19,6 @@ import {
   bemBlockName,
   renderCardWithDivier,
 } from './shared';
-
-const elasticEndpoint = objectPath.get(Meteor.settings, 'public.elasticEndpoint');
 
 export default
 class SearchResultItem extends React.PureComponent {

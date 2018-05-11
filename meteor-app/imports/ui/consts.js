@@ -1,9 +1,11 @@
 /**
  * Define UI constants here.
  */
+/* eslint camelcase: "off" */
 
 import { Meteor } from 'meteor/meteor';
 import objectPath from 'object-path';
+import url from 'url';
 
 import globalTheme from '/imports/ui/styling/muiTheme';
 
@@ -16,6 +18,45 @@ import MergeIcon from 'material-ui/svg-icons/editor/merge-type';
 import HandIcon from 'material-ui/svg-icons/action/pan-tool';
 import PinIcon from 'material-ui/svg-icons/action/room';
 import CropIcon from 'material-ui/svg-icons/image/crop-landscape';
+
+/**
+ * The email address used for receiving contacts. If undefined, contact feature will not be available.
+ * @type {string}
+ */
+export const contactEmail = objectPath.get(Meteor.settings, 'public.contactEmail');
+
+/**
+ * Elastic endpoint for the client side.
+ * If endpoint is not found in settings, use default localhost elastic.
+ * @type {string}
+ */
+export const clientElasticEndpoint = url.resolve(Meteor.absoluteUrl(), objectPath.get(Meteor.settings, 'public.elasticEndpoint', 'http://localhost:9200/'));
+
+/**
+ * @type {boolean}
+ */
+export const _debug_logSearchKitQueries = objectPath.get(Meteor.settings, 'public.searchpage.logSearchKitQueries', false);
+
+/**
+ * @type {boolean}
+ */
+export const _debug_logSearchKitQueryResults = objectPath.get(Meteor.settings, 'public.searchpage.logSearchKitQueryResults', false);
+
+/**
+ * How many result items to display per page on search page.
+ * @type {number}
+ */
+export const searchPageResultCountPerPage = objectPath.get(Meteor.settings, 'public.searchpage.resultsPerPage', 3);
+
+/**
+ * @type {boolean}
+ */
+export const searchPageRenderSearchResultItemsWithUnknownType = objectPath.get(Meteor.settings, 'public.renderSearchResultItemsWithUnknownType', false);
+
+/**
+ * @type {boolean}
+ */
+export const searchPageRenderInvalidSearchResultItems = objectPath.get(Meteor.settings, 'public.renderInvalidSearchResultItems', false);
 
 /**
  * The projection used to present spatial data (in maps).

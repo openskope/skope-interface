@@ -1,17 +1,19 @@
-import { Meteor } from 'meteor/meteor';
 import React from 'react';
 import {
   connect,
 } from 'react-redux';
 import objectPath from 'object-path';
 
+import {
+  searchPageRenderSearchResultItemsWithUnknownType as renderSearchResultItemsWithUnknownType,
+  searchPageRenderInvalidSearchResultItems as renderInvalidSearchResultItems,
+} from '/imports/ui/consts';
+
 import * as searchResultItemRenderers from './searchResultItemRenderers';
 
 import UnknownTypeRenderer from './searchResultItemRenderers/unknown';
 
 const resultTypeFieldPath = 'result._source.type';
-const renderSearchResultItemsWithUnknownType = objectPath.get(Meteor.settings, 'public.renderSearchResultItemsWithUnknownType', false);
-const renderInvalidSearchResultItems = objectPath.get(Meteor.settings, 'public.renderInvalidSearchResultItems', false);
 
 const Component = (props) => {
   const resultItemType = objectPath.get(props, resultTypeFieldPath);

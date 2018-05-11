@@ -1,6 +1,4 @@
-import { Meteor } from 'meteor/meteor';
 import React from 'react';
-import objectPath from 'object-path';
 import moment from 'moment';
 import Paper from 'material-ui/Paper';
 import FullWindowLayout from '/imports/ui/layouts/full-window';
@@ -20,6 +18,10 @@ import {
   Hits,
   NoHits,
 } from 'searchkit';
+
+import {
+  searchPageResultCountPerPage as resultsPerPage,
+} from '/imports/ui/consts';
 
 import SpatialFilter from './filter-components/spatial-filter';
 import DataTemporalRangeFilter from './filter-components/data-temporal-range-filter';
@@ -50,8 +52,6 @@ const ResetFilterButton = ({
     />
   </span>
 );
-
-const resultsPerPage = objectPath.get(Meteor.settings, 'public.searchpage.resultsPerPage', 3);
 
 export default class SearchPage extends React.Component {
 

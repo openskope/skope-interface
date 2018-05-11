@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -26,10 +25,13 @@ import {
   appSettings,
 } from '/package.json';
 
+import {
+  contactEmail,
+} from '/imports/ui/consts';
+
 const appBarTextColor = objectPath.get(appSettings, 'appBarTextColor', 'currentColor');
 const appBarBackgroundColor = objectPath.get(appSettings, 'appBarBackgroundColor', 'transparent');
 const appBarLogoColor = objectPath.get(appSettings, 'appBarLogoColor', 'currentColor');
-const contactEmail = objectPath.get(Meteor.settings, 'public.contactEmail');
 
 class Component extends React.Component {
   static propTypes = {

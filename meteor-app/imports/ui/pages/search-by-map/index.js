@@ -6,16 +6,19 @@ import React from 'react';
 import {
   connect,
 } from 'react-redux';
-import url from 'url';
-import objectPath from 'object-path';
 import {
   SearchkitManager,
   SearchkitProvider,
 } from 'searchkit';
 import 'searchkit/release/theme.css';
-import { Meteor } from 'meteor/meteor';
 
 import globalStore, { actions } from '/imports/ui/redux-store';
+
+import {
+  clientElasticEndpoint as elasticEndpoint,
+  _debug_logSearchKitQueries as logSearchKitQueries,
+  _debug_logSearchKitQueryResults as logSearchKitQueryResults,
+} from '/imports/ui/consts';
 
 import {
   createFlowRouterHistory,
@@ -23,8 +26,6 @@ import {
 
 import Component from './component';
 
-// If endpoint is not found in settings, use default localhost elastic.
-const elasticEndpoint = url.resolve(Meteor.absoluteUrl(), objectPath.get(Meteor.settings, 'public.elasticEndpoint', 'http://localhost:9200/'));
 const searchkit = new SearchkitManager(elasticEndpoint, {
   searchOnLoad: true,
   useHistory: true,
@@ -44,12 +45,12 @@ searchkit.addResultsListener((result) => globalStore.dispatch({
   result,
 }));
 
-if (objectPath.get(Meteor.settings, 'public.searchpage.logSearchKitQueries', false)) {
+if (logSearchKitQueries) {
   // Monitor query object.
   searchkit.setQueryProcessor((queryObject) => console.info('queryObject', queryObject) || queryObject);
 }
 
-if (objectPath.get(Meteor.settings, 'public.searchpage.logSearchKitQueryResults', false)) {
+if (logSearchKitQueryResults) {
   // Monitor search results.
   searchkit.addResultsListener((result) => console.info('queryResult', result));
 }
