@@ -36,6 +36,12 @@ export const contactEmail = objectPath.get(Meteor.settings, 'public.contactEmail
 export const userGuideUrl = objectPath.get(Meteor.settings, 'public.userGuideUrl');
 
 /**
+ * Whether or not to display the beta sign.
+ * @type {boolean}
+ */
+export const showBetaSign = objectPath.get(Meteor.settings, 'public.showBetaSign', false);
+
+/**
  * Elastic endpoint for the client side.
  * If endpoint is not found in settings, use default localhost elastic.
  * @type {string}

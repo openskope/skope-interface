@@ -27,6 +27,7 @@ import {
   contactEmail,
   userGuideUrl,
   appbarStyles,
+  showBetaSign,
 } from '/imports/ui/consts';
 
 class Component extends React.Component {
@@ -54,7 +55,11 @@ class Component extends React.Component {
     >
       <SafeLink
         href="https://www.openskope.org"
-        text="SKOPE"
+        text={showBetaSign
+        ? (
+          <span>SKOPE <span className="beta-ribbon">BETA</span></span>
+        )
+        : 'SKOPE'}
         style={{
           color: appbarStyles.logoColor,
           fontFamily: "'Bitter', serif",
