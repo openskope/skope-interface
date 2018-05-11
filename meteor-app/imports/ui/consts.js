@@ -19,11 +19,13 @@ import CropIcon from 'material-ui/svg-icons/image/crop-landscape';
 
 /**
  * The projection used to present spatial data (in maps).
+ * @type {ol.ProjectionLike}
  */
 export const presentationProjection = objectPath.get(Meteor.settings, 'public.presentationProjection', 'EPSG:4326');
 
 /**
  * Color used to fill the spatial boundary of available data.
+ * @type {ColorString}
  */
 export const dataSpatialBoundaryFillColor = objectPath.get(Meteor.settings, 'public.dataSpatialBoundaryFillColor', 'rgba(255, 255, 255, 0.5)');
 
