@@ -7,6 +7,10 @@ import 'c3/c3.css';
 import Toggle from 'material-ui/Toggle';
 
 import {
+  dataChartShowUncertantyByDefault,
+} from '/imports/ui/consts';
+
+import {
   getPrecisionByResolution,
   offsetDateAtPrecision,
   makeSVGDocAsync,
@@ -52,7 +56,7 @@ class AnalyticsChart extends React.Component {
     super(props);
 
     this.state = {
-      displayDataUncertaintyValues: true,
+      displayDataUncertaintyValues: dataChartShowUncertantyByDefault,
     };
   }
 

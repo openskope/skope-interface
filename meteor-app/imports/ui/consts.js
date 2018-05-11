@@ -27,6 +27,12 @@ export const presentationProjection = objectPath.get(Meteor.settings, 'public.pr
  */
 export const dataSpatialBoundaryFillColor = objectPath.get(Meteor.settings, 'public.dataSpatialBoundaryFillColor', 'rgba(255, 255, 255, 0.5)');
 
+/**
+ * Whether or not to show the data uncertanty by default (if available).
+ * @type {boolean}
+ */
+export const dataChartShowUncertantyByDefault = objectPath.get(Meteor.settings, 'public.dataChartShowUncertantyByDefault', false);
+
 export const rangeMin = 1;
 export const rangeMax = 2000;
 
