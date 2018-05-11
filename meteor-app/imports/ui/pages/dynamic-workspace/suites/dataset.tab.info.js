@@ -4,6 +4,7 @@ import Paper from 'material-ui/Paper';
 import {
   dataSpatialBoundaryFillColor,
   DatasetInfoIcon,
+  presentationProjection,
 } from '/imports/ui/consts';
 
 import {
@@ -39,7 +40,7 @@ class InfoTabContent extends React.Component {
         >
           <MapView
             basemap="arcgis"
-            projection="EPSG:3857"
+            projection={presentationProjection}
             extent={boundaryExtent}
             style={{
               height: '100%',

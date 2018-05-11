@@ -143,14 +143,12 @@ class SpatialFilter extends SearchkitComponent {
     subtitle: PropTypes.string,
     id: PropTypes.string,
     fields: PropTypes.arrayOf(PropTypes.string),
-    projection: PropTypes.string,
     defaultExtent: PropTypes.arrayOf(PropTypes.number),
     mod: PropTypes.string,
   };
 
   static defaultProps = {
     ...SearchkitComponent.defaultProps,
-    projection: 'EPSG:3857',
     defaultExtent: null,
   };
 

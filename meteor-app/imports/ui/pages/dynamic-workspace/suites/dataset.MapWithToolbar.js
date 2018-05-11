@@ -13,6 +13,7 @@ import {
 import {
   dataSpatialBoundaryFillColor,
   mapToolbarStyles,
+  presentationProjection,
 } from '/imports/ui/consts';
 
 import {
@@ -41,7 +42,7 @@ class MapWithToolbar extends React.Component {
     selectionTools: [],
     boundaryGeometry: null,
     focusGeometry: null,
-    projection: 'EPSG:3857',
+    projection: presentationProjection,
     children: null,
   };
 

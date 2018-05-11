@@ -24,6 +24,7 @@ import {
   DatasetChartIcon,
   DatasetModelIcon,
   DatasetProvenanceIcon,
+  presentationProjection,
 } from '/imports/ui/consts';
 
 import {
@@ -236,7 +237,7 @@ class SearchResultItem extends React.PureComponent {
           >{boundaryGeoJson && (
             <MapView
               basemap="arcgis"
-              projection="EPSG:3857"
+              projection={presentationProjection}
               extent={boundaryExtent}
               style={{
                 width: '100%',

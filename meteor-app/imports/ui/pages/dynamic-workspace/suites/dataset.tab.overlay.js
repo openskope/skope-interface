@@ -27,6 +27,7 @@ import {
   DatasetMapIcon,
   PanToolIcon,
   BoxToolIcon,
+  presentationProjection,
 } from '/imports/ui/consts';
 
 import {
@@ -371,7 +372,7 @@ class OverlayTabContent extends React.Component {
           <MapView
             className="mapview"
             basemap="arcgis"
-            projection="EPSG:3857"
+            projection={presentationProjection}
             extent={focusExtent}
             ref={(ref) => this._detailMap = ref}
           >

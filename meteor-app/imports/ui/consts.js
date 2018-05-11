@@ -2,6 +2,9 @@
  * Define UI constants here.
  */
 
+import { Meteor } from 'meteor/meteor';
+import objectPath from 'object-path';
+
 import globalTheme from '/imports/ui/styling/muiTheme';
 
 import InfoIcon from 'material-ui/svg-icons/action/info';
@@ -13,6 +16,11 @@ import MergeIcon from 'material-ui/svg-icons/editor/merge-type';
 import HandIcon from 'material-ui/svg-icons/action/pan-tool';
 import PinIcon from 'material-ui/svg-icons/action/room';
 import CropIcon from 'material-ui/svg-icons/image/crop-landscape';
+
+/**
+ * The projection used to present spatial data (in maps).
+ */
+export const presentationProjection = objectPath.get(Meteor.settings, 'public.presentationProjection', 'EPSG:4326');
 
 export const rangeMin = 1;
 export const rangeMax = 2000;

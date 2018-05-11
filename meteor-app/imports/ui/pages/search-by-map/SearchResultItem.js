@@ -13,6 +13,10 @@ import FlatButton from 'material-ui/FlatButton';
 import MapView from '/imports/ui/components/mapview';
 
 import {
+  presentationProjection,
+} from '/imports/ui/consts';
+
+import {
   absoluteUrl,
 } from '/imports/ui/helpers';
 
@@ -90,7 +94,7 @@ export default class SearchResultItem extends React.PureComponent {
           >{boundaryGeoJson && (
             <MapView
               basemap="osm"
-              projection="EPSG:3857"
+              projection={presentationProjection}
               extent={boundaryExtent}
               style={{
                 width: '100%',
