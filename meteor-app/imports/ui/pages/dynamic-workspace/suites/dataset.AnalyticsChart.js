@@ -213,6 +213,9 @@ class AnalyticsChart extends React.Component {
       point: {
         show: false,
       },
+      legend: {
+        hide: true,
+      },
     });
 
     this.props.onRenderEnd();
