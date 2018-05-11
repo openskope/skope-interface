@@ -9,9 +9,7 @@ import { IndexHeader } from './index-header';
 
 const renderHeader = () => (
   <div>
-    <AppbarHeader
-      onClickHelpButton={() => alert('Show help for home page.')}
-    />
+    <AppbarHeader />
     <IndexHeader />
   </div>
 );

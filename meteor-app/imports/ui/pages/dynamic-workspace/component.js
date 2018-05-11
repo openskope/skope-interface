@@ -71,7 +71,6 @@ export default class WorkspacePage extends React.Component {
   renderHeader = () => (
     <AppbarHeader
       title={<WorkspaceTitle />}
-      onClickHelpButton={() => alert('Show help for workspace page.')}
     />
   );
 

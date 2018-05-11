@@ -27,6 +27,7 @@ import {
 
 import {
   contactEmail,
+  userGuideUrl,
 } from '/imports/ui/consts';
 
 const appBarTextColor = objectPath.get(appSettings, 'appBarTextColor', 'currentColor');
@@ -39,7 +40,6 @@ class Component extends React.Component {
     children: PropTypes.any,
     currentRouterPath: PropTypes.string,
     navigateTo: PropTypes.func,
-    onClickHelpButton: PropTypes.func,
     onClickContactButton: PropTypes.func,
   };
 
@@ -48,7 +48,6 @@ class Component extends React.Component {
     children: null,
     currentRouterPath: '',
     navigateTo: () => {},
-    onClickHelpButton: () => {},
     onClickContactButton: () => {},
   };
 
@@ -131,10 +130,17 @@ class Component extends React.Component {
         }}
       >
         <MenuItem
-          disabled
+          disabled={!userGuideUrl}
           insetChildren
-          onClick={this.props.onClickHelpButton}
-          primaryText="Manual"
+          primaryText={userGuideUrl
+          ? (
+            <SafeLink
+              href={userGuideUrl}
+              text="User’s guide"
+              noBadge
+            />
+          )
+          : 'User’s guide'}
         />
         <Divider />
         <MenuItem

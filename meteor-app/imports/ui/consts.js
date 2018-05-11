@@ -26,6 +26,12 @@ import CropIcon from 'material-ui/svg-icons/image/crop-landscape';
 export const contactEmail = objectPath.get(Meteor.settings, 'public.contactEmail');
 
 /**
+ * The url of the user guide webpage. If undefined, user guide feature will not be available.
+ * @type {string}
+ */
+export const userGuideUrl = objectPath.get(Meteor.settings, 'public.userGuideUrl');
+
+/**
  * Elastic endpoint for the client side.
  * If endpoint is not found in settings, use default localhost elastic.
  * @type {string}

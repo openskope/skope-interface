@@ -7,9 +7,7 @@ import {
 } from '/imports/ui/helpers';
 
 const renderHeader = () => (
-  <AppbarHeader
-    onClickHelpButton={() => alert('Show help for 404 page.')}
-  />
+  <AppbarHeader />
 );
 
 const renderBody = () => (

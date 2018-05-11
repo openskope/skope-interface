@@ -17,9 +17,7 @@ import MapView from '/imports/ui/components/mapview';
 import geojsonExtent from 'geojson-extent';
 
 const renderHeader = () => (
-  <AppbarHeader
-    onClickHelpButton={() => alert('Show help for PaleoCAR model page.')}
-  />
+  <AppbarHeader />
 );
 
 const renderBody = ({

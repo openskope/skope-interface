@@ -62,7 +62,6 @@ export default class SearchPage extends React.Component {
   renderHeader = () => (
     <AppbarHeader
       title="Discover Paleoenvironmental Data or Models"
-      onClickHelpButton={() => alert('Show help for search page.')}
     />
   );
 
