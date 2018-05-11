@@ -7,6 +7,10 @@ import { Meteor } from 'meteor/meteor';
 import objectPath from 'object-path';
 import url from 'url';
 
+import {
+  appSettings,
+} from '/package.json';
+
 import globalTheme from '/imports/ui/styling/muiTheme';
 
 import InfoIcon from 'material-ui/svg-icons/action/info';
@@ -95,6 +99,12 @@ export const DatasetProvenanceIcon = MergeIcon;
 export const PanToolIcon = HandIcon;
 export const PointToolIcon = PinIcon;
 export const BoxToolIcon = CropIcon;
+
+export const appbarStyles = {
+  textColor: objectPath.get(appSettings, 'appBarTextColor', 'currentColor'),
+  backgroundColor: objectPath.get(appSettings, 'appBarBackgroundColor', 'transparent'),
+  logoColor: objectPath.get(appSettings, 'appBarLogoColor', 'currentColor'),
+};
 
 export
 const mapToolbarStyles = {
