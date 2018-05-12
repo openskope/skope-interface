@@ -71,6 +71,43 @@ a {
   #skope-app & { @rules(); }
 }
 
+/**
+ * This is another way of showing the beta label.
+ * Provided by <abrin@digitalantiquity.org>
+ */
+.beta-ribbon {
+  position: fixed;
+  z-index: 1000;
+  top: 11px;
+  left: -34px;
+  width: 120px;
+  padding: 7px 0;
+  font: bold 15px Sans-Serif;
+  text-align: center;
+  text-shadow: rgba(255,255,255,0.5) 0px 1px 0px;
+  transform: rotate(-45deg);
+  background-color: #BFDC7A;
+  background-image: linear-gradient(#bfdc7a 0%, #8ebf45 100%);
+  color: #6a6340;
+  box-shadow: 0px 0px 3px rgba(0,0,0,0.3);
+  
+  &::before, &::after {
+    content: "";
+    border-top:   3px solid #6e8900;   
+    border-left:  3px solid transparent;
+    border-right: 3px solid transparent;
+    position: absolute;
+    bottom: -3px;
+  }
+  
+  &::before {
+    left: 0;
+  }
+  &::after {
+    right: 0;
+  }
+}
+
 .modal {
   position: fixed;
   margin: auto;
