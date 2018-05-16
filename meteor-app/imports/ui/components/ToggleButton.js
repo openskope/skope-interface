@@ -5,7 +5,10 @@ import Paper from 'material-ui/Paper';
 import globalTheme from '/imports/ui/styling/muiTheme';
 
 const styles = {
-  root: {},
+  root: {
+    // Necessary for setting border radius on root.
+    overflow: 'hidden',
+  },
   icon: {
     color: 'inherit',
     fill: 'currentColor',
@@ -17,6 +20,8 @@ const styles = {
     backgroundColor: 'inherit',
     color: 'inherit',
     transition: false,
+    // Leave the border radius up to the root container.
+    borderRadius: false,
   },
   button_iconOnly: {
     paddingLeft: '0.5em',
@@ -31,11 +36,13 @@ const styles = {
 export default
 (props) => {
   const {
+    className,
     defaultZDepth = 0,
     zDepthWhenToggled = 1,
     label = '',
     icon = null,
     style = {},
+    buttonStyle = {},
     toggled = false,
     onToggle = () => {},
     ...otherProps
@@ -51,6 +58,7 @@ export default
 
   return (
     <Paper
+      className={className}
       style={{
         ...styles.root,
         ...style,
@@ -65,6 +73,7 @@ export default
 
         style={{
           ...styles.button,
+          ...buttonStyle,
           ...(icon && !label && styles.button_iconOnly),
           ...(toggled && styles.button_active),
         }}

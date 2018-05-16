@@ -177,17 +177,50 @@ class MapWithToolbar extends React.Component {
               }}
             />
           </ToolbarGroup>
-          <ToolbarGroup>
-            {selectionTools.map((item) => (
-              <ToggleButton
-                key={item.name}
-                className="selection-tool-button"
-                icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
-                defaultZDepth={1}
-                toggled={this.isSelectionToolActive(item)}
-                onToggle={(event, toggled) => toggled && this.setSelectionToolActive(item)}
-              />
-            ))}
+          <ToolbarGroup className="toggle-button-group">
+            {selectionTools.map((item, index, list) => {
+              const notFirstItem = index > 0;
+              const notLastItem = index < (list.length - 1);
+              const isActive = this.isSelectionToolActive(item);
+
+              return (
+                <ToggleButton
+                  key={item.name}
+                  className="toggle-button-group__item selection-tool-button"
+                  icon={<item.IconClass style={mapToolbarStyles.toggleButton.icon} />}
+                  defaultZDepth={0}
+                  zDepthWhenToggled={0}
+                  toggled={isActive}
+                  onToggle={(event, toggled) => toggled && this.setSelectionToolActive(item)}
+                  style={{
+                    // Tweak border radius so items look as if they were connected.
+                    ...(notFirstItem && {
+                      borderTopLeftRadius: 0,
+                      borderBottomLeftRadius: 0,
+                    }),
+                    ...(notLastItem && {
+                      borderTopRightRadius: 0,
+                      borderBottomRightRadius: 0,
+                    }),
+                  }}
+                  buttonStyle={{
+                    ...(isActive ? {
+                      boxShadow: [
+                        // Use stronger inset shadow when active.
+                        'rgba(0, 0, 0, 0.8) 0px 0px 1px 0px inset',
+                        'rgba(0, 0, 0, 0.1) 0px 0px 0.5em 1px inset',
+                      ],
+                    } : {
+                      boxShadow: [
+                        'rgba(0, 0, 0, 0.2) 0px 0px 0px 0.5px inset',
+                      ],
+                      // Make the color weaker when not active.
+                      color: 'rgba(0, 0, 0, 0.5)',
+                    }),
+                  }}
+                />
+              );
+            })}
           </ToolbarGroup>
         </Toolbar>
 
