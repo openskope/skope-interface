@@ -15,6 +15,7 @@ import {
   CardText,
 } from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
+import WarningIcon from 'material-ui/svg-icons/alert/warning';
 import {
   List,
 } from 'material-ui/List';
@@ -130,6 +131,8 @@ class AnalyticsTabContent extends React.Component {
           switch (true) {
             case reason.response && reason.response.data && reason.response.data.status === 400 && reason.response.data.message.indexOf('exceeded time limit of') > -1:
               return 'The server took too long to respond. Please try again or select a smaller area.';
+            case reason.message === 'network':
+              return 'Can not connect to the data service for the selected variable due to a network error.';
             default:
               return undefined;
           }
@@ -386,22 +389,43 @@ class AnalyticsTabContent extends React.Component {
           )}
           {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && !timeSeriesDataRequestError && (
             <div>
-              <p>Select <b>a variable</b> and <b>a valid point or area in the boundary</b> to view the time series data.</p>
+              <p
+                style={{
+                  lineHeight: '1.5em',
+                }}
+              >Select <b>a variable</b> and <b>a valid point or area in the boundary</b> to view the time series data.</p>
             </div>
           )}
           {!isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && timeSeriesDataRequestError && (
-            timeSeriesDataRequestError.nice
-            ? (
-              <div>
-                <p>{timeSeriesDataRequestError.nice}</p>
-              </div>
-            )
-            : (
-              <div>
-                <p>Error when requesting the data: </p>
-                <pre style={{ whiteSpace: 'pre-wrap' }}>{timeSeriesDataRequestError.raw}</pre>
-              </div>
-            )
+            <div>
+              <WarningIcon
+                color="red"
+                style={{
+                  float: 'left',
+                  height: '1.5em',
+                  width: '1.5em',
+                  margin: '0 0.5em 0.5em 0',
+                }}
+              />
+              {timeSeriesDataRequestError.nice
+              ? (
+                <p
+                  style={{
+                    lineHeight: '1.5em',
+                  }}
+                >{timeSeriesDataRequestError.nice}</p>
+              )
+              : (
+                <React.Fragment>
+                  <p
+                    style={{
+                      lineHeight: '1.5em',
+                    }}
+                  >Error when requesting the data: </p>
+                  <pre style={{ whiteSpace: 'pre-wrap' }}>{timeSeriesDataRequestError.raw}</pre>
+                </React.Fragment>
+              )}
+            </div>
           )}
         </Paper>
       </div>
