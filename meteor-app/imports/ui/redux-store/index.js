@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
-// import { createStore } from 'meteor/zodiase:reactive-redux-store';
 import { createStore } from 'redux';
 import { reducer as reduxFormReducer } from 'redux-form';
+import Raven from 'raven-js';
 
 import {
   appSettings,
@@ -12,16 +12,44 @@ import * as actions from './actions';
 import initialState from './initial-state';
 
 const reducer = (state = initialState, action) => {
-  let nextState = {
-    ...state,
-    // Insert reducer from `redux-form`.
-    form: reduxFormReducer(state.form, action),
-  };
+  let nextState = state;
 
-  if (action.type in reducers) {
-    PropTypes.checkPropTypes(actions[action.type].payloadSchema, action, 'action', `reducer:${action.type}`);
+  try {
+    nextState = {
+      ...nextState,
+      // Insert reducer from `redux-form`.
+      form: reduxFormReducer(nextState.form, action),
+    };
 
-    nextState = reducers[action.type](nextState, action);
+    if (action.type in reducers) {
+      PropTypes.checkPropTypes(actions[action.type].payloadSchema, action, 'action', `reducer:${action.type}`);
+
+      nextState = reducers[action.type](nextState, action);
+    }
+
+    if (Raven.isSetup()) {
+      Raven.captureBreadcrumb({
+        message: 'New action',
+        category: 'redux action',
+        data: {
+          state,
+          action,
+          nextState,
+        },
+      });
+    }
+  } catch (e) {
+    if (Raven.isSetup()) {
+      Raven.captureException(e, {
+        logger: 'redux',
+        extra: {
+          state,
+          action,
+        },
+      });
+    } else {
+      throw e;
+    }
   }
 
   return nextState;
