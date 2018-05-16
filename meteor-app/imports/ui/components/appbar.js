@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {
   connect,
 } from 'react-redux';
+import Raven from 'raven-js';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
@@ -206,21 +207,21 @@ export default connect(
 
         document.body.removeChild(anchorElement);
       })((anchorElement) => {
+        Raven.captureException('Contact', {
+          logger: 'contact',
+          extra: {
+            reduxState: state,
+          },
+        });
+        const referenceId = Raven.lastEventId();
+
         const subject = '';
         const body = `\n\n\n\n
 Please do not modify the content below to help technical support.
 --------------------------------------------------------------------------------
 Version: ${version}
+Reference ID: ${referenceId}
 `;
-
-        /**
-         * TODO:
-         * 1. Generate an incident ID with uuid.
-         * 2. Send state info and incident ID to Sentry.
-         * 3. Attach incident ID to email body (above).
-         *
-         * Probably don't need this anymore: ${btoa(encodeURIComponent(JSON.stringify(state)))}
-         */
 
         anchorElement.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         anchorElement.click();
