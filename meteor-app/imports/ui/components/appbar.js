@@ -195,17 +195,36 @@ export default connect(
   (state) => ({
     currentRouterPath: state.path,
     onClickContactButton: () => {
-      const anchorElement = document.createElement('a');
-      const subject = '';
-      const body = `\n\n\n\n
+      ((dealWithElement) => {
+        const anchorElement = document.createElement('a');
+
+        // Even though it's tested to be working when not inserted into document, just to be safe.
+        anchorElement.style.display = 'none';
+        document.body.appendChild(anchorElement);
+
+        dealWithElement(anchorElement);
+
+        document.body.removeChild(anchorElement);
+      })((anchorElement) => {
+        const subject = '';
+        const body = `\n\n\n\n
 Please do not modify the content below to help technical support.
 --------------------------------------------------------------------------------
 Version: ${version}
-State: ${btoa(encodeURIComponent(JSON.stringify(state)))}
 `;
 
-      anchorElement.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      anchorElement.click();
+        /**
+         * TODO:
+         * 1. Generate an incident ID with uuid.
+         * 2. Send state info and incident ID to Sentry.
+         * 3. Attach incident ID to email body (above).
+         *
+         * Probably don't need this anymore: ${btoa(encodeURIComponent(JSON.stringify(state)))}
+         */
+
+        anchorElement.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        anchorElement.click();
+      });
     },
   }),
   // mapDispatchToProps
