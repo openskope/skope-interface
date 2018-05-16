@@ -11,6 +11,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import globalStore from '/imports/ui/redux-store';
 import globalTheme from '/imports/ui/styling/muiTheme';
+import TopHelmet from '/imports/ui/top-helmet';
 
 // Create a custom mounter that uses a custom root element.
 const myReactMount = withOptions({
@@ -33,6 +34,7 @@ const mountWithStore = (store, ComponentClass, props) => myReactMount(Provider, 
 /**
  * A even more simplified version of `mountWithStore` that by default uses the global store.
  * It also applies the default Material UI theme.
+ * It also inserts some header elements with the helmet.
  * @param  {React.Component} ComponentClass - Same as the first argument to `mount`.
  * @param  {Object} props - Same as the second argument to `mount`.
  * @return {*}
@@ -48,7 +50,12 @@ const mount =
   },
 ) => mountWithStore(store, MuiThemeProvider, {
   muiTheme,
-  children: <ComponentClass {...props} />,
+  children: (
+    <React.Fragment>
+      <TopHelmet />
+      <ComponentClass {...props} />
+    </React.Fragment>
+  ),
 });
 
 /**
