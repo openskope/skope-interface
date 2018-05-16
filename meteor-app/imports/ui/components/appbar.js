@@ -55,11 +55,12 @@ class Component extends React.Component {
     >
       <SafeLink
         href="https://www.openskope.org"
-        text={showBetaSign
-        ? (
-          <span>SKOPE <span className="beta-ribbon">BETA</span></span>
-        )
-        : 'SKOPE'}
+        text={(
+          <span>
+            <span>SKOPE</span>
+            {showBetaSign && <span className="beta-ribbon">BETA</span>}
+          </span>
+        )}
         style={{
           color: appbarStyles.logoColor,
           fontFamily: "'Bitter', serif",
