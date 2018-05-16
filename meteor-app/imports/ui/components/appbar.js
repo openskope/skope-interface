@@ -66,7 +66,7 @@ class Component extends React.Component {
           fontFamily: "'Bitter', serif",
           fontSize: '1.3em',
           fontWeight: 'bold',
-          marginLeft: 35,
+          marginLeft: showBetaSign ? 35 : 0,
           marginRight: 30,
         }}
         noBadge
