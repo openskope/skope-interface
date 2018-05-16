@@ -3,7 +3,7 @@ import ReactDOMServer from 'react-dom/server';
 import {
   mount as reactMount,
   withOptions,
-} from 'react-mounter';
+} from '@xch/react-mounter';
 import {
   Provider,
 } from 'react-redux';

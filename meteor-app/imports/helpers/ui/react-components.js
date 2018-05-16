@@ -99,7 +99,7 @@ export
 /**
  * This is a bad workaround for fetching data. It should be avoided at all costs.
  */
-class PatheticDataRequester extends React.PureComponent {
+class PatheticDataRequester extends React.Component {
   static propTypes = {
     /**
      * Function that does the data fetching. Must call either `resolve` or `reject`.
