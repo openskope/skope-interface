@@ -2,6 +2,7 @@
  * This file collects individual reducers to one collection.
  */
 
+export * from './fetch_build_hash';
 export * from './page_entry';
 export * from './searchpage';
 export * from './workspace';

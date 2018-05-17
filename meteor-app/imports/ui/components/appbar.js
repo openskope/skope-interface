@@ -35,6 +35,7 @@ class Component extends React.Component {
   static propTypes = {
     title: PropTypes.any,
     children: PropTypes.any,
+    buildHash: PropTypes.string,
     currentRouterPath: PropTypes.string,
     navigateTo: PropTypes.func,
     onClickContactButton: PropTypes.func,
@@ -43,6 +44,7 @@ class Component extends React.Component {
   static defaultProps = {
     title: null,
     children: null,
+    buildHash: '',
     currentRouterPath: '',
     navigateTo: () => {},
     onClickContactButton: () => {},
@@ -173,6 +175,11 @@ class Component extends React.Component {
         <MenuItem>
           <a href={demoRepository} target="_blank" rel="noopener noreferrer">{`ver ${version}`}</a>
         </MenuItem>
+        {this.props.buildHash && (
+          <MenuItem>
+            <pre style={{ margin: 0 }}>{String.prototype.substr.call(this.props.buildHash, 0, 8)}</pre>
+          </MenuItem>
+        )}
       </IconMenu>
     </span>
   );
@@ -194,6 +201,7 @@ class Component extends React.Component {
 export default connect(
   // mapStateToProps
   (state) => ({
+    buildHash: state.buildHash,
     currentRouterPath: state.path,
     onClickContactButton: () => {
       ((dealWithElement) => {
@@ -220,6 +228,7 @@ export default connect(
 Please do not modify the content below to help technical support.
 --------------------------------------------------------------------------------
 Version: ${version}
+Build #: ${state.buildHash}
 Reference ID: ${referenceId}
 `;
 

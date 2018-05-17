@@ -16,7 +16,7 @@ console.log(packageVersion);\
 
 NPM_VER=$(echo $JS | node)
 GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-GIT_COMMIT=$(git rev-parse HEAD)
+GIT_COMMIT=$(git rev-parse --verify HEAD)
 DEFAULT_TAG="${NPM_VER}"
 
 if [ "$GIT_BRANCH" != "master" ]; then
@@ -29,6 +29,6 @@ IMAGE_NAME="${ORG_NAME}:${TAG}"
 
 printf "Image will be tagged as “%s”.\n" "${IMAGE_NAME}"
 
-docker build -t "${IMAGE_NAME}" "${DIR}"
+docker build --build-arg GIT_COMMIT="${GIT_COMMIT}" -t "${IMAGE_NAME}" "${DIR}"
 
 docker images -a --format "{{.ID}} {{.Repository}}:{{.Tag}} ({{.Size}})" | grep "${IMAGE_NAME}"

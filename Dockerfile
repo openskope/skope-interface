@@ -3,6 +3,7 @@
 ARG METEOR_VERSION="1.6.0.1"
 ARG NODE_VERSION="8.9.3"
 ARG APP_DIR="/usr/share/meteor-app"
+ARG GIT_COMMIT=""
 
 FROM ubuntu:16.04 AS build
 LABEL maintainer="Xingchen Hong <hello@xc-h.com>"
@@ -51,6 +52,7 @@ FROM node:${NODE_VERSION}-slim
 LABEL maintainer="Xingchen Hong <hello@xc-h.com>"
 
 ARG APP_DIR
+ARG GIT_COMMIT
 
 RUN apt-get update \
     && apt-get install -y -q build-essential \
@@ -73,7 +75,8 @@ ENV NODE_ENV="production" \
     ROOT_URL="http://localhost" \
     MONGO_URL="mongodb://localhost" \
     METEOR_SETTINGS='{"public":{}}' \
-    PORT=3000
+    PORT=3000 \
+    BUILD_GIT_COMMIT="${GIT_COMMIT}"
 
 #! TODO: Use the lines below to replace the workaround when `17.09` is landed
 # on Docker Cloud.

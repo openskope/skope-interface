@@ -11,6 +11,9 @@ const serverElasticEndpointInSettings = objectPath.get(Meteor.settings, 'server.
 // Register your apis here
 
 Meteor.methods({
+  buildHash () {
+    return objectPath.get(process.env, 'BUILD_GIT_COMMIT', '');
+  },
   async 'datasetManifest.get' ({
     datasetId,
   }) {
