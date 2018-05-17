@@ -28,3 +28,5 @@ zodiase:mdc
 dynamic-import@0.2.0
 webapp
 ostrio:flow-router-title
+standard-minifier-js
+standard-minifier-css
