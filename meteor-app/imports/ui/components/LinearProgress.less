@@ -1,0 +1,60 @@
+@keyframes linear-progress-animation {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+.linear-progress {
+  display: block;
+  height: 10px;
+  width: auto;
+  border-radius: 3px;
+  overflow: hidden;
+
+  .gradient-1 () {
+    @topColor: rgba(118, 179, 231, 1);
+    @bottomColor: rgba(118, 179, 231, 0.25);
+    @topColor2: rgba(118, 179, 231, 0.4);
+
+    background: linear-gradient(
+      to right,
+      @bottomColor 0%,
+      @bottomColor 10%,
+      @topColor 15%,
+      @topColor 20%,
+      @bottomColor 25%,
+      @bottomColor 39%,
+      @topColor2 42%,
+      @topColor2 43%,
+      @bottomColor 46%,
+      @bottomColor 55%,
+      @bottomColor 60%,
+      @topColor 65%,
+      @topColor 70%,
+      @bottomColor 75%,
+      @bottomColor 89%,
+      @topColor2 92%,
+      @topColor2 93%,
+      @bottomColor 96%,
+      @bottomColor 100%
+    );
+  }
+
+  &::before {
+    content: '';
+    display: block;
+
+    width: 200%;
+    height: 100%;
+
+    .gradient-1();
+
+    animation-name: linear-progress-animation;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+}
