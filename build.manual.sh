@@ -24,7 +24,7 @@ if [ "$GIT_BRANCH" != "master" ]; then
 fi
 
 TAG=${TAG:-"${DEFAULT_TAG}"}
-ORG_NAME="openskope/web-app"
+ORG_NAME="openskope/webapp"
 IMAGE_NAME="${ORG_NAME}:${TAG}"
 
 printf "Image will be tagged as “%s”.\n" "${IMAGE_NAME}"
