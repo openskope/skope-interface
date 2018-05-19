@@ -9,7 +9,7 @@ import {
   ObjectState,
   Panel,
 } from 'searchkit';
-import MapWithToolbar from '/imports/ui/pages/dynamic-workspace/suites/dataset.MapWithToolbar';
+import MapWithToolbar from '/imports/ui/components/MapWithToolbar';
 
 import {
   PanToolIcon,

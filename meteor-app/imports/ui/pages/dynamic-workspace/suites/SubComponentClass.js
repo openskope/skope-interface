@@ -7,7 +7,7 @@
 import _ from 'lodash';
 
 export default
-class SubComponent {
+class SubComponentClass {
   // Override this.
   static propTypes = {};
   // Override this.

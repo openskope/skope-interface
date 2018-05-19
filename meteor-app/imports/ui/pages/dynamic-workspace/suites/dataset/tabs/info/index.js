@@ -13,7 +13,7 @@ import {
 
 import MapView from '/imports/ui/components/mapview';
 
-import TabBaseClass from './dataset.tab.BaseClass';
+import TabBaseClass from '../BaseClass';
 
 class InfoTabContent extends React.Component {
   render () {

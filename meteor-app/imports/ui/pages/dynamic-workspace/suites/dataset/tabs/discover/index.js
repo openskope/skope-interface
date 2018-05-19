@@ -1,7 +1,7 @@
 import objectPath from 'object-path';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 
-import TabBaseClass from './dataset.tab.BaseClass';
+import TabBaseClass from '../BaseClass';
 
 export default
 class DiscoverTab extends TabBaseClass {

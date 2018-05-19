@@ -41,7 +41,7 @@ import {
 
 import MapView from '/imports/ui/components/mapview';
 
-import TabBaseClass from './dataset.tab.BaseClass';
+import TabBaseClass from '../BaseClass';
 
 class OverlayTabContent extends React.Component {
 

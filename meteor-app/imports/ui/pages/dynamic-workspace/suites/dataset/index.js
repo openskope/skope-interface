@@ -20,14 +20,14 @@ import {
   stringToNumber,
 } from '/imports/ui/helpers';
 
-import SuiteBaseClass from './SuiteBaseClass';
+import SuiteBaseClass from '../SuiteBaseClass';
 
-import DiscoverTab from './dataset.tab.discover';
-import InfoTab from './dataset.tab.info';
-import DownloadTab from './dataset.tab.download';
-import OverlayTab from './dataset.tab.overlay';
-import AnalyticsTab from './dataset.tab.analytics';
-import ModelTab from './dataset.tab.model';
+import DiscoverTab from './tabs/discover';
+import InfoTab from './tabs/info';
+import DownloadTab from './tabs/download';
+import OverlayTab from './tabs/overlay';
+import AnalyticsTab from './tabs/analytics';
+import ModelTab from './tabs/model';
 
 // Expose this collection in case other components need to know about the tabs and their order.
 export const tabConstructs = {
@@ -221,7 +221,7 @@ class DatasetWorkspace extends SuiteBaseClass {
      */
     this.state = _.merge({
       // These state properties are shared across multiple tabs.
-      // Check `dataset.tab.BaseClass.js` for helper getters and setters.
+      // Check `tabs/BaseClass.js` for helper getters and setters.
       _shared: {
         /**
          * The ID of the currently selected variable.

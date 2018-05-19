@@ -33,8 +33,8 @@ import {
   fillTemplateString,
 } from '/imports/ui/helpers';
 
-import TabBaseClass from './dataset.tab.BaseClass';
-import AnalyticsChart from './dataset.AnalyticsChart';
+import TabBaseClass from '../BaseClass';
+import AnalyticsChart from '../../AnalyticsChart';
 
 class AnalyticsTabContent extends React.Component {
 

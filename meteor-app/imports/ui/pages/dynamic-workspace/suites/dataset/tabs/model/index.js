@@ -9,7 +9,7 @@ import {
   MarkDownRenderer,
 } from '/imports/ui/helpers';
 
-import TabBaseClass from './dataset.tab.BaseClass';
+import TabBaseClass from '../BaseClass';
 
 export default
 class ModelTab extends TabBaseClass {

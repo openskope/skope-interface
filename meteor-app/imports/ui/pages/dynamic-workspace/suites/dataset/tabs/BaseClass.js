@@ -24,6 +24,7 @@ import {
   clampDateWithinRange,
 } from '/imports/helpers/model';
 
+import MapWithToolbar from '/imports/ui/components/MapWithToolbar';
 import ToggleButton from '/imports/ui/components/ToggleButton';
 
 import {
@@ -31,10 +32,9 @@ import {
   RangeWithInput,
 } from '/imports/ui/components/SliderWithInput';
 
-import SubComponentClass from './SubComponentClass';
-import * as mapLayerRenderers from './dataset.mapLayerRenderers';
-import * as mapLayerLegendRenderers from './dataset.mapLayerLegendRenderers';
-import MapWithToolbar from './dataset.MapWithToolbar';
+import SubComponentClass from '../../SubComponentClass';
+import * as mapLayerRenderers from '../mapLayerRenderers';
+import * as mapLayerLegendRenderers from '../mapLayerLegendRenderers';
 
 export default
 class TabBaseClass extends SubComponentClass {
