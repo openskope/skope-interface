@@ -8,7 +8,6 @@ import WorkspaceTitle from '/imports/ui/components/workspace-title';
 import {
   PropPrinter,
 } from '/imports/helpers/ui';
-
 import {
   NOOP,
 } from '/imports/helpers/model';
@@ -76,17 +75,13 @@ class WorkspacePage extends React.Component {
     checkToLoadNewDataset(nextProps);
   }
 
-  renderHeader = () => (
-    <AppbarHeader
-      title={<WorkspaceTitle />}
-    />
-  );
+  renderBody = () => {
+    const {
+      currentDatasetId,
+      loadingConfigData,
+      configDataRequestError,
+    } = this.props;
 
-  renderBody = ({
-    currentDatasetId,
-    loadingConfigData,
-    configDataRequestError,
-  } = this.props) => {
     if (!currentDatasetId) {
       return this.renderEmptyView();
     } else if (loadingConfigData) {
@@ -139,7 +134,7 @@ class WorkspacePage extends React.Component {
 
   render = () => (
     <FullWindowLayout
-      header={this.renderHeader()}
+      header={<AppbarHeader title={<WorkspaceTitle />} />}
       body={this.renderBody()}
     />
   );
