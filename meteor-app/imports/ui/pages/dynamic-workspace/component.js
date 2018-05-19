@@ -4,6 +4,9 @@ import PropTypes from 'prop-types';
 import FullWindowLayout from '/imports/ui/layouts/full-window';
 import AppbarHeader from '/imports/ui/components/appbar';
 import WorkspaceTitle from '/imports/ui/components/workspace-title';
+import {
+  IndeterminateProgress,
+} from '/imports/ui/components/LinearProgress';
 
 import {
   PropPrinter,
@@ -103,7 +106,8 @@ class WorkspacePage extends React.Component {
   //! Improve loading view.
   renderLoadingView = () => (
     <RootElement>
-      Loading...
+      <IndeterminateProgress />
+      <p>Loading...</p>
     </RootElement>
   );
 

@@ -22,6 +22,10 @@ import {
 
 import Raven from '/imports/startup/client/sentry';
 import {
+  IndeterminateProgress,
+} from '/imports/ui/components/LinearProgress';
+
+import {
   DatasetChartIcon,
   PanToolIcon,
   PointToolIcon,
@@ -436,7 +440,7 @@ class AnalyticsTabContent extends React.Component {
           )}
           {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
             <div>
-              <div className="linear-progress" />
+              <IndeterminateProgress />
               <p>Please wait while the chart is being loaded...</p>
             </div>
           )}
