@@ -7,6 +7,9 @@ import {
 
 import { actions } from '/imports/ui/redux-store';
 import { PropPrinter } from '/imports/ui/helpers';
+import {
+  NOOP,
+} from '/imports/helpers/model';
 
 import * as Suites from './suites';
 
@@ -27,7 +30,7 @@ class DynamicWorkspaceSuite extends React.Component {
   static defaultProps = {
     suiteProps: {},
     suiteState: {},
-    setSuiteState: () => {},
+    setSuiteState: NOOP,
   };
 
   shouldComponentUpdate (nextProps) {

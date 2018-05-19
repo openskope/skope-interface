@@ -7,6 +7,10 @@ import Range from 'rc-slider/lib/Range';
 import 'rc-slider/assets/index.css';
 import TextField from 'material-ui/TextField';
 
+import {
+  NOOP,
+} from '/imports/helpers/model';
+
 const SliderWithHandle = Slider.createSliderWithTooltip(Slider);
 const RangeWithHandle = Slider.createSliderWithTooltip(Range);
 
@@ -20,8 +24,8 @@ class LazyTextField extends React.Component {
 
   static defaultProps = {
     disabled: false,
-    onStepDown: () => {},
-    onStepUp: () => {},
+    onStepDown: NOOP,
+    onStepUp: NOOP,
   };
 
   constructor (props) {
@@ -133,7 +137,7 @@ class SliderWithInput extends React.PureComponent {
   static defaultProps = {
     step: 0,
     sliderStep: 1,
-    onFinish: () => {},
+    onFinish: NOOP,
     toSliderValue: (v) => Number(v),
     fromSliderValue: (v) => v,
     toInputValue: (v) => String(v),

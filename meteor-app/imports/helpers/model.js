@@ -412,3 +412,6 @@ const clampDateWithinRange = (date, minDate, maxDate) => {
 
   return finalDate;
 };
+
+export
+const NOOP = () => {};

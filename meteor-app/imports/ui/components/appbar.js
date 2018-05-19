@@ -30,6 +30,10 @@ import {
   showBetaSign,
 } from '/imports/ui/consts';
 
+import {
+  NOOP,
+} from '/imports/helpers/model';
+
 class Component extends React.Component {
   static propTypes = {
     title: PropTypes.any,
@@ -45,8 +49,8 @@ class Component extends React.Component {
     children: null,
     buildHash: '',
     currentRouterPath: '',
-    navigateTo: () => {},
-    onClickContactButton: () => {},
+    navigateTo: NOOP,
+    onClickContactButton: NOOP,
   };
 
   renderTitle = () => (

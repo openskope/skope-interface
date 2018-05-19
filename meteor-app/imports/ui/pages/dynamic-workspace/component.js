@@ -7,11 +7,41 @@ import WorkspaceTitle from '/imports/ui/components/workspace-title';
 
 import {
   PropPrinter,
-} from '/imports/ui/helpers';
+} from '/imports/helpers/ui';
+
+import {
+  NOOP,
+} from '/imports/helpers/model';
 
 import DynamicWorkspaceSuite from './DynamicWorkspaceSuite';
 
-export default class WorkspacePage extends React.Component {
+const checkToLoadNewDataset = (props) => {
+  const {
+    currentDatasetId,
+    requestDatasetId,
+    loadNewDataset,
+  } = props;
+
+  if (currentDatasetId !== requestDatasetId) {
+    loadNewDataset(requestDatasetId);
+    return true;
+  }
+
+  return false;
+};
+
+const RootElement = ({
+  children,
+  ...props
+}) => (
+  <div
+    {...props}
+    className="page-workspace"
+  >{children}</div>
+);
+
+export default
+class WorkspacePage extends React.Component {
 
   static propTypes = {
     // ID of the dataset currently loaded. Empty string indicating no dataset is loaded.
@@ -26,46 +56,24 @@ export default class WorkspacePage extends React.Component {
     configDataRequestError: PropTypes.object,
     // The config data object.
     configData: PropTypes.object,
+    // Callback to load new dataset (when requestDatasetId mis-matches currentDatasetId).
+    loadNewDataset: PropTypes.func,
   };
 
   static defaultProps = {
     configDataRequestError: null,
     configData: null,
+    loadNewDataset: NOOP,
   };
-
-  static _checkToLoadNewDataset (props) {
-    const {
-      currentDatasetId,
-      requestDatasetId,
-      loadNewDataset,
-    } = props;
-
-    if (currentDatasetId !== requestDatasetId) {
-      loadNewDataset(requestDatasetId);
-      return true;
-    }
-
-    return false;
-  }
-
-  static RootElement = ({
-    children,
-    ...props
-  }) => (
-    <div
-      {...props}
-      className="page-workspace"
-    >{children}</div>
-  );
 
   constructor (props) {
     super(props);
 
-    this.constructor._checkToLoadNewDataset(props);
+    checkToLoadNewDataset(props);
   }
 
   componentWillReceiveProps (nextProps) {
-    this.constructor._checkToLoadNewDataset(nextProps);
+    checkToLoadNewDataset(nextProps);
   }
 
   renderHeader = () => (
@@ -92,41 +100,41 @@ export default class WorkspacePage extends React.Component {
 
   //! Improve empty view.
   renderEmptyView = () => (
-    <this.constructor.RootElement>
+    <RootElement>
       No dataset to load.
-    </this.constructor.RootElement>
+    </RootElement>
   );
 
   //! Improve loading view.
   renderLoadingView = () => (
-    <this.constructor.RootElement>
+    <RootElement>
       Loading...
-    </this.constructor.RootElement>
+    </RootElement>
   );
 
   //! Improve error view.
   renderLoadingErrorView = ({
     configDataRequestError,
   } = this.props) => (
-    <this.constructor.RootElement>
+    <RootElement>
       <h1>Error</h1>
       <PropPrinter
         {...{
           configDataRequestError,
         }}
       />
-    </this.constructor.RootElement>
+    </RootElement>
   );
 
   renderLoadedView = ({
     configData,
   } = this.props) => (
-    <this.constructor.RootElement>
+    <RootElement>
       <DynamicWorkspaceSuite
         suiteType={`WORKSPACE_SUITE__${String(configData.type).toUpperCase()}`}
         suiteProps={configData}
       />
-    </this.constructor.RootElement>
+    </RootElement>
   );
 
   render = () => (

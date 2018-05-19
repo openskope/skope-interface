@@ -9,7 +9,10 @@ import NotFoundPage from '/imports/ui/pages/not-found';
 
 import {
   simpleMountAction,
-} from '/imports/ui/helpers';
+} from '/imports/helpers/ui/routing';
+import {
+  NOOP,
+} from '/imports/helpers/model';
 
 // Set default document.title value in case router has no title property.
 FlowRouter.globals.push({
@@ -23,7 +26,7 @@ FlowRouter.route('/', {
   triggersEnter: [(context, redirect) => {
     redirect('/discover');
   }],
-  action: () => {},
+  action: NOOP,
 });
 
 // Deprecated route.
@@ -33,7 +36,7 @@ FlowRouter.route('/search', {
   triggersEnter: [(context, redirect) => {
     redirect('/discover');
   }],
-  action: () => {},
+  action: NOOP,
 });
 
 // Deprecated route.
@@ -43,7 +46,7 @@ FlowRouter.route('/explore', {
   triggersEnter: [(context, redirect) => {
     redirect('/discover');
   }],
-  action: () => {},
+  action: NOOP,
 });
 
 FlowRouter.route('/discover', {
