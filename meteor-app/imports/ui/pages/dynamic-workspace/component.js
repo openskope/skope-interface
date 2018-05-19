@@ -78,7 +78,7 @@ class WorkspacePage extends React.Component {
     checkToLoadNewDataset(nextProps);
   }
 
-  renderBody = () => {
+  renderBody () {
     const {
       currentDatasetId,
       loadingConfigData,
@@ -94,7 +94,7 @@ class WorkspacePage extends React.Component {
     }
 
     return this.renderLoadedView();
-  };
+  }
 
   //! Improve empty view.
   renderEmptyView = () => (
@@ -112,34 +112,44 @@ class WorkspacePage extends React.Component {
   );
 
   //! Improve error view.
-  renderLoadingErrorView = ({
-    configDataRequestError,
-  } = this.props) => (
-    <RootElement>
-      <h1>Error</h1>
-      <PropPrinter
-        {...{
-          configDataRequestError,
-        }}
-      />
-    </RootElement>
-  );
+  renderLoadingErrorView () {
+    const {
+      configDataRequestError,
+    } = this.props;
 
-  renderLoadedView = ({
-    configData,
-  } = this.props) => (
-    <RootElement>
-      <DynamicWorkspaceSuite
-        suiteType={`WORKSPACE_SUITE__${String(configData.type).toUpperCase()}`}
-        suiteProps={configData}
-      />
-    </RootElement>
-  );
+    return (
+      <RootElement>
+        <h1>Error</h1>
+        <PropPrinter
+          {...{
+            configDataRequestError,
+          }}
+        />
+      </RootElement>
+    );
+  }
 
-  render = () => (
-    <FullWindowLayout
-      header={<AppbarHeader title={<WorkspaceTitle />} />}
-      body={this.renderBody()}
-    />
-  );
+  renderLoadedView () {
+    const {
+      configData,
+    } = this.props;
+    
+    return (
+      <RootElement>
+        <DynamicWorkspaceSuite
+          suiteType={`WORKSPACE_SUITE__${String(configData.type).toUpperCase()}`}
+          suiteProps={configData}
+        />
+      </RootElement>
+    );
+  }
+
+  render () {
+    return (
+      <FullWindowLayout
+        header={<AppbarHeader title={<WorkspaceTitle />} />}
+        body={this.renderBody()}
+      />
+    );
+  }
 }
