@@ -291,6 +291,10 @@ class OverlayTabContent extends React.Component {
       hasSelectedVariable,
       dateRangeStart,
       dateRangeEnd,
+      getSliderValueFromDate,
+      getDateFromSliderValue,
+      getDateFromYearStringInput,
+      updateLoadedDate,
     } = this.props;
     const {
       currentLoadedDateTemporal,
@@ -304,15 +308,15 @@ class OverlayTabContent extends React.Component {
         value={currentLoadedDateTemporal}
         disabled={!hasSelectedVariable}
         // (Date) => number
-        toSliderValue={this.props.getSliderValueFromDate}
+        toSliderValue={getSliderValueFromDate}
         // (number) => Date
-        fromSliderValue={this.props.getDateFromSliderValue}
+        fromSliderValue={getDateFromSliderValue}
         // (Date) => string
         toInputValue={getYearStringFromDate}
         // (string) => Date
-        fromInputValue={this.props.getDateFromYearStringInput}
+        fromInputValue={getDateFromYearStringInput}
         onChange={(event, date) => this.setState({ currentLoadedDateTemporal: date })}
-        onFinish={(event, date) => this.props.updateLoadedDate(date)}
+        onFinish={(event, date) => updateLoadedDate(date)}
         style={{
           // This is a workaround to insert cells used only for spacing into the grid to achieve the desired effect.
           gridTemplateAreas: '"spacing-left label spacing-inBetween input spacing-right" "slider slider slider slider slider"',
@@ -343,6 +347,12 @@ class OverlayTabContent extends React.Component {
       hasSelectedVariable,
       boundaryGeometry,
       focusGeometry,
+      renderVariableList,
+      renderTemporalControls,
+      renderFocusBoundaryMap,
+      renderMapLayerForSelectedVariable,
+      isPanelOpen,
+      togglePanelOpenState,
     } = this.props;
 
     const finalFocusGeometry = focusGeometry || boundaryGeometry;
@@ -355,11 +365,11 @@ class OverlayTabContent extends React.Component {
           zDepth={1}
         >
           <List>
-            {this.props.renderVariableList({})}
-            {this.props.renderTemporalControls({
+            {renderVariableList({})}
+            {renderTemporalControls({
               disabled: this.isPlaying,
             })}
-            {this.props.renderFocusBoundaryMap({
+            {renderFocusBoundaryMap({
               selectionTools: OverlayTabContent.selectionTools,
             })}
           </List>
@@ -376,7 +386,7 @@ class OverlayTabContent extends React.Component {
             extent={focusExtent}
             ref={(ref) => this._detailMap = ref}
           >
-            {hasSelectedVariable && this.props.renderMapLayerForSelectedVariable({ legend: true })}
+            {hasSelectedVariable && renderMapLayerForSelectedVariable({ legend: true })}
             <map-interaction-defaults />
             <map-control-defaults />
           </MapView>
@@ -386,8 +396,8 @@ class OverlayTabContent extends React.Component {
               key="overlay-animation"
               primaryText="Animation"
               primaryTogglesNestedList
-              open={this.props.isPanelOpen('overlay-animation')}
-              onNestedListToggle={() => this.props.togglePanelOpenState('overlay-animation')}
+              open={isPanelOpen('overlay-animation')}
+              onNestedListToggle={() => togglePanelOpenState('overlay-animation')}
               nestedItems={[
                 <ListItem
                   disabled

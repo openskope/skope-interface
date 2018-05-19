@@ -392,3 +392,23 @@ const stringToNumber = (value, postProcess = (x) => x) => {
 
   return postProcess(finalValue);
 };
+
+/**
+ * @param {Date} date
+ * @param {Date} minDate
+ * @param {Date} maxDate
+ */
+export
+const clampDateWithinRange = (date, minDate, maxDate) => {
+  let finalDate = date;
+
+  if (finalDate.valueOf() > maxDate.valueOf()) {
+    finalDate = maxDate;
+  }
+
+  if (finalDate.valueOf() < minDate.valueOf()) {
+    finalDate = minDate;
+  }
+
+  return finalDate;
+};

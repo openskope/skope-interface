@@ -4,14 +4,6 @@ import React from 'react';
 import objectPath from 'object-path';
 import moment from 'moment';
 import {
-  parse as parseUrl,
-  format as formatUrl,
-} from 'url';
-import {
-  parse as parseQueryString,
-  stringify as stringifyQueryString,
-} from 'querystring';
-import {
   Tab,
 } from 'material-ui/Tabs';
 import {
@@ -29,7 +21,8 @@ import CollapseIcon from 'material-ui/svg-icons/navigation/expand-less';
 import {
   getDateAtPrecision,
   getYearStringFromDate,
-} from '/imports/ui/helpers';
+  clampDateWithinRange,
+} from '/imports/helpers/model';
 
 import ToggleButton from '/imports/ui/components/ToggleButton';
 
@@ -101,14 +94,21 @@ class TabBaseClass extends SubComponentClass {
     });
   }
   /**
+   * Setting date range also updates current loaded date to make sure the
+   * current loaded date is not outside of the date range.
    * @return {[Date, Date]}
    */
   get dateRange () {
     return this.sharedState.dateRange;
   }
   set dateRange (value) {
+    let currentLoadedDate = this.currentLoadedDate;
+
+    currentLoadedDate = clampDateWithinRange(currentLoadedDate, value[0], value[1]);
+
     this.setSharedState({
       dateRange: value,
+      currentLoadedDate,
     });
   }
   /**
@@ -131,17 +131,9 @@ class TabBaseClass extends SubComponentClass {
     return this.sharedState.currentLoadedDate;
   }
   set currentLoadedDate (value) {
-    const maxDate = this.dateRangeEnd;
-    const minDate = this.dateRangeStart;
     let preciseDate = this.getPreciseDateWithinTimespan(value);
 
-    if (preciseDate.valueOf() > maxDate.valueOf()) {
-      preciseDate = maxDate;
-    }
-
-    if (preciseDate.valueOf() < minDate.valueOf()) {
-      preciseDate = minDate;
-    }
+    preciseDate = this.constructor.clampDateWithinRange(preciseDate, this.dateRangeStart, this.dateRangeEnd);
 
     if (preciseDate.valueOf() === this.currentLoadedDate.valueOf()) {
       return;
@@ -365,12 +357,20 @@ class TabBaseClass extends SubComponentClass {
     // Override this.
   }
 
+  /**
+   * @param {Event} event
+   * @param {[Date, Date]} dateRange
+   */
   onChangeDateRange = (event, dateRange) => {
     const preciseDateRange = dateRange.map(this.getPreciseDateWithinTimespan);
 
     this.dateRangeTemporal = preciseDateRange;
   };
 
+  /**
+   * @param {Event} event
+   * @param {[Date, Date]} dateRange
+   */
   onFinishDateRange = (event, dateRange) => {
     const preciseDateRange = dateRange.map(this.getPreciseDateWithinTimespan);
 
