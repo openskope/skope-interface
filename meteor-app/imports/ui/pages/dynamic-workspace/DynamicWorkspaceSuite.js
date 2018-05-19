@@ -51,19 +51,18 @@ class DynamicWorkspaceSuite extends React.Component {
     return shouldUpdate;
   }
 
-  render () {
-    if (this.props.suiteType in Suites) {
-      const WorkspaceSuite = Suites[this.props.suiteType];
-      return (
-        <WorkspaceSuite
-          {...this.props.suiteProps}
-          routing={this.props.routing}
-          suiteState={this.props.suiteState}
-          setSuiteState={this.props.setSuiteState}
-        />
-      );
-    }
+  renderValidSuite (WorkspaceSuite) {
+    return (
+      <WorkspaceSuite
+        {...this.props.suiteProps}
+        routing={this.props.routing}
+        suiteState={this.props.suiteState}
+        setSuiteState={this.props.setSuiteState}
+      />
+    );
+  }
 
+  renderInvalidSuiteErrorView () {
     return (
       <div>
         <h1>Invalid Suite Type</h1>
@@ -75,6 +74,14 @@ class DynamicWorkspaceSuite extends React.Component {
         />
       </div>
     );
+  }
+
+  render () {
+    if (this.props.suiteType in Suites) {
+      return this.renderValidSuite(Suites[this.props.suiteType]);
+    }
+
+    return this.renderInvalidSuiteErrorView();
   }
 }
 
