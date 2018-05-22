@@ -35,7 +35,6 @@ const wms = (layer, fillers) => {
       LAYER: fillTemplateString(nameOfFirstLayer, fillers),
       LEGEND_OPTIONS: stringifyQueryString({
         layout: 'vertical',
-        forceRule: true,
         dx: 10,
       }, ';', ':'),
     },
