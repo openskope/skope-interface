@@ -503,6 +503,10 @@ class TabBaseClass extends SubComponentClass {
             />
           )}
           primaryText={variable.name}
+          style={{
+            // This value should be 20px more than the width of the right icon button.
+            paddingRight: '120px',
+          }}
           rightIconButton={(
             <ToggleButton
               label="Style"
