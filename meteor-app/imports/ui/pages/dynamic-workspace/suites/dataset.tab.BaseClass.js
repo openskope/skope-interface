@@ -133,7 +133,7 @@ class TabBaseClass extends SubComponentClass {
   set currentLoadedDate (value) {
     let preciseDate = this.getPreciseDateWithinTimespan(value);
 
-    preciseDate = this.constructor.clampDateWithinRange(preciseDate, this.dateRangeStart, this.dateRangeEnd);
+    preciseDate = clampDateWithinRange(preciseDate, this.dateRangeStart, this.dateRangeEnd);
 
     if (preciseDate.valueOf() === this.currentLoadedDate.valueOf()) {
       return;
