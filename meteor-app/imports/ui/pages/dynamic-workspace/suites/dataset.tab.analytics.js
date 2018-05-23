@@ -245,8 +245,9 @@ class AnalyticsTabContent extends React.Component {
           return null;
         },
         boundaryGeometry: payload.boundaryGeometry,
-        start: () => this.props.getFrameIndexInTimespan(payload.dateRange[0]),
-        end: () => this.props.getFrameIndexInTimespan(payload.dateRange[1]),
+        //! Format these properly according to the temporal resolution of the dataset.
+        start: () => moment(payload.dateRange[0]).format('YYYY'),
+        end: () => moment(payload.dateRange[1]).format('YYYY'),
       },
       requestBody,
     );
@@ -266,12 +267,7 @@ class AnalyticsTabContent extends React.Component {
       remoteUrl,
       {
         json: true,
-        data: {
-          // Workaround until the url templates are ready.
-          start: this.props.getFrameIndexInTimespan(payload.dateRange[0]),
-          end: this.props.getFrameIndexInTimespan(payload.dateRange[1]),
-          ...requestBody,
-        },
+        data: requestBody,
       },
       (error, response) => {
         if (error) {
