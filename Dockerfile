@@ -8,9 +8,6 @@ ARG GIT_COMMIT=""
 FROM ubuntu:16.04 AS build
 LABEL maintainer="Xingchen Hong <hello@xc-h.com>"
 
-ARG METEOR_VERSION
-ARG APP_DIR
-
 RUN apt-get update \
     && apt-get install -y -q build-essential \
                              libssl-dev curl git \
@@ -22,6 +19,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 ENV HOME="/home/meteor"
+
+ARG APP_DIR
+
 RUN useradd -m -s /bin/bash meteor \
     && mkdir -p "${APP_DIR}" \
     && chown -R meteor:meteor "${APP_DIR}"
@@ -40,6 +40,8 @@ RUN chown -R meteor:meteor "${APP_DIR}/source"
 USER meteor
 
 # Install Meteor.
+ARG METEOR_VERSION
+
 RUN curl "https://install.meteor.com/?release=${METEOR_VERSION}" | sh
 ENV METEOR_PATH="${HOME}/.meteor"
 ENV PATH="$PATH:$METEOR_PATH"
@@ -51,9 +53,6 @@ RUN cd "${APP_DIR}/source" \
 FROM node:${NODE_VERSION}-slim
 LABEL maintainer="Xingchen Hong <hello@xc-h.com>"
 
-ARG APP_DIR
-ARG GIT_COMMIT
-
 RUN apt-get update \
     && apt-get install -y -q build-essential \
                              libssl-dev curl git \
@@ -64,11 +63,15 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+ARG APP_DIR
+
 ENV HOME="/home/meteor"
 RUN useradd -m -s /bin/bash meteor \
     && mkdir -p "${APP_DIR}" \
     && chown -R meteor:meteor "${APP_DIR}"
 WORKDIR "${APP_DIR}"
+
+ARG GIT_COMMIT
 
 # Meteor Port Config
 ENV NODE_ENV="production" \
