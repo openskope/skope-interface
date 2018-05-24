@@ -30,11 +30,13 @@ import {
   presentationProjection,
   maxMapZoomLevel,
   minMapZoomLevel,
+  dataSpatialBoundaryFillColor,
 } from '/imports/ui/consts';
 
 import {
   getYearStringFromDate,
   offsetDateAtPrecision,
+  buildGeoJsonWithGeometry,
 } from '/imports/ui/helpers';
 
 import MapView from '/imports/ui/components/mapview';
@@ -342,6 +344,8 @@ class OverlayTabContent extends React.Component {
       togglePanelOpenState,
     } = this.props;
 
+    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(focusGeometry);
+    const focusBoundaryGeoJsonString = focusBoundaryGeoJson && JSON.stringify(focusBoundaryGeoJson);
     const finalFocusGeometry = focusGeometry || boundaryGeometry;
     const focusExtent = finalFocusGeometry && HTMLMapLayerVector.getExtentFromGeometry(finalFocusGeometry, HTMLMapLayerVector.IOProjection);
 
@@ -374,6 +378,15 @@ class OverlayTabContent extends React.Component {
             ref={(ref) => this._detailMap = ref}
           >
             {hasSelectedVariable && renderMapLayerForSelectedVariable({ legend: true })}
+            {focusBoundaryGeoJsonString && (
+              <map-layer-geojson
+                style={{
+                  // Do not use any fill so the variable overlay is not affected.
+                  fill: 'none',
+                }}
+                src-json={focusBoundaryGeoJsonString}
+              />
+            )}
             <map-interaction-defaults />
             <map-control-defaults />
           </MapView>
