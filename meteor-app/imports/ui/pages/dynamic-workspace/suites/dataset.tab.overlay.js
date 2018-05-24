@@ -28,6 +28,8 @@ import {
   PanToolIcon,
   BoxToolIcon,
   presentationProjection,
+  maxMapZoomLevel,
+  minMapZoomLevel,
 } from '/imports/ui/consts';
 
 import {
@@ -112,14 +114,6 @@ class OverlayTabContent extends React.Component {
     this.setState(updates);
   }
 
-  componentWillUpdate () {
-    this.disconnectOverviewMap();
-  }
-
-  componentDidUpdate () {
-    this.connectOverviewMap();
-  }
-
   componentWillUnmount () {
     this.disconnectOverviewMap();
 
@@ -187,16 +181,24 @@ class OverlayTabContent extends React.Component {
   }
 
   connectOverviewMap () {
-    // When the viewing extent is changed, reflect on the overview.
-    if (this._detailMap && this._detailMap.map) {
-      this._detailMap.map.addEventListener('change:extent', this.onChangeViewingExtent);
+    if (!(this._detailMap && this._detailMap.map)) {
+      return;
     }
+
+    //! Workaround to set max zoom without `web-gis-components` supporting it.
+    this._detailMap.map.olMap_.getView().setMaxZoom(maxMapZoomLevel);
+    this._detailMap.map.olMap_.getView().setMinZoom(minMapZoomLevel);
+
+    // When the viewing extent is changed, reflect on the overview.
+    this._detailMap.map.addEventListener('change:extent', this.onChangeViewingExtent);
   }
 
   disconnectOverviewMap () {
-    if (this._detailMap && this._detailMap.map) {
-      this._detailMap.map.removeEventListener('change:extent', this.onChangeViewingExtent);
+    if (!(this._detailMap && this._detailMap.map)) {
+      return;
     }
+
+    this._detailMap.map.removeEventListener('change:extent', this.onChangeViewingExtent);
   }
 
   startAnimation () {

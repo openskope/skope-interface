@@ -92,6 +92,15 @@ export const dataSpatialBoundaryFillColor = objectPath.get(Meteor.settings, 'pub
  */
 export const dataChartShowUncertantyByDefault = objectPath.get(Meteor.settings, 'public.dataChartShowUncertantyByDefault', false);
 
+/**
+ * @type {number}
+ */
+export const maxMapZoomLevel = objectPath.get(Meteor.settings, 'public.maxMapZoomLevel', 18);
+/**
+ * @type {number}
+ */
+export const minMapZoomLevel = objectPath.get(Meteor.settings, 'public.minMapZoomLevel', 3);
+
 export const rangeMin = 1;
 export const rangeMax = 2000;
 

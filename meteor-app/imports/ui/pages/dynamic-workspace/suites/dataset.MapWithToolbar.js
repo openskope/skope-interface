@@ -14,6 +14,8 @@ import {
   dataSpatialBoundaryFillColor,
   mapToolbarStyles,
   presentationProjection,
+  maxMapZoomLevel,
+  minMapZoomLevel,
 } from '/imports/ui/consts';
 
 import {
@@ -50,6 +52,8 @@ class MapWithToolbar extends React.Component {
     super(props);
 
     const defaultSelectionTool = props.selectionTools[0] || { name: '' };
+
+    this._mapView = null;
 
     this.state = {
       activeSelectionToolName: defaultSelectionTool.name,
@@ -121,6 +125,12 @@ class MapWithToolbar extends React.Component {
   }
 
   connectMap () {
+    if (this._mapView && this._mapView.map) {
+      //! Workaround to set max zoom without `web-gis-components` supporting it.
+      this._mapView.map.olMap_.getView().setMaxZoom(maxMapZoomLevel);
+      this._mapView.map.olMap_.getView().setMinZoom(minMapZoomLevel);
+    }
+
     // Restrict to have at most 1 feature in the layer.
     if (this._focusGeometryDrawingInteraction) {
       this._focusGeometryDrawingInteraction.addEventListener('drawstart', this.onStartDrawingNewFocusGeometry);
@@ -232,6 +242,7 @@ class MapWithToolbar extends React.Component {
           style={{
             '--aspect-ratio': '4/3',
           }}
+          ref={(ref) => this._mapView = ref}
         >
           {children}
           {boundaryGeoJsonString && (
