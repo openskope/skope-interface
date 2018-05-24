@@ -151,18 +151,6 @@ class OverlayTabContent extends React.Component {
     }
   };
 
-  onChangeViewingExtent = _.throttle(() => {
-    if (!(this._detailMap && this._detailMap.map)) {
-      return;
-    }
-
-    const newExtent = this._detailMap.map.extent;
-    const extenJsonGeometry = HTMLMapLayerVector.getGeometryFromExtent(newExtent, HTMLMapLayerVector.IOProjection);
-
-    // Report new focus geometry.
-    this.props.updateFocusGeometry(extenJsonGeometry);
-  }, 3);
-
   get isPlaying () {
     return this.state.isPlaying;
   }
@@ -188,9 +176,6 @@ class OverlayTabContent extends React.Component {
     //! Workaround to set max zoom without `web-gis-components` supporting it.
     this._detailMap.map.olMap_.getView().setMaxZoom(maxMapZoomLevel);
     this._detailMap.map.olMap_.getView().setMinZoom(minMapZoomLevel);
-
-    // When the viewing extent is changed, reflect on the overview.
-    this._detailMap.map.addEventListener('change:extent', this.onChangeViewingExtent);
   }
 
   disconnectOverviewMap () {
@@ -198,7 +183,7 @@ class OverlayTabContent extends React.Component {
       return;
     }
 
-    this._detailMap.map.removeEventListener('change:extent', this.onChangeViewingExtent);
+    //! Nothing for now.
   }
 
   startAnimation () {
