@@ -222,6 +222,8 @@ export default connect(
           },
         });
         const referenceId = Raven.lastEventId();
+
+        const subject = 'SKOPE App Query/Comment';
         const body = `\n\n\n\n
 Please do not modify the content below to help technical support.
 --------------------------------------------------------------------------------
@@ -230,7 +232,7 @@ Build #: ${state.buildHash}
 Reference ID: ${referenceId}
 `;
 
-        anchorElement.href = `mailto:${contactEmail}?body=${encodeURIComponent(body)}`;
+        anchorElement.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         anchorElement.click();
       });
     },
