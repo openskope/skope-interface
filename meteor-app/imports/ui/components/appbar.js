@@ -61,7 +61,7 @@ class Component extends React.Component {
         text={(
           <span>
             <span>SKOPE</span>
-            {showBetaSign && <span className="beta-ribbon">BETA</span>}
+            {showBetaSign && <span className="beta-ribbon">Alpha</span>}
           </span>
         )}
         style={{
