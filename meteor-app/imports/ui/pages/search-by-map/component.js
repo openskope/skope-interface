@@ -116,7 +116,7 @@ export default class SearchPage extends React.Component {
               fields={[
                 'timespan.period',
               ]}
-              relation="contains"
+              relation="intersects"
               min={moment('0000', 'YYYY').toDate()}
               max={moment().toDate()}
               title="Time Period"
