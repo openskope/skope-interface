@@ -145,11 +145,14 @@ class SpatialFilter extends SearchkitComponent {
     fields: PropTypes.arrayOf(PropTypes.string),
     defaultExtent: PropTypes.arrayOf(PropTypes.number),
     mod: PropTypes.string,
+    // {intersects|disjoint|within|contains}
+    relation: PropTypes.string,
   };
 
   static defaultProps = {
     ...SearchkitComponent.defaultProps,
     defaultExtent: null,
+    relation: 'intersects',
   };
 
   static selectionTools = [
@@ -224,7 +227,7 @@ class SpatialFilter extends SearchkitComponent {
    */
   buildGeometryQuery = (geometry) => ({
     shape: geometry,
-    relation: 'contains',
+    relation: this.props.relation,
   });
 
   /**
