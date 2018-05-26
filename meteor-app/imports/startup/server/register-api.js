@@ -6,13 +6,15 @@ import path from 'path';
 import objectPath from 'object-path';
 import * as elasticsearch from 'elasticsearch';
 
+import buildGitCommit from '/imports/server/build-hash';
+
 const serverElasticEndpointInSettings = objectPath.get(Meteor.settings, 'server.elasticEndpoint');
 
 // Register your apis here
 
 Meteor.methods({
   buildHash () {
-    return objectPath.get(process.env, 'BUILD_GIT_COMMIT', '');
+    return buildGitCommit;
   },
   async 'datasetManifest.get' ({
     datasetId,
