@@ -32,9 +32,7 @@ const reducer = (state = initialState, action) => {
         message: 'New action',
         category: 'redux action',
         data: {
-          state,
           action,
-          nextState,
         },
       });
     }
