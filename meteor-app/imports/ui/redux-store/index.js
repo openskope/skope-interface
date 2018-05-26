@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import { createStore } from 'redux';
 import { reducer as reduxFormReducer } from 'redux-form';
-import Raven from 'raven-js';
 
+import Raven from '/imports/startup/client/sentry';
 import {
   appSettings,
 } from '/package.json';

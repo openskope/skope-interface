@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {
   connect,
 } from 'react-redux';
-import Raven from 'raven-js';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
@@ -15,8 +14,8 @@ import NoNotificationIcon from 'material-ui/svg-icons/social/notifications-none'
 import CodeIcon from 'material-ui/svg-icons/action/code';
 import EmailIcon from 'material-ui/svg-icons/communication/email';
 
+import Raven from '/imports/startup/client/sentry';
 import { actions } from '/imports/ui/redux-store';
-
 import SafeLink from '/imports/ui/components/SafeLink';
 
 import {
@@ -215,7 +214,7 @@ export default connect(
 
         document.body.removeChild(anchorElement);
       })((anchorElement) => {
-        Raven.captureException('Contact', {
+        Raven.captureMessage('Contact', {
           logger: 'contact',
           extra: {
             reduxState: state,

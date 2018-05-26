@@ -20,13 +20,13 @@ import {
   List,
 } from 'material-ui/List';
 
+import Raven from '/imports/startup/client/sentry';
 import {
   DatasetChartIcon,
   PanToolIcon,
   PointToolIcon,
   BoxToolIcon,
 } from '/imports/ui/consts';
-
 import {
   buildGeoJsonWithGeometry,
   PatheticDataRequester,
@@ -105,7 +105,7 @@ class AnalyticsTabContent extends React.Component {
   }
 
   onDataReady = (data) => {
-    console.log('onDataReady', data);
+    console.log('AnalyticsTabContent.onDataReady', data);
 
     this.setState({
       isLoadingTimeSeriesData: false,
@@ -117,26 +117,68 @@ class AnalyticsTabContent extends React.Component {
     });
   };
 
-  onDataError = (reason) => {
-    console.error('request error', reason);
+  onDataError = (error) => {
+    console.error('AnalyticsTabContent.onDataError', error);
+
+    const rawErrorMessage = error.message;
+    // Prepare a more friendly error message. If this always returns a valid value then the raw error will never be displayed.
+    const {
+      level: reportLevel,
+      message: niceErrorMessage,
+    } = (() => {
+      switch (true) {
+        case objectPath.get(error, 'originalError.message') === 'network':
+          return {
+            level: 'error',
+            message: 'Can not connect to the data service for the selected variable due to a network error.',
+          };
+        case objectPath.get(error, 'originalError.response.data.message').indexOf('exceeded time limit of') > -1:
+          return {
+            level: 'warn',
+            message: 'The server took too long to respond. Please try again or select a smaller area.',
+          };
+        case objectPath.get(error, 'originalError.response.data.message') === 'Coordinates are outside region covered by the dataset':
+          return {
+            level: 'info',
+            message: 'Please select a point or area within the dataset boundary.',
+          };
+        default:
+          return {
+            level: 'error',
+          };
+      }
+    })();
+
+    if (reportLevel === 'error') {
+      // Report critical error.
+      Raven.captureMessage('Time-series data request error', {
+        extra: {
+          message: error.message,
+          request: error.request,
+          originalError: error.originalError,
+          originalResponse: error.originalResponse,
+        },
+      });
+    } else {
+      // Report abnormal event.
+      Raven.captureMessage('Time-series data request abnormal event', {
+        level: reportLevel,
+        extra: {
+          niceErrorMessage,
+          request: error.request,
+          originalError: error.originalError,
+          originalResponse: error.originalResponse,
+        },
+      });
+    }
 
     this.setState({
       isLoadingTimeSeriesData: false,
       isTimeSeriesDataLoaded: false,
       timeSeriesData: null,
       timeSeriesDataRequestError: {
-        raw: reason.message,
-        // Prepare a more friendly error message. If this always returns a valid value then the raw error will never be displayed.
-        nice: (() => {
-          switch (true) {
-            case reason.response && reason.response.data && reason.response.data.status === 400 && reason.response.data.message.indexOf('exceeded time limit of') > -1:
-              return 'The server took too long to respond. Please try again or select a smaller area.';
-            case reason.message === 'network':
-              return 'Can not connect to the data service for the selected variable due to a network error.';
-            default:
-              return undefined;
-          }
-        })(),
+        raw: rawErrorMessage,
+        nice: niceErrorMessage,
       },
       timeSeriesDataResponseDate: new Date(),
       isPendingTimeSeriesChartRender: false,
@@ -144,7 +186,7 @@ class AnalyticsTabContent extends React.Component {
   };
 
   onChartRenderStart = () => {
-    console.log('onChartRenderStart');
+    console.log('AnalyticsTabContent.onChartRenderStart');
 
     this.setState({
       isPendingTimeSeriesChartRender: false,
@@ -154,7 +196,7 @@ class AnalyticsTabContent extends React.Component {
   };
 
   onChartRenderEnd = () => {
-    console.log('onChartRenderEnd');
+    console.log('AnalyticsTabContent.onChartRenderEnd');
 
     this.setState({
       isRenderingTimeSeriesChart: false,
@@ -209,7 +251,7 @@ class AnalyticsTabContent extends React.Component {
    * @param {Function} reject - Reject the request with a reason.
    */
   requestData = (payload, resolve, reject) => {
-    console.log('requestData', payload);
+    console.log('AnalyticsTabContent.requestData', payload);
 
     // Clear existing data.
     this.setState({
@@ -222,6 +264,7 @@ class AnalyticsTabContent extends React.Component {
     });
 
     if (!(payload.variableName && payload.boundaryGeometry && payload.dateRange)) {
+      console.log('Dependencies not met');
       return;
     }
 
@@ -252,7 +295,7 @@ class AnalyticsTabContent extends React.Component {
       requestBody,
     );
 
-    console.log('requestData', 'requesting', remoteUrl, requestBody);
+    console.log('AnalyticsTabContent.requestData', 'requesting', remoteUrl, requestBody);
 
     this.setState({
       isLoadingTimeSeriesData: true,
@@ -263,6 +306,14 @@ class AnalyticsTabContent extends React.Component {
       timeSeriesDataResponseDate: null,
     });
 
+    const exception = new Error('Unexpected error');
+
+    exception.request = {
+      method: 'post',
+      url: remoteUrl,
+      data: requestBody,
+    };
+
     HTTP.post(
       remoteUrl,
       {
@@ -271,12 +322,16 @@ class AnalyticsTabContent extends React.Component {
       },
       (error, response) => {
         if (error) {
-          reject(error);
+          exception.message = 'Error when requesting data';
+          exception.originalError = error;
+          reject(exception);
           return;
         }
 
         if (response.statusCode !== 200) {
-          reject(response);
+          exception.message = 'Data not OK';
+          exception.originalResponse = response;
+          reject(exception);
           return;
         }
 
