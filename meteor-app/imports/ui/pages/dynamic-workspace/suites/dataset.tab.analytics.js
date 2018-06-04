@@ -45,6 +45,7 @@ class AnalyticsTabContent extends React.Component {
     dateResolution: PropTypes.any.isRequired,
     focusGeometry: PropTypes.object,
 
+    getVariableNameById: PropTypes.func.isRequired,
     getFrameIndexInTimespan: PropTypes.func.isRequired,
     renderVariableList: PropTypes.func.isRequired,
     renderTemporalControls: PropTypes.func.isRequired,
@@ -399,6 +400,7 @@ class AnalyticsTabContent extends React.Component {
             >
               <CardMedia>
                 <AnalyticsChart
+                  variableName={this.props.getVariableNameById(selectedVariableId)}
                   temporalResolution={dateResolution}
                   temporalPeriod={{
                     gte: dateRange[0],
@@ -503,6 +505,7 @@ class AnalyticsTab extends TabBaseClass {
         dateResolution={this.component.timespan.resolution}
         focusGeometry={this.focusGeometry}
 
+        getVariableNameById={this.getVariableNameById}
         getFrameIndexInTimespan={this.component.getFrameIndexInTimespan}
         renderVariableList={this.renderVariableList}
         renderTemporalControls={this.renderTemporalControls}

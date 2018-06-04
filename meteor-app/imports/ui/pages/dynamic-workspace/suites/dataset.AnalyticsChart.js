@@ -20,6 +20,7 @@ import {
 export default
 class AnalyticsChart extends React.Component {
   static propTypes = {
+    variableName: PropTypes.string.isRequired,
     temporalResolution: PropTypes.string.isRequired,
     temporalPeriod: PropTypes.shape({
       gte: PropTypes.instanceOf(Date),
@@ -116,6 +117,7 @@ class AnalyticsChart extends React.Component {
     this.props.onRenderStart();
 
     const {
+      variableName,
       temporalResolution,
       temporalPeriod,
       data,
@@ -130,7 +132,7 @@ class AnalyticsChart extends React.Component {
     const xAxisLabelBaseIndex = objectPath.get(data, 'range.start', 0);
     const dataValues = objectPath.get(data, 'values', []);
     const dataUncertaintyValues = this.dataUncertaintyValues;
-    const dataLabel = objectPath.get(data, 'variableName', '');
+    const dataLabel = variableName === null ? objectPath.get(data, 'variableName', '') : variableName;
     const xAxisLabels = dataValues.map((v, index) => {
       const date = offsetDateAtPrecision(startDate, temporalPrecision, xAxisLabelBaseIndex + index);
 

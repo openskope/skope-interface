@@ -184,6 +184,16 @@ class TabBaseClass extends SubComponentClass {
     return variableId === this.selectedVariableId;
   }
 
+  getVariableNameById = (variableId) => {
+    const variable = this.component.variables[variableId];
+
+    if (typeof variable === 'undefined') {
+      return null;
+    }
+
+    return variable.name;
+  };
+
   /**
    * @param {string} variableId
    * @returns {number}
