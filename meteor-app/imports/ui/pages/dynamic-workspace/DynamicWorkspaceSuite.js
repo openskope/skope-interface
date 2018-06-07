@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import objectPath from 'object-path';
 import {
   connect,
 } from 'react-redux';
@@ -17,6 +18,8 @@ class DynamicWorkspaceSuite extends React.Component {
   static propTypes = {
     // Routing info from state.
     routing: PropTypes.object.isRequired,
+    // Path to the namespace in redux.
+    reduxNamespacePath: PropTypes.string.isRequired,
     // Suite type determines the renderer to use.
     suiteType: PropTypes.string.isRequired,
     // Props passed to the suite renderer.
@@ -87,14 +90,15 @@ class DynamicWorkspaceSuite extends React.Component {
 
 export default connect(
   // mapStateToProps
-  (state) => ({
+  (state, ownProps) => ({
     routing: state.routing,
-    suiteState: state.workspace.DynamicSuiteNS,
+    suiteState: objectPath.get(state, ownProps.reduxNamespacePath),
   }),
   // mapDispatchToProps
-  (dispatch) => ({
+  (dispatch, ownProps) => ({
     setSuiteState: (state, options = {}) => dispatch({
-      type: actions.WORKSPACE_SET_SUITE_STATE.type,
+      type: actions.NAMESPACE_SET_STATE.type,
+      namespacePath: ownProps.reduxNamespacePath,
       state,
       options,
     }),

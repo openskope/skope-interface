@@ -43,6 +43,7 @@ export default connect(
       loadingConfigData,
       configDataRequestError,
       configData,
+      reduxNamespacePath: 'workspace.DynamicSuiteNS',
     };
   },
   // mapDispatchToProps

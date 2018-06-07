@@ -60,12 +60,15 @@ class WorkspacePage extends React.Component {
     configData: PropTypes.object,
     // Callback to load new dataset (when requestDatasetId mis-matches currentDatasetId).
     loadNewDataset: PropTypes.func,
+    // Path to the namespace in Redux store for this.
+    reduxNamespacePath: PropTypes.string,
   };
 
   static defaultProps = {
     configDataRequestError: null,
     configData: null,
     loadNewDataset: NOOP,
+    reduxNamespacePath: '',
   };
 
   constructor (props) {
@@ -132,11 +135,13 @@ class WorkspacePage extends React.Component {
   renderLoadedView () {
     const {
       configData,
+      reduxNamespacePath,
     } = this.props;
     
     return (
       <RootElement>
         <DynamicWorkspaceSuite
+          reduxNamespacePath={reduxNamespacePath}
           suiteType={`WORKSPACE_SUITE__${String(configData.type).toUpperCase()}`}
           suiteProps={configData}
         />

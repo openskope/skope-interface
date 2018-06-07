@@ -262,33 +262,3 @@ export const WORKSPACE_LOAD_DATASET = scopedReducer((workspace, action) => {
     DynamicSuiteNS: null,
   };
 });
-
-export const WORKSPACE_SET_SUITE_STATE = scopedReducer((workspace, action) => {
-  const {
-    state: newState,
-    options = {},
-  } = action;
-
-  if (options.reset) {
-    return {
-      ...workspace,
-
-      // Reset removes the existing states.
-      DynamicSuiteNS: {
-        ...newState,
-      },
-    };
-  }
-
-  // Mimic the same behavior of `React.Component.prototype.setState`,
-  // which is merging states.
-  return {
-    ...workspace,
-
-    DynamicSuiteNS: {
-      ...workspace.DynamicSuiteNS,
-
-      ...newState,
-    },
-  };
-});
