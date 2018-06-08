@@ -137,7 +137,7 @@ class WorkspacePage extends React.Component {
       configData,
       reduxNamespacePath,
     } = this.props;
-    
+
     return (
       <RootElement>
         <DynamicWorkspaceSuite
