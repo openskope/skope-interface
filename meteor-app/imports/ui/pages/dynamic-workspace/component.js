@@ -137,12 +137,13 @@ class WorkspacePage extends React.Component {
       configData,
       reduxNamespacePath,
     } = this.props;
+    const suiteType = `WORKSPACE_SUITE__${String(configData.type).toUpperCase()}`;
 
     return (
       <RootElement>
         <DynamicWorkspaceSuite
           reduxNamespacePath={reduxNamespacePath}
-          suiteType={`WORKSPACE_SUITE__${String(configData.type).toUpperCase()}`}
+          suiteType={suiteType}
           suiteProps={configData}
         />
       </RootElement>
