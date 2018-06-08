@@ -2,7 +2,6 @@ import React from 'react';
 import Paper from 'material-ui/Paper';
 
 import {
-  dataSpatialBoundaryFillColor,
   DatasetInfoIcon,
   presentationProjection,
 } from '/imports/ui/consts';
@@ -13,15 +12,26 @@ import {
 
 import MapView from '/imports/ui/components/mapview';
 
-import TabBaseClass from '../BaseClass';
+import TabComponent from '../../TabComponent';
 
-class InfoTabContent extends React.Component {
+export default
+class InfoTab extends TabComponent {
+  static tabName = 'info';
+  static tabIcon = DatasetInfoIcon;
+  static tabLabel = 'Info';
+  static requiredProps = [
+    'information',
+  ];
+
   render () {
     const {
-      boundaryExtent,
-      boundaryGeoJsonString,
-      contentMarkdown,
+      information: informationField,
+      workspace: {
+        boundaryExtent,
+        renderBoundaryOverlay,
+      },
     } = this.props;
+    const contentMarkdown = informationField.markdown;
 
     return (
       <div className="dataset__info-tab">
@@ -47,44 +57,10 @@ class InfoTabContent extends React.Component {
               width: '100%',
             }}
           >
-            {boundaryGeoJsonString && (
-              <map-layer-geojson
-                style={{
-                  fill: dataSpatialBoundaryFillColor,
-                }}
-                src-json={boundaryGeoJsonString}
-                src-projection="EPSG:4326"
-              />
-            )}
+            {renderBoundaryOverlay()}
           </MapView>
         </Paper>
       </div>
-    );
-  }
-}
-
-export default
-class InfoTab extends TabBaseClass {
-  static tabIcon = DatasetInfoIcon;
-  static tabLabel = 'Info';
-  static requiredProps = [
-    'information',
-  ];
-
-  renderBody () {
-    const {
-      information: informationField,
-    } = this.props;
-
-    const boundaryGeoJson = this.component.boundaryGeoJson;
-    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
-
-    return (
-      <InfoTabContent
-        boundaryExtent={this.component.extent}
-        boundaryGeoJsonString={boundaryGeoJsonString}
-        contentMarkdown={informationField.markdown}
-      />
     );
   }
 }

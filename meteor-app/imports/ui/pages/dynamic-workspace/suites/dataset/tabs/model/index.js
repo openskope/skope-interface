@@ -9,17 +9,18 @@ import {
   MarkDownRenderer,
 } from '/imports/ui/helpers';
 
-import TabBaseClass from '../BaseClass';
+import TabComponent from '../../TabComponent';
 
 export default
-class ModelTab extends TabBaseClass {
+class ModelTab extends TabComponent {
+  static tabName = 'model';
   static tabIcon = DatasetModelIcon;
   static tabLabel = 'Model';
   static requiredProps = [
     'modelService',
   ];
 
-  renderBody () {
+  render () {
     const {
       modelService: modelField,
     } = this.props;

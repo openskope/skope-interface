@@ -1,16 +1,17 @@
 import objectPath from 'object-path';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 
-import TabBaseClass from '../BaseClass';
+import TabComponent from '../../TabComponent';
 
 export default
-class DiscoverTab extends TabBaseClass {
+class DiscoverTab extends TabComponent {
+  static tabName = 'discover';
   static tabLabel = 'Discover';
   static tabStyle = {
     fontSize: '1.2em',
   };
 
-  onActivate () {
+  componentDidMount () {
     /**
      * Search query state from the routing.
      * @type {Object}
@@ -29,4 +30,6 @@ class DiscoverTab extends TabBaseClass {
 
     location.href = url;
   }
+
+  render = () => null;
 }

@@ -37,23 +37,22 @@ import {
   fillTemplateString,
 } from '/imports/ui/helpers';
 
-import TabBaseClass from '../BaseClass';
+import TabComponent from '../../TabComponent';
 import AnalyticsChart from '../../AnalyticsChart';
 
-class AnalyticsTabContent extends React.Component {
+export default
+class AnalyticsTab extends TabComponent {
+  static tabName = 'analytics';
+  static tabIcon = DatasetChartIcon;
+  static tabLabel = 'Graph View';
+  static requiredProps = [
+    'analyticService',
+    'analytics',
+  ];
 
   static propTypes = {
+    ...TabComponent.propTypes,
     analytics: PropTypes.any.isRequired,
-    selectedVariableId: PropTypes.string.isRequired,
-    dateRange: PropTypes.any.isRequired,
-    dateResolution: PropTypes.any.isRequired,
-    focusGeometry: PropTypes.object,
-
-    getVariableNameById: PropTypes.func.isRequired,
-    getFrameIndexInTimespan: PropTypes.func.isRequired,
-    renderVariableList: PropTypes.func.isRequired,
-    renderTemporalControls: PropTypes.func.isRequired,
-    renderFocusBoundaryMap: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -213,7 +212,9 @@ class AnalyticsTabContent extends React.Component {
     const zip = new JsZip();
 
     const {
-      focusGeometry,
+      workspace: {
+        focusGeometry,
+      },
     } = this.props;
     const {
       timeSeriesData,
@@ -244,7 +245,11 @@ class AnalyticsTabContent extends React.Component {
   };
 
   getAnalyticsByName = (name) => {
-    return this.props.analytics.find((analytic) => {
+    const {
+      analytics,
+    } = this.props;
+
+    return analytics.find((analytic) => {
       return analytic.name === name;
     });
   };
@@ -348,10 +353,18 @@ class AnalyticsTabContent extends React.Component {
 
   render () {
     const {
-      selectedVariableId,
-      dateRange,
-      dateResolution,
-      focusGeometry,
+      workspace: {
+        selectedVariableId,
+        focusGeometry,
+        timespan: {
+          resolution: dateResolution,
+        },
+        dateRange,
+        getVariableNameById,
+        renderVariableList,
+        renderTemporalControls,
+        renderFocusBoundaryMap,
+      },
     } = this.props;
     const {
       isLoadingTimeSeriesData,
@@ -383,10 +396,10 @@ class AnalyticsTabContent extends React.Component {
           zDepth={1}
         >
           <List>
-            {this.props.renderVariableList({})}
-            {this.props.renderTemporalControls({})}
-            {this.props.renderFocusBoundaryMap({
-              selectionTools: AnalyticsTabContent.selectionTools,
+            {renderVariableList({})}
+            {renderTemporalControls({})}
+            {renderFocusBoundaryMap({
+              selectionTools: this.constructor.selectionTools,
             })}
           </List>
         </Paper>
@@ -404,7 +417,7 @@ class AnalyticsTabContent extends React.Component {
             >
               <CardMedia>
                 <AnalyticsChart
-                  variableName={this.props.getVariableNameById(selectedVariableId)}
+                  variableName={getVariableNameById(selectedVariableId)}
                   temporalResolution={dateResolution}
                   temporalPeriod={{
                     gte: dateRange[0],
@@ -486,35 +499,6 @@ class AnalyticsTabContent extends React.Component {
           )}
         </Paper>
       </div>
-    );
-  }
-}
-
-export default
-class AnalyticsTab extends TabBaseClass {
-
-  static tabIcon = DatasetChartIcon;
-  static tabLabel = 'Graph View';
-  static requiredProps = [
-    'analyticService',
-    'analytics',
-  ];
-
-  renderBody () {
-    return (
-      <AnalyticsTabContent
-        analytics={this.props.analytics}
-        selectedVariableId={this.selectedVariableId}
-        dateRange={this.dateRange}
-        dateResolution={this.component.timespan.resolution}
-        focusGeometry={this.focusGeometry}
-
-        getVariableNameById={this.getVariableNameById}
-        getFrameIndexInTimespan={this.component.getFrameIndexInTimespan}
-        renderVariableList={this.renderVariableList}
-        renderTemporalControls={this.renderTemporalControls}
-        renderFocusBoundaryMap={this.renderFocusBoundaryMap}
-      />
     );
   }
 }

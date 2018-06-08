@@ -8,8 +8,20 @@ import geojsonExtent from 'geojson-extent';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import {
   Tabs,
+  Tab,
 } from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
+import {
+  ListItem,
+} from 'material-ui/List';
+import {
+  RadioButton,
+} from 'material-ui/RadioButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+import ImageStyleIcon from 'material-ui/svg-icons/image/style';
+import ExpandIcon from 'material-ui/svg-icons/navigation/expand-more';
+import CollapseIcon from 'material-ui/svg-icons/navigation/expand-less';
 
 import {
   getPrecisionByResolution,
@@ -19,6 +31,18 @@ import {
   AllResolutionNames,
   stringToNumber,
 } from '/imports/ui/helpers';
+import {
+  getDateAtPrecision,
+  getYearStringFromDate,
+  clampDateWithinRange,
+} from '/imports/helpers/model';
+
+import ToggleButton from '/imports/ui/components/ToggleButton';
+import {
+  SliderWithInput,
+  RangeWithInput,
+} from '/imports/ui/components/SliderWithInput';
+import MapWithToolbar from '/imports/ui/components/MapWithToolbar';
 
 import SuiteBaseClass from '../SuiteBaseClass';
 
@@ -28,6 +52,9 @@ import DownloadTab from './tabs/download';
 import OverlayTab from './tabs/overlay';
 import AnalyticsTab from './tabs/analytics';
 import ModelTab from './tabs/model';
+
+import * as mapLayerRenderers from './mapLayerRenderers';
+import * as mapLayerLegendRenderers from './mapLayerLegendRenderers';
 
 // Expose this collection in case other components need to know about the tabs and their order.
 export const tabConstructs = {
@@ -68,8 +95,6 @@ class DatasetWorkspace extends SuiteBaseClass {
         ]),
       }).isRequired,
     }).isRequired,
-
-    ...OverlayTab.propTypes,
   });
 
   static defaultProps = {
@@ -111,16 +136,13 @@ class DatasetWorkspace extends SuiteBaseClass {
     };
   };
 
+  static defaultVariableOpacity = 0.5;
+
   constructor (props) {
     super(props);
 
-    this._tabs = Object.entries(tabConstructs)
-    .reduce((acc, [id, Construct]) => {
-      return {
-        ...acc,
-        [id]: new Construct(this, id),
-      };
-    }, {});
+    this._suiteContextValue = {};
+    this._tabRefs = {};
 
     /**
      * Search query state from the routing.
@@ -188,55 +210,96 @@ class DatasetWorkspace extends SuiteBaseClass {
      * and all of the namespaces returned from different tabs would be merged.
      * ! Should it warn about collisions?
      */
-    this.state = _.merge({
-      // These state properties are shared across multiple tabs.
-      // Check `tabs/BaseClass.js` for helper getters and setters.
-      _shared: {
-        /**
-         * The ID of the currently selected variable.
-         * If need default selection, configure it here.
-         * Empty string denotes null selection.
-         * @type {string}
-         */
-        selectedVariableId: '',
-        // @type {Object<variableId: string, opacity: number>}
-        variableOpacity: {},
-        // @type {Object<variableId: string, stylingRange: [Date, Date]>}
-        variableStylingRange: {},
-        /**
-         * A collection of boolean values indicating if a panel is open.
-         * When there is no value for a specific key, the default state is up to the reader's interpretation.
-         * @type {Object<boolean>}
-         */
-        isPanelOpen: {},
-        /**
-         * Range of the current selection.
-         * This tuple-style structure is used by the slider component.
-         * Since the slider is a high-update-frequency component, it's better to reduce the amount of convertion necessary.
-         * @type {[Date, Date]}
-         */
-        dateRange: initialDateRange,
-        /**
-         * This should be an exact copy of `dateRange` but gets updated much frequently more by the sliders.
-         */
-        dateRangeTemporal: initialDateRange,
-        /**
-         * The date of the currently selected time frame/band.
-         * This affects what layers are displayed in the map view and the graph view.
-         * @type {Date}
-         */
-        currentLoadedDate: initialDateRange[0],
-        /**
-         * The geometry of the area of interest.
-         * This determines the highlighted area of the map view and the study area of the graph view.
-         * @type {Object}
-         */
-        focusGeometry: initialFocusGeometry,
-      },
+    this.state = {
+      /**
+       * The ID of the currently selected variable.
+       * If need default selection, configure it here.
+       * Empty string denotes null selection.
+       * @type {string}
+       */
+      selectedVariableId: '',
+
+      // @type {Object<variableId: string, opacity: number>}
+      variableOpacity: {},
+
+      // @type {Object<variableId: string, stylingRange: [Date, Date]>}
+      variableStylingRange: {},
+
+      /**
+       * A collection of boolean values indicating if a panel is open.
+       * When there is no value for a specific key, the default state is up to the reader's interpretation.
+       * @type {Object<boolean>}
+       */
+      isPanelOpen: {},
+
+      /**
+       * Range of the current selection.
+       * This tuple-style structure is used by the slider component.
+       * Since the slider is a high-update-frequency component, it's better to reduce the amount of convertion necessary.
+       * @type {[Date, Date]}
+       */
+      dateRange: initialDateRange,
+
+      /**
+       * This should be an exact copy of `dateRange` but gets updated much frequently more by the sliders.
+       */
+      dateRangeTemporal: initialDateRange,
+
+      /**
+       * The date of the currently selected time frame/band.
+       * This affects what layers are displayed in the map view and the graph view.
+       * @type {Date}
+       */
+      currentLoadedDate: initialDateRange[0],
+
+      /**
+       * The geometry of the area of interest.
+       * This determines the highlighted area of the map view and the study area of the graph view.
+       * @type {Object}
+       */
+      focusGeometry: initialFocusGeometry,
 
       // @type {string}
-      activeTab: this._tabs.infoTab.name,
-    }, ...(Object.values(this._tabs).map((tab) => tab.getInitialStateForParent())));
+      activeTab: tabConstructs.infoTab.tabName,
+    };
+  }
+
+  /**
+   * @param {Event} event
+   * @param {[Date, Date]} dateRange
+   */
+  onChangeDateRange = _.throttle((event, dateRange) => {
+    const preciseDateRange = dateRange.map(this.getPreciseDateWithinTimespan);
+
+    this.dateRangeTemporal = preciseDateRange;
+  }, 0);
+
+  /**
+   * @param {Event} event
+   * @param {[Date, Date]} dateRange
+   */
+  onFinishDateRange = (event, dateRange) => {
+    const preciseDateRange = dateRange.map(this.getPreciseDateWithinTimespan);
+
+    this.dateRange = preciseDateRange;
+  };
+
+  /**
+   * @return {string}
+   */
+  get selectedVariableId () {
+    return this.state.selectedVariableId;
+  }
+  set selectedVariableId (value) {
+    this.setState({
+      selectedVariableId: value,
+    });
+  }
+  /**
+   * @return {boolean}
+   */
+  get hasSelectedVariable () {
+    return this.selectedVariableId !== '';
   }
 
   /**
@@ -293,12 +356,185 @@ class DatasetWorkspace extends SuiteBaseClass {
 
     return geojsonExtent(boundaryGeoJson);
   }
+  get boundaryExtent () {
+    return this.extent;
+  }
 
   /**
    * @type {Object<string, Object>}
    */
   get variables () {
     return this.props.variables;
+  }
+
+  /**
+   * @return {Object}
+   */
+  get focusGeometry () {
+    return this.state.focusGeometry;
+  }
+  set focusGeometry (value) {
+    this.setState({
+      focusGeometry: value,
+    });
+  }
+
+  /**
+   * @return {Date}
+   */
+  get currentLoadedDate () {
+    return this.state.currentLoadedDate;
+  }
+  set currentLoadedDate (value) {
+    const [
+      dateRangeStart,
+      dateRangeEnd,
+    ] = this.dateRange;
+    let preciseDate = this.getPreciseDateWithinTimespan(value);
+
+    preciseDate = clampDateWithinRange(preciseDate, dateRangeStart, dateRangeEnd);
+
+    if (preciseDate.valueOf() === this.currentLoadedDate.valueOf()) {
+      return;
+    }
+
+    this.setState({
+      currentLoadedDate: preciseDate,
+    });
+  }
+
+  /**
+   * @return {[Date, Date]}
+   */
+  get dateRangeTemporal () {
+    return this.state.dateRangeTemporal;
+  }
+  set dateRangeTemporal (value) {
+    this.setState({
+      dateRangeTemporal: value,
+    });
+  }
+
+  /**
+   * Setting date range also updates current loaded date to make sure the
+   * current loaded date is not outside of the date range.
+   * @return {[Date, Date]}
+   */
+  get dateRange () {
+    return this.state.dateRange;
+  }
+  set dateRange (value) {
+    let currentLoadedDate = this.currentLoadedDate;
+
+    currentLoadedDate = clampDateWithinRange(currentLoadedDate, value[0], value[1]);
+
+    this.setState({
+      dateRange: value,
+      currentLoadedDate,
+    });
+  }
+
+  getSuiteContextValue () {
+    // Compose new context value here.
+    const newContextValue = {
+      secret: 123,
+
+      workspace: this,
+
+      hasSelectedVariable: this.hasSelectedVariable,
+      boundaryGeometry: this.boundaryGeometry,
+      boundaryExtent: this.extent,
+      focusGeometry: this.focusGeometry,
+
+      renderBoundaryOverlay: this.renderBoundaryOverlay,
+      renderVariableList: this.renderVariableList,
+      renderTemporalControls: this.renderTemporalControls,
+      renderFocusBoundaryMap: this.renderFocusBoundaryMap,
+      renderMapLayerForSelectedVariable: this.renderMapLayerForSelectedVariable,
+      isPanelOpen: this.isPanelOpen,
+      togglePanelOpenState: this.togglePanelOpenState,
+    };
+
+    if (!_.isEqual(newContextValue, this._suiteContextValue)) {
+      this._suiteContextValue = newContextValue;
+    }
+
+    return this._suiteContextValue;
+  }
+
+  /**
+   * Make sure the given date stays within the dataset timespan and has the proper resolution.
+   * @param {Date} date
+   * @returns {Date}
+   */
+  getPreciseDateWithinTimespan = (date) => {
+    let preciseDate = getDateAtPrecision(date, this.temporalPrecision);
+
+    if (preciseDate.valueOf() > this.timespan.period.lte.valueOf()) {
+      preciseDate = this.timespan.period.lte;
+    }
+
+    if (preciseDate.valueOf() < this.timespan.period.gte.valueOf()) {
+      preciseDate = this.timespan.period.gte;
+    }
+
+    return preciseDate;
+  };
+
+  getVariableNameById = (variableId) => {
+    const variable = this.variables[variableId];
+
+    if (typeof variable === 'undefined') {
+      return null;
+    }
+
+    return variable.name;
+  };
+
+  /**
+   * @param {string} variableId
+   * @returns {number}
+   */
+  getVariableOpacity (variableId) {
+    return variableId in this.state.variableOpacity
+           ? this.state.variableOpacity[variableId]
+           : this.constructor.defaultVariableOpacity;
+  }
+
+  /**
+   * @param {string} variableId
+   * @param {number} opacity
+   */
+  setVariableOpacity (variableId, opacity) {
+    this.setState({
+      variableOpacity: {
+        ...this.state.variableOpacity,
+        [variableId]: opacity,
+      },
+    });
+  }
+
+  /**
+   * @param {string} variableId
+   * @returns {[Date, Date]|null}
+   */
+  getVariableStylingRange (variableId, defaultValue = null) {
+    return variableId in this.state.variableStylingRange
+           ? this.state.variableStylingRange[variableId]
+           : defaultValue;
+  }
+
+  /**
+   * @param {string} variableId
+   * @param {[Date, Date]|null} range
+   */
+  setVariableStylingRange (variableId, range) {
+    this.setState({
+      variableStylingRange: {
+        ...this.state.variableStylingRange,
+        [variableId]: range,
+      },
+    });
   }
 
   /**
@@ -330,26 +566,43 @@ class DatasetWorkspace extends SuiteBaseClass {
     return valueDate;
   };
 
-  setActiveTab = (newTab) => {
-    if (!(newTab in this._tabs)) {
-      throw new Error('Unknown tab.');
+  /**
+   * @param {Date} date
+   * @returns {number}
+   */
+  getSliderValueFromDate = (date) => this.getFrameIndexInTimespan(date);
+
+  /**
+   * @param {number} value
+   * @return {Date}
+   */
+  getDateFromSliderValue = (value) => this.getDateFromFrameIndex(value);
+
+  /**
+   * @param {string} s
+   * @return {Date}
+   */
+  getDateFromYearStringInput = (s) => {
+    // Fill year string to 4 digits otherwise parsing will fail.
+    const isBcYear = s[0] === '-';
+    const absYearStr = isBcYear ? s.substr(1) : s;
+    const zeroPadding = '0'.repeat(Math.max(4 - absYearStr.length, 0));
+    const paddedAbsYearStr = zeroPadding + absYearStr;
+    const paddedYearStr = isBcYear ? `-${paddedAbsYearStr}` : paddedAbsYearStr;
+
+    const date = this.parsePreciseDateString(paddedYearStr);
+
+    if (!date) {
+      throw new Error('Invalid date.');
     }
 
+    return date;
+  };
+
+  setActiveTab = (newTab) => {
     const currentTab = this.state.activeTab;
 
-    const event = new CustomEvent('build', {
-      detail: {
-        fromTab: currentTab,
-        toTab: newTab,
-      },
-      bubbles: false,
-      cancelable: false,
-    });
-
-    console.log('setActiveTab', `${event.detail.fromTab} -> ${event.detail.toTab}`);
-
-    this._tabs[currentTab].onDeactivate(event);
-    this._tabs[newTab].onActivate(event);
+    console.log('setActiveTab', `${currentTab} -> ${newTab}`, this._tabRefs);
 
     this.setState({
       activeTab: newTab,
@@ -391,6 +644,423 @@ class DatasetWorkspace extends SuiteBaseClass {
     );
   };
 
+  renderBoundaryOverlay = () => {
+    const boundaryGeoJson = this.boundaryGeoJson;
+    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
+
+    return (
+      <map-layer-geojson
+        style={{
+          strokeColor: 'red',
+        }}
+        src-json={boundaryGeoJsonString}
+        src-projection="EPSG:4326"
+      />
+    );
+  };
+
+  /**
+   * Returns true if the variable is selected.
+   * @param {string} variableId
+   * @returns {boolean}
+   */
+  isSelectedVariable (variableId) {
+    return variableId === this.selectedVariableId;
+  }
+
+  /**
+   * @param {string} panelId
+   * @returns {boolean}
+   */
+  isPanelOpen = (panelId, defaultState = true) => {
+    return panelId in this.state.isPanelOpen
+           ? this.state.isPanelOpen[panelId]
+           // Open all panels by default.
+           : defaultState;
+  };
+
+  /**
+   * @param {string} panelId
+   */
+  togglePanelOpenState = (panelId, setTo = !this.isPanelOpen(panelId)) => {
+    this.setState({
+      isPanelOpen: {
+        ...this.state.isPanelOpen,
+        [panelId]: setTo,
+      },
+    });
+  };
+
+  SidePanelCommonCollapsibleSectionContainer = (props) => {
+    const {
+      id = '',
+      label = '',
+      children = null,
+    } = props;
+    const isNestedItemsVisible = this.isPanelOpen(id, true);
+    const toggleNestedItemsVisible = () => this.togglePanelOpenState(id, !isNestedItemsVisible);
+
+    return (
+      <ListItem
+        key={id}
+        primaryText={label}
+        primaryTogglesNestedList
+        rightIconButton={(
+          <ToggleButton
+            label={isNestedItemsVisible ? 'Collapse' : 'Expand'}
+            icon={isNestedItemsVisible ? <CollapseIcon /> : <ExpandIcon />}
+            labelPosition="before"
+            zDepthWhenToggled={0}
+            toggled={isNestedItemsVisible}
+            onToggle={toggleNestedItemsVisible}
+            style={{
+              color: 'rgba(0, 0, 0, 0.5)',
+              top: '9px',
+              width: false,
+            }}
+          />
+        )}
+        open={isNestedItemsVisible}
+        nestedItems={Array.isArray(children) ? children : [children]}
+      />
+    );
+  };
+
+  /**
+   * This component is closely associated with the dataset so it can not be
+   * independent.
+   * Use the `props` parameter to pass customizable options.
+   * @param {Object} props
+   */
+  renderVariableList = () => {
+    const variableListItems = Object.entries(this.variables)
+    .map(([variableId, variable]) => {
+      const itemId = `variable-list-item__${variableId}`;
+      const isConfigOptionsVisible = this.isPanelOpen(itemId, false);
+      const toggleConfigOptionsVisible = () => this.togglePanelOpenState(itemId, !isConfigOptionsVisible);
+
+      return (
+        <ListItem
+          key={itemId}
+          className="variable-list__item"
+          leftCheckbox={(
+            <RadioButton
+              value={variableId}
+              checked={this.isSelectedVariable(variableId)}
+              onCheck={() => this.selectedVariableId = variableId}
+            />
+          )}
+          primaryText={variable.name}
+          style={{
+            // This value should be 20px more than the width of the right icon button.
+            paddingRight: '120px',
+          }}
+          rightIconButton={(
+            <ToggleButton
+              label="Style"
+              icon={(
+                <ImageStyleIcon />
+              )}
+              toggled={isConfigOptionsVisible}
+              onToggle={toggleConfigOptionsVisible}
+              style={{
+                color: 'rgba(0, 0, 0, 0.5)',
+                top: '9px',
+                width: false,
+              }}
+            />
+          )}
+          open={isConfigOptionsVisible}
+          nestedItems={[
+            <ListItem
+              disabled
+              key="variable-opacity"
+              style={{
+                padding: '0',
+              }}
+            >
+              <SliderWithInput
+                label="Opacity"
+                min={0}
+                max={1}
+                step={0.01}
+                value={this.getVariableOpacity(variableId)}
+                toSliderValue={(v) => v * 100}
+                fromSliderValue={(v) => v / 100}
+                toInputValue={(v) => `${(v * 100).toFixed(0)}%`}
+                fromInputValue={(v) => {
+                  // We want to support both format `{N}%` and `{N}`.
+                  let str = v;
+
+                  if (str[str.length - 1] === '%') {
+                    str = str.slice(0, -1);
+                  }
+
+                  if (isNaN(str)) {
+                    throw new Error('Invalid number.');
+                  }
+
+                  return parseFloat(str) / 100;
+                }}
+                onChange={(event, newValue) => this.setVariableOpacity(variableId, newValue)}
+                inputStyle={{
+                  width: '60px',
+                }}
+                sliderProps={{
+                  included: false,
+                  handleStyle: [
+                    {
+                      transform: 'scale(1.4)',
+                    },
+                  ],
+                }}
+              />
+            </ListItem>,
+
+            <ListItem
+              disabled
+              key="overlay-style-range"
+              style={{
+                padding: '0',
+              }}
+            >
+              <RangeWithInput
+                disabled
+                label="Overlay range"
+                min={variable.overlay.min}
+                max={variable.overlay.max}
+                value={this.getVariableStylingRange(variableId, [variable.overlay.min, variable.overlay.max])}
+                onChange={(event, newValue) => this.setVariableStylingRange(variableId, newValue)}
+                inputStyle={{
+                  width: '60px',
+                }}
+                sliderProps={{
+                  handleStyle: [
+                    {
+                      transform: 'scale(1.4)',
+                    },
+                  ],
+                }}
+                inputProps={{
+                  type: 'number',
+                  min: variable.overlay.min,
+                  max: variable.overlay.max,
+                }}
+              />
+            </ListItem>,
+
+            <ListItem
+              key="overlay-style"
+              disabled
+              primaryText={(
+                <div className="adjustment-option__header">
+                  <label>Overlay style: </label>
+                </div>
+              )}
+              secondaryText={(
+                <div
+                  style={{
+                    overflow: 'visible',
+                  }}
+                >
+                  <SelectField
+                    disabled
+                    value={0}
+                    style={{
+                      width: '100%',
+                    }}
+                  >{variable.overlay.styles.map((styleName) => (
+                    <MenuItem
+                      key={styleName}
+                      value={styleName}
+                      primaryText={styleName}
+                    />
+                  ))}</SelectField>
+                </div>
+              )}
+            />,
+          ]}
+        />
+      );
+    });
+
+    return (
+      <this.SidePanelCommonCollapsibleSectionContainer
+        id="variable-list"
+        label="Select variable to display"
+      >{variableListItems}</this.SidePanelCommonCollapsibleSectionContainer>
+    );
+  };
+
+  /**
+   * This component is closely associated with the dataset so it can not be
+   * independent.
+   * Use the `props` parameter to pass customizable options.
+   * @param {Object} props
+   */
+  renderTemporalControls = (props = {}) => {
+    const {
+      disabled = false,
+    } = props;
+    const timespan = this.timespan;
+    const controls = [
+      <ListItem
+        disabled
+        key="date-range"
+        style={{
+          padding: '0',
+        }}
+      >
+        <RangeWithInput
+          label="Date Range (year)"
+          min={timespan.period.gte}
+          max={timespan.period.lte}
+          value={this.dateRangeTemporal}
+          disabled={disabled}
+          // (Date) => number
+          toSliderValue={this.getSliderValueFromDate}
+          // (number) => Date
+          fromSliderValue={this.getDateFromSliderValue}
+          // (Date) => string
+          toInputValue={getYearStringFromDate}
+          // (string) => Date
+          fromInputValue={this.getDateFromYearStringInput}
+          onChange={this.onChangeDateRange}
+          onFinish={this.onFinishDateRange}
+          inputStyle={{
+            width: '60px',
+          }}
+          sliderProps={{
+            handleStyle: [
+              {
+                transform: 'scale(1.4)',
+              },
+            ],
+          }}
+          inputProps={{
+            type: 'number',
+            min: getYearStringFromDate(timespan.period.gte),
+            max: getYearStringFromDate(timespan.period.lte),
+          }}
+        />
+      </ListItem>,
+    ];
+
+    return (
+      <this.SidePanelCommonCollapsibleSectionContainer
+        id="temporal-controls"
+        label="Temporal controls"
+      >{controls}</this.SidePanelCommonCollapsibleSectionContainer>
+    );
+  };
+
+  /**
+   * Requires component as context object.
+   * @param {Object} layer
+   */
+  renderMapLayer = (layer) => {
+    if (!(layer.type in mapLayerRenderers)) {
+      console.warn(`Unknown layer type “${layer.type}” for layer “${layer.name}”`);
+      return null;
+    }
+
+    const renderer = mapLayerRenderers[layer.type];
+    // @type {Date}
+    const dateOfLayer = (typeof this.currentLoadedDate === 'undefined' || this.currentLoadedDate === null)
+                        ? this.timespan.period.gte
+                        : this.currentLoadedDate;
+
+    return renderer.call(this, {
+      ...layer,
+      extent: this.extent,
+      visible: this.isSelectedVariable(layer.name),
+      opacity: this.getVariableOpacity(layer.name),
+    }, {
+      YYYY: () => moment(dateOfLayer).format('YYYY'),
+      MM: () => moment(dateOfLayer).format('MM'),
+      DD: () => moment(dateOfLayer).format('DD'),
+    });
+  };
+
+  renderMapLayerLegend = (layer) => {
+    if (!(layer.type in mapLayerLegendRenderers)) {
+      console.warn(`Unknown layer type “${layer.type}” for layer “${layer.name}”`);
+      return null;
+    }
+
+    const renderer = mapLayerLegendRenderers[layer.type];
+    // @type {Date}
+    const dateOfLayer = (typeof this.currentLoadedDate === 'undefined' || this.currentLoadedDate === null)
+                        ? this.timespan.period.gte
+                        : this.currentLoadedDate;
+
+    return renderer.call(this, {
+      ...layer,
+    }, {
+      YYYY: () => moment(dateOfLayer).format('YYYY'),
+      MM: () => moment(dateOfLayer).format('MM'),
+      DD: () => moment(dateOfLayer).format('DD'),
+    });
+  };
+
+  renderMapLayerForSelectedVariable = (options = { legend: false }) => {
+    const variableId = this.selectedVariableId;
+    const layer = objectPath.get(this.variables, [variableId, 'overlay']);
+
+    if (!layer) {
+      return null;
+    }
+
+    return (
+      <React.Fragment>
+        {this.renderMapLayer(layer)}
+        {options.legend && this.renderMapLayerLegend(layer)}
+      </React.Fragment>
+    );
+  };
+
+  renderFocusBoundaryMap = (props = {}) => {
+    const {
+      key = 'focus-boundary',
+      title = 'Select analytics boundary',
+      // @type {Array<{name: string, IconClass: Icon, [drawingType: string]}>}
+      selectionTools = [],
+    } = props;
+
+    return (
+      <this.SidePanelCommonCollapsibleSectionContainer
+        id={key}
+        label={title}
+      >
+        <ListItem
+          disabled
+          key="map"
+        >
+          <MapWithToolbar
+            id={key}
+            selectionTools={selectionTools}
+            boundaryGeometry={this.boundaryGeometry}
+            focusGeometry={this.focusGeometry}
+            updateFocusGeometry={(geom) => this.focusGeometry = geom}
+          >
+            {this.hasSelectedVariable && this.renderMapLayerForSelectedVariable()}
+          </MapWithToolbar>
+        </ListItem>
+      </this.SidePanelCommonCollapsibleSectionContainer>
+    );
+  };
+
+  /**
+   * A tab is enabled when all of its required props are available on the dataset.
+   * @param {React.Component} TabComponent
+   * @return {boolean}
+   */
+  isTabEnabled (TabComponent) {
+    return TabComponent.requiredProps.every((key) => {
+      return key in this.props && this.props[key];
+    });
+  }
+
   renderTabLabel = ({
     IconComponent,
     label,
@@ -407,10 +1077,38 @@ class DatasetWorkspace extends SuiteBaseClass {
     </div>
   );
 
+  renderTab (TabComponent, props) {
+    const tabIsEnabled = this.isTabEnabled(TabComponent);
+    const currentTab = this.state.activeTab;
+    const tabIsActive = currentTab === TabComponent.tabName;
+
+    return (
+      <Tab
+        {...props}
+        className="tab-button"
+        label={this.renderTabLabel({
+          IconComponent: TabComponent.tabIcon,
+          label: TabComponent.tabLabel,
+        })}
+        value={TabComponent.tabName}
+        disabled={!tabIsEnabled}
+        style={{
+          cursor: false,
+          ...TabComponent.tabStyle,
+        }}
+      >{tabIsEnabled && tabIsActive && (
+        <TabComponent
+          {...this.props}
+          workspace={this}
+          ref={(ref) => this._tabRefs[TabComponent.tabName] = ref}
+        />
+      )}</Tab>
+    );
+  }
+
   renderTabs () {
-    return Object.entries(this._tabs).map(([key, tab]) => {
-      const reactElement = tab.render();
-      return React.cloneElement(reactElement, {
+    return Object.entries(tabConstructs).map(([key, TabComponent]) => {
+      return this.renderTab(TabComponent, {
         key,
       });
     });

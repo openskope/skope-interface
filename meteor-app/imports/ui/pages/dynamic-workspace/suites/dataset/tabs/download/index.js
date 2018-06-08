@@ -14,10 +14,11 @@ import {
   MarkDownRenderer,
 } from '/imports/ui/helpers';
 
-import TabBaseClass from '../BaseClass';
+import TabComponent from '../../TabComponent';
 
 export default
-class DownloadTab extends TabBaseClass {
+class DownloadTab extends TabComponent {
+  static tabName = 'download';
   static tabIcon = DatasetDownloadIcon;
   static tabLabel = 'Download';
   static requiredProps = [
@@ -35,12 +36,18 @@ class DownloadTab extends TabBaseClass {
       IconClass: BoxToolIcon,
       title: 'Rectangle tool',
       drawingType: 'Box',
+      freehandDrawing: true,
     },
   ];
 
-  renderBody () {
+  render () {
     const {
       downloadService: downloadField,
+      workspace: {
+        renderVariableList,
+        renderTemporalControls,
+        renderFocusBoundaryMap,
+      },
     } = this.props;
 
     return (
@@ -50,9 +57,9 @@ class DownloadTab extends TabBaseClass {
           zDepth={1}
         >
           <List>
-            {this.renderVariableList({})}
-            {this.renderTemporalControls({})}
-            {this.renderFocusBoundaryMap({
+            {renderVariableList({})}
+            {renderTemporalControls({})}
+            {renderFocusBoundaryMap({
               selectionTools: DownloadTab.selectionTools,
             })}
           </List>

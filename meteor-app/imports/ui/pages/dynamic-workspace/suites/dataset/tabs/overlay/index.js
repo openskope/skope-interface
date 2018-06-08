@@ -3,7 +3,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 import Paper from 'material-ui/Paper';
 import {
   List,
@@ -30,7 +29,6 @@ import {
   presentationProjection,
   maxMapZoomLevel,
   minMapZoomLevel,
-  dataSpatialBoundaryFillColor,
 } from '/imports/ui/consts';
 
 import {
@@ -41,37 +39,35 @@ import {
 
 import MapView from '/imports/ui/components/mapview';
 
-import TabBaseClass from '../BaseClass';
+import TabComponent from '../../TabComponent';
 
-class OverlayTabContent extends React.Component {
+export default
+class OverlayTab extends TabComponent {
 
   static propTypes = {
-    // Some data.
-    hasSelectedVariable: PropTypes.bool.isRequired,
-    currentLoadedDate: PropTypes.instanceOf(Date).isRequired,
-    dateRangeStart: PropTypes.instanceOf(Date).isRequired,
-    dateRangeEnd: PropTypes.instanceOf(Date).isRequired,
-    boundaryGeometry: PropTypes.object.isRequired,
-    focusGeometry: PropTypes.object,
-
-    // Some helper functions.
-    getSliderValueFromDate: PropTypes.func.isRequired,
-    getDateFromSliderValue: PropTypes.func.isRequired,
-    getDateFromYearStringInput: PropTypes.func.isRequired,
-    renderVariableList: PropTypes.func.isRequired,
-    renderTemporalControls: PropTypes.func.isRequired,
-    renderFocusBoundaryMap: PropTypes.func.isRequired,
-    renderMapLayerForSelectedVariable: PropTypes.func.isRequired,
-    updateFocusGeometry: PropTypes.func.isRequired,
-    updateLoadedDate: PropTypes.func.isRequired,
-    offsetCurrentTimeAtPrecisionByAmount: PropTypes.func.isRequired,
-    isPanelOpen: PropTypes.func.isRequired,
-    togglePanelOpenState: PropTypes.func.isRequired,
+    ...TabComponent.propTypes,
+    overlays: PropTypes.arrayOf(PropTypes.shape({
+      name: PropTypes.string,
+      description: PropTypes.string,
+      type: PropTypes.string,
+      url: PropTypes.string,
+      min: PropTypes.number,
+      max: PropTypes.number,
+      styles: PropTypes.arrayOf(PropTypes.string),
+    })),
   };
 
   static defaultProps = {
+    overlays: null,
     focusGeometry: null,
   };
+
+  static tabName = 'overlay';
+  static tabIcon = DatasetMapIcon;
+  static tabLabel = 'Map View';
+  static requiredProps = [
+    'overlays',
+  ];
 
   static selectionTools = [
     {
@@ -91,11 +87,17 @@ class OverlayTabContent extends React.Component {
   constructor (props) {
     super(props);
 
+    const {
+      workspace: {
+        currentLoadedDate,
+      },
+    } = props;
+
     this._detailMap = null;
 
     this.state = {
       // Copy of the date for the sliders.
-      currentLoadedDateTemporal: props.currentLoadedDate,
+      currentLoadedDateTemporal: currentLoadedDate,
       // @type {boolean}
       isPlaying: false,
       animationTimer: null,
@@ -107,10 +109,15 @@ class OverlayTabContent extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
+    const {
+      workspace: {
+        currentLoadedDate,
+      },
+    } = nextProps;
     const updates = {};
 
-    if (nextProps.currentLoadedDate.valueOf() !== this.state.currentLoadedDateTemporal.valueOf()) {
-      updates.currentLoadedDateTemporal = nextProps.currentLoadedDate;
+    if (currentLoadedDate.valueOf() !== this.state.currentLoadedDateTemporal.valueOf()) {
+      updates.currentLoadedDateTemporal = currentLoadedDate;
     }
 
     this.setState(updates);
@@ -147,7 +154,7 @@ class OverlayTabContent extends React.Component {
     console.log('onNextAnimationFrame');
 
     if (this.isForwardStepInTimeAllowed) {
-      this.props.offsetCurrentTimeAtPrecisionByAmount(1);
+      this.offsetCurrentTimeAtPrecisionByAmount(1);
     } else {
       this.stopAnimation();
     }
@@ -161,13 +168,27 @@ class OverlayTabContent extends React.Component {
    * @return {boolean}
    */
   get isBackStepInTimeAllowed () {
-    return this.props.currentLoadedDate > this.props.dateRangeStart;
+    const {
+      workspace: {
+        currentLoadedDate,
+        dateRange,
+      },
+    } = this.props;
+
+    return currentLoadedDate > dateRange[0];
   }
   /**
    * @return {boolean}
    */
   get isForwardStepInTimeAllowed () {
-    return this.props.currentLoadedDate < this.props.dateRangeEnd;
+    const {
+      workspace: {
+        currentLoadedDate,
+        dateRange,
+      },
+    } = this.props;
+
+    return currentLoadedDate < dateRange[1];
   }
 
   connectOverviewMap () {
@@ -205,17 +226,45 @@ class OverlayTabContent extends React.Component {
   skipAnimationToStart () {
     console.log('skipping animation to start');
 
-    this.props.updateLoadedDate(this.props.dateRangeStart);
+    const {
+      workspace,
+      workspace: {
+        dateRange,
+      },
+    } = this.props;
+
+    workspace.currentLoadedDate = dateRange[0];
   }
   skipAnimationToEnd () {
     console.log('skipping animation to end');
 
-    this.props.updateLoadedDate(this.props.dateRangeEnd);
+    const {
+      workspace,
+      workspace: {
+        dateRange,
+      },
+    } = this.props;
+
+    workspace.currentLoadedDate = dateRange[1];
+  }
+
+  offsetCurrentTimeAtPrecisionByAmount (amount) {
+    if (!amount) {
+      return;
+    }
+
+    const {
+      workspace,
+    } = this.props;
+
+    workspace.currentLoadedDate = offsetDateAtPrecision(workspace.currentLoadedDate, workspace.temporalPrecision, amount);
   }
 
   renderAnimationControls () {
     const {
-      hasSelectedVariable,
+      workspace: {
+        hasSelectedVariable,
+      },
     } = this.props;
 
     return (
@@ -277,13 +326,17 @@ class OverlayTabContent extends React.Component {
 
   renderTimeline () {
     const {
-      hasSelectedVariable,
-      dateRangeStart,
-      dateRangeEnd,
-      getSliderValueFromDate,
-      getDateFromSliderValue,
-      getDateFromYearStringInput,
-      updateLoadedDate,
+      workspace,
+      workspace: {
+        hasSelectedVariable,
+        dateRange: [
+          dateRangeStart,
+          dateRangeEnd,
+        ],
+        getSliderValueFromDate,
+        getDateFromSliderValue,
+        getDateFromYearStringInput,
+      },
     } = this.props;
     const {
       currentLoadedDateTemporal,
@@ -305,7 +358,7 @@ class OverlayTabContent extends React.Component {
         // (string) => Date
         fromInputValue={getDateFromYearStringInput}
         onChange={(event, date) => this.setState({ currentLoadedDateTemporal: date })}
-        onFinish={(event, date) => updateLoadedDate(date)}
+        onFinish={(event, date) => workspace.currentLoadedDate = date}
         style={{
           // This is a workaround to insert cells used only for spacing into the grid to achieve the desired effect.
           gridTemplateAreas: '"spacing-left label spacing-inBetween input spacing-right" "slider slider slider slider slider"',
@@ -333,15 +386,17 @@ class OverlayTabContent extends React.Component {
 
   render () {
     const {
-      hasSelectedVariable,
-      boundaryGeometry,
-      focusGeometry,
-      renderVariableList,
-      renderTemporalControls,
-      renderFocusBoundaryMap,
-      renderMapLayerForSelectedVariable,
-      isPanelOpen,
-      togglePanelOpenState,
+      workspace: {
+        hasSelectedVariable,
+        boundaryGeometry,
+        focusGeometry,
+        isPanelOpen,
+        togglePanelOpenState,
+        renderVariableList,
+        renderTemporalControls,
+        renderFocusBoundaryMap,
+        renderMapLayerForSelectedVariable,
+      },
     } = this.props;
 
     const focusBoundaryGeoJson = buildGeoJsonWithGeometry(focusGeometry);
@@ -361,7 +416,7 @@ class OverlayTabContent extends React.Component {
               disabled: this.isPlaying,
             })}
             {renderFocusBoundaryMap({
-              selectionTools: OverlayTabContent.selectionTools,
+              selectionTools: this.constructor.selectionTools,
             })}
           </List>
         </Paper>
@@ -418,66 +473,6 @@ class OverlayTabContent extends React.Component {
           </List>
         </Paper>
       </div>
-    );
-  }
-}
-
-export default
-class OverlayTab extends TabBaseClass {
-
-  static propTypes = {
-    overlays: PropTypes.arrayOf(PropTypes.shape({
-      name: PropTypes.string,
-      description: PropTypes.string,
-      type: PropTypes.string,
-      url: PropTypes.string,
-      min: PropTypes.number,
-      max: PropTypes.number,
-      styles: PropTypes.arrayOf(PropTypes.string),
-    })),
-  };
-
-  static defaultProps = {
-    overlays: null,
-  };
-
-  static tabIcon = DatasetMapIcon;
-  static tabLabel = 'Map View';
-  static requiredProps = [
-    'overlays',
-  ];
-
-  renderBody () {
-    return (
-      <OverlayTabContent
-        // Some data.
-        hasSelectedVariable={this.hasSelectedVariable}
-        currentLoadedDate={this.currentLoadedDate}
-        dateRangeStart={this.dateRangeStart}
-        dateRangeEnd={this.dateRangeEnd}
-        boundaryGeometry={this.component.boundaryGeometry}
-        focusGeometry={this.focusGeometry}
-
-        // Some helper functions.
-        getSliderValueFromDate={this.getSliderValueFromDate}
-        getDateFromSliderValue={this.getDateFromSliderValue}
-        getDateFromYearStringInput={this.getDateFromYearStringInput}
-        renderVariableList={this.renderVariableList}
-        renderTemporalControls={this.renderTemporalControls}
-        renderFocusBoundaryMap={this.renderFocusBoundaryMap}
-        renderMapLayerForSelectedVariable={this.renderMapLayerForSelectedVariable}
-        updateFocusGeometry={(value) => this.focusGeometry = value}
-        updateLoadedDate={(value) => this.currentLoadedDate = value}
-        offsetCurrentTimeAtPrecisionByAmount={(amount) => {
-          if (!amount) {
-            return;
-          }
-
-          this.currentLoadedDate = offsetDateAtPrecision(this.currentLoadedDate, this.component.temporalPrecision, amount);
-        }}
-        isPanelOpen={this.isPanelOpen}
-        togglePanelOpenState={this.togglePanelOpenState}
-      />
     );
   }
 }
