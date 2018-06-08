@@ -77,11 +77,12 @@ class InfoTab extends TabBaseClass {
     } = this.props;
 
     const boundaryGeoJson = this.component.boundaryGeoJson;
+    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
 
     return (
       <InfoTabContent
         boundaryExtent={this.component.extent}
-        boundaryGeoJsonString={boundaryGeoJson && JSON.stringify(boundaryGeoJson)}
+        boundaryGeoJsonString={boundaryGeoJsonString}
         contentMarkdown={informationField.markdown}
       />
     );

@@ -42,19 +42,19 @@ export const tabConstructs = {
 class DatasetWorkspace extends SuiteBaseClass {
 
   static propTypes = SuiteBaseClass.extendPropTypes({
-    variables: PropTypes.arrayOf(PropTypes.shape({
-      name: PropTypes.string,
-      url: PropTypes.string,
+    variables: PropTypes.objectOf(PropTypes.shape({
+      name: PropTypes.string.isRequired,
       description: PropTypes.string,
-    })),
+    })).isRequired,
     region: PropTypes.shape({
       name: PropTypes.string,
       extents: PropTypes.arrayOf(PropTypes.number),
       resolution: PropTypes.string,
       geometry: PropTypes.object,
-    }),
+    }).isRequired,
     timespan: PropTypes.shape({
-      resolution: PropTypes.oneOf(AllResolutionNames),
+      resolution: PropTypes.oneOf(AllResolutionNames).isRequired,
+      precision: PropTypes.number.isRequired,
       period: PropTypes.shape({
         gte: PropTypes.oneOfType([
           PropTypes.string,
@@ -66,27 +66,16 @@ class DatasetWorkspace extends SuiteBaseClass {
           PropTypes.number,
           PropTypes.instanceOf(Date),
         ]),
-      }),
-    }),
+      }).isRequired,
+    }).isRequired,
 
     ...OverlayTab.propTypes,
-
-    // status: PropTypes.string,
-    // description: PropTypes.string,
-    // dataExtent: PropTypes.arrayOf(PropTypes.number).isRequired,
-    // dataUrl: PropTypes.string.isRequired,
-    // layers: PropTypes.array.isRequired,
-    // metadata: PropTypes.object,
   });
 
   static defaultProps = {
     timespan: null,
 
     ...OverlayTab.defaultProps,
-
-    // status: 'undefined',
-    // description: '',
-    // metadata: {},
   };
 
   static dateFormatForPrecisions = [
@@ -120,26 +109,6 @@ class DatasetWorkspace extends SuiteBaseClass {
         lte: parseDateStringWithPrecision(period.lte, datePrecision),
       },
     };
-  };
-
-  /**
-   * @returns {Object}
-   */
-  static getVariables = (variables, { overlays, analytics }) => {
-    const mapOfOverlays = _.keyBy(overlays, 'name');
-    const mapOfAnalytics = _.keyBy(analytics, 'name');
-
-    const fullVariables = variables.map((v) => {
-      return {
-        ...v,
-        overlay: mapOfOverlays[v.name],
-        analytics: mapOfAnalytics[v.name],
-      };
-    });
-
-    const mapOfFullVariables = _.keyBy(fullVariables, 'name');
-
-    return mapOfFullVariables;
   };
 
   constructor (props) {
@@ -329,14 +298,7 @@ class DatasetWorkspace extends SuiteBaseClass {
    * @type {Object<string, Object>}
    */
   get variables () {
-    const variables = objectPath.get(this.props, 'variables', []);
-    const overlays = objectPath.get(this.props, 'overlays', []);
-    const analytics = objectPath.get(this.props, 'analytics', []);
-
-    return DatasetWorkspace.getVariables(variables, {
-      overlays,
-      analytics,
-    });
+    return this.props.variables;
   }
 
   /**

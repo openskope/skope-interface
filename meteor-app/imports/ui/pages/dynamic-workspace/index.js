@@ -7,11 +7,12 @@
  * different dataset, the new `requestDatasetId` is passed to the component.
  * The component should detect the change and call `loadNewDataset` to request
  * and load the new dataset.
- * `loadingConfigData` is `true` if the dataset config data is being loaded.
+ * `loadingDataset` is `true` if the dataset config data is being loaded.
  * `configDataRequestError` and `configData` will contain the error and the
  * result from loading the new dataset config data, respectively.
  */
 
+import objectPath from 'object-path';
 import {
   connect,
 } from 'react-redux';
@@ -19,15 +20,19 @@ import { actions } from '/imports/ui/redux-store';
 
 import Component from './component';
 
+const reduxNamespacePath = 'workspace.DynamicSuiteNS';
+
 export default connect(
   // mapStateToProps
   (state, ownProps) => {
     const {
+      routing,
       workspace: {
         datasetId: currentDatasetId,
         configDataRequest,
         configDataRequestError,
         configData,
+        dataset,
       },
     } = state;
     const {
@@ -35,15 +40,17 @@ export default connect(
         dataset: requestDatasetId = '',
       },
     } = ownProps;
-    const loadingConfigData = !!(currentDatasetId && configDataRequest);
+    const loadingDataset = !!(currentDatasetId && configDataRequest);
 
     return {
+      routing,
       currentDatasetId,
       requestDatasetId,
-      loadingConfigData,
-      configDataRequestError,
+      loadingDataset,
+      errorWhenLoadingDataset: configDataRequestError,
       configData,
-      reduxNamespacePath: 'workspace.DynamicSuiteNS',
+      dataset,
+      suiteState: objectPath.get(state, reduxNamespacePath),
     };
   },
   // mapDispatchToProps
@@ -51,6 +58,12 @@ export default connect(
     loadNewDataset: (datasetId) => dispatch({
       type: actions.WORKSPACE_LOAD_DATASET.type,
       datasetId,
+    }),
+    setSuiteState: (state, options = {}) => dispatch({
+      type: actions.NAMESPACE_SET_STATE.type,
+      namespacePath: reduxNamespacePath,
+      state,
+      options,
     }),
   }),
 )(Component);

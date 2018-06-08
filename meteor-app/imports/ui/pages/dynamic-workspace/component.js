@@ -15,7 +15,7 @@ import {
   NOOP,
 } from '/imports/helpers/model';
 
-import DynamicWorkspaceSuite from './DynamicWorkspaceSuite';
+import * as Suites from './suites';
 
 const checkToLoadNewDataset = (props) => {
   const {
@@ -53,22 +53,25 @@ class WorkspacePage extends React.Component {
     // This should eventually match `currentDatasetId`.
     requestDatasetId: PropTypes.string.isRequired,
     // True if the requested dataset is being loaded.
-    loadingConfigData: PropTypes.bool.isRequired,
+    loadingDataset: PropTypes.bool.isRequired,
     // Any error encountered during requesting the config data.
-    configDataRequestError: PropTypes.object,
-    // The config data object.
-    configData: PropTypes.object,
+    errorWhenLoadingDataset: PropTypes.object,
+    // The dataset document.
+    dataset: PropTypes.object,
+    suiteState: PropTypes.object,
+    routing: PropTypes.object,
     // Callback to load new dataset (when requestDatasetId mis-matches currentDatasetId).
     loadNewDataset: PropTypes.func,
-    // Path to the namespace in Redux store for this.
-    reduxNamespacePath: PropTypes.string,
+    setSuiteState: PropTypes.func,
   };
 
   static defaultProps = {
-    configDataRequestError: null,
-    configData: null,
+    errorWhenLoadingDataset: null,
+    dataset: null,
+    suiteState: null,
+    routing: null,
     loadNewDataset: NOOP,
-    reduxNamespacePath: '',
+    setSuiteState: NOOP,
   };
 
   constructor (props) {
@@ -84,15 +87,15 @@ class WorkspacePage extends React.Component {
   renderBody () {
     const {
       currentDatasetId,
-      loadingConfigData,
-      configDataRequestError,
+      loadingDataset,
+      errorWhenLoadingDataset,
     } = this.props;
 
     if (!currentDatasetId) {
       return this.renderEmptyView();
-    } else if (loadingConfigData) {
+    } else if (loadingDataset) {
       return this.renderLoadingView();
-    } else if (configDataRequestError) {
+    } else if (errorWhenLoadingDataset) {
       return this.renderLoadingErrorView();
     }
 
@@ -117,7 +120,7 @@ class WorkspacePage extends React.Component {
   //! Improve error view.
   renderLoadingErrorView () {
     const {
-      configDataRequestError,
+      errorWhenLoadingDataset,
     } = this.props;
 
     return (
@@ -125,28 +128,56 @@ class WorkspacePage extends React.Component {
         <h1>Error</h1>
         <PropPrinter
           {...{
-            configDataRequestError,
+            errorWhenLoadingDataset,
           }}
         />
       </RootElement>
     );
   }
 
-  renderLoadedView () {
+  renderValidSuite (Component) {
     const {
-      configData,
-      reduxNamespacePath,
+      routing,
+      dataset,
+      suiteState,
+      setSuiteState,
     } = this.props;
-    const suiteType = `WORKSPACE_SUITE__${String(configData.type).toUpperCase()}`;
 
     return (
-      <RootElement>
-        <DynamicWorkspaceSuite
-          reduxNamespacePath={reduxNamespacePath}
-          suiteType={suiteType}
-          suiteProps={configData}
+      <Component
+        {...dataset}
+        routing={routing}
+        suiteState={suiteState}
+        setSuiteState={setSuiteState}
+      />
+    );
+  }
+
+  renderInvalidSuiteErrorView () {
+    const {
+      dataset,
+    } = this.props;
+
+    return (
+      <div>
+        <h1>Invalid Suite Type</h1>
+        <PropPrinter
+          {...dataset}
         />
-      </RootElement>
+      </div>
+    );
+  }
+
+  renderLoadedView () {
+    const {
+      dataset,
+    } = this.props;
+    const suiteType = `WORKSPACE_SUITE__${String(dataset.type).toUpperCase()}`;
+    const suiteComponent = Suites[suiteType];
+    const suiteElement = suiteComponent ? this.renderValidSuite(suiteComponent) : this.renderInvalidSuiteErrorView();
+
+    return (
+      <RootElement>{suiteElement}</RootElement>
     );
   }
 
