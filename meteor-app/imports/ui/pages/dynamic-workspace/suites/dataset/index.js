@@ -217,89 +217,89 @@ class DatasetWorkspace extends SuiteBaseClass {
        * Empty string denotes null selection.
        * @type {string}
        */
-      selectedVariableId: '',
+      idOfTheSelectedVariable: '',
 
       // @type {Object<variableId: string, opacity: number>}
-      variableOpacity: {},
+      mapOfOpacityOfVariable: {},
 
       // @type {Object<variableId: string, stylingRange: [Date, Date]>}
-      variableStylingRange: {},
+      mapOfRangeOfVariableStyling: {},
 
       /**
        * A collection of boolean values indicating if a panel is open.
        * When there is no value for a specific key, the default state is up to the reader's interpretation.
        * @type {Object<boolean>}
        */
-      isPanelOpen: {},
+      mapOfOpenStatusOfPanel: {},
 
       /**
        * Range of the current selection.
        * This tuple-style structure is used by the slider component.
-       * Since the slider is a high-update-frequency component, it's better to reduce the amount of convertion necessary.
+       * Since the slider is a high-update-frequency component, it's better to reduce the amount of conversion necessary.
        * @type {[Date, Date]}
        */
-      dateRange: initialDateRange,
+      dateRangeOfFocus: initialDateRange,
 
       /**
-       * This should be an exact copy of `dateRange` but gets updated much frequently more by the sliders.
+       * This should be an exact copy of `dateRangeOfFocus` but gets updated much frequently more by the sliders.
        */
-      dateRangeTemporal: initialDateRange,
+      animatedCopyOfDateRangeOfFocus: initialDateRange,
 
       /**
        * The date of the currently selected time frame/band.
        * This affects what layers are displayed in the map view and the graph view.
        * @type {Date}
        */
-      currentLoadedDate: initialDateRange[0],
+      dateOfTheCurrentlyDisplayedFrame: initialDateRange[0],
 
       /**
        * The geometry of the area of interest.
        * This determines the highlighted area of the map view and the study area of the graph view.
        * @type {Object}
        */
-      focusGeometry: initialFocusGeometry,
+      geometryOfFocus: initialFocusGeometry,
 
       // @type {string}
-      activeTab: tabConstructs.infoTab.tabName,
+      nameOfTheActiveTab: tabConstructs.infoTab.tabName,
     };
   }
 
   /**
    * @param {Event} event
-   * @param {[Date, Date]} dateRange
+   * @param {[Date, Date]} newDateRange
    */
-  onChangeDateRange = _.throttle((event, dateRange) => {
-    const preciseDateRange = dateRange.map(this.getPreciseDateWithinTimespan);
+  onChangeDateRangeOfFocus = _.throttle((event, newDateRange) => {
+    const preciseDateRange = newDateRange.map(this.getPreciseDateWithinTimespan);
 
-    this.dateRangeTemporal = preciseDateRange;
+    this.animatedCopyOfDateRangeOfFocus = preciseDateRange;
   }, 0);
 
   /**
    * @param {Event} event
-   * @param {[Date, Date]} dateRange
+   * @param {[Date, Date]} newDateRange
    */
-  onFinishDateRange = (event, dateRange) => {
-    const preciseDateRange = dateRange.map(this.getPreciseDateWithinTimespan);
+  onFinishChangingDateRangeOfFocus = (event, newDateRange) => {
+    const preciseDateRange = newDateRange.map(this.getPreciseDateWithinTimespan);
 
-    this.dateRange = preciseDateRange;
+    this.dateRangeOfFocus = preciseDateRange;
   };
 
   /**
    * @return {string}
    */
-  get selectedVariableId () {
-    return this.state.selectedVariableId;
+  get idOfTheSelectedVariable () {
+    return this.state.idOfTheSelectedVariable;
   }
-  set selectedVariableId (value) {
+  set idOfTheSelectedVariable (value) {
     this.setState({
-      selectedVariableId: value,
+      idOfTheSelectedVariable: value,
     });
   }
   /**
    * @return {boolean}
    */
   get hasSelectedVariable () {
-    return this.selectedVariableId !== '';
+    return this.idOfTheSelectedVariable !== '';
   }
 
   /**
@@ -326,38 +326,35 @@ class DatasetWorkspace extends SuiteBaseClass {
   /**
    * @type {Object|null}
    */
-  get boundaryGeometry () {
+  get geometryOfDataBoundary () {
     return objectPath.get(this.props.region, 'geometry', null);
   }
 
   /**
    * @type {Object|null}
    */
-  get boundaryGeoJson () {
-    return buildGeoJsonWithGeometry(this.boundaryGeometry);
+  get geoJsonOfDataBoundary () {
+    return buildGeoJsonWithGeometry(this.geometryOfDataBoundary);
   }
 
   /**
    * If `extents` is specified in source, trust that. Otherwise try to calculate from boundary shape.
    * @type {Array<number>}
    */
-  get extent () {
+  get extentOfDataBoundary () {
     const boundaryExtentFromDocument = objectPath.get(this.props.region, 'extents');
 
     if (boundaryExtentFromDocument) {
       return boundaryExtentFromDocument.map((s) => parseFloat(s));
     }
 
-    const boundaryGeoJson = this.boundaryGeoJson;
+    const geoJsonOfDataBoundary = this.geoJsonOfDataBoundary;
 
-    if (!boundaryGeoJson) {
+    if (!geoJsonOfDataBoundary) {
       return null;
     }
 
-    return geojsonExtent(boundaryGeoJson);
-  }
-  get boundaryExtent () {
-    return this.extent;
+    return geojsonExtent(geoJsonOfDataBoundary);
   }
 
   /**
@@ -370,48 +367,48 @@ class DatasetWorkspace extends SuiteBaseClass {
   /**
    * @return {Object}
    */
-  get focusGeometry () {
-    return this.state.focusGeometry;
+  get geometryOfFocus () {
+    return this.state.geometryOfFocus;
   }
-  set focusGeometry (value) {
+  set geometryOfFocus (value) {
     this.setState({
-      focusGeometry: value,
+      geometryOfFocus: value,
     });
   }
 
   /**
    * @return {Date}
    */
-  get currentLoadedDate () {
-    return this.state.currentLoadedDate;
+  get dateOfTheCurrentlyDisplayedFrame () {
+    return this.state.dateOfTheCurrentlyDisplayedFrame;
   }
-  set currentLoadedDate (value) {
+  set dateOfTheCurrentlyDisplayedFrame (value) {
     const [
       dateRangeStart,
       dateRangeEnd,
-    ] = this.dateRange;
+    ] = this.dateRangeOfFocus;
     let preciseDate = this.getPreciseDateWithinTimespan(value);
 
     preciseDate = clampDateWithinRange(preciseDate, dateRangeStart, dateRangeEnd);
 
-    if (preciseDate.valueOf() === this.currentLoadedDate.valueOf()) {
+    if (preciseDate.valueOf() === this.dateOfTheCurrentlyDisplayedFrame.valueOf()) {
       return;
     }
 
     this.setState({
-      currentLoadedDate: preciseDate,
+      dateOfTheCurrentlyDisplayedFrame: preciseDate,
     });
   }
 
   /**
    * @return {[Date, Date]}
    */
-  get dateRangeTemporal () {
-    return this.state.dateRangeTemporal;
+  get animatedCopyOfDateRangeOfFocus () {
+    return this.state.animatedCopyOfDateRangeOfFocus;
   }
-  set dateRangeTemporal (value) {
+  set animatedCopyOfDateRangeOfFocus (value) {
     this.setState({
-      dateRangeTemporal: value,
+      animatedCopyOfDateRangeOfFocus: value,
     });
   }
 
@@ -420,46 +417,18 @@ class DatasetWorkspace extends SuiteBaseClass {
    * current loaded date is not outside of the date range.
    * @return {[Date, Date]}
    */
-  get dateRange () {
-    return this.state.dateRange;
+  get dateRangeOfFocus () {
+    return this.state.dateRangeOfFocus;
   }
-  set dateRange (value) {
-    let currentLoadedDate = this.currentLoadedDate;
+  set dateRangeOfFocus (value) {
+    let dateOfTheCurrentlyDisplayedFrame = this.dateOfTheCurrentlyDisplayedFrame;
 
-    currentLoadedDate = clampDateWithinRange(currentLoadedDate, value[0], value[1]);
+    dateOfTheCurrentlyDisplayedFrame = clampDateWithinRange(dateOfTheCurrentlyDisplayedFrame, value[0], value[1]);
 
     this.setState({
-      dateRange: value,
-      currentLoadedDate,
+      dateRangeOfFocus: value,
+      dateOfTheCurrentlyDisplayedFrame,
     });
-  }
-
-  getSuiteContextValue () {
-    // Compose new context value here.
-    const newContextValue = {
-      secret: 123,
-
-      workspace: this,
-
-      hasSelectedVariable: this.hasSelectedVariable,
-      boundaryGeometry: this.boundaryGeometry,
-      boundaryExtent: this.extent,
-      focusGeometry: this.focusGeometry,
-
-      renderBoundaryOverlay: this.renderBoundaryOverlay,
-      renderVariableList: this.renderVariableList,
-      renderTemporalControls: this.renderTemporalControls,
-      renderFocusBoundaryMap: this.renderFocusBoundaryMap,
-      renderMapLayerForSelectedVariable: this.renderMapLayerForSelectedVariable,
-      isPanelOpen: this.isPanelOpen,
-      togglePanelOpenState: this.togglePanelOpenState,
-    };
-
-    if (!_.isEqual(newContextValue, this._suiteContextValue)) {
-      this._suiteContextValue = newContextValue;
-    }
-
-    return this._suiteContextValue;
   }
 
   /**
@@ -496,9 +465,7 @@ class DatasetWorkspace extends SuiteBaseClass {
    * @returns {number}
    */
   getVariableOpacity (variableId) {
-    return variableId in this.state.variableOpacity
-           ? this.state.variableOpacity[variableId]
-           : this.constructor.defaultVariableOpacity;
+    return objectPath.get(this.state.mapOfOpacityOfVariable, variableId, this.constructor.defaultVariableOpacity);
   }
 
   /**
@@ -506,11 +473,12 @@ class DatasetWorkspace extends SuiteBaseClass {
    * @param {number} opacity
    */
   setVariableOpacity (variableId, opacity) {
+    const mapOfOpacityOfVariable = _.cloneDeep(this.state.mapOfOpacityOfVariable);
+
+    objectPath.set(mapOfOpacityOfVariable, variableId, opacity);
+
     this.setState({
-      variableOpacity: {
-        ...this.state.variableOpacity,
-        [variableId]: opacity,
-      },
+      mapOfOpacityOfVariable,
     });
   }
 
@@ -519,9 +487,7 @@ class DatasetWorkspace extends SuiteBaseClass {
    * @returns {[Date, Date]|null}
    */
   getVariableStylingRange (variableId, defaultValue = null) {
-    return variableId in this.state.variableStylingRange
-           ? this.state.variableStylingRange[variableId]
-           : defaultValue;
+    return objectPath.get(this.state.mapOfRangeOfVariableStyling, variableId, defaultValue);
   }
 
   /**
@@ -529,11 +495,12 @@ class DatasetWorkspace extends SuiteBaseClass {
    * @param {[Date, Date]|null} range
    */
   setVariableStylingRange (variableId, range) {
+    const mapOfRangeOfVariableStyling = _.cloneDeep(this.state.mapOfRangeOfVariableStyling);
+
+    objectPath.set(mapOfRangeOfVariableStyling, variableId, range);
+
     this.setState({
-      variableStylingRange: {
-        ...this.state.variableStylingRange,
-        [variableId]: range,
-      },
+      mapOfRangeOfVariableStyling,
     });
   }
 
@@ -600,12 +567,12 @@ class DatasetWorkspace extends SuiteBaseClass {
   };
 
   setActiveTab = (newTab) => {
-    const currentTab = this.state.activeTab;
+    const currentTab = this.state.nameOfTheActiveTab;
 
     console.log('setActiveTab', `${currentTab} -> ${newTab}`, this._tabRefs);
 
     this.setState({
-      activeTab: newTab,
+      nameOfTheActiveTab: newTab,
     });
   }
 
@@ -644,28 +611,13 @@ class DatasetWorkspace extends SuiteBaseClass {
     );
   };
 
-  renderBoundaryOverlay = () => {
-    const boundaryGeoJson = this.boundaryGeoJson;
-    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
-
-    return (
-      <map-layer-geojson
-        style={{
-          strokeColor: 'red',
-        }}
-        src-json={boundaryGeoJsonString}
-        src-projection="EPSG:4326"
-      />
-    );
-  };
-
   /**
    * Returns true if the variable is selected.
    * @param {string} variableId
    * @returns {boolean}
    */
   isSelectedVariable (variableId) {
-    return variableId === this.selectedVariableId;
+    return variableId === this.idOfTheSelectedVariable;
   }
 
   /**
@@ -673,21 +625,19 @@ class DatasetWorkspace extends SuiteBaseClass {
    * @returns {boolean}
    */
   isPanelOpen = (panelId, defaultState = true) => {
-    return panelId in this.state.isPanelOpen
-           ? this.state.isPanelOpen[panelId]
-           // Open all panels by default.
-           : defaultState;
+    return objectPath.get(this.state.mapOfOpenStatusOfPanel, panelId, defaultState);
   };
 
   /**
    * @param {string} panelId
    */
   togglePanelOpenState = (panelId, setTo = !this.isPanelOpen(panelId)) => {
+    const mapOfOpenStatusOfPanel = _.cloneDeep(this.state.mapOfOpenStatusOfPanel);
+
+    objectPath.set(mapOfOpenStatusOfPanel, panelId, setTo);
+
     this.setState({
-      isPanelOpen: {
-        ...this.state.isPanelOpen,
-        [panelId]: setTo,
-      },
+      mapOfOpenStatusOfPanel,
     });
   };
 
@@ -747,7 +697,7 @@ class DatasetWorkspace extends SuiteBaseClass {
             <RadioButton
               value={variableId}
               checked={this.isSelectedVariable(variableId)}
-              onCheck={() => this.selectedVariableId = variableId}
+              onCheck={() => this.idOfTheSelectedVariable = variableId}
             />
           )}
           primaryText={variable.name}
@@ -915,7 +865,7 @@ class DatasetWorkspace extends SuiteBaseClass {
           label="Date Range (year)"
           min={timespan.period.gte}
           max={timespan.period.lte}
-          value={this.dateRangeTemporal}
+          value={this.animatedCopyOfDateRangeOfFocus}
           disabled={disabled}
           // (Date) => number
           toSliderValue={this.getSliderValueFromDate}
@@ -925,8 +875,8 @@ class DatasetWorkspace extends SuiteBaseClass {
           toInputValue={getYearStringFromDate}
           // (string) => Date
           fromInputValue={this.getDateFromYearStringInput}
-          onChange={this.onChangeDateRange}
-          onFinish={this.onFinishDateRange}
+          onChange={this.onChangeDateRangeOfFocus}
+          onFinish={this.onFinishChangingDateRangeOfFocus}
           inputStyle={{
             width: '60px',
           }}
@@ -954,6 +904,21 @@ class DatasetWorkspace extends SuiteBaseClass {
     );
   };
 
+  renderBoundaryOverlay = () => {
+    const geoJsonOfDataBoundary = this.geoJsonOfDataBoundary;
+    const geoJsonStringOfDataBoundary = geoJsonOfDataBoundary && JSON.stringify(geoJsonOfDataBoundary);
+
+    return (
+      <map-layer-geojson
+        style={{
+          strokeColor: 'red',
+        }}
+        src-json={geoJsonStringOfDataBoundary}
+        src-projection="EPSG:4326"
+      />
+    );
+  };
+
   /**
    * Requires component as context object.
    * @param {Object} layer
@@ -966,13 +931,13 @@ class DatasetWorkspace extends SuiteBaseClass {
 
     const renderer = mapLayerRenderers[layer.type];
     // @type {Date}
-    const dateOfLayer = (typeof this.currentLoadedDate === 'undefined' || this.currentLoadedDate === null)
+    const dateOfLayer = (typeof this.dateOfTheCurrentlyDisplayedFrame === 'undefined' || this.dateOfTheCurrentlyDisplayedFrame === null)
                         ? this.timespan.period.gte
-                        : this.currentLoadedDate;
+                        : this.dateOfTheCurrentlyDisplayedFrame;
 
     return renderer.call(this, {
       ...layer,
-      extent: this.extent,
+      extent: this.extentOfDataBoundary,
       visible: this.isSelectedVariable(layer.name),
       opacity: this.getVariableOpacity(layer.name),
     }, {
@@ -990,9 +955,9 @@ class DatasetWorkspace extends SuiteBaseClass {
 
     const renderer = mapLayerLegendRenderers[layer.type];
     // @type {Date}
-    const dateOfLayer = (typeof this.currentLoadedDate === 'undefined' || this.currentLoadedDate === null)
+    const dateOfLayer = (typeof this.dateOfTheCurrentlyDisplayedFrame === 'undefined' || this.dateOfTheCurrentlyDisplayedFrame === null)
                         ? this.timespan.period.gte
-                        : this.currentLoadedDate;
+                        : this.dateOfTheCurrentlyDisplayedFrame;
 
     return renderer.call(this, {
       ...layer,
@@ -1004,7 +969,7 @@ class DatasetWorkspace extends SuiteBaseClass {
   };
 
   renderMapLayerForSelectedVariable = (options = { legend: false }) => {
-    const variableId = this.selectedVariableId;
+    const variableId = this.idOfTheSelectedVariable;
     const layer = objectPath.get(this.variables, [variableId, 'overlay']);
 
     if (!layer) {
@@ -1039,11 +1004,12 @@ class DatasetWorkspace extends SuiteBaseClass {
           <MapWithToolbar
             id={key}
             selectionTools={selectionTools}
-            boundaryGeometry={this.boundaryGeometry}
-            focusGeometry={this.focusGeometry}
-            updateFocusGeometry={(geom) => this.focusGeometry = geom}
+            defaultExtent={this.extentOfDataBoundary}
+            geometryOfFocus={this.geometryOfFocus}
+            updateGeometryOfFocus={(geom) => this.geometryOfFocus = geom}
           >
             {this.hasSelectedVariable && this.renderMapLayerForSelectedVariable()}
+            {this.renderBoundaryOverlay()}
           </MapWithToolbar>
         </ListItem>
       </this.SidePanelCommonCollapsibleSectionContainer>
@@ -1079,7 +1045,7 @@ class DatasetWorkspace extends SuiteBaseClass {
 
   renderTab (TabComponent, props) {
     const tabIsEnabled = this.isTabEnabled(TabComponent);
-    const currentTab = this.state.activeTab;
+    const currentTab = this.state.nameOfTheActiveTab;
     const tabIsActive = currentTab === TabComponent.tabName;
 
     return (
@@ -1122,7 +1088,7 @@ class DatasetWorkspace extends SuiteBaseClass {
         <Tabs
           className="tabs-panel"
           contentContainerClassName="tabs-panel__content"
-          value={this.state.activeTab}
+          value={this.state.nameOfTheActiveTab}
           inkBarStyle={{
             backgroundColor: this.props.muiTheme.tabs.inkBarColor,
           }}

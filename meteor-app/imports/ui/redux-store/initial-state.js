@@ -40,8 +40,8 @@ export default {
     configDataRequest: null,
     // Stores any error encountered during requesting the config data.
     configDataRequestError: null,
-    // Stores the config data.
-    configData: null,
+    // Stores the dataset document.
+    dataset: null,
     // Namespace for any state the dynamic suite needs to store.
     // This should be reset whenever a new suite is used.
     DynamicSuiteNS: null,

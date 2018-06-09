@@ -8,7 +8,7 @@
  * The component should detect the change and call `loadNewDataset` to request
  * and load the new dataset.
  * `loadingDataset` is `true` if the dataset config data is being loaded.
- * `configDataRequestError` and `configData` will contain the error and the
+ * `configDataRequestError` and `dataset` will contain the error and the
  * result from loading the new dataset config data, respectively.
  */
 
@@ -31,7 +31,6 @@ export default connect(
         datasetId: currentDatasetId,
         configDataRequest,
         configDataRequestError,
-        configData,
         dataset,
       },
     } = state;
@@ -48,7 +47,6 @@ export default connect(
       requestDatasetId,
       loadingDataset,
       errorWhenLoadingDataset: configDataRequestError,
-      configData,
       dataset,
       suiteState: objectPath.get(state, reduxNamespacePath),
     };

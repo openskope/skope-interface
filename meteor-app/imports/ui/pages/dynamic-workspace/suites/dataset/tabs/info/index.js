@@ -27,7 +27,7 @@ class InfoTab extends TabComponent {
     const {
       information: informationField,
       workspace: {
-        boundaryExtent,
+        extentOfDataBoundary,
         renderBoundaryOverlay,
       },
     } = this.props;
@@ -51,7 +51,7 @@ class InfoTab extends TabComponent {
           <MapView
             basemap="arcgis"
             projection={presentationProjection}
-            extent={boundaryExtent}
+            extent={extentOfDataBoundary}
             style={{
               height: '100%',
               width: '100%',

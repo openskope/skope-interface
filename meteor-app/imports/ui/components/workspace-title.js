@@ -2,6 +2,7 @@ import React from 'react';
 import {
   connect,
 } from 'react-redux';
+import objectPath from 'object-path';
 
 const Component = ({
   /**
@@ -15,7 +16,7 @@ const Component = ({
 export default connect(
   // mapStateToProps
   (state) => ({
-    title: (state.workspace.configData && state.workspace.configData.title) || '',
+    title: objectPath.get(state, 'workspace.dataset.title', ''),
   }),
   // mapDispatchToProps
   null,

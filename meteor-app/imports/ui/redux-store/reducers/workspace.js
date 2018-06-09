@@ -19,13 +19,13 @@ import {
  */
 const scopedReducer = (reducer) => scopedReducerCreator('workspace', reducer);
 
-const parseDatasetConfigData = (configData) => {
+const parseDatasetDocument = (datasetDoc) => {
   return {
-    skopeid: configData.skopeid,
-    status: configData.status,
-    revised: configData.revised,
-    title: configData.title,
-    description: configData.description,
+    skopeid: datasetDoc.skopeid,
+    status: datasetDoc.status,
+    revised: datasetDoc.revised,
+    title: datasetDoc.title,
+    description: datasetDoc.description,
     timespan: (({ name, resolution, period }) => {
       const precision = getPrecisionByResolution(resolution);
 
@@ -38,14 +38,14 @@ const parseDatasetConfigData = (configData) => {
           lte: parseDateStringWithPrecision(period.lte, precision),
         },
       };
-    })(configData.timespan),
-    region: configData.region,
-    type: configData.type,
+    })(datasetDoc.timespan),
+    region: datasetDoc.region,
+    type: datasetDoc.type,
 
     variables: ((items) => {
       const keyField = 'name';
-      const mapOfOverlays = _.keyBy(configData.overlays, keyField);
-      const mapOfAnalytics = _.keyBy(configData.analytics, keyField);
+      const mapOfOverlays = _.keyBy(datasetDoc.overlays, keyField);
+      const mapOfAnalytics = _.keyBy(datasetDoc.analytics, keyField);
       const variables = items.map((v) => {
         const key = v[keyField];
 
@@ -62,17 +62,17 @@ const parseDatasetConfigData = (configData) => {
       const mapOfVariables = _.keyBy(variables, keyField);
 
       return mapOfVariables;
-    })(configData.variables),
-    overlays: configData.overlays,
-    analytics: configData.analytics,
-    downloads: configData.downloads,
+    })(datasetDoc.variables),
+    overlays: datasetDoc.overlays,
+    analytics: datasetDoc.analytics,
+    downloads: datasetDoc.downloads,
 
-    information: configData.information,
-    overlayService: configData.overlayService,
-    analyticService: configData.analyticService,
-    downloadService: configData.downloadService,
-    modelService: configData.modelService,
-    provenanceService: configData.provenanceService,
+    information: datasetDoc.information,
+    overlayService: datasetDoc.overlayService,
+    analyticService: datasetDoc.analyticService,
+    downloadService: datasetDoc.downloadService,
+    modelService: datasetDoc.modelService,
+    provenanceService: datasetDoc.provenanceService,
   };
 };
 
@@ -81,7 +81,7 @@ const WORKSPACE_RESOLVE_DATASET_DATA = scopedReducer((workspace, action) => {
   let {
     configDataRequest,
     configDataRequestError,
-    configData,
+    dataset,
   } = workspace;
 
   if (
@@ -94,11 +94,11 @@ const WORKSPACE_RESOLVE_DATASET_DATA = scopedReducer((workspace, action) => {
 
       configDataRequest = null;
       configDataRequestError = action.error;
-      configData = null;
+      dataset = null;
     } else {
       configDataRequest = null;
       configDataRequestError = null;
-      configData = action.data;
+      dataset = parseDatasetDocument(action.data);
     }
   }
 
@@ -107,8 +107,7 @@ const WORKSPACE_RESOLVE_DATASET_DATA = scopedReducer((workspace, action) => {
 
     configDataRequest,
     configDataRequestError,
-    configData,
-    dataset: parseDatasetConfigData(configData),
+    dataset,
   };
 });
 
@@ -121,7 +120,7 @@ const WORKSPACE_LOAD_DATASET = scopedReducer((workspace, action) => {
     datasetId,
     configDataRequest,
     configDataRequestError,
-    configData,
+    dataset,
   } = workspace;
 
   // Dataset ID could be empty, which means unloading dataset.
@@ -135,7 +134,7 @@ const WORKSPACE_LOAD_DATASET = scopedReducer((workspace, action) => {
       requestId,
     };
     configDataRequestError = null;
-    configData = null;
+    dataset = null;
 
     Meteor.call(
       'datasetManifest.get',
@@ -160,7 +159,7 @@ const WORKSPACE_LOAD_DATASET = scopedReducer((workspace, action) => {
     datasetId = '';
     configDataRequest = null;
     configDataRequestError = null;
-    configData = null;
+    dataset = null;
   }
 
   return {
@@ -169,7 +168,7 @@ const WORKSPACE_LOAD_DATASET = scopedReducer((workspace, action) => {
     datasetId,
     configDataRequest,
     configDataRequestError,
-    configData,
+    dataset,
 
     // Reset state for the dynamic suite.
     DynamicSuiteNS: null,

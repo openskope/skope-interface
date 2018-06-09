@@ -33,17 +33,17 @@ class MapWithToolbar extends React.Component {
     id: PropTypes.string.isRequired,
     // @type {Array<{name: string, IconClass: Icon, [drawingType: string]}>}
     selectionTools: PropTypes.arrayOf(PropTypes.object),
-    boundaryGeometry: PropTypes.object,
-    focusGeometry: PropTypes.object,
-    updateFocusGeometry: PropTypes.func.isRequired,
+    defaultExtent: PropTypes.arrayOf(PropTypes.number),
+    geometryOfFocus: PropTypes.object,
+    updateGeometryOfFocus: PropTypes.func.isRequired,
     projection: PropTypes.string,
     children: PropTypes.any,
   };
 
   static defaultProps = {
     selectionTools: [],
-    boundaryGeometry: null,
-    focusGeometry: null,
+    defaultExtent: null,
+    geometryOfFocus: null,
     projection: presentationProjection,
     children: null,
   };
@@ -94,7 +94,7 @@ class MapWithToolbar extends React.Component {
     const jsonGeometry = this._focusGeometryDrawingLayer.writeGeometryObject(olGeometry);
 
     // Report new focus geometry.
-    this.props.updateFocusGeometry(jsonGeometry);
+    this.props.updateGeometryOfFocus(jsonGeometry);
 
     this.clearFocusFeatureDrawing();
   };
@@ -109,7 +109,7 @@ class MapWithToolbar extends React.Component {
     // If the new tool can't draw, don't clear existing features.
     if (tool.drawingType) {
       // Setting focus gemoetry to null should load the default focus geometry.
-      this.props.updateFocusGeometry(null);
+      this.props.updateGeometryOfFocus(null);
       this.clearFocusFeatureDrawing();
     }
   }
@@ -154,8 +154,10 @@ class MapWithToolbar extends React.Component {
     const {
       id,
       selectionTools,
-      boundaryGeometry,
-      focusGeometry,
+
+      defaultExtent,
+
+      geometryOfFocus,
       projection,
       children,
     } = this.props;
@@ -164,10 +166,7 @@ class MapWithToolbar extends React.Component {
       freehandDrawing,
     } = this.state;
 
-    const boundaryExtent = boundaryGeometry && HTMLMapLayerVector.getExtentFromGeometry(boundaryGeometry, HTMLMapLayerVector.IOProjection);
-    const boundaryGeoJson = buildGeoJsonWithGeometry(boundaryGeometry);
-    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
-    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(focusGeometry);
+    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(geometryOfFocus);
     const focusBoundaryGeoJsonString = focusBoundaryGeoJson && JSON.stringify(focusBoundaryGeoJson);
 
     return (
@@ -238,22 +237,13 @@ class MapWithToolbar extends React.Component {
           className="map"
           basemap="arcgis"
           projection={projection}
-          extent={boundaryExtent}
+          extent={defaultExtent}
           style={{
             '--aspect-ratio': '4/3',
           }}
           ref={(ref) => this._mapView = ref}
         >
           {children}
-          {boundaryGeoJsonString && (
-            <map-layer-geojson
-              id={`${id}__boundary-geometry-display-layer`}
-              style={{
-                strokeColor: 'red',
-              }}
-              src-json={boundaryGeoJsonString}
-            />
-          )}
           {focusBoundaryGeoJsonString && (
             <map-layer-geojson
               id={`${id}__focus-geometry-display-layer`}

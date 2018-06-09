@@ -55,10 +55,6 @@ class AnalyticsTab extends TabComponent {
     analytics: PropTypes.any.isRequired,
   };
 
-  static defaultProps = {
-    focusGeometry: null,
-  };
-
   static selectionTools = [
     {
       name: 'pan',
@@ -213,14 +209,14 @@ class AnalyticsTab extends TabComponent {
 
     const {
       workspace: {
-        focusGeometry,
+        geometryOfFocus,
       },
     } = this.props;
     const {
       timeSeriesData,
     } = this.state;
 
-    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(focusGeometry);
+    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(geometryOfFocus);
     const focusBoundaryGeoJsonString = focusBoundaryGeoJson && JSON.stringify(focusBoundaryGeoJson);
 
     if (focusBoundaryGeoJsonString) {
@@ -273,7 +269,7 @@ class AnalyticsTab extends TabComponent {
       timeSeriesDataResponseDate: null,
     });
 
-    if (!(payload.variableName && payload.boundaryGeometry && payload.dateRange)) {
+    if (!(payload.variableName && payload.geometryOfDataBoundary && payload.dateRangeOfFocus)) {
       console.log('Dependencies not met');
       return;
     }
@@ -284,23 +280,23 @@ class AnalyticsTab extends TabComponent {
       analytics.url,
       {
         LAT: () => {
-          if (payload.boundaryGeometry.type === 'Point') {
-            return payload.boundaryGeometry.coordinates[1];
+          if (payload.geometryOfDataBoundary.type === 'Point') {
+            return payload.geometryOfDataBoundary.coordinates[1];
           }
 
           return null;
         },
         LONG: () => {
-          if (payload.boundaryGeometry.type === 'Point') {
-            return payload.boundaryGeometry.coordinates[0];
+          if (payload.geometryOfDataBoundary.type === 'Point') {
+            return payload.geometryOfDataBoundary.coordinates[0];
           }
 
           return null;
         },
-        boundaryGeometry: payload.boundaryGeometry,
+        boundaryGeometry: payload.geometryOfDataBoundary,
         //! Format these properly according to the temporal resolution of the dataset.
-        start: () => moment(payload.dateRange[0]).format('YYYY'),
-        end: () => moment(payload.dateRange[1]).format('YYYY'),
+        start: () => moment(payload.dateRangeOfFocus[0]).format('YYYY'),
+        end: () => moment(payload.dateRangeOfFocus[1]).format('YYYY'),
       },
       requestBody,
     );
@@ -354,12 +350,12 @@ class AnalyticsTab extends TabComponent {
   render () {
     const {
       workspace: {
-        selectedVariableId,
-        focusGeometry,
+        idOfTheSelectedVariable,
+        geometryOfFocus,
         timespan: {
           resolution: dateResolution,
         },
-        dateRange,
+        dateRangeOfFocus,
         getVariableNameById,
         renderVariableList,
         renderTemporalControls,
@@ -382,9 +378,9 @@ class AnalyticsTab extends TabComponent {
     return (
       <div className="dataset__analytics-tab">
         <PatheticDataRequester
-          variableName={selectedVariableId}
-          boundaryGeometry={focusGeometry}
-          dateRange={dateRange}
+          variableName={idOfTheSelectedVariable}
+          geometryOfDataBoundary={geometryOfFocus}
+          dateRangeOfFocus={dateRangeOfFocus}
           requester={this.requestData}
           onReady={this.onDataReady}
           onError={this.onDataError}
@@ -417,11 +413,11 @@ class AnalyticsTab extends TabComponent {
             >
               <CardMedia>
                 <AnalyticsChart
-                  variableName={getVariableNameById(selectedVariableId)}
+                  variableName={getVariableNameById(idOfTheSelectedVariable)}
                   temporalResolution={dateResolution}
                   temporalPeriod={{
-                    gte: dateRange[0],
-                    lte: dateRange[1],
+                    gte: dateRangeOfFocus[0],
+                    lte: dateRangeOfFocus[1],
                   }}
                   data={timeSeriesData}
                   onRenderStart={this.onChartRenderStart}

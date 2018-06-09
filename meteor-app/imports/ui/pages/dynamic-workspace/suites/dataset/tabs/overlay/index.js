@@ -54,12 +54,7 @@ class OverlayTab extends TabComponent {
       min: PropTypes.number,
       max: PropTypes.number,
       styles: PropTypes.arrayOf(PropTypes.string),
-    })),
-  };
-
-  static defaultProps = {
-    overlays: null,
-    focusGeometry: null,
+    })).isRequired,
   };
 
   static tabName = 'overlay';
@@ -89,7 +84,7 @@ class OverlayTab extends TabComponent {
 
     const {
       workspace: {
-        currentLoadedDate,
+        dateOfTheCurrentlyDisplayedFrame,
       },
     } = props;
 
@@ -97,7 +92,7 @@ class OverlayTab extends TabComponent {
 
     this.state = {
       // Copy of the date for the sliders.
-      currentLoadedDateTemporal: currentLoadedDate,
+      animatedCopyOfDateOfTheCurrentlyDisplayedFrame: dateOfTheCurrentlyDisplayedFrame,
       // @type {boolean}
       isPlaying: false,
       animationTimer: null,
@@ -111,13 +106,13 @@ class OverlayTab extends TabComponent {
   componentWillReceiveProps (nextProps) {
     const {
       workspace: {
-        currentLoadedDate,
+        dateOfTheCurrentlyDisplayedFrame,
       },
     } = nextProps;
     const updates = {};
 
-    if (currentLoadedDate.valueOf() !== this.state.currentLoadedDateTemporal.valueOf()) {
-      updates.currentLoadedDateTemporal = currentLoadedDate;
+    if (dateOfTheCurrentlyDisplayedFrame.valueOf() !== this.state.animatedCopyOfDateOfTheCurrentlyDisplayedFrame.valueOf()) {
+      updates.animatedCopyOfDateOfTheCurrentlyDisplayedFrame = dateOfTheCurrentlyDisplayedFrame;
     }
 
     this.setState(updates);
@@ -170,12 +165,12 @@ class OverlayTab extends TabComponent {
   get isBackStepInTimeAllowed () {
     const {
       workspace: {
-        currentLoadedDate,
-        dateRange,
+        dateOfTheCurrentlyDisplayedFrame,
+        dateRangeOfFocus,
       },
     } = this.props;
 
-    return currentLoadedDate > dateRange[0];
+    return dateOfTheCurrentlyDisplayedFrame > dateRangeOfFocus[0];
   }
   /**
    * @return {boolean}
@@ -183,12 +178,12 @@ class OverlayTab extends TabComponent {
   get isForwardStepInTimeAllowed () {
     const {
       workspace: {
-        currentLoadedDate,
-        dateRange,
+        dateOfTheCurrentlyDisplayedFrame,
+        dateRangeOfFocus,
       },
     } = this.props;
 
-    return currentLoadedDate < dateRange[1];
+    return dateOfTheCurrentlyDisplayedFrame < dateRangeOfFocus[1];
   }
 
   connectOverviewMap () {
@@ -229,11 +224,11 @@ class OverlayTab extends TabComponent {
     const {
       workspace,
       workspace: {
-        dateRange,
+        dateRangeOfFocus,
       },
     } = this.props;
 
-    workspace.currentLoadedDate = dateRange[0];
+    workspace.dateOfTheCurrentlyDisplayedFrame = dateRangeOfFocus[0];
   }
   skipAnimationToEnd () {
     console.log('skipping animation to end');
@@ -241,11 +236,11 @@ class OverlayTab extends TabComponent {
     const {
       workspace,
       workspace: {
-        dateRange,
+        dateRangeOfFocus,
       },
     } = this.props;
 
-    workspace.currentLoadedDate = dateRange[1];
+    workspace.dateOfTheCurrentlyDisplayedFrame = dateRangeOfFocus[1];
   }
 
   offsetCurrentTimeAtPrecisionByAmount (amount) {
@@ -257,7 +252,7 @@ class OverlayTab extends TabComponent {
       workspace,
     } = this.props;
 
-    workspace.currentLoadedDate = offsetDateAtPrecision(workspace.currentLoadedDate, workspace.temporalPrecision, amount);
+    workspace.dateOfTheCurrentlyDisplayedFrame = offsetDateAtPrecision(workspace.dateOfTheCurrentlyDisplayedFrame, workspace.temporalPrecision, amount);
   }
 
   renderAnimationControls () {
@@ -329,7 +324,7 @@ class OverlayTab extends TabComponent {
       workspace,
       workspace: {
         hasSelectedVariable,
-        dateRange: [
+        dateRangeOfFocus: [
           dateRangeStart,
           dateRangeEnd,
         ],
@@ -339,7 +334,7 @@ class OverlayTab extends TabComponent {
       },
     } = this.props;
     const {
-      currentLoadedDateTemporal,
+      animatedCopyOfDateOfTheCurrentlyDisplayedFrame,
     } = this.state;
 
     return (
@@ -347,7 +342,7 @@ class OverlayTab extends TabComponent {
         label="Date (year):"
         min={dateRangeStart}
         max={dateRangeEnd}
-        value={currentLoadedDateTemporal}
+        value={animatedCopyOfDateOfTheCurrentlyDisplayedFrame}
         disabled={!hasSelectedVariable}
         // (Date) => number
         toSliderValue={getSliderValueFromDate}
@@ -357,8 +352,8 @@ class OverlayTab extends TabComponent {
         toInputValue={getYearStringFromDate}
         // (string) => Date
         fromInputValue={getDateFromYearStringInput}
-        onChange={(event, date) => this.setState({ currentLoadedDateTemporal: date })}
-        onFinish={(event, date) => workspace.currentLoadedDate = date}
+        onChange={(event, date) => this.setState({ animatedCopyOfDateOfTheCurrentlyDisplayedFrame: date })}
+        onFinish={(event, date) => workspace.dateOfTheCurrentlyDisplayedFrame = date}
         style={{
           // This is a workaround to insert cells used only for spacing into the grid to achieve the desired effect.
           gridTemplateAreas: '"spacing-left label spacing-inBetween input spacing-right" "slider slider slider slider slider"',
@@ -388,8 +383,8 @@ class OverlayTab extends TabComponent {
     const {
       workspace: {
         hasSelectedVariable,
-        boundaryGeometry,
-        focusGeometry,
+        geometryOfDataBoundary,
+        geometryOfFocus,
         isPanelOpen,
         togglePanelOpenState,
         renderVariableList,
@@ -399,9 +394,9 @@ class OverlayTab extends TabComponent {
       },
     } = this.props;
 
-    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(focusGeometry);
+    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(geometryOfFocus);
     const focusBoundaryGeoJsonString = focusBoundaryGeoJson && JSON.stringify(focusBoundaryGeoJson);
-    const finalFocusGeometry = focusGeometry || boundaryGeometry;
+    const finalFocusGeometry = geometryOfFocus || geometryOfDataBoundary;
     const focusExtent = finalFocusGeometry && HTMLMapLayerVector.getExtentFromGeometry(finalFocusGeometry, HTMLMapLayerVector.IOProjection);
 
     return (
