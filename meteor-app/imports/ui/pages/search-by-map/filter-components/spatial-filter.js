@@ -1,5 +1,3 @@
-/* global HTMLMapLayerVector */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -9,7 +7,7 @@ import {
   ObjectState,
   Panel,
 } from 'searchkit';
-import MapWithToolbar from '/imports/ui/pages/dynamic-workspace/suites/dataset.MapWithToolbar';
+import MapWithToolbar from '/imports/ui/components/MapWithToolbar';
 
 import {
   PanToolIcon,
@@ -271,9 +269,9 @@ class SpatialFilter extends SearchkitComponent {
         <MapWithToolbar
           id="spatial-filter"
           selectionTools={SpatialFilter.selectionTools}
-          boundaryGeometry={HTMLMapLayerVector.getGeometryFromExtent(defaultExtent)}
-          focusGeometry={filterGeometry}
-          updateFocusGeometry={(geom) => this.setGeometryQuery(geom)}
+          defaultExtent={defaultExtent}
+          geometryOfFocus={filterGeometry}
+          updateGeometryOfFocus={(geom) => this.setGeometryQuery(geom)}
         />
       </Panel>
     );

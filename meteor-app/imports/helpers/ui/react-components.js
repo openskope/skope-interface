@@ -11,6 +11,10 @@ import {
   renderToStaticMarkup,
 } from './react';
 
+import {
+  NOOP,
+} from '../model';
+
 /**
  * This is a utility component for debugging purposes.
  * It prints all the props passed to it.
@@ -125,8 +129,8 @@ class PatheticDataRequester extends React.Component {
   };
 
   static defaultProps = {
-    onNewRequest: () => {},
-    onError: () => {},
+    onNewRequest: NOOP,
+    onError: NOOP,
     verbose: false,
   };
 

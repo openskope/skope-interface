@@ -73,9 +73,9 @@ export default class SearchResultItem extends React.PureComponent {
       },
     } = this.props;
 
-    const boundaryGeoJson = Area && this.constructor.buildGeoJsonWithGeometry(Area);
-    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
-    const boundaryExtent = geojsonExtent(boundaryGeoJson);
+    const geoJsonOfDataBoundary = Area && this.constructor.buildGeoJsonWithGeometry(Area);
+    const geoJsonStringOfDataBoundary = geoJsonOfDataBoundary && JSON.stringify(geoJsonOfDataBoundary);
+    const extentOfDataBoundary = geojsonExtent(geoJsonOfDataBoundary);
 
     return (
       <Card className="search-result-item">
@@ -91,16 +91,16 @@ export default class SearchResultItem extends React.PureComponent {
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat',
             }}
-          >{boundaryGeoJson && (
+          >{geoJsonOfDataBoundary && (
             <MapView
               basemap="osm"
               projection={presentationProjection}
-              extent={boundaryExtent}
+              extent={extentOfDataBoundary}
               style={{
                 width: '100%',
                 height: '100%',
               }}
-            ><map-layer-geojson src-json={boundaryGeoJsonString} /></MapView>
+            ><map-layer-geojson src-json={geoJsonStringOfDataBoundary} /></MapView>
           )}</div>
           <div className="search-result-item__metadata">
             <TextField

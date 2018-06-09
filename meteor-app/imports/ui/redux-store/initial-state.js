@@ -40,69 +40,11 @@ export default {
     configDataRequest: null,
     // Stores any error encountered during requesting the config data.
     configDataRequestError: null,
-    // Stores the config data.
-    configData: null,
+    // Stores the dataset document.
+    dataset: null,
     // Namespace for any state the dynamic suite needs to store.
     // This should be reset whenever a new suite is used.
     DynamicSuiteNS: null,
-
-    //! For testing only. Should be empty on start.
-    layers: [
-      {
-        name: 'GDD may sept demosaic',
-        wmsBaseUrl: 'http://141.142.170.103:8080/geoserver/skope/wms',
-        wmsLayerName: 'GDD_may_sept_demosaic',
-        minZoom: 5,
-        maxZoom: 12,
-        invisible: false,
-        sidePanelMenuClosed: true,
-        opacity: 0.7,
-        extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
-      },
-      {
-        name: 'PPT annual demosaic',
-        wmsBaseUrl: 'http://141.142.170.103:8080/geoserver/skope/wms',
-        wmsLayerName: 'PPT_annual_demosaic',
-        minZoom: 5,
-        maxZoom: 12,
-        invisible: false,
-        sidePanelMenuClosed: true,
-        opacity: 0.7,
-        extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
-      },
-      {
-        name: 'PPT may sept demosaic',
-        wmsBaseUrl: 'http://141.142.170.103:8080/geoserver/skope/wms',
-        wmsLayerName: 'PPT_may_sept_demosaic',
-        minZoom: 5,
-        maxZoom: 12,
-        invisible: true,
-        sidePanelMenuClosed: true,
-        opacity: 0.7,
-        extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
-      },
-      {
-        name: 'PPT water year',
-        wmsBaseUrl: 'http://141.142.170.103:8080/geoserver/skope/wms',
-        wmsLayerName: 'PPT_water_year',
-        minZoom: 5,
-        maxZoom: 12,
-        invisible: true,
-        sidePanelMenuClosed: true,
-        opacity: 0.7,
-        extent: '-12856096.661340367, 3620057.6595859504, -11359153.899403473, 5371382.851655904',
-      },
-    ],
-
-    filterValue: null,
-
-    // Whether a point is selected for inspection.
-    inspectPointSelected: false,
-    // If a point is selected for inspection, this would be its coordinates in [long, lat] (this order).
-    inspectPointCoordinate: [0, 0],
-
-    welcomeWindowClosed: true,
-    toolbarMenuClosed: true,
   },
 
   model: {

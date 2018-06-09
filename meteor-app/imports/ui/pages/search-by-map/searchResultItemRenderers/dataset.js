@@ -158,15 +158,15 @@ class SearchResultItem extends React.PureComponent {
     } = this.props;
 
     const datasetTitle = objectPath.get(datasetSourceData, 'title', '');
-    const boundaryGeometry = objectPath.get(datasetSourceData, 'region.geometry', null);
-    const boundaryGeoJson = boundaryGeometry && buildGeoJsonWithGeometry(boundaryGeometry);
-    const boundaryGeoJsonString = boundaryGeoJson && JSON.stringify(boundaryGeoJson);
+    const geometryOfDataBoundary = objectPath.get(datasetSourceData, 'region.geometry', null);
+    const geoJsonOfDataBoundary = geometryOfDataBoundary && buildGeoJsonWithGeometry(geometryOfDataBoundary);
+    const geoJsonStringOfDataBoundary = geoJsonOfDataBoundary && JSON.stringify(geoJsonOfDataBoundary);
     // If `extents` is specified in source, trust that. Otherwise try to calculate from boundary shape.
     const boundaryExtentFromDocument = objectPath.get(datasetSourceData, 'region.extents', null);
-    const boundaryExtent = boundaryExtentFromDocument
-                           // Extent coordinates stored in the document are strings instead of numbers.
-                           ? (boundaryExtentFromDocument.map((s) => parseFloat(s)))
-                           : (boundaryGeoJson && geojsonExtent(boundaryGeoJson));
+    const extentOfDataBoundary = boundaryExtentFromDocument
+      // Extent coordinates stored in the document are strings instead of numbers.
+      ? (boundaryExtentFromDocument.map((s) => parseFloat(s)))
+      : (geoJsonOfDataBoundary && geojsonExtent(geoJsonOfDataBoundary));
     const datasetRegionName = objectPath.get(datasetSourceData, 'region.name', '');
     const datasetTimespanName = objectPath.get(datasetSourceData, 'timespan.name', '');
     const datasetDescriptionMarkdown = objectPath.get(datasetSourceData, 'description', '');
@@ -234,11 +234,11 @@ class SearchResultItem extends React.PureComponent {
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat',
             }}
-          >{boundaryGeoJson && (
+          >{geoJsonOfDataBoundary && (
             <MapView
               basemap="arcgis"
               projection={presentationProjection}
-              extent={boundaryExtent}
+              extent={extentOfDataBoundary}
               style={{
                 width: '100%',
                 height: '100%',
@@ -248,7 +248,7 @@ class SearchResultItem extends React.PureComponent {
                 style={{
                   fill: dataSpatialBoundaryFillColor,
                 }}
-                src-json={boundaryGeoJsonString}
+                src-json={geoJsonStringOfDataBoundary}
               />
             </MapView>
           )}</a>

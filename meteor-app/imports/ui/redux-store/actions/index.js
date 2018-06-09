@@ -1,3 +1,9 @@
+/**
+ * This file collects individual actions to one collection.
+ */
+
+export * from './namespacing';
+
 export * from './fetch_build_hash';
 export * from './page_entry';
 export * from './searchpage';

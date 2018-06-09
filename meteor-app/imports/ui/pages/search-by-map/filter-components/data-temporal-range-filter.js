@@ -10,10 +10,11 @@ import {
 } from 'searchkit';
 
 import {
+  NOOP,
   getPrecisionByResolution,
   getDateStringAtPrecision,
   parseDateStringWithPrecision,
-} from '/imports/ui/helpers';
+} from '/imports/helpers/model';
 
 import {
   RangeWithInput,
@@ -160,8 +161,8 @@ class DateRangeInput extends React.Component {
     max: null,
     minValue: null,
     maxValue: null,
-    onChange: () => {},
-    onFinished: () => {},
+    onChange: NOOP,
+    onFinished: NOOP,
     resolution: 'date',
   };
 

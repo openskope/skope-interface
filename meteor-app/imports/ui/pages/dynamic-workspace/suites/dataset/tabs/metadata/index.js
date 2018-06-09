@@ -5,17 +5,18 @@ import {
   MarkDownRenderer,
 } from '/imports/ui/helpers';
 
-import TabBaseClass from './dataset.tab.BaseClass';
+import TabComponent from '../../TabComponent';
 
 export default
-class MetadataTab extends TabBaseClass {
+class MetadataTab extends TabComponent {
+  static tabName = 'metadata';
   static tabIcon = null;
   static tabLabel = 'Metadata';
   static requiredProps = [
     'metadata',
   ];
 
-  renderBody () {
+  render () {
     const {
       metadata: metadataField,
     } = this.props;

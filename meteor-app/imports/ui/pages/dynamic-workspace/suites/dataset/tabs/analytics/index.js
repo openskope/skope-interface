@@ -22,6 +22,10 @@ import {
 
 import Raven from '/imports/startup/client/sentry';
 import {
+  IndeterminateProgress,
+} from '/imports/ui/components/LinearProgress';
+
+import {
   DatasetChartIcon,
   PanToolIcon,
   PointToolIcon,
@@ -33,27 +37,22 @@ import {
   fillTemplateString,
 } from '/imports/ui/helpers';
 
-import TabBaseClass from './dataset.tab.BaseClass';
-import AnalyticsChart from './dataset.AnalyticsChart';
+import TabComponent from '../../TabComponent';
+import AnalyticsChart from '../../AnalyticsChart';
 
-class AnalyticsTabContent extends React.Component {
+export default
+class AnalyticsTab extends TabComponent {
+  static tabName = 'analytics';
+  static tabIcon = DatasetChartIcon;
+  static tabLabel = 'Graph View';
+  static requiredProps = [
+    'analyticService',
+    'analytics',
+  ];
 
   static propTypes = {
+    ...TabComponent.propTypes,
     analytics: PropTypes.any.isRequired,
-    selectedVariableId: PropTypes.string.isRequired,
-    dateRange: PropTypes.any.isRequired,
-    dateResolution: PropTypes.any.isRequired,
-    focusGeometry: PropTypes.object,
-
-    getVariableNameById: PropTypes.func.isRequired,
-    getFrameIndexInTimespan: PropTypes.func.isRequired,
-    renderVariableList: PropTypes.func.isRequired,
-    renderTemporalControls: PropTypes.func.isRequired,
-    renderFocusBoundaryMap: PropTypes.func.isRequired,
-  };
-
-  static defaultProps = {
-    focusGeometry: null,
   };
 
   static selectionTools = [
@@ -209,13 +208,15 @@ class AnalyticsTabContent extends React.Component {
     const zip = new JsZip();
 
     const {
-      focusGeometry,
+      workspace: {
+        geometryOfFocus,
+      },
     } = this.props;
     const {
       timeSeriesData,
     } = this.state;
 
-    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(focusGeometry);
+    const focusBoundaryGeoJson = buildGeoJsonWithGeometry(geometryOfFocus);
     const focusBoundaryGeoJsonString = focusBoundaryGeoJson && JSON.stringify(focusBoundaryGeoJson);
 
     if (focusBoundaryGeoJsonString) {
@@ -240,7 +241,11 @@ class AnalyticsTabContent extends React.Component {
   };
 
   getAnalyticsByName = (name) => {
-    return this.props.analytics.find((analytic) => {
+    const {
+      analytics,
+    } = this.props;
+
+    return analytics.find((analytic) => {
       return analytic.name === name;
     });
   };
@@ -264,7 +269,7 @@ class AnalyticsTabContent extends React.Component {
       timeSeriesDataResponseDate: null,
     });
 
-    if (!(payload.variableName && payload.boundaryGeometry && payload.dateRange)) {
+    if (!(payload.variableName && payload.geometryOfDataBoundary && payload.dateRangeOfFocus)) {
       console.log('Dependencies not met');
       return;
     }
@@ -275,23 +280,23 @@ class AnalyticsTabContent extends React.Component {
       analytics.url,
       {
         LAT: () => {
-          if (payload.boundaryGeometry.type === 'Point') {
-            return payload.boundaryGeometry.coordinates[1];
+          if (payload.geometryOfDataBoundary.type === 'Point') {
+            return payload.geometryOfDataBoundary.coordinates[1];
           }
 
           return null;
         },
         LONG: () => {
-          if (payload.boundaryGeometry.type === 'Point') {
-            return payload.boundaryGeometry.coordinates[0];
+          if (payload.geometryOfDataBoundary.type === 'Point') {
+            return payload.geometryOfDataBoundary.coordinates[0];
           }
 
           return null;
         },
-        boundaryGeometry: payload.boundaryGeometry,
+        boundaryGeometry: payload.geometryOfDataBoundary,
         //! Format these properly according to the temporal resolution of the dataset.
-        start: () => moment(payload.dateRange[0]).format('YYYY'),
-        end: () => moment(payload.dateRange[1]).format('YYYY'),
+        start: () => moment(payload.dateRangeOfFocus[0]).format('YYYY'),
+        end: () => moment(payload.dateRangeOfFocus[1]).format('YYYY'),
       },
       requestBody,
     );
@@ -344,10 +349,18 @@ class AnalyticsTabContent extends React.Component {
 
   render () {
     const {
-      selectedVariableId,
-      dateRange,
-      dateResolution,
-      focusGeometry,
+      workspace: {
+        idOfTheSelectedVariable,
+        geometryOfFocus,
+        timespan: {
+          resolution: dateResolution,
+        },
+        dateRangeOfFocus,
+        getVariableNameById,
+        renderVariableList,
+        renderTemporalControls,
+        renderFocusBoundaryMap,
+      },
     } = this.props;
     const {
       isLoadingTimeSeriesData,
@@ -365,9 +378,9 @@ class AnalyticsTabContent extends React.Component {
     return (
       <div className="dataset__analytics-tab">
         <PatheticDataRequester
-          variableName={selectedVariableId}
-          boundaryGeometry={focusGeometry}
-          dateRange={dateRange}
+          variableName={idOfTheSelectedVariable}
+          geometryOfDataBoundary={geometryOfFocus}
+          dateRangeOfFocus={dateRangeOfFocus}
           requester={this.requestData}
           onReady={this.onDataReady}
           onError={this.onDataError}
@@ -379,10 +392,10 @@ class AnalyticsTabContent extends React.Component {
           zDepth={1}
         >
           <List>
-            {this.props.renderVariableList({})}
-            {this.props.renderTemporalControls({})}
-            {this.props.renderFocusBoundaryMap({
-              selectionTools: AnalyticsTabContent.selectionTools,
+            {renderVariableList({})}
+            {renderTemporalControls({})}
+            {renderFocusBoundaryMap({
+              selectionTools: this.constructor.selectionTools,
             })}
           </List>
         </Paper>
@@ -400,11 +413,11 @@ class AnalyticsTabContent extends React.Component {
             >
               <CardMedia>
                 <AnalyticsChart
-                  variableName={this.props.getVariableNameById(selectedVariableId)}
+                  variableName={getVariableNameById(idOfTheSelectedVariable)}
                   temporalResolution={dateResolution}
                   temporalPeriod={{
-                    gte: dateRange[0],
-                    lte: dateRange[1],
+                    gte: dateRangeOfFocus[0],
+                    lte: dateRangeOfFocus[1],
                   }}
                   data={timeSeriesData}
                   onRenderStart={this.onChartRenderStart}
@@ -436,7 +449,7 @@ class AnalyticsTabContent extends React.Component {
           )}
           {isLoadingTimeSeriesData && !isTimeSeriesDataLoaded && (
             <div>
-              <div className="linear-progress" />
+              <IndeterminateProgress />
               <p>Please wait while the chart is being loaded...</p>
             </div>
           )}
@@ -482,35 +495,6 @@ class AnalyticsTabContent extends React.Component {
           )}
         </Paper>
       </div>
-    );
-  }
-}
-
-export default
-class AnalyticsTab extends TabBaseClass {
-
-  static tabIcon = DatasetChartIcon;
-  static tabLabel = 'Graph View';
-  static requiredProps = [
-    'analyticService',
-    'analytics',
-  ];
-
-  renderBody () {
-    return (
-      <AnalyticsTabContent
-        analytics={this.props.analytics}
-        selectedVariableId={this.selectedVariableId}
-        dateRange={this.dateRange}
-        dateResolution={this.component.timespan.resolution}
-        focusGeometry={this.focusGeometry}
-
-        getVariableNameById={this.getVariableNameById}
-        getFrameIndexInTimespan={this.component.getFrameIndexInTimespan}
-        renderVariableList={this.renderVariableList}
-        renderTemporalControls={this.renderTemporalControls}
-        renderFocusBoundaryMap={this.renderFocusBoundaryMap}
-      />
     );
   }
 }

@@ -16,6 +16,9 @@ import {
   makeSVGDocAsync,
   svgDocToBlob,
 } from '/imports/ui/helpers';
+import {
+  NOOP,
+} from '/imports/helpers/model';
 
 export default
 class AnalyticsChart extends React.Component {
@@ -40,8 +43,8 @@ class AnalyticsChart extends React.Component {
   };
 
   static defaultProps = {
-    onRenderStart: () => {},
-    onRenderEnd: () => {},
+    onRenderStart: NOOP,
+    onRenderEnd: NOOP,
   };
 
   static timeFormatsForC3 = [

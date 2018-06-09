@@ -4,6 +4,10 @@ import Paper from 'material-ui/Paper';
 
 import globalTheme from '/imports/ui/styling/muiTheme';
 
+import {
+  NOOP,
+} from '/imports/helpers/model';
+
 const styles = {
   root: {
     // Necessary for setting border radius on root.
@@ -44,7 +48,7 @@ export default
     style = {},
     buttonStyle = {},
     toggled = false,
-    onToggle = () => {},
+    onToggle = NOOP,
     ...otherProps
   } = props;
 
