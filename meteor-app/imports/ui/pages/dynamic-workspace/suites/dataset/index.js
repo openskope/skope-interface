@@ -1010,6 +1010,7 @@ class DatasetWorkspace extends SuiteBaseClass {
           >
             {this.hasSelectedVariable && this.renderMapLayerForSelectedVariable()}
             {this.renderBoundaryOverlay()}
+            <map-control-mouse-position slot="bottom-dock" />
           </MapWithToolbar>
         </ListItem>
       </this.SidePanelCommonCollapsibleSectionContainer>

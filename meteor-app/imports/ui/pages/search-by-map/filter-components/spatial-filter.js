@@ -272,7 +272,9 @@ class SpatialFilter extends SearchkitComponent {
           defaultExtent={defaultExtent}
           geometryOfFocus={filterGeometry}
           updateGeometryOfFocus={(geom) => this.setGeometryQuery(geom)}
-        />
+        >
+          <map-control-mouse-position slot="bottom-dock" />
+        </MapWithToolbar>
       </Panel>
     );
   }

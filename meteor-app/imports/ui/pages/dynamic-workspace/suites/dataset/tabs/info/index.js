@@ -58,6 +58,7 @@ class InfoTab extends TabComponent {
             }}
           >
             {renderBoundaryOverlay()}
+            <map-control-mouse-position slot="bottom-dock" />
           </MapView>
         </Paper>
       </div>

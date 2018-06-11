@@ -439,6 +439,7 @@ class OverlayTab extends TabComponent {
             )}
             <map-interaction-defaults />
             <map-control-defaults />
+            <map-control-mouse-position slot="bottom-dock" />
           </MapView>
 
           <List>
