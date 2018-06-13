@@ -1,5 +1,8 @@
+import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import { FlowRouterTitle } from 'meteor/ostrio:flow-router-title';
+import ReactGA from 'react-ga';
+import objectPath from 'object-path';
 
 // Import needed templates
 import SearchPage from '/imports/ui/pages/search-by-map';
@@ -18,6 +21,11 @@ import {
 FlowRouter.globals.push({
   title: 'SKOPE',
 });
+
+// These triggers are called before those defined in individual routes.
+FlowRouter.triggers.enter([
+  (context) => ReactGA.pageview(context.path),
+]);
 
 // Set up all routes in the app
 FlowRouter.route('/', {
@@ -75,3 +83,11 @@ FlowRouter.route('*', {
 
 export
 const titleHandler = new FlowRouterTitle(FlowRouter);
+
+((gaTrackingId) => {
+  if (!gaTrackingId) {
+    return;
+  }
+
+  ReactGA.initialize(gaTrackingId);
+})(objectPath.get(Meteor.settings, 'public.gaTrackingId'));
