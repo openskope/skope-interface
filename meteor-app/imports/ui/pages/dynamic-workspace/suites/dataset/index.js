@@ -947,7 +947,7 @@ class DatasetWorkspace extends SuiteBaseClass {
     });
   };
 
-  renderMapLayerLegend = (layer) => {
+  renderMapLayerLegend = (layer, options = {}) => {
     if (!(layer.type in mapLayerLegendRenderers)) {
       console.warn(`Unknown layer type “${layer.type}” for layer “${layer.name}”`);
       return null;
@@ -961,6 +961,7 @@ class DatasetWorkspace extends SuiteBaseClass {
 
     return renderer.call(this, {
       ...layer,
+      ...options,
     }, {
       YYYY: () => moment(dateOfLayer).format('YYYY'),
       MM: () => moment(dateOfLayer).format('MM'),
@@ -968,7 +969,11 @@ class DatasetWorkspace extends SuiteBaseClass {
     });
   };
 
-  renderMapLayerForSelectedVariable = (options = { legend: false }) => {
+  renderMapLayerForSelectedVariable = (options = {}) => {
+    const {
+      legend: shouldRenderLegend = false,
+      legendStyle = {},
+    } = options;
     const variableId = this.idOfTheSelectedVariable;
     const layer = objectPath.get(this.variables, [variableId, 'overlay']);
 
@@ -979,7 +984,9 @@ class DatasetWorkspace extends SuiteBaseClass {
     return (
       <React.Fragment>
         {this.renderMapLayer(layer)}
-        {options.legend && this.renderMapLayerLegend(layer)}
+        {shouldRenderLegend && this.renderMapLayerLegend(layer, {
+          legendStyle,
+        })}
       </React.Fragment>
     );
   };

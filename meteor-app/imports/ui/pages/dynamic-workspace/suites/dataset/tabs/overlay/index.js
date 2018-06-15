@@ -41,6 +41,21 @@ import MapView from '/imports/ui/components/mapview';
 
 import TabComponent from '../../TabComponent';
 
+const selectionTools = [
+  {
+    name: 'pan',
+    IconClass: PanToolIcon,
+    title: 'Pan tool',
+  },
+  {
+    name: 'rectangle',
+    IconClass: BoxToolIcon,
+    title: 'Rectangle tool',
+    drawingType: 'Box',
+    freehandDrawing: true,
+  },
+];
+
 export default
 class OverlayTab extends TabComponent {
 
@@ -62,21 +77,6 @@ class OverlayTab extends TabComponent {
   static tabLabel = 'Map View';
   static requiredProps = [
     'overlays',
-  ];
-
-  static selectionTools = [
-    {
-      name: 'pan',
-      IconClass: PanToolIcon,
-      title: 'Pan tool',
-    },
-    {
-      name: 'rectangle',
-      IconClass: BoxToolIcon,
-      title: 'Rectangle tool',
-      drawingType: 'Box',
-      freehandDrawing: true,
-    },
   ];
 
   constructor (props) {
@@ -411,7 +411,7 @@ class OverlayTab extends TabComponent {
               disabled: this.isPlaying,
             })}
             {renderFocusBoundaryMap({
-              selectionTools: this.constructor.selectionTools,
+              selectionTools,
             })}
           </List>
         </Paper>
@@ -427,7 +427,18 @@ class OverlayTab extends TabComponent {
             extent={focusExtent}
             ref={(ref) => this._detailMap = ref}
           >
-            {hasSelectedVariable && renderMapLayerForSelectedVariable({ legend: true })}
+            <map-interaction-defaults />
+            <map-control-defaults />
+            <map-control-mouse-position slot="bottom-dock" />
+
+            {hasSelectedVariable && renderMapLayerForSelectedVariable({
+              legend: true,
+              legendStyle: {
+                paddingLeft: '2px',
+                paddingRight: '2px',
+                marginLeft: 'auto',
+              },
+            })}
             {focusBoundaryGeoJsonString && (
               <map-layer-geojson
                 style={{
@@ -437,9 +448,6 @@ class OverlayTab extends TabComponent {
                 src-json={focusBoundaryGeoJsonString}
               />
             )}
-            <map-interaction-defaults />
-            <map-control-defaults />
-            <map-control-mouse-position slot="bottom-dock" />
           </MapView>
 
           <List>

@@ -15,6 +15,7 @@ import {
 /**
  * @param {Object} layer
  * @param {string} layer.url
+ * @param {Object} layer.legendStyle
  * @param {Object} fillers
  * @returns {ReactElement}
  */
@@ -22,8 +23,19 @@ export
 const wms = (layer, fillers) => {
   const urlParse = parseUrl(layer.url);
   const queryParse = parseQueryString(urlParse.query, '&', '=');
-  const layerNames = queryParse.layers.split(',').map((s) => String.prototype.trim.call(s));
+  const layersString = queryParse.layers;
+
+  if (!layersString) {
+    return null;
+  }
+
+  const layerNames = String.prototype.split.call(layersString, ',').map((s) => String.prototype.trim.call(s));
   const nameOfFirstLayer = layerNames[0];
+
+  if (!nameOfFirstLayer) {
+    return null;
+  }
+
   const legendUrl = formatUrl({
     protocol: urlParse.protocol,
     host: urlParse.host,
@@ -42,15 +54,15 @@ const wms = (layer, fillers) => {
 
   return (
     <div
-      style={{
-        position: 'absolute',
-        bottom: '0.5em',
-        left: '0.5em',
-      }}
+      slot="bottom-dock"
+      style={layer.legendStyle}
     >
       <img
         alt="legend"
         src={legendUrl}
+        style={{
+          verticalAlign: 'bottom',
+        }}
       />
     </div>
   );
