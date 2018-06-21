@@ -429,14 +429,14 @@ class OverlayTab extends TabComponent {
           >
             <map-interaction-defaults />
             <map-control-defaults />
-            <map-control-mouse-position slot="bottom-dock" />
+            <map-control-mouse-position slot="right-dock" />
 
             {hasSelectedVariable && renderMapLayerForSelectedVariable({
               legend: true,
               legendStyle: {
                 paddingLeft: '2px',
                 paddingRight: '2px',
-                marginLeft: 'auto',
+                marginRight: 'auto',
               },
             })}
             {focusBoundaryGeoJsonString && (
