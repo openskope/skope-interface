@@ -1,10 +1,10 @@
+/* global HTMLMapLayerVector */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import objectPath from 'object-path';
 import moment from 'moment';
-import geojsonExtent from 'geojson-extent';
-
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import {
   Tabs,
@@ -348,13 +348,15 @@ class DatasetWorkspace extends SuiteBaseClass {
       return boundaryExtentFromDocument.map((s) => parseFloat(s));
     }
 
-    const geoJsonOfDataBoundary = this.geoJsonOfDataBoundary;
-
-    if (!geoJsonOfDataBoundary) {
+    const geometryOfDataBoundary = this.geometryOfDataBoundary;
+    
+    if (!geometryOfDataBoundary) {
       return null;
     }
+    
+    const extent = HTMLMapLayerVector.getExtentFromGeometry(geometryOfDataBoundary, HTMLMapLayerVector.IOProjection);
 
-    return geojsonExtent(geoJsonOfDataBoundary);
+    return extent;
   }
 
   /**

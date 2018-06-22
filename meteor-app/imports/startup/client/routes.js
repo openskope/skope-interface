@@ -7,7 +7,6 @@ import objectPath from 'object-path';
 // Import needed templates
 import SearchPage from '/imports/ui/pages/search-by-map';
 import WorkspacePage from '/imports/ui/pages/dynamic-workspace';
-import PaleoCarModelPage from '/imports/ui/pages/model-paleocar--stepper';
 import NotFoundPage from '/imports/ui/pages/not-found';
 
 import {
@@ -67,12 +66,6 @@ FlowRouter.route('/workspace', {
   name: 'App.workspace',
   title: 'Workspace - SKOPE',
   action: simpleMountAction(WorkspacePage),
-});
-
-FlowRouter.route('/model/paleocar', {
-  name: 'App.model.paleocar',
-  title: 'Paleocar model - SKOPE',
-  action: simpleMountAction(PaleoCarModelPage),
 });
 
 FlowRouter.route('*', {

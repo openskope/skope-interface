@@ -1,6 +1,7 @@
+/* global HTMLMapLayerVector */
+
 import React from 'react';
 import objectPath from 'object-path';
-import geojsonExtent from 'geojson-extent';
 import {
   Card,
   CardActions,
@@ -166,7 +167,7 @@ class SearchResultItem extends React.PureComponent {
     const extentOfDataBoundary = boundaryExtentFromDocument
       // Extent coordinates stored in the document are strings instead of numbers.
       ? (boundaryExtentFromDocument.map((s) => parseFloat(s)))
-      : (geoJsonOfDataBoundary && geojsonExtent(geoJsonOfDataBoundary));
+      : (geometryOfDataBoundary && HTMLMapLayerVector.getExtentFromGeometry(geometryOfDataBoundary, HTMLMapLayerVector.IOProjection));
     const datasetRegionName = objectPath.get(datasetSourceData, 'region.name', '');
     const datasetTimespanName = objectPath.get(datasetSourceData, 'timespan.name', '');
     const datasetDescriptionMarkdown = objectPath.get(datasetSourceData, 'description', '');
