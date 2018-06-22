@@ -1,8 +1,5 @@
 # This Dockerfile is used to build the production bundle for a Meteor app.
 
-ARG METEOR_VERSION="1.6.0.1"
-ARG NODE_VERSION="8.9.3"
-ARG APP_DIR="/usr/share/meteor-app"
 ARG GIT_COMMIT=""
 
 FROM ubuntu:16.04 AS build
@@ -20,37 +17,33 @@ RUN apt-get update \
 
 ENV HOME="/home/meteor"
 
-ARG APP_DIR
-
 RUN useradd -m -s /bin/bash meteor \
-    && mkdir -p "${APP_DIR}" \
-    && chown -R meteor:meteor "${APP_DIR}"
+    && mkdir -p /usr/share/meteor-app \
+    && chown -R meteor:meteor /usr/share/meteor-app
 
 #! TODO: Use the line below to replace the workaround when `17.09` is landed
 # on Docker Cloud.
 # See https://github.com/moby/moby/issues/35731#issuecomment-360666913
 #
-# ADD --chown=meteor:meteor ./meteor-app "${APP_DIR}/source"
+# ADD --chown=meteor:meteor ./meteor-app "/usr/share/meteor-app/source"
 #
 #! Workaround begins.
-ADD ./meteor-app "${APP_DIR}/source"
-RUN chown -R meteor:meteor "${APP_DIR}/source"
+ADD ./meteor-app "/usr/share/meteor-app/source"
+RUN chown -R meteor:meteor "/usr/share/meteor-app/source"
 #! End of workaround.
 
 USER meteor
 
 # Install Meteor.
-ARG METEOR_VERSION
-
-RUN curl "https://install.meteor.com/?release=${METEOR_VERSION}" | sh
+RUN curl "https://install.meteor.com/?release=1.6.0.1" | sh
 ENV METEOR_PATH="${HOME}/.meteor"
 ENV PATH="$PATH:$METEOR_PATH"
 
-RUN cd "${APP_DIR}/source" \
+RUN cd "/usr/share/meteor-app/source" \
     && meteor npm install --production --unsafe-perm \
-    && meteor build "${APP_DIR}" --directory --architecture os.linux.x86_64
+    && meteor build "/usr/share/meteor-app" --directory --architecture os.linux.x86_64
 
-FROM node:${NODE_VERSION}-slim
+FROM node:8.9.3-slim
 LABEL maintainer="Xingchen Hong <hello@xc-h.com>"
 
 RUN apt-get update \
@@ -63,13 +56,11 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-ARG APP_DIR
-
 ENV HOME="/home/meteor"
 RUN useradd -m -s /bin/bash meteor \
-    && mkdir -p "${APP_DIR}" \
-    && chown -R meteor:meteor "${APP_DIR}"
-WORKDIR "${APP_DIR}"
+    && mkdir -p "/usr/share/meteor-app" \
+    && chown -R meteor:meteor "/usr/share/meteor-app"
+WORKDIR "/usr/share/meteor-app"
 
 ARG GIT_COMMIT
 
@@ -85,15 +76,15 @@ ENV NODE_ENV="production" \
 # on Docker Cloud.
 # See https://github.com/moby/moby/issues/35731#issuecomment-360666913
 #
-# COPY --from=build --chown=meteor:meteor "${APP_DIR}/bundle" "${APP_DIR}/bundle"
-# ADD --chown=meteor:meteor ./meteor-app.settings.default.json "${APP_DIR}/app-settings.json"
-# ADD --chown=meteor:meteor ./Dockerfile.entrypoint.sh "${APP_DIR}/entrypoint.sh"
+# COPY --from=build --chown=meteor:meteor "/usr/share/meteor-app/bundle" "/usr/share/meteor-app/bundle"
+# ADD --chown=meteor:meteor ./meteor-app.settings.default.json "/usr/share/meteor-app/app-settings.json"
+# ADD --chown=meteor:meteor ./Dockerfile.entrypoint.sh "/usr/share/meteor-app/entrypoint.sh"
 #
 #! Workaround begins.
-COPY --from=build "${APP_DIR}/bundle" "${APP_DIR}/bundle"
-ADD ./meteor-app.settings.default.json "${APP_DIR}/app-settings.json"
-ADD ./Dockerfile.entrypoint.sh "${APP_DIR}/entrypoint.sh"
-RUN chown -R meteor:meteor "${APP_DIR}"
+COPY --from=build "/usr/share/meteor-app/bundle" "/usr/share/meteor-app/bundle"
+ADD ./meteor-app.settings.default.json "/usr/share/meteor-app/app-settings.json"
+ADD ./Dockerfile.entrypoint.sh "/usr/share/meteor-app/entrypoint.sh"
+RUN chown -R meteor:meteor "/usr/share/meteor-app"
 #! End of workaround.
 
 USER meteor
