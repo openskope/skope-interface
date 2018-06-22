@@ -1,0 +1,14 @@
+{
+    "[html]": {
+        "editor.detectIndentation": false,
+        "editor.tabSize": 2
+    },
+    "[javascript]": {
+        "editor.detectIndentation": false,
+        "editor.tabSize": 2
+    },
+    "[less]": {
+        "editor.detectIndentation": false,
+        "editor.tabSize": 2
+    }
+}
