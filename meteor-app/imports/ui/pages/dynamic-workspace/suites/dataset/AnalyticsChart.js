@@ -235,7 +235,7 @@ class AnalyticsChart extends React.Component {
     };
 
     return (
-      <div>
+      <div className="AnalyticsChart">
         <Plot
           data={plotData}
           layout={plotLayout}
