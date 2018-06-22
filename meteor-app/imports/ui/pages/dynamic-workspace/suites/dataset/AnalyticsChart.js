@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import objectPath from 'object-path';
-import c3 from 'c3';
-import 'c3/c3.css';
+import Plot from 'react-plotly.js';
+import Plotly from 'plotly.js/dist/plotly';
 import Toggle from 'material-ui/Toggle';
 
 import {
@@ -13,10 +13,6 @@ import {
 import {
   getPrecisionByResolution,
   offsetDateAtPrecision,
-  makeSVGDocAsync,
-  svgDocToBlob,
-} from '/imports/ui/helpers';
-import {
   NOOP,
 } from '/imports/helpers/model';
 
@@ -47,34 +43,23 @@ class AnalyticsChart extends React.Component {
     onRenderEnd: NOOP,
   };
 
-  static timeFormatsForC3 = [
-    '%Y',
-    '%Y-%m',
-    '%Y-%m-%d',
-    '%Y-%m-%d %H',
-    '%Y-%m-%d %H:%M',
-    '%Y-%m-%d %H:%M:%S',
-  ];
-
   constructor (props) {
     super(props);
 
     this.state = {
       displayDataUncertaintyValues: dataChartShowUncertantyByDefault,
     };
-  }
 
-  componentDidMount () {
-    this.renderChart();
+    this._graphDiv = null;
   }
 
   shouldComponentUpdate (nextProps, nextState) {
     return !(_.isEqual(nextProps, this.props) && _.isEqual(nextState, this.state));
   }
 
-  componentDidUpdate () {
-    this.renderChart();
-  }
+  onPlotInitialized = (figure, graphDiv) => {
+    this._graphDiv = graphDiv;
+  };
 
   onToggleDataUncertainty = () => {
     this.setState({
@@ -100,139 +85,170 @@ class AnalyticsChart extends React.Component {
     ];
   }
 
-  toBlob = async () => {
-    const svgElement = this._chartContainer.querySelector('svg');
-
-    if (!svgElement) {
-      return null;
-    }
-
-    const svgDoc = await makeSVGDocAsync(svgElement);
-
-    return svgDocToBlob(svgDoc);
-  };
-
-  renderChart () {
-    if (!this._chartContainer) {
-      return;
-    }
-
-    this.props.onRenderStart();
-
+  getXValues () {
     const {
-      variableName,
       temporalResolution,
       temporalPeriod,
       data,
     } = this.props;
-    const {
-      displayDataUncertaintyValues,
-    } = this.state;
-
     const temporalPrecision = getPrecisionByResolution(temporalResolution);
     const startDate = new Date(temporalPeriod.gte);
-    const xAxisFormat = AnalyticsChart.timeFormatsForC3[temporalPrecision];
     const xAxisLabelBaseIndex = objectPath.get(data, 'range.start', 0);
     const dataValues = objectPath.get(data, 'values', []);
-    const dataUncertaintyValues = this.dataUncertaintyValues;
-    const dataLabel = variableName === null ? objectPath.get(data, 'variableName', '') : variableName;
-    const xAxisLabels = dataValues.map((v, index) => {
+    const xAxisValues = dataValues.map((v, index) => {
       const date = offsetDateAtPrecision(startDate, temporalPrecision, xAxisLabelBaseIndex + index);
 
       return date;
     });
 
-    const chartDataColumns = [
-      ['x', ...xAxisLabels],
-    ];
-
-    if (dataUncertaintyValues && displayDataUncertaintyValues) {
-      chartDataColumns.push(['range +', ...dataUncertaintyValues[1]]);
-      chartDataColumns.push(['value', ...dataValues]);
-      chartDataColumns.push(['range -', ...dataUncertaintyValues[0]]);
-    } else {
-      chartDataColumns.push(['value', ...dataValues]);
-    }
-
-    // Number in pixels.
-    const XTickSize = 60;
-    const xTickCount = Math.floor(this._chartContainer.clientWidth / XTickSize);
-
-    this._chart = c3.generate({
-      bindto: this._chartContainer,
-      data: {
-        x: 'x',
-        // xFormat: '%Y-%m', // 'xFormat' can be used as custom format of 'x'
-        // xFormat: xAxisFormat,
-        columns: chartDataColumns,
-        types: {
-          'range +': 'area',
-          'range -': 'area',
-        },
-        colors: {
-          'range +': '#CCCCCC',
-          'range -': '#FFFFFF',
-        },
-      },
-      area: {
-        zerobased: false,
-      },
-      axis: {
-        y: {
-          label: {
-            text: dataLabel,
-            position: 'outer-middle',
-          },
-        },
-        x: {
-          type: 'timeseries',
-          label: {
-            text: `Date (${temporalResolution})`,
-            position: 'outer-center',
-          },
-          tick: {
-            format: xAxisFormat,
-            values: (xRange) => {
-              // @type {number}
-              const minX = xRange[0].valueOf();
-              // @type {number}
-              const maxX = xRange[1].valueOf();
-              // @type {number}
-              const segmentCount = xTickCount - 1;
-              // @type {number}
-              const segmentSize = (maxX - minX) / segmentCount;
-
-              const vals = [];
-
-              for (let i = 0; i < segmentCount; i += 1) {
-                const thisValue = new Date(minX + (segmentSize * i));
-
-                vals.push(thisValue);
-              }
-
-              return vals;
-            },
-          },
-        },
-      },
-      point: {
-        show: false,
-      },
-      legend: {
-        hide: true,
-      },
-    });
-
-    this.props.onRenderEnd();
+    return xAxisValues;
   }
 
-  render () {
+  getPlotData () {
+    const {
+      data,
+    } = this.props;
+    const {
+      displayDataUncertaintyValues,
+    } = this.state;
+    const dataValues = objectPath.get(data, 'values', []);
+    const xValues = this.getXValues();
     const dataUncertaintyValues = this.dataUncertaintyValues;
+
+    if (displayDataUncertaintyValues && dataUncertaintyValues) {
+      return [
+        {
+          x: xValues,
+          y: dataUncertaintyValues[0],
+          line: {
+            width: 0,
+          },
+          marker: {
+            color: '444',
+          },
+          mode: 'lines',
+          name: 'Lower Bound',
+          type: 'scatter',
+        },
+        {
+          x: xValues,
+          y: dataValues,
+          fill: 'tonexty',
+          fillcolor: 'rgba(68, 68, 68, 0.3)',
+          line: {
+            width: 1,
+            color: 'rgb(31, 119, 180)',
+          },
+          mode: 'lines',
+          name: 'Measurement',
+          type: 'scatter',
+        },
+        {
+          x: xValues,
+          y: dataUncertaintyValues[1],
+          fill: 'tonexty',
+          fillcolor: 'rgba(68, 68, 68, 0.3)',
+          line: {
+            width: 0,
+          },
+          marker: {
+            color: '444',
+          },
+          mode: 'lines',
+          name: 'Upper Bound',
+          type: 'scatter',
+        },
+      ];
+    }
+
+    return [{
+      x: xValues,
+      y: dataValues,
+      line: {
+        width: 1,
+        color: 'rgb(31, 119, 180)',
+      },
+      mode: 'lines',
+      name: 'Measurement',
+      type: 'scatter',
+    }];
+  }
+
+  toBlob = async (options = {}) => {
+    if (!this._graphDiv) {
+      return null;
+    }
+
+    const {
+      format = 'png',
+      height = 480,
+      width = 1280,
+    } = options;
+
+    const dataUrl = await Plotly.toImage(this._graphDiv, {
+      format,
+      height,
+      width,
+    });
+
+    const blob = await (await fetch(dataUrl)).blob();
+
+    return blob;
+  };
+
+  /**
+   * ! Try to reconnect `onRenderStart` and `onRenderEnd`.
+   */
+  render () {
+    const {
+      variableName,
+      temporalResolution,
+    } = this.props;
+    const dataUncertaintyValues = this.dataUncertaintyValues;
+    const plotData = this.getPlotData();
+    const plotLayout = {
+      // title: `${data.datasetId}`,
+      margin: {
+        b: 50,
+        t: 30,
+        r: 30,
+      },
+      autosize: true,
+      showlegend: false,
+      hovermode: 'x',
+      yaxis: {
+        title: variableName,
+        // This disables zooming on y-axis.
+        fixedrange: true,
+      },
+      xaxis: {
+        title: `Date (${temporalResolution})`,
+      },
+    };
+    const plotConfig = {
+      showLink: false,
+      displaylogo: false,
+      // Modebar Buttons names at https://github.com/plotly/plotly.js/blob/master/src/components/modebar/buttons.js
+      modeBarButtonsToRemove: [
+        'sendDataToCloud',
+      ],
+    };
 
     return (
       <div>
-        <div
-          ref={(ref) => this._chartContainer = ref}
+        <Plot
+          data={plotData}
+          layout={plotLayout}
+          config={plotConfig}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+          useResizeHandler
+          // This seems to only run for the first time the plot is mounted.
+          onInitialized={this.onPlotInitialized}
+          // For some reason this is not called for the first render after `onInitialized`.
+          // onAfterPlot={this.props.onRenderEnd}
         />
         {dataUncertaintyValues && (
           <Toggle

@@ -232,7 +232,8 @@ class AnalyticsTab extends TabComponent {
     const chart = this._chartComponent;
 
     if (chart) {
-      zip.file('chart.svg', await chart.toBlob());
+      zip.file('chart.png', await chart.toBlob({ format: 'png' }));
+      zip.file('chart.svg', await chart.toBlob({ format: 'svg' }));
     }
 
     const blob = await zip.generateAsync({ type: 'blob' });
