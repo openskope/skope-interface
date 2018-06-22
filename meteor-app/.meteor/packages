@@ -24,6 +24,5 @@ flemay:less-autoprefixer
 ostrio:flow-router-extra
 webapp
 ostrio:flow-router-title
-standard-minifier-js
 standard-minifier-css
 shell-server
