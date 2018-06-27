@@ -1,7 +1,5 @@
 // Import client startup through a single index entry point
 
-import 'typeface-roboto';
-
 import { onReady as onBuildHashReady } from '/imports/client/build-hash';
 import globalStore, { actions } from '/imports/ui/redux-store';
 
