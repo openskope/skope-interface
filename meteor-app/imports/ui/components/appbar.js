@@ -162,7 +162,7 @@ class Component extends React.Component {
       <IconMenu
         iconButtonElement={
           <IconButton
-            tooltip="Boring Stuff"
+            tooltip="About"
             tooltipPosition="bottom-left"
           ><CodeIcon color={appbarStyles.textColor} /></IconButton>
         }
