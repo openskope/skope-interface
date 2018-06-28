@@ -655,24 +655,12 @@ class DatasetWorkspace extends SuiteBaseClass {
     return (
       <ListItem
         key={id}
+        autoGenerateNestedIndicator={false}
+        leftIcon={isNestedItemsVisible ? <CollapseIcon /> : <ExpandIcon />}
         primaryText={label}
         primaryTogglesNestedList
-        rightIconButton={(
-          <ToggleButton
-            label={isNestedItemsVisible ? 'Collapse' : 'Expand'}
-            icon={isNestedItemsVisible ? <CollapseIcon /> : <ExpandIcon />}
-            labelPosition="before"
-            zDepthWhenToggled={0}
-            toggled={isNestedItemsVisible}
-            onToggle={toggleNestedItemsVisible}
-            style={{
-              color: 'rgba(0, 0, 0, 0.5)',
-              top: '9px',
-              width: false,
-            }}
-          />
-        )}
         open={isNestedItemsVisible}
+        onNestedListToggle={toggleNestedItemsVisible}
         nestedItems={Array.isArray(children) ? children : [children]}
       />
     );

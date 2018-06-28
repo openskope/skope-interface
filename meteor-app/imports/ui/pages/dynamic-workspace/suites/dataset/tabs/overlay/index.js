@@ -382,11 +382,10 @@ class OverlayTab extends TabComponent {
   render () {
     const {
       workspace: {
+        SidePanelCommonCollapsibleSectionContainer,
         hasSelectedVariable,
         geometryOfDataBoundary,
         geometryOfFocus,
-        isPanelOpen,
-        togglePanelOpenState,
         renderVariableList,
         renderTemporalControls,
         renderFocusBoundaryMap,
@@ -451,29 +450,25 @@ class OverlayTab extends TabComponent {
           </MapView>
 
           <List>
-            <ListItem
-              key="overlay-animation"
-              primaryText="Animation"
-              primaryTogglesNestedList
-              open={isPanelOpen('overlay-animation')}
-              onNestedListToggle={() => togglePanelOpenState('overlay-animation')}
-              nestedItems={[
-                <ListItem
-                  disabled
-                  key="animation-controls"
-                  style={{
-                    padding: '0',
-                  }}
-                >{this.renderAnimationControls()}</ListItem>,
-                <ListItem
-                  disabled
-                  key="animation-timeline"
-                  style={{
-                    padding: '0',
-                  }}
-                >{this.renderTimeline()}</ListItem>,
-              ]}
-            />
+            <SidePanelCommonCollapsibleSectionContainer
+              id="overlay-animation"
+              label="Animation"
+            >
+              <ListItem
+                disabled
+                key="animation-controls"
+                style={{
+                  padding: '0',
+                }}
+              >{this.renderAnimationControls()}</ListItem>
+              <ListItem
+                disabled
+                key="animation-timeline"
+                style={{
+                  padding: '0',
+                }}
+              >{this.renderTimeline()}</ListItem>
+            </SidePanelCommonCollapsibleSectionContainer>
           </List>
         </Paper>
       </div>
