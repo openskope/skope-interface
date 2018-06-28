@@ -19,7 +19,7 @@ import {
 } from 'material-ui/RadioButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
-import ImageStyleIcon from 'material-ui/svg-icons/image/style';
+import SettingsIcon from 'material-ui/svg-icons/action/settings';
 import ExpandIcon from 'material-ui/svg-icons/navigation/expand-more';
 import CollapseIcon from 'material-ui/svg-icons/navigation/expand-less';
 
@@ -697,9 +697,8 @@ class DatasetWorkspace extends SuiteBaseClass {
           }}
           rightIconButton={(
             <ToggleButton
-              label="Style"
               icon={(
-                <ImageStyleIcon />
+                <SettingsIcon />
               )}
               toggled={isConfigOptionsVisible}
               onToggle={toggleConfigOptionsVisible}
