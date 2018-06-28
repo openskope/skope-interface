@@ -8,9 +8,64 @@ import * as elasticsearch from 'elasticsearch';
 
 import buildGitCommit from '/imports/server/build-hash';
 
+import Raven from './sentry';
+
 const serverElasticEndpointInSettings = objectPath.get(Meteor.settings, 'server.elasticEndpoint');
 
 // Register your apis here
+
+const getDatasetBySkopeId = async (skopeId) => {
+  if (!serverElasticEndpointInSettings) {
+    return null;
+  }
+
+  const client = new elasticsearch.Client({
+    host: serverElasticEndpointInSettings,
+  });
+
+  const {
+    took,
+    timed_out: timedOut,
+    hits: {
+      total,
+      hits,
+    },
+  } = await client.search({
+    index: 'datasets',
+    type: 'dataset',
+    body: {
+      query: {
+        term: {
+          skopeid: skopeId,
+        },
+      },
+    },
+  });
+
+  console.log('Looking up datasets by skopeid.', {
+    skopeId,
+    took,
+    timedOut,
+    hits: total,
+  });
+
+  if (timedOut || total === 0) {
+    const exception = new Error('Unable to find datasets by skope ID.');
+
+    Raven.captureException(exception, {
+      extra: {
+        skopeId,
+        took,
+        timedOut,
+        hits: total,
+      },
+    });
+
+    return null;
+  }
+
+  return hits[0];
+};
 
 Meteor.methods({
   buildHash () {
@@ -19,25 +74,13 @@ Meteor.methods({
   async 'datasetManifest.get' ({
     datasetId,
   }) {
-    if (!serverElasticEndpointInSettings) {
-      return null;
+    const dataset = await getDatasetBySkopeId(datasetId);
+
+    if (!dataset) {
+      throw new Meteor.Error('Not Found', 'Unable to find dataset.');
     }
 
-    const client = new elasticsearch.Client({
-      host: serverElasticEndpointInSettings,
-    });
-
-    const response = await client.get({
-      index: 'datasets',
-      type: 'dataset',
-      id: datasetId,
-    });
-
-    if (!response.found) {
-      return null;
-    }
-
-    return response._source;
+    return dataset._source;
   },
 });
 

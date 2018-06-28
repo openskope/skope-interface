@@ -153,11 +153,11 @@ class SearchResultItem extends React.PureComponent {
     const {
       routing,
       result: {
-        _id,
         _source: datasetSourceData,
       },
     } = this.props;
 
+    const datasetId = objectPath.get(datasetSourceData, 'skopeid', '');
     const datasetTitle = objectPath.get(datasetSourceData, 'title', '');
     const geometryOfDataBoundary = objectPath.get(datasetSourceData, 'region.geometry', null);
     const geoJsonOfDataBoundary = geometryOfDataBoundary && buildGeoJsonWithGeometry(geometryOfDataBoundary);
@@ -173,7 +173,7 @@ class SearchResultItem extends React.PureComponent {
     const datasetDescriptionMarkdown = objectPath.get(datasetSourceData, 'description', '');
 
     const workspacePageUrl = absoluteUrl('/workspace', null, {
-      dataset: _id,
+      dataset: datasetId,
       q: ((obj) => (obj ? JSON.stringify(obj) : null))(objectPath.get(routing, 'queryParams', null)),
     });
     const subtitle = ((items) => items.filter(Boolean).join(' | '))([
