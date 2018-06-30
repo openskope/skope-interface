@@ -22,7 +22,7 @@ react-meteor-data
 http@1.4.1
 flemay:less-autoprefixer
 ostrio:flow-router-extra
-webapp@1.6.0
+webapp@1.6.2
 ostrio:flow-router-title
 standard-minifier-css@1.4.1
 shell-server@0.3.1
