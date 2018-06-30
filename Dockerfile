@@ -2,7 +2,7 @@
 
 ARG GIT_COMMIT=""
 
-FROM zodiase/meteor-tool:1.6.0.1 AS build
+FROM zodiase/meteor-tool:1.7.0.3 AS build
 
 USER root
 
