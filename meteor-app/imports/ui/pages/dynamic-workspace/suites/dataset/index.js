@@ -33,7 +33,6 @@ import {
 } from '/imports/ui/helpers';
 import {
   getDateAtPrecision,
-  getYearStringFromDate,
   clampDateWithinRange,
 } from '/imports/helpers/model';
 
@@ -547,11 +546,17 @@ class DatasetWorkspace extends SuiteBaseClass {
    */
   getDateFromSliderValue = (value) => this.getDateFromFrameIndex(value);
 
+  getInputValueFromDate = (date) => {
+    return this.buildPreciseDateString(date);
+  };
+
   /**
    * @param {string} s
    * @return {Date}
    */
-  getDateFromYearStringInput = (s) => {
+  getDateFromInputValue = (s) => {
+    //! Needs to handle negative years!
+
     // Fill year string to 4 digits otherwise parsing will fail.
     const isBcYear = s[0] === '-';
     const absYearStr = isBcYear ? s.substr(1) : s;
@@ -842,6 +847,7 @@ class DatasetWorkspace extends SuiteBaseClass {
       disabled = false,
     } = props;
     const timespan = this.timespan;
+
     const controls = [
       <ListItem
         disabled
@@ -851,7 +857,7 @@ class DatasetWorkspace extends SuiteBaseClass {
         }}
       >
         <RangeWithInput
-          label="Date Range (year)"
+          label={`Date Range (${timespan.resolution})`}
           min={timespan.period.gte}
           max={timespan.period.lte}
           value={this.animatedCopyOfDateRangeOfFocus}
@@ -861,9 +867,9 @@ class DatasetWorkspace extends SuiteBaseClass {
           // (number) => Date
           fromSliderValue={this.getDateFromSliderValue}
           // (Date) => string
-          toInputValue={getYearStringFromDate}
+          toInputValue={this.getInputValueFromDate}
           // (string) => Date
-          fromInputValue={this.getDateFromYearStringInput}
+          fromInputValue={this.getDateFromInputValue}
           onChange={this.onChangeDateRangeOfFocus}
           onFinish={this.onFinishChangingDateRangeOfFocus}
           inputStyle={{
@@ -877,9 +883,9 @@ class DatasetWorkspace extends SuiteBaseClass {
             ],
           }}
           inputProps={{
-            type: 'number',
-            min: getYearStringFromDate(timespan.period.gte),
-            max: getYearStringFromDate(timespan.period.lte),
+            type: 'text',
+            min: this.getInputValueFromDate(timespan.period.gte),
+            max: this.getInputValueFromDate(timespan.period.lte),
           }}
         />
       </ListItem>,
