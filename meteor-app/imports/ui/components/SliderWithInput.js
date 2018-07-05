@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import uuidv4 from 'uuid/v4';
+import uuid from 'uuid/v4';
 import Slider from 'rc-slider/lib/Slider';
 import Range from 'rc-slider/lib/Range';
 import 'rc-slider/assets/index.css';
@@ -74,12 +74,10 @@ class LazyTextField extends React.Component {
         break;
       case event.keyCode === 38 && !event.altKey && !event.ctrlKey && !event.shiftKey:
         // Allow the user to prevent default.
-        // event.preventDefault();
         this.props.onStepUp(event);
         break;
       case event.keyCode === 40 && !event.altKey && !event.ctrlKey && !event.shiftKey:
         // Allow the user to prevent default.
-        // event.preventDefault();
         this.props.onStepDown(event);
         break;
       default:
@@ -97,7 +95,7 @@ class LazyTextField extends React.Component {
 
     return (
       <TextField
-        name={`LazyTextField-${uuidv4()}`}
+        name={`LazyTextField-${uuid()}`}
         {...textFieldProps}
         value={this.state.dirtyInputValue}
         onChange={this.inputOnChange}
@@ -583,6 +581,19 @@ class RangeWithInput extends SliderWithInput {
   };
 
   /**
+   * @param {number} valueIndex
+   * @param {number} amount
+   */
+  stepBy = (valueIndex, amount) => {
+    const sliderValue = this.sliderValue[valueIndex];
+    const newSliderValue = sliderValue + (this.sliderStep * amount);
+    const newValue = this.props.fromSliderValue(newSliderValue);
+    const newValues = this.props.value.map((v, i) => ((i === valueIndex) ? newValue : v));
+
+    this.triggerValueOnChange(null, newValues, true);
+  };
+
+  /**
    * @param {Event} event
    * @param {number} valueIndex
    */
@@ -592,19 +603,9 @@ class RangeWithInput extends SliderWithInput {
       return;
     }
 
-    const sliderValue = this.sliderValue[valueIndex];
-    const newSliderValue = sliderValue - this.sliderStep;
-    const newValue = this.props.fromSliderValue(newSliderValue);
-    const newValues = this.props.value.map((v, i) => ((i === valueIndex) ? newValue : v));
+    event.preventDefault();
 
-    console.log('RangeWithInput.inputOnStepDown', valueIndex, {
-      sliderValue: this.sliderValue,
-      sliderStep: this.sliderStep,
-      newSliderValue,
-      newValue,
-    });
-
-    this.triggerValueOnChange(event, newValues, true);
+    this.stepBy(valueIndex, -1);
   };
 
   /**
@@ -617,20 +618,9 @@ class RangeWithInput extends SliderWithInput {
       return;
     }
 
-    const sliderValue = this.sliderValue[valueIndex];
-    const newSliderValue = sliderValue + this.sliderStep;
-    const newValue = this.props.fromSliderValue(newSliderValue);
-    const newValues = this.props.value.map((v, i) => ((i === valueIndex) ? newValue : v));
-
-    console.log('RangeWithInput.inputOnStepUp', valueIndex, {
-      sliderValue: this.sliderValue,
-      sliderStep: this.sliderStep,
-      newSliderValue,
-      newValue,
-    });
     event.preventDefault();
 
-    this.triggerValueOnChange(event, newValues, true);
+    this.stepBy(valueIndex, 1);
   };
 
   render () {
