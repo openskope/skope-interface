@@ -167,6 +167,7 @@ class SliderWithInput extends React.PureComponent {
     width: false,
     marginLeft: false,
     transform: 'translateX(-50%)',
+    whiteSpace: 'nowrap',
   };
 
   constructor (props) {
