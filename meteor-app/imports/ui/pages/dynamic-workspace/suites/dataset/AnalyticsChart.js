@@ -127,7 +127,7 @@ class AnalyticsChart extends React.Component {
             color: '444',
           },
           mode: 'lines',
-          name: 'Lower Bound',
+          name: 'Range -',
           type: 'scatter',
         },
         {
@@ -155,7 +155,7 @@ class AnalyticsChart extends React.Component {
             color: '444',
           },
           mode: 'lines',
-          name: 'Upper Bound',
+          name: 'Range +',
           type: 'scatter',
         },
       ];
