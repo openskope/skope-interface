@@ -32,14 +32,14 @@ class LazyTextField extends React.Component {
     super(props);
 
     this.state = {
-      dirtyInputValue: props.value,
+      transitionaryInputValue: props.value,
     };
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.value !== this.state.dirtyInputValue) {
+    if (nextProps.value !== this.state.transitionaryInputValue) {
       this.setState({
-        dirtyInputValue: nextProps.value,
+        transitionaryInputValue: nextProps.value,
       });
     }
   }
@@ -52,17 +52,17 @@ class LazyTextField extends React.Component {
                      ? this.props.value
                      : specificValue;
     this.setState({
-      dirtyInputValue: newValue,
+      transitionaryInputValue: newValue,
     });
   }
 
   flushValue (event) {
-    this.props.onChange(event, this.state.dirtyInputValue);
+    this.props.onChange(event, this.state.transitionaryInputValue);
   }
 
   inputOnChange = (event, newValue) => {
     this.setState({
-      dirtyInputValue: newValue,
+      transitionaryInputValue: newValue,
     });
   };
 
@@ -89,6 +89,9 @@ class LazyTextField extends React.Component {
   };
 
   render () {
+    const {
+      transitionaryInputValue: inputValue,
+    } = this.state;
     const textFieldProps = Object.assign({}, this.props);
     delete textFieldProps.onStepDown;
     delete textFieldProps.onStepUp;
@@ -97,7 +100,7 @@ class LazyTextField extends React.Component {
       <TextField
         name={`LazyTextField-${uuid()}`}
         {...textFieldProps}
-        value={this.state.dirtyInputValue}
+        value={inputValue}
         onChange={this.inputOnChange}
         onKeyDown={this.inputOnKeyDown}
         onBlur={this.inputOnBlur}
