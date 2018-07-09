@@ -152,7 +152,9 @@ class DatasetWorkspace extends SuiteBaseClass {
 
       try {
         searchState = JSON.parse(searchStateString);
-      } catch (e) {}
+      } catch (e) {
+        return null;
+      }
 
       return searchState;
     })(objectPath.get(props, 'routing.queryParams.q'));
@@ -348,11 +350,11 @@ class DatasetWorkspace extends SuiteBaseClass {
     }
 
     const geometryOfDataBoundary = this.geometryOfDataBoundary;
-    
+
     if (!geometryOfDataBoundary) {
       return null;
     }
-    
+
     const extent = HTMLMapLayerVector.getExtentFromGeometry(geometryOfDataBoundary, HTMLMapLayerVector.IOProjection);
 
     return extent;
