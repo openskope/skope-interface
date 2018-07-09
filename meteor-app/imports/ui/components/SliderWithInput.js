@@ -1,6 +1,8 @@
+// This file exports 2 components.
+/* eslint react/no-multi-comp: off */
+
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 import uuid from 'uuid/v4';
 import Slider from 'rc-slider/lib/Slider';
 import Range from 'rc-slider/lib/Range';
@@ -110,24 +112,75 @@ class LazyTextField extends React.Component {
 }
 
 export
+/**
+ * This component displays a numeric value on a slider, as well as in a text
+ * input field.
+ */
 class SliderWithInput extends React.PureComponent {
   static propTypes = {
+    // Use `label` to specify the text label displayed for this control.
     label: PropTypes.string.isRequired,
-    // `min`, `max`, `step` and `value` have the same unit.
-    min: PropTypes.any.isRequired,
-    max: PropTypes.any.isRequired,
-    step: PropTypes.any,
-    // If `step` is specified, `sliderStep` is ignored.
-    sliderStep: PropTypes.number,
+    // Specify the value of the control.
     value: PropTypes.any.isRequired,
+    /**
+     * Specify the minimum possible value.
+     * Has the same unit as `value`.
+     */
+    min: PropTypes.any.isRequired,
+    /**
+     * Specify the maximum possible value.
+     * Has the same unit as `value`.
+     */
+    max: PropTypes.any.isRequired,
+    /**
+     * Specify how much of the value to change when stepping.
+     * Has the same unit as `value`.
+     * Has a default value of `0` indicating a step is not specified.
+     */
+    step: PropTypes.any,
+    /**
+     * Specify the step size of the slider.
+     * It should be used when stepping relies on the slider instead of the value.
+     * If `step` is specified, this is ignored.
+     */
+    sliderStep: PropTypes.number,
+    /**
+     * Callback when the slider value is changed.
+     * This is triggered multiple times during a drag.
+     */
     onChange: PropTypes.func.isRequired,
+    /**
+     * Callback when the slider value is settled.
+     * This is triggered only at the end of a drag.
+     */
     onFinish: PropTypes.func,
+
+    /**
+     * Transform function to convert `value` into the number used by the slider.
+     * This is useful to avoid keeping a transient value in the code.
+     * The input of the function is the `value` and alike (`min`, `max`, `step`, etc.).
+     * The return value of the function should be a numeric value.
+     */
     toSliderValue: PropTypes.func,
-    // This function should not throw an error. Every point on the slider should be a valid input.
+    /**
+     * Transform function that does the reverse of `toSliderValue`.
+     * This function should not throw an error. Every point on the slider should be a valid input.
+     */
     fromSliderValue: PropTypes.func,
+
+    /**
+     * Transform function to convert `value` into the string used by the text input.
+     * This is useful to avoid keeping a transient value in the code.
+     * The input of the function is the `value` and alike (`min`, `max`, `step`, etc.).
+     * The return value of the function should be a string.
+     */
     toInputValue: PropTypes.func,
-    // If this function throws an error, the input value will be reset.
+    /**
+     * Transform function that does the reverse of `toInputValue`.
+     * If this function throws an error, the input value will be reset.
+     */
     fromInputValue: PropTypes.func,
+
     sliderStyle: PropTypes.object,
     inputStyle: PropTypes.object,
     sliderProps: PropTypes.object,
@@ -449,7 +502,11 @@ export
 class RangeWithInput extends SliderWithInput {
   static propTypes = {
     ...SliderWithInput.propTypes,
-    // Note that `value` is now an array.
+    /**
+     * Note that `value` is now an array.
+     * It should consist of `[start, end]` of the range.
+     */
+    value: PropTypes.arrayOf(PropTypes.any).isRequired,
   };
 
   static defaultProps = {
