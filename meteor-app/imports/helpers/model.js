@@ -43,31 +43,31 @@ const getDateAtPrecision = (
       }, date)
 )([
   {
-    handler: Date.prototype.setFullYear,
+    handler: Date.prototype.setUTCFullYear,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setMonth,
+    handler: Date.prototype.setUTCMonth,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setDate,
+    handler: Date.prototype.setUTCDate,
     zeroPoint: 1,
   },
   {
-    handler: Date.prototype.setHours,
+    handler: Date.prototype.setUTCHours,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setMinutes,
+    handler: Date.prototype.setUTCMinutes,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setSeconds,
+    handler: Date.prototype.setUTCSeconds,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setMilliseconds,
+    handler: Date.prototype.setUTCMilliseconds,
     zeroPoint: 0,
   },
 ]);
@@ -104,32 +104,32 @@ const offsetDateAtPrecision = (
     }
 )([
   {
-    setter: Date.prototype.setFullYear,
-    getter: Date.prototype.getFullYear,
+    setter: Date.prototype.setUTCFullYear,
+    getter: Date.prototype.getUTCFullYear,
   },
   {
-    setter: Date.prototype.setMonth,
-    getter: Date.prototype.getMonth,
+    setter: Date.prototype.setUTCMonth,
+    getter: Date.prototype.getUTCMonth,
   },
   {
-    setter: Date.prototype.setDate,
-    getter: Date.prototype.getDate,
+    setter: Date.prototype.setUTCDate,
+    getter: Date.prototype.getUTCDate,
   },
   {
-    setter: Date.prototype.setHours,
-    getter: Date.prototype.getHours,
+    setter: Date.prototype.setUTCHours,
+    getter: Date.prototype.getUTCHours,
   },
   {
-    setter: Date.prototype.setMinutes,
-    getter: Date.prototype.getMinutes,
+    setter: Date.prototype.setUTCMinutes,
+    getter: Date.prototype.getUTCMinutes,
   },
   {
-    setter: Date.prototype.setSeconds,
-    getter: Date.prototype.getSeconds,
+    setter: Date.prototype.setUTCSeconds,
+    getter: Date.prototype.getUTCSeconds,
   },
   {
-    setter: Date.prototype.setMilliseconds,
-    getter: Date.prototype.getMilliseconds,
+    setter: Date.prototype.setUTCMilliseconds,
+    getter: Date.prototype.getUTCMilliseconds,
   },
 ]);
 
