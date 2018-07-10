@@ -531,7 +531,7 @@ class DatasetWorkspace extends SuiteBaseClass {
   getDateFromFrameIndex = (value) => {
     const timespan = this.timespan;
     const baseDate = timespan.period.gte;
-    const valueDate = moment(baseDate).add(value, timespan.resolution).toDate();
+    const valueDate = moment.utc(baseDate).add(value, timespan.resolution).toDate();
 
     return valueDate;
   };

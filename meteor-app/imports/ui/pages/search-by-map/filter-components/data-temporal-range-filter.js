@@ -281,7 +281,7 @@ class DateRangeInput extends React.Component {
         // (Date) => number
         toSliderValue={(date) => Math.round(moment.duration(date - minDate).as(resolution))}
         // (number) => Date
-        fromSliderValue={(value) => moment(minDate).add(value, resolution).toDate()}
+        fromSliderValue={(value) => moment.utc(minDate).add(value, resolution).toDate()}
         // (Date) => string
         toInputValue={this.buildPreciseDateString}
         // (string) => Date
