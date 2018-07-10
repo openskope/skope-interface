@@ -82,16 +82,8 @@ class DatasetWorkspace extends SuiteBaseClass {
       resolution: PropTypes.oneOf(AllResolutionNames).isRequired,
       precision: PropTypes.number.isRequired,
       period: PropTypes.shape({
-        gte: PropTypes.oneOfType([
-          PropTypes.string,
-          PropTypes.number,
-          PropTypes.instanceOf(Date),
-        ]),
-        lte: PropTypes.oneOfType([
-          PropTypes.string,
-          PropTypes.number,
-          PropTypes.instanceOf(Date),
-        ]),
+        gte: PropTypes.instanceOf(Date).isRequired,
+        lte: PropTypes.instanceOf(Date).isRequired,
       }).isRequired,
     }).isRequired,
   });
@@ -169,9 +161,20 @@ class DatasetWorkspace extends SuiteBaseClass {
      */
     const initialDateRange = (() => {
       const queryDateRange = [
-        parseDateStringWithPrecision(objectPath.get(searchQuery, 'timespan.min'), 0),
-        parseDateStringWithPrecision(objectPath.get(searchQuery, 'timespan.max'), 0),
-      ];
+        objectPath.get(searchQuery, 'timespan.min'),
+        objectPath.get(searchQuery, 'timespan.max'),
+      ].map((dateString) => {
+        // `dateString` could be undefined.
+        if (typeof dateString === 'undefined') {
+          return null;
+        }
+
+        try {
+          return parseDateStringWithPrecision(dateString, 0);
+        } catch (e) {
+          return null;
+        }
+      });
       const isValidQueryDateRange = queryDateRange.every((date) => date !== null);
 
       if (isValidQueryDateRange) {
@@ -307,17 +310,14 @@ class DatasetWorkspace extends SuiteBaseClass {
    * @type {{resolution: string, period: {gte: Date, lte: Date}}}
    */
   get timespan () {
-    const {
-      timespan: {
-        resolution,
-        period,
-      },
-    } = this.props;
-
-    return DatasetWorkspace.getTimespan(resolution, period);
+    return this.props.timespan;
   }
 
   /**
+   * 0: year
+   * 1: month
+   * 2: day
+   * ...
    * @type {number}
    */
   get temporalPrecision () {
@@ -557,22 +557,7 @@ class DatasetWorkspace extends SuiteBaseClass {
    * @return {Date}
    */
   getDateFromInputValue = (s) => {
-    //! Needs to handle negative years!
-
-    // Fill year string to 4 digits otherwise parsing will fail.
-    const isBcYear = s[0] === '-';
-    const absYearStr = isBcYear ? s.substr(1) : s;
-    const zeroPadding = '0'.repeat(Math.max(4 - absYearStr.length, 0));
-    const paddedAbsYearStr = zeroPadding + absYearStr;
-    const paddedYearStr = isBcYear ? `-${paddedAbsYearStr}` : paddedAbsYearStr;
-
-    const date = this.parsePreciseDateString(paddedYearStr);
-
-    if (!date) {
-      throw new Error('Invalid date.');
-    }
-
-    return date;
+    return this.parsePreciseDateString(s);
   };
 
   setActiveTab = (newTab) => {
@@ -600,11 +585,7 @@ class DatasetWorkspace extends SuiteBaseClass {
    * @return {string}
    */
   buildPreciseDateString = (date) => {
-    return getDateStringAtPrecision(
-      date,
-      this.temporalPrecision,
-      DatasetWorkspace.dateFormatForPrecisions,
-    );
+    return getDateStringAtPrecision(date, this.temporalPrecision);
   };
 
   /**
@@ -616,7 +597,6 @@ class DatasetWorkspace extends SuiteBaseClass {
     return parseDateStringWithPrecision(
       dateString,
       this.temporalPrecision,
-      DatasetWorkspace.dateFormatForPrecisions,
     );
   };
 
@@ -1086,6 +1066,8 @@ class DatasetWorkspace extends SuiteBaseClass {
   }
 
   render () {
+    const tabBarBackgroundColor = objectPath.get(this.props, 'muiTheme.tabs.inkBarColor', 'white');
+
     return (
       <Paper
         className="suite-wrapper"
@@ -1095,7 +1077,7 @@ class DatasetWorkspace extends SuiteBaseClass {
           contentContainerClassName="tabs-panel__content"
           value={this.state.nameOfTheActiveTab}
           inkBarStyle={{
-            backgroundColor: this.props.muiTheme.tabs.inkBarColor,
+            backgroundColor: tabBarBackgroundColor,
           }}
           onChange={this.onTabChange}
         >{this.renderTabs()}</Tabs>

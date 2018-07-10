@@ -20,12 +20,6 @@ import {
   RangeWithInput,
 } from '/imports/ui/components/SliderWithInput';
 
-const dateStringFormatForPrecisions = [
-  'YYYY',
-  'YYYY-MM',
-  'YYYY-MM-DD',
-];
-
 /**
  * An extended version of RangeAccessor to support multi-field range filtering
  * and aggregation.
@@ -75,7 +69,6 @@ class DataTemporalRangeAccessor extends RangeAccessor {
         return parseDateStringWithPrecision(
           str,
           datePrecision,
-          dateStringFormatForPrecisions,
         );
       });
       const rangeInDateString = rangeInDate
@@ -83,7 +76,6 @@ class DataTemporalRangeAccessor extends RangeAccessor {
         return getDateStringAtPrecision(
           date,
           datePrecision,
-          dateStringFormatForPrecisions,
         );
       });
 
@@ -103,8 +95,8 @@ class DataTemporalRangeAccessor extends RangeAccessor {
       const newQuery = this.options.fields
       .reduce((q, field, fieldIndex) => {
         const rangeFilter = this.fieldContexts[fieldIndex].wrapFilter(RangeQuery(field, {
-          gte: moment(rangeInDate[0]).format('YYYY-MM-DD'),
-          lte: moment(rangeInDate[1]).format('YYYY-MM-DD'),
+          gte: getDateStringAtPrecision(rangeInDate[0], 2),
+          lte: getDateStringAtPrecision(rangeInDate[1], 2),
           format: 'yyyy-MM-dd',
           relation: this.options.relation,
         }));
@@ -166,11 +158,10 @@ class DateRangeInput extends React.Component {
     resolution: 'date',
   };
 
-  static dateFormatsForResolutions = [
-    'YYYY',
-    'YYYY-MM',
-    'YYYY-MM-DD',
-  ];
+  // @see `getPrecisionByResolution`.
+  get datePrecision () {
+    return getPrecisionByResolution(this.props.resolution);
+  }
 
   /**
    * Build a date string of the date with the precision of the current dataset.
@@ -178,14 +169,21 @@ class DateRangeInput extends React.Component {
    * @return {string}
    */
   buildPreciseDateString = (date) => {
-    const datePrecision = getPrecisionByResolution(
-      this.props.resolution,
-    );
-
     return getDateStringAtPrecision(
       date,
-      datePrecision,
-      DateRangeInput.dateFormatsForResolutions,
+      this.datePrecision,
+    );
+  };
+
+  /**
+   * Does the oppsite of `#buildPreciseDateString`.
+   * @param  {string} dateString
+   * @return {Date}
+   */
+  parsePreciseDateString = (dateString) => {
+    return parseDateStringWithPrecision(
+      dateString,
+      this.datePrecision,
     );
   };
 
@@ -271,6 +269,7 @@ class DateRangeInput extends React.Component {
       max: maxDate,
       minValue,
       maxValue,
+      resolution,
     } = this.props;
 
     return (
@@ -280,28 +279,13 @@ class DateRangeInput extends React.Component {
         max={maxDate}
         value={[minValue, maxValue]}
         // (Date) => number
-        toSliderValue={(date) => Math.round(moment.duration(date - minDate).as('year'))}
+        toSliderValue={(date) => Math.round(moment.duration(date - minDate).as(resolution))}
         // (number) => Date
-        fromSliderValue={(value) => moment(minDate).add(value, 'year').toDate()}
+        fromSliderValue={(value) => moment(minDate).add(value, resolution).toDate()}
         // (Date) => string
-        toInputValue={(date) => getDateStringAtPrecision(date, 0)}
+        toInputValue={this.buildPreciseDateString}
         // (string) => Date
-        fromInputValue={(s) => {
-          // Fill year string to 4 digits otherwise parsing will fail.
-          const isBcYear = s[0] === '-';
-          const absYearStr = isBcYear ? s.substr(1) : s;
-          const zeroPadding = '0'.repeat(Math.max(4 - absYearStr.length, 0));
-          const paddedAbsYearStr = zeroPadding + absYearStr;
-          const paddedYearStr = isBcYear ? `-${paddedAbsYearStr}` : paddedAbsYearStr;
-
-          const date = parseDateStringWithPrecision(paddedYearStr, 0);
-
-          if (!date) {
-            throw new Error('Invalid date.');
-          }
-
-          return date;
-        }}
+        fromInputValue={this.parsePreciseDateString}
         onChange={this.rangeOnChange}
         onFinish={this.rangeOnFinish}
         inputStyle={{
@@ -385,12 +369,10 @@ class DataTemporalRangeFilter extends RangeFilter {
       const minDateString = getDateStringAtPrecision(
         newValues.min,
         datePrecision,
-        dateStringFormatForPrecisions,
       );
       const maxDateString = getDateStringAtPrecision(
         newValues.max,
         datePrecision,
-        dateStringFormatForPrecisions,
       );
 
       this.accessor.state = this.accessor.state.setValue({
@@ -417,14 +399,12 @@ class DataTemporalRangeFilter extends RangeFilter {
                     : parseDateStringWithPrecision(
                       stateValue.min,
                       datePrecision,
-                      dateStringFormatForPrecisions,
                     );
     const maxDate = typeof stateValue.max === 'undefined'
                     ? this.props.max
                     : parseDateStringWithPrecision(
                       stateValue.max,
                       datePrecision,
-                      dateStringFormatForPrecisions,
                     );
 
     return {

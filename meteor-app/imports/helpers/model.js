@@ -1,6 +1,15 @@
 import _ from 'lodash';
 import moment from 'moment';
 
+export
+const getNumber = (value, defaultValue) => {
+  if (typeof value === 'number' && !isNaN(value)) {
+    return value;
+  }
+
+  return defaultValue;
+};
+
 /**
  * Make sure the filter value is correct.
  */
@@ -162,67 +171,79 @@ const getPrecisionByResolution = (
 /**
  * @param {Date} date
  * @param {number} precision
- * @param {Array<string>} customFormats
  * @returns {string}
  */
 export
-const getDateStringAtPrecision = (
-  (dateFormatForPrecisions) =>
-    (date, precision, customFormats) => {
-      if (!date) {
-        return '';
-      }
+const getDateStringAtPrecision = (date, precision, options = {}) => {
+  const {
+    delimiter = '-',
+  } = options;
 
-      const dateAtPrecision = getDateAtPrecision(date, precision);
-      const dateTemplateAtPrecision = (customFormats || dateFormatForPrecisions)[precision];
+  const year = date.getUTCFullYear();
+  const yearString = year < 0
+    // For negative years, should pad to 6 digits, to conform to `toISOString`.
+    ? `-${String(-year).padStart(6, '0')}`
+    : `${year}`.padStart(4, '0');
 
-      return moment(dateAtPrecision).format(dateTemplateAtPrecision);
-    }
-)([
-  'YYYY',
-  'MMM YYYY',
-  'MMM Do YYYY',
-  'MMM Do YYYY, h a',
-  'MMM Do YYYY, h:m a',
-  'MMM Do YYYY, h:m:s a',
-]);
+  const dateStringSegments = [
+    yearString,
+    `${date.getUTCMonth() + 1}`.padStart(2, '0'),
+    `${date.getUTCDate()}`.padStart(2, '0'),
+  ];
+
+  const necessarySegments = dateStringSegments.slice(0, precision + 1);
+  const dateString = necessarySegments.join(delimiter);
+
+  return dateString;
+};
 
 /**
+ * Parse the given string to a date at a specific precision.
+ * This assumes the input conforms to the format `year-month-day`.
+ * No segments are required to be padded to full length.
+ *
+ * Extra information contained in the date string will be discarded.
+ * For example, parsing "2345-6-7" at monthly resolution will yield "2345-6".
+ *
+ * On the other hand, missing information will be filled with default values,
+ * whenever possible.
+ * For example, parsing "2345-6" at daily resolution will yield "2345-6-1".
+ * However, year can not be omitted, since there is no suitable default value.
+ *
  * @param {string} dateString
  * @param {number} precision
- * @param {Array<string>} customFormats
  * @returns {Date}
  */
 export
-const parseDateStringWithPrecision = (
-  (dateStringFormatForPrecisions) =>
-    (dateString, precision, customFormats) => {
-      if (!dateString) {
-        return null;
-      }
+const parseDateStringWithPrecision = (dateString, precision, options = {}) => {
+  const {
+    delimiter = '-',
+  } = options;
 
-      const format = (customFormats || dateStringFormatForPrecisions)[precision];
+  const isBcYear = dateString[0] === '-';
+  const absYearStr = isBcYear ? dateString.substr(1) : dateString;
+  const dateStringSegments = absYearStr.split(delimiter);
+  const dateValueSegments = dateStringSegments.map((s) => parseInt(s, 10));
 
-      if (!format) {
-        return null;
-      }
+  const absYear = getNumber(dateValueSegments[0]);
+  if (typeof absYear === 'undefined') {
+    throw new Error(`"${dateString}" is not a valid date string: year info missing.`);
+  }
 
-      // Use strict parsing to avoid unpredictable results. (`true` in the 3rd argument).
-      const $date = moment(dateString, format, true);
+  // Create a date object with all fields cleared out.
+  const date = getDateAtPrecision(new Date(), -1);
+  const year = isBcYear ? -absYear : absYear;
+  const month = getNumber(dateValueSegments[1], 1);
+  const day = getNumber(dateValueSegments[2], 1);
 
-      if (!$date.isValid()) {
-        return null;
-      }
+  date.setUTCFullYear(year);
+  date.setUTCMonth(month - 1);
+  date.setUTCDate(day);
 
-      const date = $date.toDate();
+  const dateAtPrecision = getDateAtPrecision(date, precision);
 
-      return date;
-    }
-)([
-  'YYYY',
-  'YYYY-MM',
-  'YYYY-MM-DD',
-]);
+  return dateAtPrecision;
+};
 
 /**
  * @param {number} precision
