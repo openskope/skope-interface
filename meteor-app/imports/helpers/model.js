@@ -380,20 +380,20 @@ function difference(object, base) {
  * Go through objects or arrays to find strings and convert them into numbers whenever possible.
  */
 export
-const stringToNumber = (value, postProcess = (x) => x) => {
-  let finalValue = value;
+const stringToNumber = (inputValue, postProcess = (x) => x) => {
+  let finalValue = inputValue;
 
-  switch (typeof value) {
+  switch (typeof inputValue) {
     case 'string':
-      if (!isNaN(value)) {
-        finalValue = parseFloat(value);
+      if (!isNaN(inputValue)) {
+        finalValue = parseFloat(inputValue);
       }
       break;
     case 'object':
-      if (Array.isArray(value)) {
-        finalValue = value.map((item) => stringToNumber(item, postProcess));
-      } else if (value !== null) {
-        finalValue = Object.entries(value).reduce((acc, [key, value]) => {
+      if (Array.isArray(inputValue)) {
+        finalValue = inputValue.map((item) => stringToNumber(item, postProcess));
+      } else if (inputValue !== null) {
+        finalValue = Object.entries(inputValue).reduce((acc, [key, value]) => {
           return {
             ...acc,
             [key]: stringToNumber(value, postProcess),
