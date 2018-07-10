@@ -24,17 +24,15 @@ import ExpandIcon from 'material-ui/svg-icons/navigation/expand-more';
 import CollapseIcon from 'material-ui/svg-icons/navigation/expand-less';
 
 import {
+  AllResolutionNames,
   getPrecisionByResolution,
   getDateStringAtPrecision,
-  parseDateStringWithPrecision,
-  buildGeoJsonWithGeometry,
-  AllResolutionNames,
-  stringToNumber,
-} from '/imports/ui/helpers';
-import {
   getDateAtPrecision,
   getDateStringSegments,
+  parseDateStringWithPrecision,
   clampDateWithinRange,
+  stringToNumber,
+  buildGeoJsonWithGeometry,
 } from '/imports/helpers/model';
 
 import ToggleButton from '/imports/ui/components/ToggleButton';
@@ -186,8 +184,8 @@ class DatasetWorkspace extends SuiteBaseClass {
 
       // Query date range is restricted by dataset date range.
       const dateRange = [
-        queryDateRange[0] < datasetDateRange[0] ? datasetDateRange[0] : queryDateRange[0],
-        queryDateRange[1] > datasetDateRange[1] ? datasetDateRange[1] : queryDateRange[1],
+        clampDateWithinRange(queryDateRange[0], ...datasetDateRange),
+        clampDateWithinRange(queryDateRange[1], ...datasetDateRange),
       ];
 
       return dateRange;
