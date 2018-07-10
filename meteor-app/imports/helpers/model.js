@@ -170,15 +170,10 @@ const getPrecisionByResolution = (
 
 /**
  * @param {Date} date
- * @param {number} precision
- * @returns {string}
+ * @returns {Array.<string>}
  */
 export
-const getDateStringAtPrecision = (date, precision, options = {}) => {
-  const {
-    delimiter = '-',
-  } = options;
-
+const getDateStringSegments = (date) => {
   const year = date.getUTCFullYear();
   const yearString = year < 0
     // For negative years, should pad to 6 digits, to conform to `toISOString`.
@@ -190,6 +185,22 @@ const getDateStringAtPrecision = (date, precision, options = {}) => {
     `${date.getUTCMonth() + 1}`.padStart(2, '0'),
     `${date.getUTCDate()}`.padStart(2, '0'),
   ];
+
+  return dateStringSegments;
+};
+
+/**
+ * @param {Date} date
+ * @param {number} precision
+ * @returns {string}
+ */
+export
+const getDateStringAtPrecision = (date, precision, options = {}) => {
+  const {
+    delimiter = '-',
+  } = options;
+
+  const dateStringSegments = getDateStringSegments(date);
 
   const necessarySegments = dateStringSegments.slice(0, precision + 1);
   const dateString = necessarySegments.join(delimiter);

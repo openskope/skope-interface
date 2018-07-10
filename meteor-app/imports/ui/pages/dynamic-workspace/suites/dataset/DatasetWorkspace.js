@@ -33,6 +33,7 @@ import {
 } from '/imports/ui/helpers';
 import {
   getDateAtPrecision,
+  getDateStringSegments,
   clampDateWithinRange,
 } from '/imports/helpers/model';
 
@@ -93,12 +94,6 @@ class DatasetWorkspace extends SuiteBaseClass {
 
     ...OverlayTab.defaultProps,
   };
-
-  static dateFormatForPrecisions = [
-    'YYYY',
-    'YYYY-MM',
-    'YYYY-MM-DD',
-  ];
 
   /**
    * @param {string} urlTemplate
@@ -923,9 +918,9 @@ class DatasetWorkspace extends SuiteBaseClass {
       visible: this.isSelectedVariable(layer.name),
       opacity: this.getVariableOpacity(layer.name),
     }, {
-      YYYY: () => moment(dateOfLayer).format('YYYY'),
-      MM: () => moment(dateOfLayer).format('MM'),
-      DD: () => moment(dateOfLayer).format('DD'),
+      YYYY: () => getDateStringSegments(dateOfLayer)[0],
+      MM: () => getDateStringSegments(dateOfLayer)[1],
+      DD: () => getDateStringSegments(dateOfLayer)[2],
     });
   };
 
@@ -945,9 +940,9 @@ class DatasetWorkspace extends SuiteBaseClass {
       ...layer,
       ...options,
     }, {
-      YYYY: () => moment(dateOfLayer).format('YYYY'),
-      MM: () => moment(dateOfLayer).format('MM'),
-      DD: () => moment(dateOfLayer).format('DD'),
+      YYYY: () => getDateStringSegments(dateOfLayer)[0],
+      MM: () => getDateStringSegments(dateOfLayer)[1],
+      DD: () => getDateStringSegments(dateOfLayer)[2],
     });
   };
 
