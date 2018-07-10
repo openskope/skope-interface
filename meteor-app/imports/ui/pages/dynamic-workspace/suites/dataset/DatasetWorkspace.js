@@ -160,6 +160,14 @@ class DatasetWorkspace extends SuiteBaseClass {
      * @type {[Date, Date]}
      */
     const initialDateRange = (() => {
+      /**
+       * Date range of the dataset.
+       * @type {[Date, Date]}
+       */
+      const datasetDateRange = [
+        this.timespan.period.gte,
+        this.timespan.period.lte,
+      ];
       const queryDateRange = [
         objectPath.get(searchQuery, 'timespan.min'),
         objectPath.get(searchQuery, 'timespan.max'),
@@ -177,20 +185,17 @@ class DatasetWorkspace extends SuiteBaseClass {
       });
       const isValidQueryDateRange = queryDateRange.every((date) => date !== null);
 
-      if (isValidQueryDateRange) {
-        return queryDateRange;
+      if (!isValidQueryDateRange) {
+        return datasetDateRange;
       }
 
-      /**
-       * Date range of the dataset.
-       * @type {[Date, Date]}
-       */
-      const datasetDateRange = [
-        this.timespan.period.gte,
-        this.timespan.period.lte,
+      // Query date range is restricted by dataset date range.
+      const dateRange = [
+        queryDateRange[0] < datasetDateRange[0] ? datasetDateRange[0] : queryDateRange[0],
+        queryDateRange[1] > datasetDateRange[1] ? datasetDateRange[1] : queryDateRange[1],
       ];
 
-      return datasetDateRange;
+      return dateRange;
     })();
 
     console.log('initialDateRange', initialDateRange);
