@@ -26,7 +26,7 @@ RUN cd "/usr/share/meteor-app/source" \
     && meteor npm install --production --unsafe-perm \
     && meteor build "/usr/share/meteor-app" --directory --architecture os.linux.x86_64
 
-FROM node:8.9.3-slim
+FROM node:8.11.3-slim
 LABEL maintainer="Xingchen Hong <hello@xc-h.com>"
 
 RUN apt-get update \
