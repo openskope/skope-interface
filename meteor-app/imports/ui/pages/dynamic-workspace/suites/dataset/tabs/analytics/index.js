@@ -32,9 +32,13 @@ import {
   BoxToolIcon,
 } from '/imports/ui/consts';
 import {
+  getPrecisionByResolution,
+  getDateStringAtPrecision,
   buildGeoJsonWithGeometry,
-  PatheticDataRequester,
   fillTemplateString,
+} from '/imports/helpers/model';
+import {
+  PatheticDataRequester,
 } from '/imports/ui/helpers';
 
 import TabComponent from '../../TabComponent';
@@ -260,6 +264,13 @@ class AnalyticsTab extends TabComponent {
   requestData = (payload, resolve, reject) => {
     console.log('AnalyticsTabContent.requestData', payload);
 
+    const {
+      variableName,
+      geometryOfDataBoundary,
+      dateRangeOfFocus,
+      dateResolution,
+    } = payload;
+
     // Clear existing data.
     this.setState({
       isLoadingTimeSeriesData: false,
@@ -270,34 +281,39 @@ class AnalyticsTab extends TabComponent {
       timeSeriesDataResponseDate: null,
     });
 
-    if (!(payload.variableName && payload.geometryOfDataBoundary && payload.dateRangeOfFocus)) {
+    if (![
+      variableName,
+      geometryOfDataBoundary,
+      dateRangeOfFocus,
+      dateResolution,
+    ].every(Boolean)) {
       console.log('Dependencies not met');
       return;
     }
 
-    const analytics = this.getAnalyticsByName(payload.variableName);
+    const datePrecision = getPrecisionByResolution(dateResolution);
+    const analytics = this.getAnalyticsByName(variableName);
     const requestBody = {};
     const remoteUrl = fillTemplateString(
       analytics.url,
       {
         LAT: () => {
-          if (payload.geometryOfDataBoundary.type === 'Point') {
-            return payload.geometryOfDataBoundary.coordinates[1];
+          if (geometryOfDataBoundary.type === 'Point') {
+            return geometryOfDataBoundary.coordinates[1];
           }
 
           return null;
         },
         LONG: () => {
-          if (payload.geometryOfDataBoundary.type === 'Point') {
-            return payload.geometryOfDataBoundary.coordinates[0];
+          if (geometryOfDataBoundary.type === 'Point') {
+            return geometryOfDataBoundary.coordinates[0];
           }
 
           return null;
         },
-        boundaryGeometry: payload.geometryOfDataBoundary,
-        //! Format these properly according to the temporal resolution of the dataset.
-        start: () => moment(payload.dateRangeOfFocus[0]).format('YYYY'),
-        end: () => moment(payload.dateRangeOfFocus[1]).format('YYYY'),
+        boundaryGeometry: geometryOfDataBoundary,
+        start: () => getDateStringAtPrecision(dateRangeOfFocus[0], datePrecision),
+        end: () => getDateStringAtPrecision(dateRangeOfFocus[1], datePrecision),
       },
       requestBody,
     );
@@ -382,6 +398,7 @@ class AnalyticsTab extends TabComponent {
           variableName={idOfTheSelectedVariable}
           geometryOfDataBoundary={geometryOfFocus}
           dateRangeOfFocus={dateRangeOfFocus}
+          dateResolution={dateResolution}
           requester={this.requestData}
           onReady={this.onDataReady}
           onError={this.onDataError}

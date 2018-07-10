@@ -1,5 +1,13 @@
 import _ from 'lodash';
-import moment from 'moment';
+
+export
+const getNumber = (value, defaultValue) => {
+  if (typeof value === 'number' && !isNaN(value)) {
+    return value;
+  }
+
+  return defaultValue;
+};
 
 /**
  * Make sure the filter value is correct.
@@ -43,31 +51,31 @@ const getDateAtPrecision = (
       }, date)
 )([
   {
-    handler: Date.prototype.setFullYear,
+    handler: Date.prototype.setUTCFullYear,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setMonth,
+    handler: Date.prototype.setUTCMonth,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setDate,
+    handler: Date.prototype.setUTCDate,
     zeroPoint: 1,
   },
   {
-    handler: Date.prototype.setHours,
+    handler: Date.prototype.setUTCHours,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setMinutes,
+    handler: Date.prototype.setUTCMinutes,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setSeconds,
+    handler: Date.prototype.setUTCSeconds,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setMilliseconds,
+    handler: Date.prototype.setUTCMilliseconds,
     zeroPoint: 0,
   },
 ]);
@@ -104,32 +112,32 @@ const offsetDateAtPrecision = (
     }
 )([
   {
-    setter: Date.prototype.setFullYear,
-    getter: Date.prototype.getFullYear,
+    setter: Date.prototype.setUTCFullYear,
+    getter: Date.prototype.getUTCFullYear,
   },
   {
-    setter: Date.prototype.setMonth,
-    getter: Date.prototype.getMonth,
+    setter: Date.prototype.setUTCMonth,
+    getter: Date.prototype.getUTCMonth,
   },
   {
-    setter: Date.prototype.setDate,
-    getter: Date.prototype.getDate,
+    setter: Date.prototype.setUTCDate,
+    getter: Date.prototype.getUTCDate,
   },
   {
-    setter: Date.prototype.setHours,
-    getter: Date.prototype.getHours,
+    setter: Date.prototype.setUTCHours,
+    getter: Date.prototype.getUTCHours,
   },
   {
-    setter: Date.prototype.setMinutes,
-    getter: Date.prototype.getMinutes,
+    setter: Date.prototype.setUTCMinutes,
+    getter: Date.prototype.getUTCMinutes,
   },
   {
-    setter: Date.prototype.setSeconds,
-    getter: Date.prototype.getSeconds,
+    setter: Date.prototype.setUTCSeconds,
+    getter: Date.prototype.getUTCSeconds,
   },
   {
-    setter: Date.prototype.setMilliseconds,
-    getter: Date.prototype.getMilliseconds,
+    setter: Date.prototype.setUTCMilliseconds,
+    getter: Date.prototype.getUTCMilliseconds,
   },
 ]);
 
@@ -161,68 +169,91 @@ const getPrecisionByResolution = (
 
 /**
  * @param {Date} date
+ * @returns {Array.<string>}
+ */
+export
+const getDateStringSegments = (date) => {
+  const year = date.getUTCFullYear();
+  const yearString = year < 0
+    // For negative years, should pad to 6 digits, to conform to `toISOString`.
+    ? `-${String(-year).padStart(6, '0')}`
+    : `${year}`.padStart(4, '0');
+
+  const dateStringSegments = [
+    yearString,
+    `${date.getUTCMonth() + 1}`.padStart(2, '0'),
+    `${date.getUTCDate()}`.padStart(2, '0'),
+  ];
+
+  return dateStringSegments;
+};
+
+/**
+ * @param {Date} date
  * @param {number} precision
- * @param {Array<string>} customFormats
  * @returns {string}
  */
 export
-const getDateStringAtPrecision = (
-  (dateFormatForPrecisions) =>
-    (date, precision, customFormats) => {
-      if (!date) {
-        return '';
-      }
+const getDateStringAtPrecision = (date, precision, options = {}) => {
+  const {
+    delimiter = '-',
+  } = options;
 
-      const dateAtPrecision = getDateAtPrecision(date, precision);
-      const dateTemplateAtPrecision = (customFormats || dateFormatForPrecisions)[precision];
+  const dateStringSegments = getDateStringSegments(date);
 
-      return moment(dateAtPrecision).format(dateTemplateAtPrecision);
-    }
-)([
-  'YYYY',
-  'MMM YYYY',
-  'MMM Do YYYY',
-  'MMM Do YYYY, h a',
-  'MMM Do YYYY, h:m a',
-  'MMM Do YYYY, h:m:s a',
-]);
+  const necessarySegments = dateStringSegments.slice(0, precision + 1);
+  const dateString = necessarySegments.join(delimiter);
+
+  return dateString;
+};
 
 /**
+ * Parse the given string to a date at a specific precision.
+ * This assumes the input conforms to the format `year-month-day`.
+ * No segments are required to be padded to full length.
+ *
+ * Extra information contained in the date string will be discarded.
+ * For example, parsing "2345-6-7" at monthly resolution will yield "2345-6".
+ *
+ * On the other hand, missing information will be filled with default values,
+ * whenever possible.
+ * For example, parsing "2345-6" at daily resolution will yield "2345-6-1".
+ * However, year can not be omitted, since there is no suitable default value.
+ *
  * @param {string} dateString
  * @param {number} precision
- * @param {Array<string>} customFormats
  * @returns {Date}
  */
 export
-const parseDateStringWithPrecision = (
-  (dateStringFormatForPrecisions) =>
-    (dateString, precision, customFormats) => {
-      if (!dateString) {
-        return null;
-      }
+const parseDateStringWithPrecision = (dateString, precision, options = {}) => {
+  const {
+    delimiter = '-',
+  } = options;
 
-      const format = (customFormats || dateStringFormatForPrecisions)[precision];
+  const isBcYear = dateString[0] === '-';
+  const absYearStr = isBcYear ? dateString.substr(1) : dateString;
+  const dateStringSegments = absYearStr.split(delimiter);
+  const dateValueSegments = dateStringSegments.map((s) => parseInt(s, 10));
 
-      if (!format) {
-        return null;
-      }
+  const absYear = getNumber(dateValueSegments[0]);
+  if (typeof absYear === 'undefined') {
+    throw new Error(`"${dateString}" is not a valid date string: year info missing.`);
+  }
 
-      // Use strict parsing to avoid unpredictable results. (`true` in the 3rd argument).
-      const $date = moment(dateString, format, true);
+  // Create a date object with all fields cleared out.
+  const date = getDateAtPrecision(new Date(), -1);
+  const year = isBcYear ? -absYear : absYear;
+  const month = getNumber(dateValueSegments[1], 1);
+  const day = getNumber(dateValueSegments[2], 1);
 
-      if (!$date.isValid()) {
-        return null;
-      }
+  date.setUTCFullYear(year);
+  date.setUTCMonth(month - 1);
+  date.setUTCDate(day);
 
-      const date = $date.toDate();
+  const dateAtPrecision = getDateAtPrecision(date, precision);
 
-      return date;
-    }
-)([
-  'YYYY',
-  'YYYY-MM',
-  'YYYY-MM-DD',
-]);
+  return dateAtPrecision;
+};
 
 /**
  * @param {number} precision
@@ -266,13 +297,6 @@ const buildGeoJsonWithGeometry = (geometry) => {
     ],
   };
 };
-
-/**
- * @param {Date} date
- * @return {string}
- */
-export
-const getYearStringFromDate = (date) => getDateStringAtPrecision(date, 0);
 
 const placeholderGlobalFindPattern = /\{([a-z-_][a-z0-9-_]*)\}/gim;
 const placeholderPattern = /\{([a-z-_][a-z0-9-_]*)\}/i;
@@ -366,20 +390,20 @@ function difference(object, base) {
  * Go through objects or arrays to find strings and convert them into numbers whenever possible.
  */
 export
-const stringToNumber = (value, postProcess = (x) => x) => {
-  let finalValue = value;
+const stringToNumber = (inputValue, postProcess = (x) => x) => {
+  let finalValue = inputValue;
 
-  switch (typeof value) {
+  switch (typeof inputValue) {
     case 'string':
-      if (!isNaN(value)) {
-        finalValue = parseFloat(value);
+      if (!isNaN(inputValue)) {
+        finalValue = parseFloat(inputValue);
       }
       break;
     case 'object':
-      if (Array.isArray(value)) {
-        finalValue = value.map((item) => stringToNumber(item, postProcess));
-      } else if (value !== null) {
-        finalValue = Object.entries(value).reduce((acc, [key, value]) => {
+      if (Array.isArray(inputValue)) {
+        finalValue = inputValue.map((item) => stringToNumber(item, postProcess));
+      } else if (inputValue !== null) {
+        finalValue = Object.entries(inputValue).reduce((acc, [key, value]) => {
           return {
             ...acc,
             [key]: stringToNumber(value, postProcess),

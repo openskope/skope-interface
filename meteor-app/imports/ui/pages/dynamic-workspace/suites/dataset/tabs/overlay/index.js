@@ -32,7 +32,6 @@ import {
 } from '/imports/ui/consts';
 
 import {
-  getYearStringFromDate,
   offsetDateAtPrecision,
   buildGeoJsonWithGeometry,
 } from '/imports/ui/helpers';
@@ -324,13 +323,15 @@ class OverlayTab extends TabComponent {
       workspace,
       workspace: {
         hasSelectedVariable,
+        timespan,
         dateRangeOfFocus: [
           dateRangeStart,
           dateRangeEnd,
         ],
         getSliderValueFromDate,
         getDateFromSliderValue,
-        getDateFromYearStringInput,
+        getInputValueFromDate,
+        getDateFromInputValue,
       },
     } = this.props;
     const {
@@ -339,7 +340,7 @@ class OverlayTab extends TabComponent {
 
     return (
       <SliderWithInput
-        label="Date (year):"
+        label={`Date (${timespan.resolution}):`}
         min={dateRangeStart}
         max={dateRangeEnd}
         value={animatedCopyOfDateOfTheCurrentlyDisplayedFrame}
@@ -349,9 +350,9 @@ class OverlayTab extends TabComponent {
         // (number) => Date
         fromSliderValue={getDateFromSliderValue}
         // (Date) => string
-        toInputValue={getYearStringFromDate}
+        toInputValue={getInputValueFromDate}
         // (string) => Date
-        fromInputValue={getDateFromYearStringInput}
+        fromInputValue={getDateFromInputValue}
         onChange={(event, date) => this.setState({ animatedCopyOfDateOfTheCurrentlyDisplayedFrame: date })}
         onFinish={(event, date) => workspace.dateOfTheCurrentlyDisplayedFrame = date}
         style={{
@@ -371,9 +372,9 @@ class OverlayTab extends TabComponent {
           ],
         }}
         inputProps={{
-          type: 'number',
-          min: getYearStringFromDate(dateRangeStart),
-          max: getYearStringFromDate(dateRangeEnd),
+          type: 'text',
+          min: getInputValueFromDate(dateRangeStart),
+          max: getInputValueFromDate(dateRangeEnd),
         }}
       />
     );
