@@ -51,31 +51,31 @@ const getDateAtPrecision = (
       }, date)
 )([
   {
-    handler: Date.prototype.setUTCFullYear,
+    handler: Date.prototype.setFullYear,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setUTCMonth,
+    handler: Date.prototype.setMonth,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setUTCDate,
+    handler: Date.prototype.setDate,
     zeroPoint: 1,
   },
   {
-    handler: Date.prototype.setUTCHours,
+    handler: Date.prototype.setHours,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setUTCMinutes,
+    handler: Date.prototype.setMinutes,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setUTCSeconds,
+    handler: Date.prototype.setSeconds,
     zeroPoint: 0,
   },
   {
-    handler: Date.prototype.setUTCMilliseconds,
+    handler: Date.prototype.setMilliseconds,
     zeroPoint: 0,
   },
 ]);
@@ -112,32 +112,32 @@ const offsetDateAtPrecision = (
     }
 )([
   {
-    setter: Date.prototype.setUTCFullYear,
-    getter: Date.prototype.getUTCFullYear,
+    setter: Date.prototype.setFullYear,
+    getter: Date.prototype.getFullYear,
   },
   {
-    setter: Date.prototype.setUTCMonth,
-    getter: Date.prototype.getUTCMonth,
+    setter: Date.prototype.setMonth,
+    getter: Date.prototype.getMonth,
   },
   {
-    setter: Date.prototype.setUTCDate,
-    getter: Date.prototype.getUTCDate,
+    setter: Date.prototype.setDate,
+    getter: Date.prototype.getDate,
   },
   {
-    setter: Date.prototype.setUTCHours,
-    getter: Date.prototype.getUTCHours,
+    setter: Date.prototype.setHours,
+    getter: Date.prototype.getHours,
   },
   {
-    setter: Date.prototype.setUTCMinutes,
-    getter: Date.prototype.getUTCMinutes,
+    setter: Date.prototype.setMinutes,
+    getter: Date.prototype.getMinutes,
   },
   {
-    setter: Date.prototype.setUTCSeconds,
-    getter: Date.prototype.getUTCSeconds,
+    setter: Date.prototype.setSeconds,
+    getter: Date.prototype.getSeconds,
   },
   {
-    setter: Date.prototype.setUTCMilliseconds,
-    getter: Date.prototype.getUTCMilliseconds,
+    setter: Date.prototype.setMilliseconds,
+    getter: Date.prototype.getMilliseconds,
   },
 ]);
 
@@ -173,7 +173,7 @@ const getPrecisionByResolution = (
  */
 export
 const getDateStringSegments = (date) => {
-  const year = date.getUTCFullYear();
+  const year = date.getFullYear();
   const yearString = year < 0
     // For negative years, should pad to 6 digits, to conform to `toISOString`.
     ? `-${String(-year).padStart(6, '0')}`
@@ -181,8 +181,8 @@ const getDateStringSegments = (date) => {
 
   const dateStringSegments = [
     yearString,
-    `${date.getUTCMonth() + 1}`.padStart(2, '0'),
-    `${date.getUTCDate()}`.padStart(2, '0'),
+    `${date.getMonth() + 1}`.padStart(2, '0'),
+    `${date.getDate()}`.padStart(2, '0'),
   ];
 
   return dateStringSegments;
@@ -246,9 +246,9 @@ const parseDateStringWithPrecision = (dateString, precision, options = {}) => {
   const month = getNumber(dateValueSegments[1], 1);
   const day = getNumber(dateValueSegments[2], 1);
 
-  date.setUTCFullYear(year);
-  date.setUTCMonth(month - 1);
-  date.setUTCDate(day);
+  date.setFullYear(year);
+  date.setMonth(month - 1);
+  date.setDate(day);
 
   const dateAtPrecision = getDateAtPrecision(date, precision);
 

@@ -117,8 +117,8 @@ export default class SearchPage extends React.Component {
                 'timespan.period',
               ]}
               relation="intersects"
-              min={moment.utc('0001', 'YYYY').toDate()}
-              max={moment.utc().toDate()}
+              min={moment('0001', 'YYYY').toDate()}
+              max={moment().toDate()}
               title="Time Period"
             />
 
