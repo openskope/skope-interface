@@ -43,6 +43,11 @@ class AnalyticsChart extends React.Component {
     onRenderEnd: NOOP,
   };
 
+  static tickMarkFormatsPerResolution = {
+    year: '%Y',
+    month: '%Y-%m',
+  };
+
   constructor (props) {
     super(props);
 
@@ -205,6 +210,7 @@ class AnalyticsChart extends React.Component {
       temporalResolution,
     } = this.props;
     const dataUncertaintyValues = this.dataUncertaintyValues;
+    const tickMarkFormat = AnalyticsChart.tickMarkFormatsPerResolution[temporalResolution];
     const plotData = this.getPlotData();
     const plotLayout = {
       // title: `${data.datasetId}`,
@@ -223,6 +229,8 @@ class AnalyticsChart extends React.Component {
       },
       xaxis: {
         title: `Date (${temporalResolution})`,
+        // tickformat: tickMarkFormat,
+        hoverformat: tickMarkFormat,
       },
     };
     const plotConfig = {
