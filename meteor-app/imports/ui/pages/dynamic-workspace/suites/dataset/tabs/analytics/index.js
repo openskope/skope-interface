@@ -141,7 +141,10 @@ class AnalyticsTab extends TabComponent {
             level: 'warn',
             message: 'The server took too long to respond. Please try again or select a smaller area.',
           };
-        case objectPath.get(error, 'originalError.response.data.message') === 'Coordinates are outside region covered by the dataset':
+        case [
+          'Coordinates are outside region covered by the dataset',
+          'The selected area does not overlap the region covered by the dataset',
+        ].includes(objectPath.get(error, 'originalError.response.data.message')):
           return {
             level: 'info',
             message: 'Please select a point or area within the dataset boundary.',
