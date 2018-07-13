@@ -7,7 +7,7 @@ import Plotly from 'plotly.js/dist/plotly';
 import Toggle from 'material-ui/Toggle';
 
 import {
-  dataChartShowUncertantyByDefault,
+  dataChartShowUncertaintyByDefault,
 } from '/imports/ui/consts';
 
 import {
@@ -47,7 +47,7 @@ class AnalyticsChart extends React.Component {
     super(props);
 
     this.state = {
-      displayDataUncertaintyValues: dataChartShowUncertantyByDefault,
+      displayDataUncertaintyValues: dataChartShowUncertaintyByDefault,
     };
 
     this._graphDiv = null;
