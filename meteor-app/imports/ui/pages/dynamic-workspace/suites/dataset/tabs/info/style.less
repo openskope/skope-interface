@@ -1,16 +1,15 @@
 .dataset__info-tab {
   .two-column-layout();
 
-  width: 100%;
-  height: 100%;
-
   & > .info__markdown {
     .two-column-layout > .left;
     .two-column-layout > .top-layer;
-    .markdown-container;
+    .markdown-container();
   }
   & > .info__map {
     .two-column-layout > .right;
     .two-column-layout > .bottom-layer;
+
+    overflow: hidden;
   }
 }

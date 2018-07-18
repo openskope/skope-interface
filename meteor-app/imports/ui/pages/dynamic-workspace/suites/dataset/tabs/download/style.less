@@ -1,8 +1,5 @@
 .dataset__download-tab {
-  .two-column-layout;
-
-  width: 100%;
-  height: 100%;
+  .two-column-layout();
 
   & > .download__controls {
     .two-column-layout > .left;
@@ -11,11 +8,6 @@
   & > .download__markdown {
     .two-column-layout > .right;
     .two-column-layout > .bottom-layer;
-    .markdown-container;
-  }
-
-  .download__controls {
-    overflow-x: hidden;
-    overflow-y: auto;
+    .markdown-container();
   }
 }

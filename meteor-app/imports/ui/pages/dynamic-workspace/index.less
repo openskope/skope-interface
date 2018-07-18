@@ -7,13 +7,21 @@
 
   .two-column-layout() {
     .flex-row;
+    width: 100%;
+    height: 100%;
 
     & > .left {
       width: 50%;
       max-width: 600px;
+
+      overflow-x: hidden;
+      overflow-y: scroll;
     }
     & > .right {
       .layout-fill;
+
+      overflow-x: hidden;
+      overflow-y: scroll;
     }
 
     & > .full {
@@ -30,8 +38,6 @@
   }
   .markdown-container() {
     padding: 15px;
-    overflow-x: hidden;
-    overflow-y: auto;
   }
 
   & > .suite-wrapper {
