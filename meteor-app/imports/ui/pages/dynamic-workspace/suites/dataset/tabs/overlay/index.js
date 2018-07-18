@@ -18,9 +18,7 @@ import PlayIcon from 'material-ui/svg-icons/av/play-arrow';
 import PauseIcon from 'material-ui/svg-icons/av/pause';
 import ToStartIcon from 'material-ui/svg-icons/av/skip-previous';
 import ToEndIcon from 'material-ui/svg-icons/av/skip-next';
-import {
-  SliderWithInput,
-} from '/imports/ui/components/SliderWithInput';
+import store from 'store';
 
 import {
   DatasetMapIcon,
@@ -29,6 +27,7 @@ import {
   presentationProjection,
   maxMapZoomLevel,
   minMapZoomLevel,
+  baseMaps,
 } from '/imports/ui/consts';
 
 import {
@@ -36,6 +35,9 @@ import {
   buildGeoJsonWithGeometry,
 } from '/imports/ui/helpers';
 
+import {
+  SliderWithInput,
+} from '/imports/ui/components/SliderWithInput';
 import MapView from '/imports/ui/components/mapview';
 
 import TabComponent from '../../TabComponent';
@@ -87,6 +89,8 @@ class OverlayTab extends TabComponent {
       },
     } = props;
 
+    const storedBaseMapIndex = store.get('workspace.overlay.baseMapIndex');
+
     this._detailMap = null;
 
     this.state = {
@@ -95,6 +99,8 @@ class OverlayTab extends TabComponent {
       // @type {boolean}
       isPlaying: false,
       animationTimer: null,
+      // @type {number}
+      baseMapIndex: typeof storedBaseMapIndex === 'undefined' ? 0 : storedBaseMapIndex,
     };
   }
 
@@ -254,6 +260,13 @@ class OverlayTab extends TabComponent {
     workspace.dateOfTheCurrentlyDisplayedFrame = offsetDateAtPrecision(workspace.dateOfTheCurrentlyDisplayedFrame, workspace.temporalPrecision, amount);
   }
 
+  setActiveBaseMap (newIndex) {
+    store.set('workspace.overlay.baseMapIndex', newIndex);
+    this.setState({
+      baseMapIndex: newIndex,
+    });
+  }
+
   renderAnimationControls () {
     const {
       workspace: {
@@ -380,6 +393,49 @@ class OverlayTab extends TabComponent {
     );
   }
 
+  renderBaseMapLayerAndSelector () {
+    const {
+      workspace: {
+        renderBaseMapLayer,
+      },
+    } = this.props;
+    const {
+      baseMapIndex,
+    } = this.state;
+    const validBaseMapIndex = Math.max(Math.min(baseMapIndex, baseMaps.length - 1), 0);
+
+    return (
+      <React.Fragment>
+        {baseMaps.length > 0 && renderBaseMapLayer(baseMaps[validBaseMapIndex])}
+
+        {baseMaps.length > 0 && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '5px',
+              left: '50px',
+              pointerEvents: 'auto',
+            }}
+          >
+            <select
+              value={validBaseMapIndex}
+              onChange={(event) => this.setActiveBaseMap(event.target.value)}
+            >
+              {baseMaps.map((baseMap, index) => (
+                <option
+                  key={index}
+                  value={index}
+                >
+                  {baseMap.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </React.Fragment>
+    );
+  }
+
   render () {
     const {
       workspace: {
@@ -422,7 +478,6 @@ class OverlayTab extends TabComponent {
         >
           <MapView
             className="mapview"
-            basemap="arcgis"
             projection={presentationProjection}
             extent={focusExtent}
             ref={(ref) => this._detailMap = ref}
@@ -430,6 +485,8 @@ class OverlayTab extends TabComponent {
             <map-interaction-defaults />
             <map-control-defaults />
             <map-control-mouse-position slot="right-dock" />
+
+            {this.renderBaseMapLayerAndSelector()}
 
             {hasSelectedVariable && renderMapLayerForSelectedVariable({
               legend: true,

@@ -46,13 +46,14 @@
     "redux": "^3.7.2",
     "redux-form": "^7.2.0",
     "searchkit": "^2.3.0",
+    "store": "^2.0.12",
     "uuid": "^3.1.0",
     "whatwg-fetch": "^2.0.4"
   },
   "devDependencies": {
     "@meteorjs/eslint-config-meteor": "^1.0.5",
     "babel-eslint": "^7.2.3",
-    "eslint": "^3.19.0",
+    "eslint": "^4.19.1",
     "eslint-config-airbnb": "^15.1.0",
     "eslint-import-resolver-meteor": "^0.4.0",
     "eslint-plugin-import": "^2.8.0",

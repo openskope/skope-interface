@@ -899,12 +899,17 @@ class DatasetWorkspace extends SuiteBaseClass {
    * @param {Object} layer
    */
   renderMapLayer = (layer) => {
-    if (!(layer.type in mapLayerRenderers)) {
-      console.warn(`Unknown layer type “${layer.type}” for layer “${layer.name}”`);
+    const {
+      type: layerType,
+      name: layerName,
+    } = layer;
+
+    if (!(layerType in mapLayerRenderers)) {
+      console.warn(`Unknown layer type “${layerType}” for layer “${layerName}”`);
       return null;
     }
 
-    const renderer = mapLayerRenderers[layer.type];
+    const renderer = mapLayerRenderers[layerType];
     // @type {Date}
     const dateOfLayer = (typeof this.dateOfTheCurrentlyDisplayedFrame === 'undefined' || this.dateOfTheCurrentlyDisplayedFrame === null)
                         ? this.timespan.period.gte
@@ -913,8 +918,8 @@ class DatasetWorkspace extends SuiteBaseClass {
     return renderer.call(this, {
       ...layer,
       extent: this.extentOfDataBoundary,
-      visible: this.isSelectedVariable(layer.name),
-      opacity: this.getVariableOpacity(layer.name),
+      visible: this.isSelectedVariable(layerName),
+      opacity: this.getVariableOpacity(layerName),
     }, {
       YYYY: () => getDateStringSegments(dateOfLayer)[0],
       MM: () => getDateStringSegments(dateOfLayer)[1],
@@ -923,12 +928,17 @@ class DatasetWorkspace extends SuiteBaseClass {
   };
 
   renderMapLayerLegend = (layer, options = {}) => {
-    if (!(layer.type in mapLayerLegendRenderers)) {
-      console.warn(`Unknown layer type “${layer.type}” for layer “${layer.name}”`);
+    const {
+      type: layerType,
+      name: layerName,
+    } = layer;
+
+    if (!(layerType in mapLayerLegendRenderers)) {
+      console.warn(`Unknown layer type “${layerType}” for layer “${layerName}”`);
       return null;
     }
 
-    const renderer = mapLayerLegendRenderers[layer.type];
+    const renderer = mapLayerLegendRenderers[layerType];
     // @type {Date}
     const dateOfLayer = (typeof this.dateOfTheCurrentlyDisplayedFrame === 'undefined' || this.dateOfTheCurrentlyDisplayedFrame === null)
                         ? this.timespan.period.gte
@@ -941,6 +951,25 @@ class DatasetWorkspace extends SuiteBaseClass {
       YYYY: () => getDateStringSegments(dateOfLayer)[0],
       MM: () => getDateStringSegments(dateOfLayer)[1],
       DD: () => getDateStringSegments(dateOfLayer)[2],
+    });
+  };
+
+  renderBaseMapLayer = (layer) => {
+    const {
+      type: layerType,
+      name: layerName,
+    } = layer;
+
+    if (!(layerType in mapLayerRenderers)) {
+      console.warn(`Unknown layer type “${layerType}” for layer “${layerName}”`);
+      return null;
+    }
+
+    const renderer = mapLayerRenderers[layerType];
+
+    return renderer.call(this, {
+      ...layer,
+      visible: true,
     });
   };
 

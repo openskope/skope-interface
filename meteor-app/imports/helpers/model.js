@@ -361,7 +361,7 @@ const fillTemplateStringSegment = (templateString, matchedString, fillers, dataS
  */
 export
 const fillTemplateString = (templateString, fillers, dataStore) => {
-  if (!templateString) {
+  if (!templateString || !fillers) {
     return templateString;
   }
 

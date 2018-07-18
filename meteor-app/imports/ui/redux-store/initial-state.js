@@ -1,8 +1,3 @@
-import {
-  rangeMin,
-  rangeMax,
-} from '/imports/ui/consts';
-
 export default {
 
   // The current path from the router.
@@ -45,27 +40,5 @@ export default {
     // Namespace for any state the dynamic suite needs to store.
     // This should be reset whenever a new suite is used.
     DynamicSuiteNS: null,
-  },
-
-  model: {
-    // Whether a point is selected for inspection.
-    inspectPointSelected: false,
-    // If a point is selected for inspection, this would be its coordinates in [long, lat] (this order).
-    inspectPointCoordinate: [0, 0],
-
-    mapShown: false,
-    predictionYears: rangeMax,
-    meanVar: '',
-    minWidth: 0,
-  },
-
-  charts: {
-    // If a point is selected for inspection, the loaded data will be stored here.
-    inspectPointData: null,
-    // If a request is pending, this will be an object with at least a unique request ID.
-    inspectPointDataRequest: null,
-
-    filterMin: rangeMin,
-    filterMax: rangeMax,
   },
 };

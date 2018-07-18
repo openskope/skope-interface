@@ -101,8 +101,10 @@ export const maxMapZoomLevel = objectPath.get(Meteor.settings, 'public.maxMapZoo
  */
 export const minMapZoomLevel = objectPath.get(Meteor.settings, 'public.minMapZoomLevel', 3);
 
-export const rangeMin = 1;
-export const rangeMax = 2000;
+/**
+ * @type {Array.<{name: string, title: string, type: string, url: string}>}
+ */
+export const baseMaps = objectPath.get(Meteor.settings, 'public.baseMaps', []);
 
 export const DatasetInfoIcon = InfoIcon;
 export const DatasetDownloadIcon = DownloadIcon;
