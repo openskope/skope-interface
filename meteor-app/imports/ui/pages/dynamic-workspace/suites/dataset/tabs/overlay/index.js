@@ -408,7 +408,7 @@ class OverlayTab extends TabComponent {
       <React.Fragment>
         {baseMaps.length > 0 && renderBaseMapLayer(baseMaps[validBaseMapIndex])}
 
-        {baseMaps.length > 0 && (
+        {baseMaps.length > 1 && (
           <div
             style={{
               position: 'absolute',
