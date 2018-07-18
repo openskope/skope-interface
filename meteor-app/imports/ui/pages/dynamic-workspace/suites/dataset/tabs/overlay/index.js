@@ -84,6 +84,7 @@ class OverlayTab extends TabComponent {
     super(props);
 
     const {
+      skopeid,
       workspace: {
         dateOfTheCurrentlyDisplayedFrame,
       },
@@ -101,6 +102,8 @@ class OverlayTab extends TabComponent {
       animationTimer: null,
       // @type {number}
       baseMapIndex: typeof storedBaseMapIndex === 'undefined' ? 0 : storedBaseMapIndex,
+      //! Temporary fix.
+      disableContinuousPlayback: skopeid === 'prism-climate-data',
     };
   }
 
@@ -273,6 +276,9 @@ class OverlayTab extends TabComponent {
         hasSelectedVariable,
       },
     } = this.props;
+    const {
+      disableContinuousPlayback,
+    } = this.state;
 
     return (
       <Toolbar
@@ -299,16 +305,33 @@ class OverlayTab extends TabComponent {
               marginRight: '10px',
             }}
           />
-          <FlatButton
-            label={this.isPlaying ? 'Pause' : 'Play'}
-            icon={this.isPlaying ? <PauseIcon /> : <PlayIcon />}
-            disabled={!hasSelectedVariable}
-            onClick={this.onClickPlayButton}
-            style={{
-              width: '6.5em',
-              margin: false,
-            }}
-          />
+          {disableContinuousPlayback
+            ? (
+              <FlatButton
+                label="Play"
+                icon={<PlayIcon />}
+                disabled
+                style={{
+                  width: '6.5em',
+                  margin: false,
+                }}
+                title="Continuous playback disabled for this dataset."
+              />
+            )
+            : (
+              <FlatButton
+                label={this.isPlaying ? 'Pause' : 'Play'}
+                icon={this.isPlaying ? <PauseIcon /> : <PlayIcon />}
+                disabled={!hasSelectedVariable}
+                onClick={this.onClickPlayButton}
+                style={{
+                  width: '6.5em',
+                  margin: false,
+                }}
+              />
+            )
+          }
+
           <ToolbarSeparator
             style={{
               marginLeft: '10px',
