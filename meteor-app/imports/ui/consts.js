@@ -46,7 +46,7 @@ export const showBetaSign = objectPath.get(Meteor.settings, 'public.showBetaSign
  * If endpoint is not found in settings, use default localhost elastic.
  * @type {string}
  */
-export const clientElasticEndpoint = url.resolve(Meteor.absoluteUrl(), objectPath.get(Meteor.settings, 'public.elasticEndpoint', 'http://localhost:9200/'));
+export const clientElasticEndpoint = '/es' // url.resolve(Meteor.absoluteUrl(), objectPath.get(Meteor.settings, 'public.elasticEndpoint', 'http://localhost:9200/'));
 
 /**
  * @type {boolean}
