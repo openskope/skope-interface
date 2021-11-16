@@ -1,6 +1,8 @@
 # SKOPE Web App
 
-The app is deployed at http://staging.openskope.org/app.
+** ARCHIVED **
+
+This repository and UI for SKOPE web services has been deprecated in favor of a new version developed at https://github.com/openskope/skopeui 
 
 ## To develop the app locally
 
